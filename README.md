@@ -40,3 +40,42 @@ npx prettier --write .
 ```
 
 VSCode 등 IDE의 포맷 기능과 연동해 자동 정렬도 가능합니다.
+
+---
+
+## 폴더 구조 및 클린 아키텍처(2025-10-30 기준)
+
+```
+livbee-project/
+  └── src/
+      ├── app/
+      ├── assets/
+      │    └── react.svg
+      ├── data/
+      │    ├── mappers/
+      │    ├── repositories/
+      │    └── sources/
+      ├── domain/
+      │    ├── entities/
+      │    └── usecases/
+      ├── presentation/
+      │    ├── components/
+      │    │    └── Home.tsx
+      │    ├── hooks/
+      │    ├── pages/
+      │    └── styles/
+      │         └── Home.css
+      ├── shared/
+      ├── App.css
+      ├── App.tsx
+      ├── index.css
+      └── main.tsx
+```
+
+> 📚 **클린 아키텍처 구조 설명**
+> - app: 환경설정, 진입점, 라우터 등 전체 앱 부트스트랩/구성 담당
+> - assets: 이미지, 폰트 등의 정적 리소스
+> - data: 외부 데이터 소스(API, DB 등)와 관련된 계층
+> - domain: 핵심 비즈니스 로직, 엔티티, 유스케이스(순수함수 중심)
+> - presentation: UI 컴포넌트, 페이지, 훅, 스타일 등 표현(뷰) 계층
+> - shared: 공통 유틸, 타입, 상수 등 여러 계층에서 공유되는 코드
