@@ -4,6 +4,8 @@ import ShoppingLiveSection from './home/ShoppingLiveSection';
 import BrandPickSection from './home/BrandPickSection';
 import LivbeeNewsSection from './home/LivbeeNewsSection';
 import HowShowhostSection from './home/HowShowhostSection';
+import ConceptModelSection from './home/ConceptModelSection';
+import HotClipSection from './home/HotClipSection';
 
 // (유지) 스크롤바 숨기기 클래스를 위해 import
 import '../styles/global.css';
@@ -32,6 +34,12 @@ const Home: React.FC = () => {
 
       {/* "이런 쇼호스트는 어떠세요?" 섹션 */}
       <HowShowhostSection />
+
+      {/* "컨셉에 맞는 모델찾기" 섹션 */}
+      <ConceptModelSection />
+
+      {/* "HOT CLIP" 섹션 */}
+      <HotClipSection />
     </div>
   );
 };
