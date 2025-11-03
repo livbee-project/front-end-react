@@ -48,3 +48,16 @@ body {
   margin-right: auto;
   box-sizing: border-box;
 }
+
+/* --- (추가) 스크롤바 숨기기 유틸리티 클래스 --- */
+.hide-scrollbar {
+  /* Firefox */
+  scrollbar-width: none;
+  /* IE, Edge */
+  -ms-overflow-style: none;
+}
+
+/* Chrome, Safari, Opera 등 WebKit 기반 브라우저 */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* 스크롤바를 숨김 */
+}
