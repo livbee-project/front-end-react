@@ -2,6 +2,8 @@ import React from 'react';
 // (추가) 공통 컴포넌트 import
 import SectionContainer from '../components/SectionContainer';
 import RecruitCard from '../components/RecruitCard';
+import DividedList from '../components/DividedList';
+import DividedListItem from '../components/DividedListItem';
 // (유지) 스크롤바 숨기기 클래스를 위해 import
 import '../styles/global.css';
 
@@ -13,6 +15,12 @@ import '../styles/global.css';
 const Home: React.FC = () => {
   // 가로 스크롤 리스트를 시연하기 위한 임시 데이터
   const shoppingLiveItems = [1, 2, 3, 4, 5];
+
+  // (추가) "라이비 뉴스" 섹션을 위한 임시 데이터
+  const newsItems = [
+    { id: 1, title: '라이비, 2025년 상반기 파트너사 모집', time: '5분 전', content: '브랜드와 쇼호스트를 위한 새로운...' },
+    { id: 2, title: '새로운 기능 업데이트 안내 (v1.2)', time: '3일 전', content: '스튜디오 예약 기능이 추가되었습니다...' },
+  ];
 
   // (수정) React.FC 반환 타입에 맞게 <></> (Fragment) 대신
   // 최상위 <div className="app-container">로 변경합니다.
@@ -129,7 +137,7 @@ const Home: React.FC = () => {
         </div>
       </SectionContainer>
 
-     {/* --- (추가) "브랜드 픽" 섹션 --- */}
+      {/* --- (추가) "브랜드 픽" 섹션 --- */}
       {/*
         "브랜드 픽" 섹션도 동일하게 SectionContainer로 감싸줍니다.
       */}
@@ -223,7 +231,80 @@ const Home: React.FC = () => {
           ))}
         </div>
       </SectionContainer>
-      {/* --- "브랜드 픽" 섹션 종료 --- */}
+      
+
+      <SectionContainer
+        title="라이비 뉴스"
+        onMorePressed={() => console.log('라이비 뉴스 더보기 클릭')}
+      >
+        {/*
+          Flutter 원본의 Padding(horizontal: 10)을 적용합니다.
+        */}
+        <div style={{ padding: '0 10px' }}>
+          {/*
+            새로 만든 DividedList 컴포넌트를 사용합니다.
+          */}
+          <DividedList>
+            {/*
+              임시 newsItems 데이터를 map으로 순회하며
+              DividedListItem 컴포넌트를 렌더링합니다.
+            */}
+            {newsItems.map((news) => (
+              <DividedListItem
+                key={news.id}
+                onTap={() => console.log(`뉴스 ${news.id} 클릭`)}
+              >
+                {/*
+                  Flutter 원본의 Column 구조를
+                  flex-direction: column으로 구현합니다.
+                */}
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    gap: 8, // Flutter 원본(SizedBox(height: 8))
+                  }}
+                >
+                  {/* 1. 뉴스 제목 */}
+                  <span
+                    style={{
+                      fontWeight: 700,
+                      fontSize: 'var(--h3)', // 16px (React 기준)
+                      color: 'var(--black)',
+                      // (추가) 말줄임표 스타일
+                      width: '100%',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {news.title}
+                  </span>
+
+                  {/* 2. 시간 및 내용 요약 */}
+                  <span
+                    style={{
+                      fontWeight: 400,
+                      // Flutter 원본의 p(12px)
+                      fontSize: '12px',
+                      color: 'var(--dark-gray)',
+                      width: '100%',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {/* Flutter 원본 형식 ('$relativeTime · ${article.content}') */}
+                    {news.time} · {news.content}
+                  </span>
+                </div>
+              </DividedListItem>
+            ))}
+          </DividedList>
+        </div>
+      </SectionContainer>
+      {/* --- "라이비 뉴스" 섹션 종료 --- */}
     </div>
   );
 };
