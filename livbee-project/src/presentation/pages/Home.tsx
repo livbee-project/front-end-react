@@ -3,9 +3,11 @@ import React from 'react';
 import ShoppingLiveSection from './home/ShoppingLiveSection';
 import BrandPickSection from './home/BrandPickSection';
 import LivbeeNewsSection from './home/LivbeeNewsSection';
+import HowShowhostSection from './home/HowShowhostSection';
 
 // (유지) 스크롤바 숨기기 클래스를 위해 import
 import '../styles/global.css';
+
 
 /**
  * 홈 페이지 컴포넌트
@@ -18,6 +20,7 @@ const Home: React.FC = () => {
   // 최상위 <div className="app-container">로 변경합니다.
   return (
     <div className="app-container">
+
       {/* "지금 뜨는 쇼핑라이브" 섹션 */}
       <ShoppingLiveSection />
 
@@ -26,6 +29,9 @@ const Home: React.FC = () => {
 
       {/* "라이비 뉴스" 섹션 */}
       <LivbeeNewsSection />
+
+      {/* "이런 쇼호스트는 어떠세요?" 섹션 */}
+      <HowShowhostSection />
     </div>
   );
 };
