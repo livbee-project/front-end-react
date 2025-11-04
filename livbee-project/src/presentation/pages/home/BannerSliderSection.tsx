@@ -34,7 +34,6 @@ const BannerSliderSection: React.FC = () => {
                 aspectRatio: '16 / 9',
                 position: 'relative',
                 overflow: 'hidden',
-                borderRadius: 10,
                 cursor: 'grab', // 드래그 가능 커서
             }}
             // (수정) 훅에서 반환된 이벤트 핸들러 묶음을 적용
