@@ -2,10 +2,13 @@ import React from 'react';
 // (추가) 방금 생성한 useSlider 훅 임포트
 import { useSlider } from '../../hooks/useSlider';
 
+import banner01 from '../../assets/images/banner_01.jpg';
+import banner02 from '../../assets/images/banner_02.jpg';
+
+// (수정) 텍스트/색상에서 실제 임포트한 이미지 경로(src)로 변경합니다.
 const MOCK_BANNERS = [
-    { id: 1, text: '배너 1 (16:9)', color: '#687CF4' },
-    { id: 2, text: '배너 2 (16:9)', color: '#5E5E5E' },
-    { id: 3, text: '배너 3 (16:9)', color: '#f0a0a0' },
+    { id: 1, src: banner01 },
+    { id: 2, src: banner02 },
 ];
 
 /**
@@ -51,23 +54,23 @@ const BannerSliderSection: React.FC = () => {
                     userSelect: 'none', // 드래그 시 텍스트 선택 방지
                 }}
             >
+                {/* (수정) MOCK_BANNERS 배열을 순회하며 <img> 태그를 렌더링 */}
                 {MOCK_BANNERS.map((banner) => (
-                    <div
+                    // (수정) 배경색/텍스트 div 대신 img 태그 사용
+                    <img
                         key={banner.id}
+                        src={banner.src} // 임포트한 이미지 경로
+                        alt={`배너 ${banner.id}`}
                         style={{
-                            width: `${100 / MOCK_BANNERS.length}%`,
+                            // (수정) div 스타일 대신 img 스타일 적용
+                            width: `${100 / MOCK_BANNERS.length}%`, // 50%
                             height: '100%',
-                            backgroundColor: banner.color,
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            color: 'white',
-                            fontSize: '24px',
-                            fontWeight: 'bold',
+                            objectFit: 'cover', // 16:9 비율을 꽉 채우도록
+                            // (추가) 드래그 방지
+                            userSelect: 'none',
+                            pointerEvents: 'none',
                         }}
-                    >
-                        <span style={{ userSelect: 'none' }}>{banner.text}</span>
-                    </div>
+                    />
                 ))}
             </div>
 
