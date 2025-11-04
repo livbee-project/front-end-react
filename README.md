@@ -79,3 +79,38 @@ livbee-project/
 > - domain: 핵심 비즈니스 로직, 엔티티, 유스케이스(순수함수 중심)
 > - presentation: UI 컴포넌트, 페이지, 훅, 스타일 등 표현(뷰) 계층
 > - shared: 공통 유틸, 타입, 상수 등 여러 계층에서 공유되는 코드
+
+# React 프로젝트 작명 규칙 (Naming Conventions)
+
+이 프로젝트는 React 및 TypeScript의 표준 작명 규칙을 따릅니다.
+
+## 1. 컴포넌트 (Components)
+
+- **규칙:** **파스칼 케이스 (PascalCase)**
+- **설명:** 컴포넌트의 함수/클래스명과 파일명은 모두 대문자로 시작하는 파스칼 케이스를 사용합니다.
+- **이유:** 일반 HTML 태그(`<div>`, `<span>`)와 React 컴포넌트(`<SectionContainer>`)를 시각적으로 명확하게 구분하기 위함입니다.
+- **예시:**
+  - `src/presentation/components/SectionContainer.tsx`
+  - `src/presentation/components/PortraitCard.tsx`
+  - `function PortraitCard() { ... }`
+  - `const App: React.FC = () => { ... }`
+
+## 2. 훅 (Hooks)
+
+- **규칙:** `use` 접두사 + **카멜 케이스 (camelCase)**
+- **설명:** React 내장 훅(`useState`) 또는 커스텀 훅(Custom Hook)의 함수명과 파일명은 `use`로 시작하는 카멜 케이스를 사용합니다.
+- **이유:** React 린터(Linter)가 해당 함수를 훅으로 인식하고, "훅의 규칙"(Rules of Hooks)을 올바르게 검사하고 강제할 수 있도록 보장합니다.
+- **예시:**
+  - `src/presentation/hooks/useSlider.tsx`
+  - `function useSlider() { ... }`
+  - `const { ... } = useSlider();`
+
+## 3. 기타 (변수, 함수, 폴더)
+
+- **규칙:** **카멜 케이스 (camelCase)**
+- **설명:** 컴포넌트와 훅을 제외한 모든 일반 변수, 함수, 폴더명에는 표준 JavaScript/TypeScript 관례인 카멜 케이스를 사용합니다.
+- **예시:**
+  - `const shoppingLiveItems = [ ... ];`
+  - `function startTimer() { ... }`
+  - `src/presentation/pages/home/`
+  - `src/presentation/components/`
