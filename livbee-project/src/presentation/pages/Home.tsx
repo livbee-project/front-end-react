@@ -1,5 +1,6 @@
 import React from 'react';
 
+import BannerSliderSection from './home/BannerSliderSection';
 import ShoppingLiveSection from './home/ShoppingLiveSection';
 import BrandPickSection from './home/BrandPickSection';
 import LivbeeNewsSection from './home/LivbeeNewsSection';
@@ -22,6 +23,15 @@ const Home: React.FC = () => {
   // 최상위 <div className="app-container">로 변경합니다.
   return (
     <div className="app-container">
+
+      {/* 1. (추가) 배너 슬라이더 섹션 */}
+      {/*
+        Flutter 원본의 BannerSliderSection 위치와
+        간격(SizedBox(height: 24))을 동일하게 적용
+      */}
+      <div style={{ marginBottom: 24 }}>
+        <BannerSliderSection />
+      </div>
 
       {/* "지금 뜨는 쇼핑라이브" 섹션 */}
       <ShoppingLiveSection />
