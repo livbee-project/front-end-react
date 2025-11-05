@@ -6,29 +6,15 @@ import DividedList from '@/presentation/components/DividedList';
 import DividedListItem from '@/presentation/components/DividedListItem';
 
 /**
- * (추가) 리스트 렌더링을 위한 임시 목업 데이터
- * (디자인 이미지 참고)
+ * (수정) 리스트 렌더링을 위한 임시 목업 데이터
+ * (스크롤 테스트를 위해 3개에서 10개로 늘림)
  */
-const MOCK_CAMPAIGNS = [
-  {
-    id: 1,
-    brandName: '브랜드명',
-    title: '한 줄 제목 넘치면 ...으로 표시하는..',
-    content: 'P.동해물과 백두산이 마르고 닳도록',
-  },
-  {
-    id: 2,
-    brandName: '브랜드명',
-    title: '두 번째 아이템 제목입니다',
-    content: 'P.하느님이 보우하사 우리나라 만세',
-  },
-  {
-    id: 3,
-    brandName: '브랜드명',
-    title: '세 번째 아이템 제목입니다',
-    content: 'P.무궁화 삼천리 화려강산 대한사람',
-  },
-];
+const MOCK_CAMPAIGNS = Array.from({ length: 15 }, (_, i) => ({
+  id: i + 1, // id를 1부터 10까지 동적으로 생성
+  brandName: `브랜드명 ${i + 1}`,
+  title: `공고 제목 ${i + 1} (스크롤 테스트용)`,
+  content: `P.동해물과 백두산이 마르고 닳도록 ${i + 1}`,
+}));
 
 const CampaignsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
