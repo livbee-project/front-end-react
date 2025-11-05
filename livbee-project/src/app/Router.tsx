@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from '../presentation/pages/Home';
+import Home from '../presentation/pages/home/Home';
 import '../presentation/styles/global.css';
 import TopNavLayout from '../presentation/layouts/TopNavLayout';
 import RootLayout from '../presentation/layouts/RootLayout';
@@ -29,18 +29,18 @@ const AppRouter = () => (
           */}
           <Route element={<TopNavLayout />}>
             {/* 기존 탭 페이지들 */}
-            <Route path='/' element={<Home />} />
-            <Route path='/clips' element={<div>클립 페이지</div>} />
-            <Route path='/live' element={<div>쇼핑라이브 페이지</div>} />
-            <Route path='/news' element={<div>뉴스 페이지</div>} />
-            <Route path='/event' element={<div>이벤트 페이지</div>} />
-            <Route path='/service' element={<div>서비스 페이지</div>} />
+            <Route path="/" element={<Home />} />
+            <Route path="/clips" element={<div>클립 페이지</div>} />
+            <Route path="/live" element={<div>쇼핑라이브 페이지</div>} />
+            <Route path="/news" element={<div>뉴스 페이지</div>} />
+            <Route path="/event" element={<div>이벤트 페이지</div>} />
+            <Route path="/service" element={<div>서비스 페이지</div>} />
 
             {/* (추가) BottomNavBar의 탭 경로들을 추가합니다. */}
-            <Route path='/campaigns' element={<div>모집공고 페이지</div>} />
-            <Route path='/models' element={<div>모델 페이지</div>} />
-            <Route path='/portfolios' element={<div>포트폴리오 페이지</div>} />
-            <Route path='/mypage' element={<div>마이페이지</div>} />
+            <Route path="/campaigns" element={<div>모집공고 페이지</div>} />
+            <Route path="/models" element={<div>모델 페이지</div>} />
+            <Route path="/portfolios" element={<div>포트폴리오 페이지</div>} />
+            <Route path="/mypage" element={<div>마이페이지</div>} />
           </Route>
 
           {/*

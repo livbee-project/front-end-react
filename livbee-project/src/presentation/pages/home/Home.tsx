@@ -1,16 +1,15 @@
 import React from 'react';
 
-import BannerSliderSection from './home/BannerSliderSection';
-import ShoppingLiveSection from './home/ShoppingLiveSection';
-import BrandPickSection from './home/BrandPickSection';
-import LivbeeNewsSection from './home/LivbeeNewsSection';
-import HowShowhostSection from './home/HowShowhostSection';
-import ConceptModelSection from './home/ConceptModelSection';
-import HotClipSection from './home/HotClipSection';
+import BannerSliderSection from './BannerSliderSection';
+import ShoppingLiveSection from './ShoppingLiveSection';
+import BrandPickSection from './BrandPickSection';
+import LivbeeNewsSection from './LivbeeNewsSection';
+import HowShowhostSection from './HowShowhostSection';
+import ConceptModelSection from './ConceptModelSection';
+import HotClipSection from './HotClipSection';
 
 // (유지) 스크롤바 숨기기 클래스를 위해 import
-import '../styles/global.css';
-
+import '../../styles/global.css';
 
 /**
  * 홈 페이지 컴포넌트
@@ -18,12 +17,10 @@ import '../styles/global.css';
  * 조립하는 역할만 담당합니다.
  */
 const Home: React.FC = () => {
-
   // (수정) React.FC 반환 타입에 맞게 <></> (Fragment) 대신
   // 최상위 <div className="app-container">로 변경합니다.
   return (
     <div className="app-container">
-
       {/* 1. (추가) 배너 슬라이더 섹션 */}
       {/*
         Flutter 원본의 BannerSliderSection 위치와
