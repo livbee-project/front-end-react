@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from '../presentation/pages/home/Home';
-import '../presentation/styles/global.css';
-import TopNavLayout from '../presentation/layouts/TopNavLayout';
-import RootLayout from '../presentation/layouts/RootLayout';
+import Home from '@/presentation/pages/home/Home';
+import '@/presentation/styles/global.css';
+import TopNavLayout from '@/presentation/layouts/TopNavLayout';
+import RootLayout from '@/presentation/layouts/RootLayout';
+import CampaignsPage from '@/presentation/pages/campaign/CampaignsPage';
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -37,7 +38,7 @@ const AppRouter = () => (
             <Route path="/service" element={<div>서비스 페이지</div>} />
 
             {/* (추가) BottomNavBar의 탭 경로들을 추가합니다. */}
-            <Route path="/campaigns" element={<div>모집공고 페이지</div>} />
+            <Route path="/campaigns" element={<CampaignsPage />} />
             <Route path="/models" element={<div>모델 페이지</div>} />
             <Route path="/portfolios" element={<div>포트폴리오 페이지</div>} />
             <Route path="/mypage" element={<div>마이페이지</div>} />
