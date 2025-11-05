@@ -11,7 +11,7 @@ const AppRouter = () => (
       이것이 RootLayout이 3단(헤더/컨텐츠/푸터) 분리 작업을
       수행하기 위한 기준 높이가 됩니다.
     */}
-    <div className='app-container' style={{ height: '100vh' }}>
+    <div className="app-container" style={{ height: '100vh' }}>
       <Routes>
         {/*
           --- (수정) 최상위 Shell Route 적용 ---

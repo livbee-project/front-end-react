@@ -61,3 +61,15 @@ body {
 .hide-scrollbar::-webkit-scrollbar {
   display: none; /* 스크롤바를 숨김 */
 }
+
+body {
+  /* Firefox */
+  scrollbar-width: none;
+  /* IE, Edge */
+  -ms-overflow-style: none;
+}
+
+body::-webkit-scrollbar {
+  /* Chrome, Safari, Opera (WebKit) */
+  display: none;
+}

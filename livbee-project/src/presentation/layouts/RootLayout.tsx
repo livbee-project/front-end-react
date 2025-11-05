@@ -53,7 +53,7 @@ const RootLayout: React.FC = () => {
       {/* (핵심) 스크롤이 되는 메인 컨텐츠 영역
         TopNavLayout과 그 자식(Home 등)이 이 <Outlet>에 렌더링됩니다.
       */}
-      <main style={contentStyle}>
+      <main style={contentStyle} className="hide-scrollbar">
         <Outlet />
       </main>
 
