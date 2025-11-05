@@ -1,6 +1,14 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import BottomNavItem from './BottomNavItem';
+// (추가) react-icons/ri (Remix Icon) 라이브러리에서 아이콘들을 임포트합니다.
+import {
+  RiHomeLine,
+  RiArchiveDrawerLine,
+  RiUserStarLine,
+  RiUser3Line,
+  RiUserSettingsLine,
+} from 'react-icons/ri';
 // CSS 변수를 사용하기 위해 global.css 임포트
 import '../styles/global.css';
 
@@ -18,17 +26,17 @@ const useAuth = () => {
 };
 
 /**
- * 탭 메뉴의 데이터
- * Flutter의 _buildNavItem 목록을 기반으로 함
+ * (수정) 탭 메뉴의 데이터
+ * icon 속성을 텍스트('[H]')에서 임포트한 아이콘 컴포넌트(RiHomeLine)로 변경합니다.
+ * Flutter의 RemixIcons 이름과 거의 동일합니다.
  */
 const TABS = [
-  { label: '홈', path: '/', icon: '[H]' },
-  { label: '모집공고', path: '/campaigns', icon: '[L]' },
-  { label: '모델', path: '/models', icon: '[M]' },
-  { label: '포트폴리오', path: '/portfolios', icon: '[P]' },
-  { label: '마이페이지', path: '/mypage', icon: '[My]' },
+  { label: '홈', path: '/', icon: RiHomeLine },
+  { label: '모집공고', path: '/campaigns', icon: RiArchiveDrawerLine },
+  { label: '모델', path: '/models', icon: RiUserStarLine },
+  { label: '포트폴리오', path: '/portfolios', icon: RiUser3Line },
+  { label: '마이페이지', path: '/mypage', icon: RiUserSettingsLine },
 ];
-
 /**
  * 로그인이 필요한 경로
  * Flutter의 authRequiredRoutes

@@ -9,7 +9,7 @@ import React from 'react';
  */
 interface BottomNavItemProps {
   label: string;
-  icon: string;
+  icon: React.ElementType;
   isActive: boolean;
   onClick: () => void;
 }
@@ -18,7 +18,12 @@ interface BottomNavItemProps {
  * BottomNavBar의 개별 탭 아이템 UI 컴포넌트
  * (BottomNavBar.tsx의 map 루프 내부 로직을 분리)
  */
-const BottomNavItem: React.FC<BottomNavItemProps> = ({ label, icon, isActive, onClick }) => {
+const BottomNavItem: React.FC<BottomNavItemProps> = ({
+  label,
+  icon: Icon, // (수정) prop 이름을 소문자 'icon'에서 대문자 'Icon'으로 변경 (컴포넌트로 사용하기 위함)
+  isActive,
+  onClick,
+}) => {
   // --- 스타일 정의 (BottomNavBar.tsx에서 이동) ---
 
   /** 개별 탭 버튼 스타일 */
@@ -35,7 +40,7 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({ label, icon, isActive, on
     cursor: 'pointer',
   };
 
-  /** 아이콘과 텍스트의 공통 스타일 */
+  /** 아이콘과 텍스트의 공통 스타일 (변경 없음) */
   const textAndIconStyle: React.CSSProperties = {
     color: isActive ? 'var(--primary)' : 'var(--dark-gray)',
     transition: 'color 0.1s ease',
@@ -43,20 +48,21 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({ label, icon, isActive, on
 
   return (
     <button style={tabButtonStyle} onClick={onClick}>
-      {/* 1. 아이콘 */}
+      {/*
+        (수정) 1. 아이콘
+        <span>{icon}</span> 대신,
+        prop으로 전달받은 <Icon> 컴포넌트를 렌더링합니다.
+      */}
+      <Icon
+        size={20} // Flutter 원본과 동일한 20px
+        style={textAndIconStyle} // 활성/비활성 색상 적용
+      />
+
+      {/* 2. 라벨 (변경 없음) */}
       <span
         style={{
           ...textAndIconStyle,
-          fontSize: 20, // Flutter 원본
-        }}
-      >
-        {icon}
-      </span>
-      {/* 2. 라벨 */}
-      <span
-        style={{
-          ...textAndIconStyle,
-          fontSize: 12, // Flutter 원본
+          fontSize: 12,
           fontWeight: 700,
         }}
       >
