@@ -1,8 +1,7 @@
 import React from 'react';
-// (추가) 필요한 공통 컴포넌트 임포트
-import SectionContainer from '../../components/SectionContainer';
-import DividedList from '../../components/DividedList';
-import DividedListItem from '../../components/DividedListItem';
+import SectionContainer from '@/presentation/components/SectionContainer';
+import VerticalList from '@/presentation/components/VerticalList';
+import ListItem from '@/presentation/components/ListItem';
 
 /**
  * "라이비 뉴스" 섹션 컴포넌트
@@ -35,13 +34,10 @@ const LivbeeNewsSection: React.FC = () => {
         (Home.tsx에서 그대로 복사)
       */}
       <div style={{ padding: '0 10px' }}>
-        <DividedList>
+        <VerticalList>
           {/* (Home.tsx에서 그대로 복사) */}
           {newsItems.map((news) => (
-            <DividedListItem
-              key={news.id}
-              onTap={() => console.log(`뉴스 ${news.id} 클릭`)}
-            >
+            <ListItem key={news.id} onTap={() => console.log(`뉴스 ${news.id} 클릭`)}>
               <div
                 style={{
                   display: 'flex',
@@ -80,9 +76,9 @@ const LivbeeNewsSection: React.FC = () => {
                   {news.time} · {news.content}
                 </span>
               </div>
-            </DividedListItem>
+            </ListItem>
           ))}
-        </DividedList>
+        </VerticalList>
       </div>
     </SectionContainer>
   );

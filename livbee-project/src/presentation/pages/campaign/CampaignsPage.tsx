@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-// (추가) 절대 경로로 필요한 공통 컴포넌트들을 임포트합니다.
 import SearchInput from '@/presentation/components/SearchInput';
 import CampaignCard from '@/presentation/components/CampaignCard';
-import DividedList from '@/presentation/components/DividedList';
-import DividedListItem from '@/presentation/components/DividedListItem';
+import VerticalList from '@/presentation/components/VerticalList';
+import ListItem from '@/presentation/components/ListItem';
 
 /**
  * (수정) 리스트 렌더링을 위한 임시 목업 데이터
@@ -50,14 +49,14 @@ const CampaignsPage: React.FC = () => {
       {/*
         DividedList를 사용하여 리스트를 만듭니다.
       */}
-      <DividedList>
+      <VerticalList showDividers={false}>
         {MOCK_CAMPAIGNS.map((campaign) => (
           /*
             DividedListItem으로 각 아이템을 감쌉니다.
             (수정) 디자인에 구분선이 없으므로 
             borderBottom: 'none' 스타일을 추가하여 구분선을 숨깁니다.
           */
-          <DividedListItem
+          <ListItem
             key={campaign.id}
             onTap={() => console.log(`Campaign ${campaign.id} 클릭`)}
             style={{ borderBottom: 'none' }} // (추가) 구분선 숨기기
@@ -70,9 +69,9 @@ const CampaignsPage: React.FC = () => {
               title={campaign.title}
               content={campaign.content}
             />
-          </DividedListItem>
+          </ListItem>
         ))}
-      </DividedList>
+      </VerticalList>
     </div>
   );
 };

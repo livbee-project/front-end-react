@@ -1,9 +1,8 @@
 import React from 'react';
-// (추가) 이 섹션에서 사용할 모든 공통 컴포넌트를 임포트합니다.
-import SectionContainer from '../../components/SectionContainer';
-import DividedList from '../../components/DividedList';
-import DividedListItem from '../../components/DividedListItem';
-import PortfolioRowCard from '../../components/PortfolioRowCard'; // 방금 생성한 카드
+import SectionContainer from '@/presentation/components/SectionContainer';
+import VerticalList from '@/presentation/components/VerticalList';
+import ListItem from '@/presentation/components/ListItem';
+import PortfolioRowCard from '@/presentation/components/PortfolioRowCard';
 
 /**
  * "이런 쇼호스트는 어떠세요?" 섹션 컴포넌트
@@ -31,16 +30,16 @@ const HowShowhostSection: React.FC = () => {
       title="이런 쇼호스트는 어떠세요?"
       onMorePressed={() => console.log('쇼호스트 더보기 클릭')}
     >
-      {/* Flutter 원본의 Container(padding: 10) 적용 
-      */}
+      {/* Flutter 원본의 Container(padding: 10) 적용
+       */}
       <div style={{ padding: '0 10px' }}>
         {/* 2. 구분선이 있는 리스트 (재사용) */}
-        <DividedList>
-          {/* 임시 데이터를 map으로 순회하며 리스트 아이템 렌더링 
-          */}
+        <VerticalList>
+          {/* 임시 데이터를 map으로 순회하며 리스트 아이템 렌더링
+           */}
           {showhostItems.map((item) => (
             // 3. 리스트 아이템 (재사용)
-            <DividedListItem key={item.id}>
+            <ListItem key={item.id}>
               {/* 4. 방금 생성한 공통 카드 (신규 사용)
                 Flutter의 _buildPortfolioCard를 대체합니다.
               */}
@@ -51,9 +50,9 @@ const HowShowhostSection: React.FC = () => {
                 onOfferPress={() => console.log(`제안하기 ${item.id}`)}
                 onCardPress={() => console.log(`포트폴리오 ${item.id} 클릭`)}
               />
-            </DividedListItem>
+            </ListItem>
           ))}
-        </DividedList>
+        </VerticalList>
       </div>
     </SectionContainer>
   );
