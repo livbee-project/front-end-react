@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import SearchInput from '@/presentation/components/SearchInput';
 import PortraitCard from '@/presentation/components/PortraitCard';
+import FloatingActionButton from '@/presentation/components/FloatingActionButton';
 
 /**
  * 리스트 렌더링을 위한 임시 목업 데이터
@@ -80,6 +81,11 @@ const ModelsPage: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* 플로팅 액션 버튼 */}
+      <FloatingActionButton
+        onClick={() => console.log('모델 등록 클릭')}
+      />
     </div>
   );
 };

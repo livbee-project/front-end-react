@@ -3,6 +3,7 @@ import SearchInput from '@/presentation/components/SearchInput';
 import PortfolioRowCard from '@/presentation/components/PortfolioRowCard';
 import VerticalList from '@/presentation/components/VerticalList';
 import ListItem from '@/presentation/components/ListItem';
+import FloatingActionButton from '@/presentation/components/FloatingActionButton';
 
 /**
  * 리스트 렌더링을 위한 임시 목업 데이터
@@ -58,6 +59,11 @@ const PortfolioPage: React.FC = () => {
           </ListItem>
         ))}
       </VerticalList>
+
+      {/* 플로팅 액션 버튼 */}
+      <FloatingActionButton
+        onClick={() => console.log('포트폴리오 작성 클릭')}
+      />
     </div>
   );
 };

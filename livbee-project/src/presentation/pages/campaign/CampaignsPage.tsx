@@ -3,6 +3,7 @@ import SearchInput from '@/presentation/components/SearchInput';
 import CampaignCard from '@/presentation/components/CampaignCard';
 import VerticalList from '@/presentation/components/VerticalList';
 import ListItem from '@/presentation/components/ListItem';
+import FloatingActionButton from '@/presentation/components/FloatingActionButton';
 
 /**
  * (수정) 리스트 렌더링을 위한 임시 목업 데이터
@@ -72,6 +73,11 @@ const CampaignsPage: React.FC = () => {
           </ListItem>
         ))}
       </VerticalList>
+
+      {/* 플로팅 액션 버튼 */}
+      <FloatingActionButton
+        onClick={() => console.log('모집 공고 작성 클릭')}
+      />
     </div>
   );
 };
