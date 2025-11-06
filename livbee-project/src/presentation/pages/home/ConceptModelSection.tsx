@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 // (추가) 필요한 공통 컴포넌트 임포트
 import SectionContainer from '../../components/SectionContainer';
 import PortraitCard from '../../components/PortraitCard'; // PortraitCard 재사용
@@ -10,6 +11,7 @@ import '../../styles/global.css';
  * Flutter 원본을 기반으로 함
  */
 const ConceptModelSection: React.FC = () => {
+  const navigate = useNavigate();
   // (추가) 섹션에서 사용할 임시 데이터
   const conceptModelItems = [
     { id: 1, title: '모델이름 1', content: '한줄소개한줄소개한줄소개...' },
@@ -22,7 +24,7 @@ const ConceptModelSection: React.FC = () => {
     // 1. 섹션 컨테이너 (재사용)
     <SectionContainer
       title="컨셉에 맞는 모델 찾기"
-      onMorePressed={() => console.log('모델 더보기 클릭')}
+      onMorePressed={() => navigate('/models')}
     >
       {/* 2. 가로 스크롤 컨테이너 */}
       <div
