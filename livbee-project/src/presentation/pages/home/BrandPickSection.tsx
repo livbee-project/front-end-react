@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 // 공통 컴포넌트 임포트
 import SectionContainer from '../../components/SectionContainer';
 import RecruitCard from '../../components/RecruitCard';
@@ -10,13 +11,14 @@ import '../../styles/global.css';
  * Home.tsx에 있던 로직을 이 파일로 이동
  */
 const BrandPickSection: React.FC = () => {
+  const navigate = useNavigate();
   // (추가) "브랜드 픽" 섹션을 위한 임시 데이터 (Home.tsx에서 가져옴)
   const brandPickItems = [1, 2, 3, 4, 5];
 
   return (
     <SectionContainer
       title="브랜드 PICK"
-      onMorePressed={() => console.log('브랜드 픽 더보기 클릭')}
+      onMorePressed={() => navigate('/campaigns')}
     >
       {/* 가로 스크롤 리스트 컨테이너 (Home.tsx에서 그대로 복사) */}
       <div
