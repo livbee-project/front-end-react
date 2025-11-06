@@ -40,8 +40,9 @@ const TABS = [
 /**
  * 로그인이 필요한 경로
  * Flutter의 authRequiredRoutes
+ * (현재는 비활성화 - 필요시 다시 활성화)
  */
-const AUTH_REQUIRED_PATHS = ['/mypage'];
+const AUTH_REQUIRED_PATHS: string[] = [];
 
 /**
  * 화면 하단에 고정되는 공통 네비게이션 바 컴포넌트
