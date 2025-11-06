@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SearchInput from '@/presentation/components/SearchInput';
 import PortfolioRowCard from '@/presentation/components/PortfolioRowCard';
 import VerticalList from '@/presentation/components/VerticalList';
@@ -15,6 +16,7 @@ const MOCK_PORTFOLIOS = Array.from({ length: 15 }, (_, i) => ({
 }));
 
 const PortfolioPage: React.FC = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearchSubmit = (query: string) => {
@@ -62,7 +64,7 @@ const PortfolioPage: React.FC = () => {
 
       {/* 플로팅 액션 버튼 */}
       <FloatingActionButton
-        onClick={() => console.log('포트폴리오 작성 클릭')}
+        onClick={() => navigate('/portfolios/register')}
       />
     </div>
   );

@@ -6,6 +6,7 @@ import RootLayout from '@/presentation/layouts/RootLayout';
 import CampaignsPage from '@/presentation/pages/campaign/CampaignsPage';
 import ModelsPage from '@/presentation/pages/model/ModelsPage';
 import PortfolioPage from '@/presentation/pages/portfolio/PortfolioPage';
+import PortfolioRegisterPage from '@/presentation/pages/portfolio/PortfolioRegisterPage';
 import MyPage from '@/presentation/pages/mypage/MyPage';
 
 const AppRouter = () => (
@@ -44,6 +45,7 @@ const AppRouter = () => (
             <Route path="/campaigns" element={<CampaignsPage />} />
             <Route path="/models" element={<ModelsPage />} />
             <Route path="/portfolios" element={<PortfolioPage />} />
+            <Route path="/portfolios/register" element={<PortfolioRegisterPage />} />
             <Route path="/mypage" element={<MyPage />} />
           </Route>
 
