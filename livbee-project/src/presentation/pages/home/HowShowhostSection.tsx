@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import SectionContainer from '@/presentation/components/SectionContainer';
 import VerticalList from '@/presentation/components/VerticalList';
 import ListItem from '@/presentation/components/ListItem';
@@ -8,6 +9,7 @@ import PortfolioRowCard from '@/presentation/components/PortfolioRowCard';
  * "이런 쇼호스트는 어떠세요?" 섹션 컴포넌트
  */
 const HowShowhostSection: React.FC = () => {
+  const navigate = useNavigate();
   // (추가) 섹션에서 사용할 임시 데이터
   const showhostItems = [
     {
@@ -28,7 +30,7 @@ const HowShowhostSection: React.FC = () => {
     // 1. 섹션 컨테이너 (재사용)
     <SectionContainer
       title="이런 쇼호스트는 어떠세요?"
-      onMorePressed={() => console.log('쇼호스트 더보기 클릭')}
+      onMorePressed={() => navigate('/portfolios')}
     >
       {/* Flutter 원본의 Container(padding: 10) 적용
        */}
