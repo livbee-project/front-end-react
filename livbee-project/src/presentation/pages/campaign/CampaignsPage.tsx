@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SearchInput from '@/presentation/components/SearchInput';
 import CampaignCard from '@/presentation/components/CampaignCard';
 import VerticalList from '@/presentation/components/VerticalList';
@@ -17,6 +18,7 @@ const MOCK_CAMPAIGNS = Array.from({ length: 15 }, (_, i) => ({
 }));
 
 const CampaignsPage: React.FC = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearchSubmit = (query: string) => {
@@ -76,7 +78,7 @@ const CampaignsPage: React.FC = () => {
 
       {/* 플로팅 액션 버튼 */}
       <FloatingActionButton
-        onClick={() => console.log('모집 공고 작성 클릭')}
+        onClick={() => navigate('/campaigns/register')}
       />
     </div>
   );

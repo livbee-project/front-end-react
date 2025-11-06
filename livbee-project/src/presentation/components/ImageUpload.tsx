@@ -6,6 +6,7 @@ import { RiImageLine } from 'react-icons/ri';
  */
 interface ImageUploadProps {
   size?: number;
+  aspectRatio?: string; // 예: '1:2', '1:1', '3:4'
   onImageSelect?: (file: File) => void;
 }
 
@@ -14,6 +15,7 @@ interface ImageUploadProps {
  */
 const ImageUpload: React.FC<ImageUploadProps> = ({
   size = 100,
+  aspectRatio,
   onImageSelect,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -29,10 +31,22 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     }
   };
 
+  // aspectRatio에 따라 크기 계산
+  const getDimensions = () => {
+    if (!aspectRatio) {
+      return { width: size, height: size };
+    }
+    const [w, h] = aspectRatio.split(':').map(Number);
+    const ratio = h / w;
+    return { width: size, height: size * ratio };
+  };
+
+  const { width, height } = getDimensions();
+
   const containerStyle: React.CSSProperties = {
-    width: size,
-    height: size,
-    borderRadius: size === 100 ? '50%' : '12px',
+    width,
+    height,
+    borderRadius: size === 100 && !aspectRatio ? '50%' : '12px',
     border: '1px solid var(--paint-gray, #E5E7ED)',
     backgroundColor: '#F5F5F5',
     display: 'flex',

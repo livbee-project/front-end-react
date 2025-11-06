@@ -4,6 +4,7 @@ import '@/presentation/styles/global.css';
 import TopNavLayout from '@/presentation/layouts/TopNavLayout';
 import RootLayout from '@/presentation/layouts/RootLayout';
 import CampaignsPage from '@/presentation/pages/campaign/CampaignsPage';
+import CampaignRegisterPage from '@/presentation/pages/campaign/CampaignRegisterPage';
 import ModelsPage from '@/presentation/pages/model/ModelsPage';
 import ModelRegisterPage from '@/presentation/pages/model/ModelRegisterPage';
 import PortfolioPage from '@/presentation/pages/portfolio/PortfolioPage';
@@ -44,6 +45,7 @@ const AppRouter = () => (
 
             {/* (추가) BottomNavBar의 탭 경로들을 추가합니다. */}
             <Route path="/campaigns" element={<CampaignsPage />} />
+            <Route path="/campaigns/register" element={<CampaignRegisterPage />} />
             <Route path="/models" element={<ModelsPage />} />
             <Route path="/models/register" element={<ModelRegisterPage />} />
             <Route path="/portfolios" element={<PortfolioPage />} />
