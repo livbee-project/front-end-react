@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SearchInput from '@/presentation/components/SearchInput';
 import PortraitCard from '@/presentation/components/PortraitCard';
 import FloatingActionButton from '@/presentation/components/FloatingActionButton';
@@ -13,6 +14,7 @@ const MOCK_MODELS = Array.from({ length: 15 }, (_, i) => ({
 }));
 
 const ModelsPage: React.FC = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearchSubmit = (query: string) => {
@@ -84,7 +86,7 @@ const ModelsPage: React.FC = () => {
 
       {/* 플로팅 액션 버튼 */}
       <FloatingActionButton
-        onClick={() => console.log('모델 등록 클릭')}
+        onClick={() => navigate('/models/register')}
       />
     </div>
   );
