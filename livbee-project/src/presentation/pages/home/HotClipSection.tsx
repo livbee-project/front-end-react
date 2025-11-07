@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 // 공통 컴포넌트 임포트
 import SectionContainer from '@/presentation/components/section/SectionContainer';
 import PortraitCard from '@/presentation/components/cards/PortraitCard'; // PortraitCard 재사용
@@ -11,6 +12,8 @@ import '@/presentation/styles/global.css';
  * 동일한 PortraitCard를 사용합니다.
  */
 const HotClipSection: React.FC = () => {
+  const navigate = useNavigate();
+
   // (추가) 섹션에서 사용할 임시 데이터
   const hotClipItems = [
     { id: 1, title: '영상제목 1', content: '한줄소개한줄소개한줄소개...' },
@@ -19,11 +22,18 @@ const HotClipSection: React.FC = () => {
     { id: 4, title: '영상제목 4', content: '한줄소개한줄소개한줄소개...' },
   ];
 
+  /**
+   * 더보기 버튼 클릭 핸들러
+   */
+  const handleMoreClick = () => {
+    navigate('/clips');
+  };
+
   return (
     // 1. 섹션 컨테이너 (재사용)
     <SectionContainer
       title="HOT CLIP"
-      onMorePressed={() => console.log('HOT CLIP 더보기 클릭')}
+      onMorePressed={handleMoreClick}
     >
       {/* 2. 가로 스크롤 컨테이너 */}
       <div

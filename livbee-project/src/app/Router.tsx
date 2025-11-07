@@ -14,6 +14,7 @@ import PortfolioRegisterPage from '@/presentation/pages/portfolio/PortfolioRegis
 import PortfolioDetailPage from '@/presentation/pages/portfolio/PortfolioDetailPage';
 import MyPortfolioPage from '@/presentation/pages/portfolio/MyPortfolioPage';
 import MyPage from '@/presentation/pages/mypage/MyPage';
+import ClipsPage from '@/presentation/pages/clip/ClipsPage';
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -41,7 +42,7 @@ const AppRouter = () => (
           <Route element={<TopNavLayout />}>
             {/* 기존 탭 페이지들 */}
             <Route path="/" element={<Home />} />
-            <Route path="/clips" element={<div>클립 페이지</div>} />
+            <Route path="/clips" element={<ClipsPage />} />
             <Route path="/live" element={<div>쇼핑라이브 페이지</div>} />
             <Route path="/news" element={<div>뉴스 페이지</div>} />
             <Route path="/event" element={<div>이벤트 페이지</div>} />
