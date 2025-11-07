@@ -7,6 +7,7 @@ import CampaignsPage from '@/presentation/pages/campaign/CampaignsPage';
 import CampaignRegisterPage from '@/presentation/pages/campaign/CampaignRegisterPage';
 import ModelsPage from '@/presentation/pages/model/ModelsPage';
 import ModelRegisterPage from '@/presentation/pages/model/ModelRegisterPage';
+import ModelDetailPage from '@/presentation/pages/model/ModelDetailPage';
 import PortfolioPage from '@/presentation/pages/portfolio/PortfolioPage';
 import PortfolioRegisterPage from '@/presentation/pages/portfolio/PortfolioRegisterPage';
 import MyPage from '@/presentation/pages/mypage/MyPage';
@@ -48,6 +49,7 @@ const AppRouter = () => (
             <Route path="/campaigns/register" element={<CampaignRegisterPage />} />
             <Route path="/models" element={<ModelsPage />} />
             <Route path="/models/register" element={<ModelRegisterPage />} />
+            <Route path="/models/:id" element={<ModelDetailPage />} />
             <Route path="/portfolios" element={<PortfolioPage />} />
             <Route path="/portfolios/register" element={<PortfolioRegisterPage />} />
             <Route path="/mypage" element={<MyPage />} />

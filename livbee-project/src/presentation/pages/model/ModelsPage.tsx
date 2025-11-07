@@ -77,7 +77,7 @@ const ModelsPage: React.FC = () => {
                 title={model.name}
                 content={model.content}
                 width="100%"
-                onPress={() => console.log(`Model ${model.id} 클릭`)}
+                onPress={() => navigate(`/models/${model.id}`)}
               />
             </div>
           ))}

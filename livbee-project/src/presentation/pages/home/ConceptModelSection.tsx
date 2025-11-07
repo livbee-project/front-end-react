@@ -45,7 +45,7 @@ const ConceptModelSection: React.FC = () => {
             title={item.title}
             content={item.content}
             // imageUrl={item.imageUrl} (테스트용 이미지)
-            onPress={() => console.log(`모델 ${item.id} 클릭`)}
+            onPress={() => navigate(`/models/${item.id}`)}
           />
         ))}
       </div>
