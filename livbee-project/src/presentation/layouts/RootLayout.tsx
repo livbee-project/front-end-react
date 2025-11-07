@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import BottomNavBar from '../components/BottomNavBar';
+import BottomNavBar from '../components/navigation/BottomNavBar';
 // import CommonHeader from '../components/CommonHeader'; // (주석 처리) Flutter의 CommonHeader에 해당하는 로고 헤더가 추후 이 자리에 추가될 수 있습니다.
 
 /**

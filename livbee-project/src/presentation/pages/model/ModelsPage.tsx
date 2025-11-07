@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SearchInput from '@/presentation/components/SearchInput';
-import PortraitCard from '@/presentation/components/PortraitCard';
-import FloatingActionButton from '@/presentation/components/FloatingActionButton';
+import SearchInput from '@/presentation/components/common/SearchInput';
+import PortraitCard from '@/presentation/components/cards/PortraitCard';
+import FloatingActionButton from '@/presentation/components/common/FloatingActionButton';
 
 /**
  * 리스트 렌더링을 위한 임시 목업 데이터

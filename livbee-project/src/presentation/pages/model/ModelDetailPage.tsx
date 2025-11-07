@@ -1,9 +1,9 @@
 import React from 'react';
-import ModelProfileSection from '@/presentation/components/ModelProfileSection';
-import Header from '@/presentation/components/Header';
-import GalleryGrid from '@/presentation/components/GalleryGrid';
-import InfoItem from '@/presentation/components/InfoItem';
-import Tag from '@/presentation/components/Tag';
+import ModelProfileSection from '@/presentation/components/common/ModelProfileSection';
+import Header from '@/presentation/components/common/Header';
+import GalleryGrid from '@/presentation/components/common/GalleryGrid';
+import InfoItem from '@/presentation/components/common/InfoItem';
+import Tag from '@/presentation/components/common/Tag';
 import '@/presentation/styles/global.css';
 
 /**

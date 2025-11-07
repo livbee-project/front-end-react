@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import TopTabBar from '../components/TopTabBar'; // 방금 만든 탭바
+import TopTabBar from '../components/navigation/TopTabBar'; // 방금 만든 탭바
 
 const TopNavLayout: React.FC = () => {
     return (

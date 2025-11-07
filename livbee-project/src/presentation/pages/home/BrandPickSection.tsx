@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 // 공통 컴포넌트 임포트
-import SectionContainer from '../../components/SectionContainer';
-import RecruitCard from '../../components/RecruitCard';
+import SectionContainer from '../../components/common/SectionContainer';
+import RecruitCard from '../../components/cards/RecruitCard';
 // 스크롤바 숨기기 CSS 임포트
 import '../../styles/global.css';
 

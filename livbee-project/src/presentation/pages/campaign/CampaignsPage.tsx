@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SearchInput from '@/presentation/components/SearchInput';
-import CampaignCard from '@/presentation/components/CampaignCard';
-import VerticalList from '@/presentation/components/VerticalList';
-import ListItem from '@/presentation/components/ListItem';
-import FloatingActionButton from '@/presentation/components/FloatingActionButton';
+import SearchInput from '@/presentation/components/common/SearchInput';
+import CampaignCard from '@/presentation/components/cards/CampaignCard';
+import VerticalList from '@/presentation/components/common/VerticalList';
+import ListItem from '@/presentation/components/common/ListItem';
+import FloatingActionButton from '@/presentation/components/common/FloatingActionButton';
 
 /**
  * (수정) 리스트 렌더링을 위한 임시 목업 데이터

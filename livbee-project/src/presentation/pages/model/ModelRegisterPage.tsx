@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import TextInput from '@/presentation/components/TextInput';
-import ToggleSwitch from '@/presentation/components/ToggleSwitch';
-import FileUpload from '@/presentation/components/FileUpload';
-import ImageUpload from '@/presentation/components/ImageUpload';
-import VerticalList from '@/presentation/components/VerticalList';
-import ListItem from '@/presentation/components/ListItem';
+import TextInput from '@/presentation/components/forms/TextInput';
+import ToggleSwitch from '@/presentation/components/common/ToggleSwitch';
+import FileUpload from '@/presentation/components/common/FileUpload';
+import ImageUpload from '@/presentation/components/common/ImageUpload';
+import VerticalList from '@/presentation/components/common/VerticalList';
+import ListItem from '@/presentation/components/common/ListItem';
 
 /**
  * 모델 등록 페이지

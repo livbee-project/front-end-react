@@ -1,9 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import SectionContainer from '@/presentation/components/SectionContainer';
-import VerticalList from '@/presentation/components/VerticalList';
-import ListItem from '@/presentation/components/ListItem';
-import PortfolioRowCard from '@/presentation/components/PortfolioRowCard';
+import SectionContainer from '@/presentation/components/common/SectionContainer';
+import VerticalList from '@/presentation/components/common/VerticalList';
+import ListItem from '@/presentation/components/common/ListItem';
+import PortfolioRowCard from '@/presentation/components/cards/PortfolioRowCard';
 
 /**
  * "이런 쇼호스트는 어떠세요?" 섹션 컴포넌트

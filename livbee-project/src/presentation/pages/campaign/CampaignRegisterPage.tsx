@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import TextInput from '@/presentation/components/TextInput';
-import SelectInput from '@/presentation/components/SelectInput';
-import DateInput from '@/presentation/components/DateInput';
-import TimeInput from '@/presentation/components/TimeInput';
-import ImageUpload from '@/presentation/components/ImageUpload';
+import TextInput from '@/presentation/components/forms/TextInput';
+import SelectInput from '@/presentation/components/forms/SelectInput';
+import DateInput from '@/presentation/components/forms/DateInput';
+import TimeInput from '@/presentation/components/forms/TimeInput';
+import ImageUpload from '@/presentation/components/common/ImageUpload';
 
 /**
  * 모집공고 등록 페이지

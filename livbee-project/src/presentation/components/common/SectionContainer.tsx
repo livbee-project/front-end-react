@@ -1,5 +1,5 @@
 import React from 'react';
-import Header from './Header'; // 기존에 생성한 Header 컴포넌트를 재사용
+import Header from './Header';
 
 /**
  * SectionContainer가 받을 props 타입을 정의합니다.

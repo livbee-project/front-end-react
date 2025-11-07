@@ -1,8 +1,8 @@
 import React from 'react';
-import CampaignDetailHeader from '@/presentation/components/CampaignDetailHeader';
-import BulletList from '@/presentation/components/BulletList';
-import InfoItem from '@/presentation/components/InfoItem';
-import ProductCard from '@/presentation/components/ProductCard';
+import CampaignDetailHeader from '@/presentation/components/common/CampaignDetailHeader';
+import BulletList from '@/presentation/components/common/BulletList';
+import InfoItem from '@/presentation/components/common/InfoItem';
+import ProductCard from '@/presentation/components/common/ProductCard';
 import '@/presentation/styles/global.css';
 
 /**

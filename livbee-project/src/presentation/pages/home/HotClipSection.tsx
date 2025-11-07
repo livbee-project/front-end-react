@@ -1,7 +1,7 @@
 import React from 'react';
 // 공통 컴포넌트 임포트
-import SectionContainer from '../../components/SectionContainer';
-import PortraitCard from '../../components/PortraitCard'; // PortraitCard 재사용
+import SectionContainer from '../../components/common/SectionContainer';
+import PortraitCard from '../../components/cards/PortraitCard'; // PortraitCard 재사용
 // 스크롤바 숨기기 CSS 임포트
 import '../../styles/global.css';
 

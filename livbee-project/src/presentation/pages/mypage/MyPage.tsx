@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RiArrowRightSLine } from 'react-icons/ri';
-import VerticalList from '@/presentation/components/VerticalList';
-import ListItem from '@/presentation/components/ListItem';
+import VerticalList from '@/presentation/components/common/VerticalList';
+import ListItem from '@/presentation/components/common/ListItem';
 
 const PLACEHOLDER_SUBTITLE = 'P.동해물과 백두산이 마르고 닳도록';
 

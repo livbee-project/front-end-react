@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 // import { useNavigate } from 'react-router-dom';
-import TextInput from '@/presentation/components/TextInput';
-import ToggleSwitch from '@/presentation/components/ToggleSwitch';
-import FileUpload from '@/presentation/components/FileUpload';
-import ImageUpload from '@/presentation/components/ImageUpload';
-import VerticalList from '@/presentation/components/VerticalList';
-import ListItem from '@/presentation/components/ListItem';
+import TextInput from '@/presentation/components/forms/TextInput';
+import ToggleSwitch from '@/presentation/components/common/ToggleSwitch';
+import FileUpload from '@/presentation/components/common/FileUpload';
+import ImageUpload from '@/presentation/components/common/ImageUpload';
+import VerticalList from '@/presentation/components/common/VerticalList';
+import ListItem from '@/presentation/components/common/ListItem';
 
 /**
  * 포트폴리오 등록 페이지
