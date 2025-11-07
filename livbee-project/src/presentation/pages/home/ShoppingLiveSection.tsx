@@ -40,7 +40,7 @@ const ShoppingLiveSection: React.FC = () => {
             brandName={`브랜드명 ${item}`}
             title={`[${item}] 지금 뜨는 라이브 제목`}
             content={`[${item}] 라이브 내용 요약이 여기에 표시됩니다...`}
-            onPress={() => console.log(`쇼핑라이브 Card ${item} 클릭`)}
+            onPress={() => navigate(`/campaigns/${item}`)}
             // --- 2. 상단 (TopContent) Prop 전달 ---
             topContent={
               <div

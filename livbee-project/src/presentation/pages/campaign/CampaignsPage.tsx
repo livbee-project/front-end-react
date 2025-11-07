@@ -61,7 +61,7 @@ const CampaignsPage: React.FC = () => {
           */
           <ListItem
             key={campaign.id}
-            onTap={() => console.log(`Campaign ${campaign.id} 클릭`)}
+            onTap={() => navigate(`/campaigns/${campaign.id}`)}
             style={{ borderBottom: 'none' }} // (추가) 구분선 숨기기
           >
             {/*

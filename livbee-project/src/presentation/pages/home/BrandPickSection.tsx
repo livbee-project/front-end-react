@@ -40,7 +40,7 @@ const BrandPickSection: React.FC = () => {
             brandName={`브랜드 ${item}`}
             title={`[${item}] 브랜드 픽 제목`}
             content={`[${item}] 브랜드 픽 내용 요약...`}
-            onPress={() => console.log(`브랜드 픽 Card ${item} 클릭`)}
+            onPress={() => navigate(`/campaigns/${item}`)}
             // --- 2. 상단 (TopContent) Prop 전달 ---
             // "브랜드 픽"에 맞는 150px 높이의 이미지 영역 UI
             topContent={
