@@ -5,6 +5,9 @@ import GalleryGrid from '@/presentation/components/common/GalleryGrid';
 import InfoItem from '@/presentation/components/common/InfoItem';
 import Tag from '@/presentation/components/common/Tag';
 import Button from '@/presentation/components/common/Button';
+import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
+import DetailSection from '@/presentation/layouts/DetailSection';
+import DetailContent from '@/presentation/layouts/DetailContent';
 import '@/presentation/styles/global.css';
 
 /**
@@ -17,33 +20,6 @@ import '@/presentation/styles/global.css';
  * 5. 하단 버튼
  */
 const PortfolioDetailPage: React.FC = () => {
-  /**
-   * 페이지 컨테이너 스타일
-   */
-  const pageStyle: React.CSSProperties = {
-    width: '100%',
-    backgroundColor: 'var(--white)',
-  };
-
-  /**
-   * 섹션 구분선 스타일
-   */
-  const dividerStyle: React.CSSProperties = {
-    borderBottom: '1px solid #F7F8FA',
-  };
-
-  /**
-   * 상세소개 컨텐츠 영역 스타일
-   */
-  const introContentStyle: React.CSSProperties = {
-    padding: '16px',
-    minHeight: '100px',
-    fontSize: 'var(--p2)', // 14px
-    fontWeight: 400,
-    color: 'var(--dark-gray)',
-  };
-
-
   /**
    * 태그 컨테이너 스타일
    */
@@ -80,7 +56,7 @@ const PortfolioDetailPage: React.FC = () => {
   };
 
   return (
-    <div style={pageStyle}>
+    <DetailPageLayout>
       {/* 1. 포트폴리오 프로필 섹션 */}
       <ModelProfileSection
         name="오해원"
@@ -89,17 +65,15 @@ const PortfolioDetailPage: React.FC = () => {
       />
 
       {/* 2. 상세소개 섹션 */}
-      <div style={dividerStyle}>
-        <div style={{ padding: '16px 16px 0 16px' }}>
+      <DetailSection showDivider>
+        <div style={{ paddingBottom: '16px' }}>
           <Header title="상세소개" />
         </div>
-        <div style={introContentStyle}>
-          내용을 입력해주세요
-        </div>
-      </div>
+        <DetailContent>내용을 입력해주세요</DetailContent>
+      </DetailSection>
 
       {/* 3. 갤러리 섹션 */}
-      <div style={{ ...dividerStyle, padding: '16px' }}>
+      <DetailSection>
         <Header title="갤러리" />
         <div style={{ marginTop: '16px' }}>
           <GalleryGrid
@@ -107,7 +81,7 @@ const PortfolioDetailPage: React.FC = () => {
             onImageClick={handleGalleryImageClick}
           />
         </div>
-      </div>
+      </DetailSection>
 
       {/* 4. 정보 및 태그 섹션 */}
       <div>
@@ -142,7 +116,7 @@ const PortfolioDetailPage: React.FC = () => {
           BUTTON
         </Button>
       </div>
-    </div>
+    </DetailPageLayout>
   );
 };
 

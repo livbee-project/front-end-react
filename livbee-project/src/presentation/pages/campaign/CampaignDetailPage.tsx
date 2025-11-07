@@ -4,6 +4,8 @@ import BulletList from '@/presentation/components/common/BulletList';
 import InfoItem from '@/presentation/components/common/InfoItem';
 import ProductCard from '@/presentation/components/common/ProductCard';
 import Button from '@/presentation/components/common/Button';
+import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
+import DetailSection from '@/presentation/layouts/DetailSection';
 import '@/presentation/styles/global.css';
 
 /**
@@ -19,31 +21,6 @@ import '@/presentation/styles/global.css';
  * 8. 하단 액션 버튼
  */
 const CampaignDetailPage: React.FC = () => {
-  /**
-   * 페이지 컨테이너 스타일
-   */
-  const pageStyle: React.CSSProperties = {
-    width: '100%',
-    backgroundColor: 'var(--white)',
-  };
-
-  /**
-   * 섹션 컨테이너 스타일
-   */
-  const sectionStyle: React.CSSProperties = {
-    padding: '16px',
-    borderBottom: '1px solid #F7F8FA',
-  };
-
-  /**
-   * 섹션 제목 스타일
-   */
-  const sectionTitleStyle: React.CSSProperties = {
-    fontSize: 'var(--h2)', // 18px
-    fontWeight: 700,
-    color: 'var(--black)',
-    marginBottom: '16px',
-  };
 
 
   /**
@@ -71,7 +48,7 @@ const CampaignDetailPage: React.FC = () => {
   };
 
   return (
-    <div style={pageStyle}>
+    <DetailPageLayout>
       {/* 1. 상단 헤더 */}
       <CampaignDetailHeader
         brandName="브랜드명"
@@ -82,8 +59,7 @@ const CampaignDetailPage: React.FC = () => {
       />
 
       {/* 2. 브랜드 소개 섹션 */}
-      <div style={sectionStyle}>
-        <h2 style={sectionTitleStyle}>■ 브랜드 소개</h2>
+      <DetailSection title="■ 브랜드 소개">
         <div style={{ marginBottom: '16px' }}>
           <p style={{ fontSize: 'var(--p2)', lineHeight: 1.6, marginBottom: '12px' }}>
             <strong>[BRAND NAME]</strong>는 "움직임이 스타일이 된다 (Move with Style)"를 슬로건으로 한 프리미엄 스니커즈 브랜드입니다.
@@ -102,11 +78,10 @@ const CampaignDetailPage: React.FC = () => {
             '유통채널: 자사몰 / 무신사 / 네이버 브랜드스토어 / 오프라인 팝업스토어',
           ]}
         />
-      </div>
+      </DetailSection>
 
       {/* 3. 모집부문 및 담당 업무 섹션 */}
-      <div style={sectionStyle}>
-        <h2 style={sectionTitleStyle}>■ 모집부문: 라이브커머스 쇼호스트 (Live Commerce Host)</h2>
+      <DetailSection title="■ 모집부문: 라이브커머스 쇼호스트 (Live Commerce Host)">
         <BulletList
           items={[
             '브랜드 공식 라이브커머스(네이버쇼핑 LIVE, 자사몰 LIVE 등) 진행',
@@ -116,11 +91,10 @@ const CampaignDetailPage: React.FC = () => {
             '방송 기획 및 콘텐츠 아이디어 제안',
           ]}
         />
-      </div>
+      </DetailSection>
 
       {/* 4. 자격요건 섹션 */}
-      <div style={sectionStyle}>
-        <h2 style={sectionTitleStyle}>■ 자격요건</h2>
+      <DetailSection title="■ 자격요건">
         <BulletList
           items={[
             '나이/학력 무관',
@@ -130,18 +104,17 @@ const CampaignDetailPage: React.FC = () => {
             '브랜드의 감성과 메시지를 진정성 있게 전달할 수 있는 분',
           ]}
         />
-      </div>
+      </DetailSection>
 
       {/* 5. 우대사항 섹션 */}
-      <div style={sectionStyle}>
-        <h2 style={sectionTitleStyle}>■ 우대사항</h2>
+      <DetailSection title="■ 우대사항">
         <BulletList
           items={[
             '패션 크리에이터, 인플루언서 경력 보유자',
             '영상 콘텐츠 기획 및 SNS 운영 경험자',
           ]}
         />
-      </div>
+      </DetailSection>
 
       {/* 6. 모집 상세 정보 필드 섹션 */}
       <div>
@@ -155,12 +128,12 @@ const CampaignDetailPage: React.FC = () => {
       </div>
 
       {/* 7. 관련 상품 정보 섹션 */}
-      <div style={sectionStyle}>
+      <DetailSection>
         <ProductCard
           productName="스니커즈 (상품명)"
           onClick={handleProductClick}
         />
-      </div>
+      </DetailSection>
 
       {/* 8. 하단 액션 버튼 */}
       <div style={{ padding: '16px' }}>
@@ -173,7 +146,7 @@ const CampaignDetailPage: React.FC = () => {
           BUTTON
         </Button>
       </div>
-    </div>
+    </DetailPageLayout>
   );
 };
 
