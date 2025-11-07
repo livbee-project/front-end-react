@@ -10,7 +10,7 @@ import {
   RiUserSettingsLine,
 } from 'react-icons/ri';
 // CSS 변수를 사용하기 위해 global.css 임포트
-import '../../styles/global.css';
+import '@/presentation/styles/global.css';
 
 /**
  * (임시) 인증 상태를 확인하는 훅

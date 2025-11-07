@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 // global.css의 CSS 변수(색상)와 .hide-scrollbar 클래스를 사용합니다.
-import '../../styles/global.css';
+import '@/presentation/styles/global.css';
 
 /**
  * Flutter 원본의

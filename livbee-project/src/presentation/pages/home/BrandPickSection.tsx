@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 // 공통 컴포넌트 임포트
-import SectionContainer from '../../components/common/SectionContainer';
-import RecruitCard from '../../components/cards/RecruitCard';
-import Button from '../../components/common/Button';
+import SectionContainer from '@/presentation/components/common/SectionContainer';
+import RecruitCard from '@/presentation/components/cards/RecruitCard';
+import Button from '@/presentation/components/common/Button';
 // 스크롤바 숨기기 CSS 임포트
-import '../../styles/global.css';
+import '@/presentation/styles/global.css';
 
 /**
  * "브랜드 픽" 섹션 컴포넌트

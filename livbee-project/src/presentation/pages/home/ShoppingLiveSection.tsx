@@ -1,10 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 // 공통 컴포넌트 임포트
-import SectionContainer from '../../components/common/SectionContainer';
-import RecruitCard from '../../components/cards/RecruitCard';
+import SectionContainer from '@/presentation/components/common/SectionContainer';
+import RecruitCard from '@/presentation/components/cards/RecruitCard';
 // 스크롤바 숨기기 CSS 임포트
-import '../../styles/global.css';
+import '@/presentation/styles/global.css';
 
 /**
  * "지금 뜨는 쇼핑라이브" 섹션 컴포넌트

@@ -1,9 +1,9 @@
 import React from 'react';
 // 공통 컴포넌트 임포트
-import SectionContainer from '../../components/common/SectionContainer';
-import PortraitCard from '../../components/cards/PortraitCard'; // PortraitCard 재사용
+import SectionContainer from '@/presentation/components/common/SectionContainer';
+import PortraitCard from '@/presentation/components/cards/PortraitCard'; // PortraitCard 재사용
 // 스크롤바 숨기기 CSS 임포트
-import '../../styles/global.css';
+import '@/presentation/styles/global.css';
 
 /**
  * "HOT CLIP" 섹션 컴포넌트

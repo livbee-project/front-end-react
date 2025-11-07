@@ -1,9 +1,9 @@
 import React from 'react';
 // (추가) 방금 생성한 useSlider 훅 임포트
-import { useSlider } from '../../hooks/useSlider';
+import { useSlider } from '@/presentation/hooks/useSlider';
 
-import banner01 from '../../assets/images/banner_01.jpg';
-import banner02 from '../../assets/images/banner_02.jpg';
+import banner01 from '@/presentation/assets/images/banner_01.jpg';
+import banner02 from '@/presentation/assets/images/banner_02.jpg';
 
 // (수정) 텍스트/색상에서 실제 임포트한 이미지 경로(src)로 변경합니다.
 const MOCK_BANNERS = [

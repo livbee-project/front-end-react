@@ -9,7 +9,7 @@ import ConceptModelSection from './ConceptModelSection';
 import HotClipSection from './HotClipSection';
 
 // (유지) 스크롤바 숨기기 클래스를 위해 import
-import '../../styles/global.css';
+import '@/presentation/styles/global.css';
 
 /**
  * 홈 페이지 컴포넌트
