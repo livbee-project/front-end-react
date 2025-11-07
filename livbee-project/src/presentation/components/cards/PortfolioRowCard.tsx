@@ -1,4 +1,5 @@
 import React from 'react';
+import { GAP, FONT_SIZE, FONT_WEIGHT, TEXT_COLOR, ELLIPSIS_TEXT, BORDER_RADIUS } from '@/presentation/styles/constants';
 
 /**
  * PortfolioRowCard가 받을 props 타입을 정의합니다.
@@ -30,59 +31,55 @@ const PortfolioRowCard: React.FC<PortfolioRowCardProps> = ({
 }) => {
   // --- 스타일 정의 ---
 
-  // 1. 좌측 텍스트 컨테이너 (Flutter: Expanded(flex: 7))
+  // 1. 좌측 텍스트 컨테이너
   const textContainerStyle: React.CSSProperties = {
-    flex: 1, // 남은 공간을 모두 차지
+    flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    gap: 5, // Flutter 원본(SizedBox(5))
-    minWidth: 0, // flex 컨테이너 내에서 ellipsis가 잘 동작하도록 설정
+    gap: GAP.SM,
+    minWidth: 0,
   };
 
   // 1a. 상단 제목 + 제안하기 Row
   const topRowStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: 10, // Flutter 원본(SizedBox(10))
+    gap: GAP.LG,
   };
 
-  // 1a-1. 제목 텍스트 (Flutter: Expanded(flex: 3))
+  // 1a-1. 제목 텍스트
   const titleStyle: React.CSSProperties = {
-    flex: 1, // 남은 공간 차지
-    fontWeight: 500,
-    fontSize: 'var(--h2)', // 18px (React 기준)
-    color: 'var(--black)',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    flex: 1,
+    fontWeight: FONT_WEIGHT.MEDIUM,
+    fontSize: FONT_SIZE.LG,
+    color: TEXT_COLOR.BLACK,
+    ...ELLIPSIS_TEXT,
   };
 
   // 1a-2. "제안하기" 텍스트
   const offerStyle: React.CSSProperties = {
-    fontWeight: 500,
-    fontSize: 'var(--h2)', // 18px
-    color: 'var(--primary)',
+    fontWeight: FONT_WEIGHT.MEDIUM,
+    fontSize: FONT_SIZE.LG,
+    color: TEXT_COLOR.PRIMARY,
     cursor: onOfferPress ? 'pointer' : 'default',
-    flexShrink: 0, // 줄어들지 않음
+    flexShrink: 0,
   };
 
   // 1b. 하단 내용 텍스트
   const contentStyle: React.CSSProperties = {
-    fontWeight: 400,
-    fontSize: '12px', // Flutter p(12px)
-    color: 'var(--dark-gray)',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    fontWeight: FONT_WEIGHT.NORMAL,
+    fontSize: FONT_SIZE.XS,
+    color: TEXT_COLOR.DARK_GRAY,
+    ...ELLIPSIS_TEXT,
   };
 
-  // 2. 우측 원형 이미지 (Flutter: Container(100, 100))
+  // 2. 우측 원형 이미지
   const imageContainerStyle: React.CSSProperties = {
     width: 100,
     height: 100,
-    flexShrink: 0, // 줄어들지 않음
-    borderRadius: '50%',
-    border: '1px solid var(--dark-gray)',
+    flexShrink: 0,
+    borderRadius: BORDER_RADIUS.CIRCLE,
+    border: `1px solid ${TEXT_COLOR.DARK_GRAY}`,
     // 이미지 URL이 있으면 배경 이미지로, 없으면 회색 배경
     backgroundColor: imageUrl ? 'transparent' : 'var(--bs-gray-200)',
     backgroundImage: imageUrl ? `url(${imageUrl})` : 'none',
@@ -102,7 +99,7 @@ const PortfolioRowCard: React.FC<PortfolioRowCardProps> = ({
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 16, // Flutter 원본(SizedBox(16))
+        gap: GAP.XXL,
         width: '100%',
         cursor: onCardPress ? 'pointer' : 'default',
       }}

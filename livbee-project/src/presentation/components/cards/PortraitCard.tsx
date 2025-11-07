@@ -1,4 +1,5 @@
 import React from 'react';
+import { GAP, FONT_SIZE, FONT_WEIGHT, TEXT_COLOR, ELLIPSIS_TEXT, BORDER_RADIUS, SPACING } from '@/presentation/styles/constants';
 
 /**
  * PortraitCard가 받을 props 타입을 정의합니다.
@@ -46,9 +47,9 @@ const PortraitCard: React.FC<PortraitCardProps> = ({
     width: isDefaultWidth ? 300 : '100%',
     height: isDefaultWidth ? 400 : undefined,
     aspectRatio: isDefaultWidth ? undefined : '3/4', // 비율 유지 (3:4) - 반응형일 때만 적용
-    backgroundColor: '#f0f0f0', // 이미지 없을 시 배경색
-    borderRadius: 10, // 다른 카드와 통일성을 위해 10px 적용
-    border: '1px solid var(--dark-gray)', // 다른 카드와 통일성을 위해 적용
+    backgroundColor: '#f0f0f0',
+    borderRadius: BORDER_RADIUS.MD,
+    border: `1px solid ${TEXT_COLOR.DARK_GRAY}`,
 
     // 이미지 처리
     backgroundImage: imageUrl ? `url(${imageUrl})` : 'none',
@@ -67,31 +68,26 @@ const PortraitCard: React.FC<PortraitCardProps> = ({
   const textContainerStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
-    paddingTop: 20, // Flutter 원본(SizedBox(20))
-    gap: 10, // Flutter 원본(SizedBox(10))
+    paddingTop: SPACING.XL,
+    gap: GAP.LG,
   };
 
   // 4. 제목 텍스트
   const titleStyle: React.CSSProperties = {
-    fontWeight: 400,
-    // Flutter의 AppTexts.h2(16.0)와 일치하는 React의 var(--h3)
-    fontSize: 'var(--h3)',
-    color: 'var(--black)',
+    fontWeight: FONT_WEIGHT.NORMAL,
+    fontSize: FONT_SIZE.MD,
+    color: TEXT_COLOR.BLACK,
     width: '100%',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    ...ELLIPSIS_TEXT,
   };
 
   // 5. 내용 텍스트
   const contentStyle: React.CSSProperties = {
-    fontWeight: 400,
-    fontSize: '12px', // Flutter의 AppTexts.p(12.0)
-    color: 'var(--dark-gray)',
+    fontWeight: FONT_WEIGHT.NORMAL,
+    fontSize: FONT_SIZE.XS,
+    color: TEXT_COLOR.DARK_GRAY,
     width: '100%',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    ...ELLIPSIS_TEXT,
   };
 
   // --- 컴포넌트 렌더링 ---
