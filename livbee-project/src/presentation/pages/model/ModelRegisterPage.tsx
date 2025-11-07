@@ -5,6 +5,7 @@ import FileUpload from '@/presentation/components/common/FileUpload';
 import ImageUpload from '@/presentation/components/common/ImageUpload';
 import VerticalList from '@/presentation/components/common/VerticalList';
 import ListItem from '@/presentation/components/common/ListItem';
+import Button from '@/presentation/components/common/Button';
 
 /**
  * 모델 등록 페이지
@@ -278,22 +279,14 @@ const ModelRegisterPage: React.FC = () => {
 
       {/* 하단 버튼 */}
       <div style={{ marginTop: '32px' }}>
-        <button
+        <Button
+          variant="primary"
+          size="medium"
+          fullWidth
           onClick={handleSubmit}
-          style={{
-            width: '100%',
-            padding: '16px',
-            backgroundColor: 'var(--primary)',
-            color: 'var(--white)',
-            border: 'none',
-            borderRadius: 12,
-            fontSize: 'var(--h3)',
-            fontWeight: 500,
-            cursor: 'pointer',
-          }}
         >
           BUTTON
-        </button>
+        </Button>
       </div>
     </div>
   );

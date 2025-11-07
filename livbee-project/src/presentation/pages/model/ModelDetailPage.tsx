@@ -4,6 +4,7 @@ import Header from '@/presentation/components/common/Header';
 import GalleryGrid from '@/presentation/components/common/GalleryGrid';
 import InfoItem from '@/presentation/components/common/InfoItem';
 import Tag from '@/presentation/components/common/Tag';
+import Button from '@/presentation/components/common/Button';
 import '@/presentation/styles/global.css';
 
 /**
@@ -42,23 +43,6 @@ const ModelDetailPage: React.FC = () => {
     color: 'var(--dark-gray)',
   };
 
-  /**
-   * 하단 버튼 스타일
-   */
-  const buttonStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '16px',
-    backgroundColor: 'var(--primary)',
-    color: 'var(--white)',
-    fontSize: 'var(--h2)', // 18px
-    fontWeight: 700,
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    margin: '16px',
-    maxWidth: 'calc(100% - 32px)',
-    boxSizing: 'border-box',
-  };
 
   /**
    * 태그 컨테이너 스타일
@@ -148,9 +132,16 @@ const ModelDetailPage: React.FC = () => {
       </div>
 
       {/* 5. 하단 버튼 */}
-      <button style={buttonStyle} onClick={handleButtonClick}>
-        BUTTON
-      </button>
+      <div style={{ padding: '16px' }}>
+        <Button
+          variant="primary"
+          size="large"
+          fullWidth
+          onClick={handleButtonClick}
+        >
+          BUTTON
+        </Button>
+      </div>
     </div>
   );
 };

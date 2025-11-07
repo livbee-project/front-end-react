@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 // 공통 컴포넌트 임포트
 import SectionContainer from '../../components/common/SectionContainer';
 import RecruitCard from '../../components/cards/RecruitCard';
+import Button from '../../components/common/Button';
 // 스크롤바 숨기기 CSS 임포트
 import '../../styles/global.css';
 
@@ -80,21 +81,14 @@ const BrandPickSection: React.FC = () => {
             // --- 3. 하단 (BottomContent) Prop 전달 ---
             // "브랜드 픽"에 맞는 'BUTTON' UI
             bottomContent={
-              <div
-                style={{
-                  width: '100%',
-                  padding: '10px 0',
-                  background: 'var(--primary)',
-                  color: 'var(--white)',
-                  borderRadius: 10,
-                  textAlign: 'center',
-                  fontSize: 'var(--p2)',
-                  fontWeight: 400,
-                  cursor: 'pointer',
-                }}
+              <Button
+                variant="primary"
+                size="small"
+                fullWidth
+                onClick={() => navigate('/campaigns')}
               >
                 BUTTON
-              </div>
+              </Button>
             }
           />
         ))}
