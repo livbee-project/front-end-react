@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import SearchInput from '@/presentation/components/common/SearchInput';
 import PortfolioRowCard from '@/presentation/components/cards/PortfolioRowCard';
 import VerticalList from '@/presentation/components/common/VerticalList';
 import ListItem from '@/presentation/components/common/ListItem';
-import FloatingActionButton from '@/presentation/components/common/FloatingActionButton';
+import ListPageLayout from '@/presentation/layouts/ListPageLayout';
 
 /**
  * 리스트 렌더링을 위한 임시 목업 데이터
@@ -17,34 +16,12 @@ const MOCK_PORTFOLIOS = Array.from({ length: 15 }, (_, i) => ({
 
 const PortfolioPage: React.FC = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const handleSearchSubmit = (query: string) => {
-    console.log('검색 실행:', query);
-    // TODO: 추후 ViewModel(데이터 관리 로직)과 연결
-  };
 
   return (
-    <div style={{ padding: '16px' }}>
-      <SearchInput
-        placeholder="검색"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        onSearchSubmit={handleSearchSubmit}
-      />
-
-      <p
-        style={{
-          marginBlockStart: '40px',
-          marginBlockEnd: 0,
-          fontSize: '12px',
-          color: 'var(--dark-gray)',
-          marginBottom: '20px',
-        }}
-      >
-        카드를 누르면 상세 정보를 보실 수 있습니다.
-      </p>
-
+    <ListPageLayout
+      searchPlaceholder="검색"
+      floatingActionButtonPath="/portfolios/register"
+    >
       {/* 포트폴리오 리스트 */}
       <VerticalList showDividers={true}>
         {MOCK_PORTFOLIOS.map((portfolio) => (
@@ -61,12 +38,7 @@ const PortfolioPage: React.FC = () => {
           </ListItem>
         ))}
       </VerticalList>
-
-      {/* 플로팅 액션 버튼 */}
-      <FloatingActionButton
-        onClick={() => navigate('/portfolios/register')}
-      />
-    </div>
+    </ListPageLayout>
   );
 };
 

@@ -3,7 +3,7 @@ import ModelProfileSection from '@/presentation/components/common/ModelProfileSe
 import Header from '@/presentation/components/common/Header';
 import GalleryGrid from '@/presentation/components/common/GalleryGrid';
 import InfoItem from '@/presentation/components/common/InfoItem';
-import Tag from '@/presentation/components/common/Tag';
+import TagContainer from '@/presentation/components/common/TagContainer';
 import Button from '@/presentation/components/common/Button';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';
@@ -20,17 +20,6 @@ import '@/presentation/styles/global.css';
  * 5. 하단 버튼
  */
 const PortfolioDetailPage: React.FC = () => {
-  /**
-   * 태그 컨테이너 스타일
-   */
-  const tagContainerStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: '8px',
-    flexWrap: 'wrap',
-  };
-
   /**
    * 프로필 이미지 클릭 핸들러
    */
@@ -94,14 +83,16 @@ const PortfolioDetailPage: React.FC = () => {
         
         {/* 태그가 포함된 정보 항목 */}
         <InfoItem title="타이틀">
-          <div style={tagContainerStyle}>
-            <Tag label="CH" variant="circle" />
-            <Tag label="CH" variant="circle" />
-            <Tag label="CH" variant="circle" />
-            <Tag label="CH" variant="circle" />
-            <Tag label="CH" variant="circle" />
-            <Tag label="CH" variant="circle" />
-          </div>
+          <TagContainer
+            tags={[
+              { label: 'CH', variant: 'circle' },
+              { label: 'CH', variant: 'circle' },
+              { label: 'CH', variant: 'circle' },
+              { label: 'CH', variant: 'circle' },
+              { label: 'CH', variant: 'circle' },
+              { label: 'CH', variant: 'circle' },
+            ]}
+          />
         </InfoItem>
       </div>
 

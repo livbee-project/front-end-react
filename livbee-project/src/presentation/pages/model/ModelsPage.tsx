@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import SearchInput from '@/presentation/components/common/SearchInput';
 import PortraitCard from '@/presentation/components/cards/PortraitCard';
-import FloatingActionButton from '@/presentation/components/common/FloatingActionButton';
+import ListPageLayout from '@/presentation/layouts/ListPageLayout';
 
 /**
  * 리스트 렌더링을 위한 임시 목업 데이터
@@ -15,36 +14,13 @@ const MOCK_MODELS = Array.from({ length: 15 }, (_, i) => ({
 
 const ModelsPage: React.FC = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const handleSearchSubmit = (query: string) => {
-    console.log('검색 실행:', query);
-    // TODO: 추후 ViewModel(데이터 관리 로직)과 연결
-  };
 
   return (
-    <div style={{ padding: '16px 0' }}>
-      <div style={{ padding: '0 10px' }}>
-        <SearchInput
-          placeholder="모델명·소개로 검색"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onSearchSubmit={handleSearchSubmit}
-        />
-
-        <p
-          style={{
-            marginBlockStart: '40px',
-            marginBlockEnd: 0,
-            fontSize: '12px',
-            color: 'var(--dark-gray)',
-            marginBottom: '20px',
-          }}
-        >
-          카드를 누르면 상세 정보를 보실 수 있습니다.
-        </p>
-      </div>
-
+    <ListPageLayout
+      searchPlaceholder="모델명·소개로 검색"
+      floatingActionButtonPath="/models/register"
+      pageStyle={{ padding: '16px 0' }}
+    >
       {/* 모델 리스트 - 2열 그리드 구조 */}
       <div
         style={{
@@ -56,11 +32,11 @@ const ModelsPage: React.FC = () => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', // minmax로 오버플로우 방지
-            gap: '0 30px', // 열 사이 간격 30px
+            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+            gap: '0 30px',
             width: '100%',
             boxSizing: 'border-box',
-            minWidth: 0, // 오버플로우 방지
+            minWidth: 0,
           }}
         >
           {MOCK_MODELS.map((model) => (
@@ -68,7 +44,7 @@ const ModelsPage: React.FC = () => {
               key={model.id}
               style={{
                 width: '100%',
-                minWidth: 0, // 오버플로우 방지
+                minWidth: 0,
                 marginBottom: '20px',
                 boxSizing: 'border-box',
               }}
@@ -83,12 +59,7 @@ const ModelsPage: React.FC = () => {
           ))}
         </div>
       </div>
-
-      {/* 플로팅 액션 버튼 */}
-      <FloatingActionButton
-        onClick={() => navigate('/models/register')}
-      />
-    </div>
+    </ListPageLayout>
   );
 };
 
