@@ -50,7 +50,7 @@ const PortfolioPage: React.FC = () => {
         {MOCK_PORTFOLIOS.map((portfolio) => (
           <ListItem
             key={portfolio.id}
-            onTap={() => console.log(`Portfolio ${portfolio.id} 클릭`)}
+            onTap={() => navigate(`/portfolios/${portfolio.id}`)}
           >
             <PortfolioRowCard
               title={portfolio.name}

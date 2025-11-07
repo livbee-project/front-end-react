@@ -50,7 +50,7 @@ const HowShowhostSection: React.FC = () => {
                 content={item.content}
                 // imageUrl={item.imageUrl} (이미지 URL prop)
                 onOfferPress={() => console.log(`제안하기 ${item.id}`)}
-                onCardPress={() => console.log(`포트폴리오 ${item.id} 클릭`)}
+                onCardPress={() => navigate(`/portfolios/${item.id}`)}
               />
             </ListItem>
           ))}

@@ -11,6 +11,7 @@ import ModelRegisterPage from '@/presentation/pages/model/ModelRegisterPage';
 import ModelDetailPage from '@/presentation/pages/model/ModelDetailPage';
 import PortfolioPage from '@/presentation/pages/portfolio/PortfolioPage';
 import PortfolioRegisterPage from '@/presentation/pages/portfolio/PortfolioRegisterPage';
+import PortfolioDetailPage from '@/presentation/pages/portfolio/PortfolioDetailPage';
 import MyPage from '@/presentation/pages/mypage/MyPage';
 
 const AppRouter = () => (
@@ -54,6 +55,7 @@ const AppRouter = () => (
             <Route path="/models/:id" element={<ModelDetailPage />} />
             <Route path="/portfolios" element={<PortfolioPage />} />
             <Route path="/portfolios/register" element={<PortfolioRegisterPage />} />
+            <Route path="/portfolios/:id" element={<PortfolioDetailPage />} />
             <Route path="/mypage" element={<MyPage />} />
           </Route>
 
