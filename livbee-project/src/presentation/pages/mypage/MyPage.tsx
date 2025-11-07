@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { RiArrowRightSLine } from 'react-icons/ri';
 import VerticalList from '@/presentation/components/common/VerticalList';
 import ListItem from '@/presentation/components/common/ListItem';
+import SectionTitle from '@/presentation/components/common/SectionTitle';
 
 const PLACEHOLDER_SUBTITLE = 'P.동해물과 백두산이 마르고 닳도록';
 
@@ -61,29 +62,6 @@ const MenuItem: React.FC<MenuItemProps> = ({ title, subtitle, onTap }) => {
   );
 };
 
-/**
- * 섹션 제목 컴포넌트
- */
-interface SectionTitleProps {
-  title: string;
-  isFirst?: boolean;
-}
-
-const SectionTitle: React.FC<SectionTitleProps> = ({ title, isFirst = false }) => {
-  return (
-    <h2
-      style={{
-        fontSize: 'var(--h3)', // 16px
-        fontWeight: 500,
-        color: 'var(--dark-gray)',
-        margin: 0,
-        padding: isFirst ? '16px 16px 16px 16px' : '32px 16px 16px 16px',
-      }}
-    >
-      {title}
-    </h2>
-  );
-};
 
 const MyPage: React.FC = () => {
   const navigate = useNavigate();
@@ -91,7 +69,9 @@ const MyPage: React.FC = () => {
   return (
     <div style={{ padding: '0' }}>
       {/* 공통 섹션 */}
-      <SectionTitle title="공통" isFirst={true} />
+      <div style={{ padding: '16px 16px 16px 16px' }}>
+        <SectionTitle variant="subtitle" marginBottom="0">공통</SectionTitle>
+      </div>
       <div style={{ padding: '0 16px' }}>
         <VerticalList showDividers={true}>
           <MenuItem
@@ -117,7 +97,9 @@ const MyPage: React.FC = () => {
       </div>
 
       {/* 브랜드 섹션 */}
-      <SectionTitle title="브랜드" />
+      <div style={{ padding: '32px 16px 16px 16px' }}>
+        <SectionTitle variant="subtitle" marginBottom="0">브랜드</SectionTitle>
+      </div>
       <div style={{ padding: '0 16px' }}>
         <VerticalList showDividers={true}>
           <MenuItem
@@ -144,7 +126,9 @@ const MyPage: React.FC = () => {
       </div>
 
       {/* 쇼호스트 & 모델 섹션 */}
-      <SectionTitle title="쇼호스트 & 모델" />
+      <div style={{ padding: '32px 16px 16px 16px' }}>
+        <SectionTitle variant="subtitle" marginBottom="0">쇼호스트 & 모델</SectionTitle>
+      </div>
       <div style={{ padding: '0 16px' }}>
         <VerticalList showDividers={true}>
           <MenuItem

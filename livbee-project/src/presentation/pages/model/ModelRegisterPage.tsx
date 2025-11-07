@@ -6,6 +6,7 @@ import ImageUpload from '@/presentation/components/common/ImageUpload';
 import VerticalList from '@/presentation/components/common/VerticalList';
 import ListItem from '@/presentation/components/common/ListItem';
 import Button from '@/presentation/components/common/Button';
+import SectionTitle from '@/presentation/components/common/SectionTitle';
 
 /**
  * 모델 등록 페이지
@@ -82,12 +83,6 @@ const ModelRegisterPage: React.FC = () => {
     marginBottom: '24px',
   };
 
-  const sectionTitleStyle: React.CSSProperties = {
-    fontSize: 'var(--h3)',
-    fontWeight: 400,
-    color: 'var(--black)',
-    marginBottom: '12px',
-  };
 
   const rowStyle: React.CSSProperties = {
     display: 'flex',
@@ -102,7 +97,7 @@ const ModelRegisterPage: React.FC = () => {
       <div style={sectionStyle}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
           <div style={{ flex: 1 }}>
-            <div style={sectionTitleStyle}>이름</div>
+            <SectionTitle variant="default" marginBottom="12px">이름</SectionTitle>
             <TextInput
               placeholder="내용을 입력해주세요"
               value={formData.name}
@@ -145,7 +140,7 @@ const ModelRegisterPage: React.FC = () => {
 
       {/* 웹사이트 */}
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>웹사이트</div>
+        <SectionTitle variant="default" marginBottom="12px">웹사이트</SectionTitle>
         <VerticalList showDividers={false}>
           {[0, 1, 2].map((index) => (
             <ListItem key={index} style={{ padding: '0', marginBottom: '12px' }}>
@@ -182,7 +177,7 @@ const ModelRegisterPage: React.FC = () => {
 
       {/* 포트폴리오 */}
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>포트폴리오</div>
+        <SectionTitle variant="default" marginBottom="12px">포트폴리오</SectionTitle>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <FileUpload label="아바타" />
           <FileUpload label="모드볼륨2" />
@@ -191,7 +186,7 @@ const ModelRegisterPage: React.FC = () => {
 
       {/* 연락처 */}
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>연락처</div>
+        <SectionTitle variant="default" marginBottom="12px">연락처</SectionTitle>
         <div style={rowStyle}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <TextInput
@@ -209,7 +204,7 @@ const ModelRegisterPage: React.FC = () => {
 
       {/* 오픈채팅방 */}
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>오픈채팅방</div>
+        <SectionTitle variant="default" marginBottom="12px">오픈채팅방</SectionTitle>
         <div style={rowStyle}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <TextInput
@@ -227,7 +222,7 @@ const ModelRegisterPage: React.FC = () => {
 
       {/* 태그 */}
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>태그</div>
+        <SectionTitle variant="default" marginBottom="12px">태그</SectionTitle>
         <VerticalList showDividers={false}>
           {formData.tags.map((tag, index) => (
             <ListItem key={index} style={{ padding: '0', marginBottom: '12px' }}>
@@ -263,7 +258,7 @@ const ModelRegisterPage: React.FC = () => {
 
       {/* 갤러리 */}
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>갤러리</div>
+        <SectionTitle variant="default" marginBottom="12px">갤러리</SectionTitle>
         <div
           style={{
             display: 'grid',

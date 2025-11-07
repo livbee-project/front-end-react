@@ -7,6 +7,7 @@ import ImageUpload from '@/presentation/components/common/ImageUpload';
 import VerticalList from '@/presentation/components/common/VerticalList';
 import ListItem from '@/presentation/components/common/ListItem';
 import Button from '@/presentation/components/common/Button';
+import SectionTitle from '@/presentation/components/common/SectionTitle';
 
 /**
  * 포트폴리오 등록 페이지
@@ -65,12 +66,6 @@ const PortfolioRegisterPage: React.FC = () => {
     marginBottom: '24px',
   };
 
-  const sectionTitleStyle: React.CSSProperties = {
-    fontSize: 'var(--h3)',
-    fontWeight: 400,
-    color: 'var(--black)',
-    marginBottom: '12px',
-  };
 
   const rowStyle: React.CSSProperties = {
     display: 'flex',
@@ -85,7 +80,7 @@ const PortfolioRegisterPage: React.FC = () => {
       <div style={sectionStyle}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
           <div style={{ flex: 1 }}>
-            <div style={sectionTitleStyle}>이름</div>
+            <SectionTitle variant="default" marginBottom="12px">이름</SectionTitle>
             <div
               style={{
                 fontSize: '12px',
@@ -142,7 +137,7 @@ const PortfolioRegisterPage: React.FC = () => {
 
       {/* 웹사이트 */}
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>웹사이트</div>
+        <SectionTitle variant="default" marginBottom="12px">웹사이트</SectionTitle>
         <VerticalList showDividers={false}>
           {[0, 1, 2].map((index) => (
             <ListItem key={index} style={{ padding: '0', marginBottom: '12px' }}>
@@ -188,7 +183,7 @@ const PortfolioRegisterPage: React.FC = () => {
 
       {/* 포트폴리오 */}
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>포트폴리오</div>
+        <SectionTitle variant="default" marginBottom="12px">포트폴리오</SectionTitle>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <FileUpload label="이력서" />
           <FileUpload label="포트폴리오" />
@@ -197,7 +192,7 @@ const PortfolioRegisterPage: React.FC = () => {
 
       {/* 연락처 */}
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>연락처</div>
+        <SectionTitle variant="default" marginBottom="12px">연락처</SectionTitle>
         <div style={rowStyle}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <TextInput
@@ -215,7 +210,7 @@ const PortfolioRegisterPage: React.FC = () => {
 
       {/* 오픈채팅방 */}
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>오픈채팅방</div>
+        <SectionTitle variant="default" marginBottom="12px">오픈채팅방</SectionTitle>
         <div style={rowStyle}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <TextInput
@@ -233,7 +228,7 @@ const PortfolioRegisterPage: React.FC = () => {
 
       {/* 태그 */}
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>태그</div>
+        <SectionTitle variant="default" marginBottom="12px">태그</SectionTitle>
         <VerticalList showDividers={false}>
           {[0, 1, 2, 3, 4].map((index) => (
             <ListItem key={index} style={{ padding: '0', marginBottom: '12px' }}>
@@ -269,7 +264,7 @@ const PortfolioRegisterPage: React.FC = () => {
 
       {/* 갤러리 */}
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>갤러리</div>
+        <SectionTitle variant="default" marginBottom="12px">갤러리</SectionTitle>
         <ImageUpload size={120} />
       </div>
 

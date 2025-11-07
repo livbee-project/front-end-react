@@ -5,6 +5,7 @@ import DateInput from '@/presentation/components/forms/DateInput';
 import TimeInput from '@/presentation/components/forms/TimeInput';
 import ImageUpload from '@/presentation/components/common/ImageUpload';
 import Button from '@/presentation/components/common/Button';
+import SectionTitle from '@/presentation/components/common/SectionTitle';
 
 /**
  * 모집공고 등록 페이지
@@ -39,13 +40,6 @@ const CampaignRegisterPage: React.FC = () => {
     marginBottom: '24px',
   };
 
-  const sectionTitleStyle: React.CSSProperties = {
-    fontSize: 'var(--h3)',
-    fontWeight: 400,
-    color: 'var(--black)',
-    marginBottom: '12px',
-  };
-
   const recruitmentTypeOptions = [
     { value: 'store', label: '스토스트 모집' },
     { value: 'model', label: '모델 모집' },
@@ -63,7 +57,7 @@ const CampaignRegisterPage: React.FC = () => {
     <div style={{ padding: '16px', paddingBottom: '32px' }}>
       {/* 대표이미지 1:2 */}
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>대표이미지 1:2*</div>
+        <SectionTitle variant="default" marginBottom="16px">대표이미지 1:2*</SectionTitle>
         <ImageUpload size={200} aspectRatio="1:2" />
       </div>
 
@@ -191,13 +185,13 @@ const CampaignRegisterPage: React.FC = () => {
 
       {/* 상품 이미지 1:1 */}
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>상품 이미지 1:1</div>
+        <SectionTitle variant="default" marginBottom="16px">상품 이미지 1:1</SectionTitle>
         <ImageUpload size={200} aspectRatio="1:1" />
       </div>
 
       {/* 쇼핑라이브 커버 3:4 */}
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>쇼핑라이브 커버 3:4</div>
+        <SectionTitle variant="default" marginBottom="16px">쇼핑라이브 커버 3:4</SectionTitle>
         <ImageUpload size={200} aspectRatio="3:4" />
       </div>
 

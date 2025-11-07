@@ -1,4 +1,5 @@
 import React from 'react';
+import SectionTitle from '@/presentation/components/common/SectionTitle';
 
 /**
  * DetailSection 컴포넌트가 받을 props 타입을 정의합니다.
@@ -30,18 +31,18 @@ const DetailSection: React.FC<DetailSectionProps> = ({
   };
 
   /**
-   * 섹션 제목 스타일
+   * 제목에서 "■" 기호 추출
    */
-  const sectionTitleStyle: React.CSSProperties = {
-    fontSize: 'var(--h2)', // 18px
-    fontWeight: 700,
-    color: 'var(--black)',
-    marginBottom: '16px',
-  };
+  const hasBullet = title ? title.startsWith('■') : false;
+  const titleText = title && hasBullet ? title.substring(2).trim() : title;
 
   return (
     <div style={sectionStyle}>
-      {title && <h2 style={sectionTitleStyle}>{title}</h2>}
+      {title && (
+        <SectionTitle variant="detail" showBullet={hasBullet}>
+          {titleText}
+        </SectionTitle>
+      )}
       {children}
     </div>
   );

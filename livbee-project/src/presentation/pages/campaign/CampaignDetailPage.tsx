@@ -59,7 +59,7 @@ const CampaignDetailPage: React.FC = () => {
       />
 
       {/* 2. 브랜드 소개 섹션 */}
-      <DetailSection title="■ 브랜드 소개">
+      <DetailSection title="브랜드 소개">
         <div style={{ marginBottom: '16px' }}>
           <p style={{ fontSize: 'var(--p2)', lineHeight: 1.6, marginBottom: '12px' }}>
             <strong>[BRAND NAME]</strong>는 "움직임이 스타일이 된다 (Move with Style)"를 슬로건으로 한 프리미엄 스니커즈 브랜드입니다.
@@ -81,7 +81,7 @@ const CampaignDetailPage: React.FC = () => {
       </DetailSection>
 
       {/* 3. 모집부문 및 담당 업무 섹션 */}
-      <DetailSection title="■ 모집부문: 라이브커머스 쇼호스트 (Live Commerce Host)">
+      <DetailSection title="모집부문: 라이브커머스 쇼호스트 (Live Commerce Host)">
         <BulletList
           items={[
             '브랜드 공식 라이브커머스(네이버쇼핑 LIVE, 자사몰 LIVE 등) 진행',
@@ -94,7 +94,7 @@ const CampaignDetailPage: React.FC = () => {
       </DetailSection>
 
       {/* 4. 자격요건 섹션 */}
-      <DetailSection title="■ 자격요건">
+      <DetailSection title="자격요건">
         <BulletList
           items={[
             '나이/학력 무관',
@@ -107,7 +107,7 @@ const CampaignDetailPage: React.FC = () => {
       </DetailSection>
 
       {/* 5. 우대사항 섹션 */}
-      <DetailSection title="■ 우대사항">
+      <DetailSection title="우대사항">
         <BulletList
           items={[
             '패션 크리에이터, 인플루언서 경력 보유자',
