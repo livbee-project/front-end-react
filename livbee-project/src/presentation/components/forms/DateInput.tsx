@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { RiCalendarLine } from 'react-icons/ri';
 import DatePickerModal from './DatePickerModal';
+import InputWrapper from '@/presentation/components/common/InputWrapper';
+import InputIcon from '@/presentation/components/common/InputIcon';
+import { INPUT_BASE_STYLE } from '@/presentation/styles/constants';
 
 /**
  * DateInput이 받을 props 타입을 정의합니다.
@@ -22,38 +25,8 @@ const DateInput: React.FC<DateInputProps> = ({ label, value, onChange, ...rest }
    * 입력 필드 스타일
    */
   const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '12px 16px',
-    paddingRight: '40px',
-    backgroundColor: 'var(--white)',
-    borderRadius: 12,
-    border: '1px solid var(--paint-gray, #E5E7ED)',
-    fontSize: 'var(--h3)', // 16px
-    color: 'var(--black)',
-    fontWeight: 400,
-    outline: 'none',
-    boxSizing: 'border-box',
+    ...INPUT_BASE_STYLE,
     cursor: 'pointer',
-  };
-
-  /**
-   * 래퍼 스타일
-   */
-  const wrapperStyle: React.CSSProperties = {
-    position: 'relative',
-    width: '100%',
-  };
-
-  /**
-   * 아이콘 스타일
-   */
-  const iconStyle: React.CSSProperties = {
-    position: 'absolute',
-    right: '16px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    pointerEvents: 'none',
-    color: 'var(--dark-gray)',
   };
 
   /**
@@ -111,7 +84,7 @@ const DateInput: React.FC<DateInputProps> = ({ label, value, onChange, ...rest }
           </span>
         </div>
       )}
-      <div style={wrapperStyle}>
+      <InputWrapper>
         <input
           type="text"
           style={inputStyle}
@@ -121,8 +94,8 @@ const DateInput: React.FC<DateInputProps> = ({ label, value, onChange, ...rest }
           placeholder={rest.placeholder || '날짜를 선택해주세요'}
           {...rest}
         />
-        <RiCalendarLine size={20} style={iconStyle} />
-      </div>
+        <InputIcon icon={RiCalendarLine} />
+      </InputWrapper>
 
       {/* 날짜 선택 모달 */}
       <DatePickerModal

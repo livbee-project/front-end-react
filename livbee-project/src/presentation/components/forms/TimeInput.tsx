@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { RiTimeLine } from 'react-icons/ri';
 import TimePickerModal from './TimePickerModal';
+import InputWrapper from '@/presentation/components/common/InputWrapper';
+import InputIcon from '@/presentation/components/common/InputIcon';
+import { INPUT_BASE_STYLE } from '@/presentation/styles/constants';
 
 /**
  * TimeInput이 받을 props 타입을 정의합니다.
@@ -22,38 +25,9 @@ const TimeInput: React.FC<TimeInputProps> = ({ label, value, onChange, ...rest }
    * 입력 필드 스타일
    */
   const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '12px 16px',
-    paddingRight: '40px',
-    backgroundColor: 'var(--white)',
-    borderRadius: 12,
-    border: '1px solid var(--paint-gray, #E5E7ED)',
-    fontSize: 'var(--h3)', // 16px
+    ...INPUT_BASE_STYLE,
     color: value ? 'var(--black)' : 'var(--dark-gray)',
-    fontWeight: 400,
-    outline: 'none',
-    boxSizing: 'border-box',
     cursor: 'pointer',
-  };
-
-  /**
-   * 래퍼 스타일
-   */
-  const wrapperStyle: React.CSSProperties = {
-    position: 'relative',
-    width: '100%',
-  };
-
-  /**
-   * 아이콘 스타일
-   */
-  const iconStyle: React.CSSProperties = {
-    position: 'absolute',
-    right: '16px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    pointerEvents: 'none',
-    color: 'var(--primary)',
   };
 
   /**
@@ -112,7 +86,7 @@ const TimeInput: React.FC<TimeInputProps> = ({ label, value, onChange, ...rest }
           </span>
         </div>
       )}
-      <div style={wrapperStyle}>
+      <InputWrapper>
         <input
           type="text"
           style={inputStyle}
@@ -122,8 +96,8 @@ const TimeInput: React.FC<TimeInputProps> = ({ label, value, onChange, ...rest }
           placeholder={rest.placeholder || '시간을 선택해주세요'}
           {...rest}
         />
-        <RiTimeLine size={20} style={iconStyle} />
-      </div>
+        <InputIcon icon={RiTimeLine} color="var(--primary)" />
+      </InputWrapper>
 
       {/* 시간 선택 모달 */}
       <TimePickerModal

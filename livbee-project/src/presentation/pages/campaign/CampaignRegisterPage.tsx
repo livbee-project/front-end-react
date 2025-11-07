@@ -5,7 +5,8 @@ import DateInput from '@/presentation/components/forms/DateInput';
 import TimeInput from '@/presentation/components/forms/TimeInput';
 import ImageUpload from '@/presentation/components/common/ImageUpload';
 import Button from '@/presentation/components/common/Button';
-import SectionTitle from '@/presentation/components/common/SectionTitle';
+import RegisterPageLayout from '@/presentation/layouts/RegisterPageLayout';
+import FormSection from '@/presentation/components/common/FormSection';
 
 /**
  * 모집공고 등록 페이지
@@ -36,10 +37,6 @@ const CampaignRegisterPage: React.FC = () => {
     // TODO: 실제 등록 로직 구현
   };
 
-  const sectionStyle: React.CSSProperties = {
-    marginBottom: '24px',
-  };
-
   const recruitmentTypeOptions = [
     { value: 'store', label: '스토스트 모집' },
     { value: 'model', label: '모델 모집' },
@@ -54,105 +51,104 @@ const CampaignRegisterPage: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '16px', paddingBottom: '32px' }}>
+    <RegisterPageLayout>
       {/* 대표이미지 1:2 */}
-      <div style={sectionStyle}>
-        <SectionTitle variant="default" marginBottom="16px">대표이미지 1:2*</SectionTitle>
+      <FormSection title="대표이미지 1:2*">
         <ImageUpload size={200} aspectRatio="1:2" />
-      </div>
+      </FormSection>
 
       {/* 브랜드명 */}
-      <div style={sectionStyle}>
+      <FormSection>
         <TextInput
           label="브랜드명*"
           placeholder="내용을 입력해주세요"
           value={formData.brandName}
           onChange={(e) => handleInputChange('brandName', e.target.value)}
         />
-      </div>
+      </FormSection>
 
       {/* 제목 */}
-      <div style={sectionStyle}>
+      <FormSection>
         <TextInput
           label="제목*"
           placeholder="내용을 입력해주세요"
           value={formData.title}
           onChange={(e) => handleInputChange('title', e.target.value)}
         />
-      </div>
+      </FormSection>
 
       {/* 내용 */}
-      <div style={sectionStyle}>
+      <FormSection>
         <TextInput
           label="내용*"
           placeholder="내용을 입력해주세요"
           value={formData.content}
           onChange={(e) => handleInputChange('content', e.target.value)}
         />
-      </div>
+      </FormSection>
 
       {/* 상세 내용 */}
-      <div style={sectionStyle}>
+      <FormSection>
         <TextInput
           label="상세 내용*"
           placeholder="내용을 입력해주세요"
           value={formData.detailedContent}
           onChange={(e) => handleInputChange('detailedContent', e.target.value)}
         />
-      </div>
+      </FormSection>
 
       {/* 모집구분 */}
-      <div style={sectionStyle}>
+      <FormSection>
         <SelectInput
           label="모집구분*"
           options={recruitmentTypeOptions}
           value={formData.recruitmentType}
           onChange={(e) => handleInputChange('recruitmentType', e.target.value)}
         />
-      </div>
+      </FormSection>
 
       {/* 카테고리 */}
-      <div style={sectionStyle}>
+      <FormSection>
         <SelectInput
           label="카테고리*"
           options={categoryOptions}
           value={formData.category}
           onChange={(e) => handleInputChange('category', e.target.value)}
         />
-      </div>
+      </FormSection>
 
       {/* 장소 */}
-      <div style={sectionStyle}>
+      <FormSection>
         <TextInput
           label="장소"
           placeholder="내용을 입력해주세요"
           value={formData.location}
           onChange={(e) => handleInputChange('location', e.target.value)}
         />
-      </div>
+      </FormSection>
 
       {/* 촬영일 */}
-      <div style={sectionStyle}>
+      <FormSection>
         <DateInput
           label="촬영일*"
           placeholder="내용을 입력해주세요"
           value={formData.filmingDate}
           onChange={(e) => handleInputChange('filmingDate', e.target.value)}
         />
-      </div>
+      </FormSection>
 
       {/* 공고 마감일 */}
-      <div style={sectionStyle}>
+      <FormSection>
         <DateInput
           label="공고 마감일*"
           placeholder="내용을 입력해주세요"
           value={formData.deadline}
           onChange={(e) => handleInputChange('deadline', e.target.value)}
         />
-      </div>
+      </FormSection>
 
       {/* 시작시간, 종료시간 */}
-      <div style={sectionStyle}>
+      <FormSection>
         <div
           style={{
             display: 'grid',
@@ -171,29 +167,27 @@ const CampaignRegisterPage: React.FC = () => {
             onChange={(e) => handleInputChange('endTime', e.target.value)}
           />
         </div>
-      </div>
+      </FormSection>
 
       {/* 상품명 */}
-      <div style={sectionStyle}>
+      <FormSection>
         <TextInput
           label="상품명"
           placeholder="내용을 입력해주세요"
           value={formData.productName}
           onChange={(e) => handleInputChange('productName', e.target.value)}
         />
-      </div>
+      </FormSection>
 
       {/* 상품 이미지 1:1 */}
-      <div style={sectionStyle}>
-        <SectionTitle variant="default" marginBottom="16px">상품 이미지 1:1</SectionTitle>
+      <FormSection title="상품 이미지 1:1">
         <ImageUpload size={200} aspectRatio="1:1" />
-      </div>
+      </FormSection>
 
       {/* 쇼핑라이브 커버 3:4 */}
-      <div style={sectionStyle}>
-        <SectionTitle variant="default" marginBottom="16px">쇼핑라이브 커버 3:4</SectionTitle>
+      <FormSection title="쇼핑라이브 커버 3:4">
         <ImageUpload size={200} aspectRatio="3:4" />
-      </div>
+      </FormSection>
 
       {/* 하단 버튼 */}
       <div style={{ marginTop: '32px' }}>
@@ -206,7 +200,7 @@ const CampaignRegisterPage: React.FC = () => {
           BUTTON
         </Button>
       </div>
-    </div>
+    </RegisterPageLayout>
   );
 };
 

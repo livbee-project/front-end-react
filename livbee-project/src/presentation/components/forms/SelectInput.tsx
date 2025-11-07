@@ -1,5 +1,8 @@
 import React from 'react';
 import { RiArrowDownSLine } from 'react-icons/ri';
+import InputWrapper from '@/presentation/components/common/InputWrapper';
+import InputIcon from '@/presentation/components/common/InputIcon';
+import { INPUT_BASE_STYLE } from '@/presentation/styles/constants';
 
 /**
  * SelectInput이 받을 props 타입을 정의합니다.
@@ -18,33 +21,9 @@ const SelectInput: React.FC<SelectInputProps> = ({
   ...rest
 }) => {
   const selectStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '12px 16px',
-    paddingRight: '40px',
-    backgroundColor: 'var(--white)',
-    borderRadius: 12,
-    border: '1px solid var(--paint-gray, #E5E7ED)',
-    fontSize: 'var(--h3)', // 16px
-    color: 'var(--black)',
-    fontWeight: 400,
-    outline: 'none',
-    boxSizing: 'border-box',
+    ...INPUT_BASE_STYLE,
     appearance: 'none',
     cursor: 'pointer',
-  };
-
-  const wrapperStyle: React.CSSProperties = {
-    position: 'relative',
-    width: '100%',
-  };
-
-  const iconStyle: React.CSSProperties = {
-    position: 'absolute',
-    right: '16px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    pointerEvents: 'none',
-    color: 'var(--dark-gray)',
   };
 
   return (
@@ -62,7 +41,7 @@ const SelectInput: React.FC<SelectInputProps> = ({
           </span>
         </div>
       )}
-      <div style={wrapperStyle}>
+      <InputWrapper>
         <select style={selectStyle} {...rest}>
           {options.map((option) => (
             <option key={option.value} value={option.value}>
@@ -70,8 +49,8 @@ const SelectInput: React.FC<SelectInputProps> = ({
             </option>
           ))}
         </select>
-        <RiArrowDownSLine size={20} style={iconStyle} />
-      </div>
+        <InputIcon icon={RiArrowDownSLine} />
+      </InputWrapper>
     </div>
   );
 };

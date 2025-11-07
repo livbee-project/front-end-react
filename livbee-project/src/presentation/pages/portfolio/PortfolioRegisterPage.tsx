@@ -8,6 +8,9 @@ import VerticalList from '@/presentation/components/common/VerticalList';
 import ListItem from '@/presentation/components/common/ListItem';
 import Button from '@/presentation/components/common/Button';
 import SectionTitle from '@/presentation/components/common/SectionTitle';
+import RegisterPageLayout from '@/presentation/layouts/RegisterPageLayout';
+import FormSection from '@/presentation/components/common/FormSection';
+import FormRow from '@/presentation/components/common/FormRow';
 
 /**
  * 포트폴리오 등록 페이지
@@ -62,22 +65,10 @@ const PortfolioRegisterPage: React.FC = () => {
     // TODO: 실제 등록 로직 구현
   };
 
-  const sectionStyle: React.CSSProperties = {
-    marginBottom: '24px',
-  };
-
-
-  const rowStyle: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    marginBottom: '12px',
-  };
-
   return (
-    <div style={{ padding: '16px', paddingBottom: '32px' }}>
+    <RegisterPageLayout>
       {/* 이름 섹션 (이미지 업로드 포함) */}
-      <div style={sectionStyle}>
+      <FormSection>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
           <div style={{ flex: 1 }}>
             <SectionTitle variant="default" marginBottom="12px">이름</SectionTitle>
@@ -93,107 +84,106 @@ const PortfolioRegisterPage: React.FC = () => {
           </div>
           <ImageUpload size={100} />
         </div>
-      </div>
+      </FormSection>
 
       {/* 등록구분 */}
-      <div style={sectionStyle}>
+      <FormSection>
         <TextInput
           label="등록구분"
           placeholder="내용을 입력해주세요."
           value={formData.registrationType}
           onChange={(e) => handleInputChange('registrationType', e.target.value)}
         />
-      </div>
+      </FormSection>
 
       {/* 이름 (두 번째) */}
-      <div style={sectionStyle}>
+      <FormSection>
         <TextInput
           label="이름"
           placeholder="내용을 입력해주세요."
           value={formData.name}
           onChange={(e) => handleInputChange('name', e.target.value)}
         />
-      </div>
+      </FormSection>
 
       {/* 한줄 소개 */}
-      <div style={sectionStyle}>
+      <FormSection>
         <TextInput
           label="한줄 소개"
           placeholder="내용을 입력해주세요."
           value={formData.oneLineIntro}
           onChange={(e) => handleInputChange('oneLineIntro', e.target.value)}
         />
-      </div>
+      </FormSection>
 
       {/* 상세소개 */}
-      <div style={sectionStyle}>
+      <FormSection>
         <TextInput
           label="상세소개"
           placeholder="내용을 입력해주세요."
           value={formData.detailedIntro}
           onChange={(e) => handleInputChange('detailedIntro', e.target.value)}
         />
-      </div>
+      </FormSection>
 
       {/* 웹사이트 */}
-      <div style={sectionStyle}>
-        <SectionTitle variant="default" marginBottom="12px">웹사이트</SectionTitle>
+      <FormSection title="웹사이트">
         <VerticalList showDividers={false}>
           {[0, 1, 2].map((index) => (
             <ListItem key={index} style={{ padding: '0', marginBottom: '12px' }}>
-              <div style={rowStyle}>
-                <span
-                  style={{
-                    fontSize: '12px',
-                    color: 'var(--dark-gray)',
-                    flexShrink: 0,
-                    width: '80px',
-                  }}
-                >
-                  관리자 입력
-                </span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <TextInput
-                    placeholder="내용을 입력해주세요."
-                    value={formData.websites[index]}
-                    onChange={(e) =>
-                      handleInputChange('websites', e.target.value, index)
-                    }
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <FormRow>
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      color: 'var(--dark-gray)',
+                      flexShrink: 0,
+                      width: '80px',
+                    }}
+                  >
+                    관리자 입력
+                  </span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <TextInput
+                      placeholder="내용을 입력해주세요."
+                      value={formData.websites[index]}
+                      onChange={(e) =>
+                        handleInputChange('websites', e.target.value, index)
+                      }
+                    />
+                  </div>
+                  <ToggleSwitch
+                    checked={toggles.websites[index]}
+                    onChange={() => handleToggleChange('websites', index)}
                   />
-                </div>
-                <ToggleSwitch
-                  checked={toggles.websites[index]}
-                  onChange={() => handleToggleChange('websites', index)}
-                />
+                </FormRow>
               </div>
             </ListItem>
           ))}
         </VerticalList>
-      </div>
+      </FormSection>
 
       {/* 최근 라이브 링크 */}
-      <div style={sectionStyle}>
+      <FormSection>
         <TextInput
           label="최근 라이브 링크"
           placeholder="내용을 입력해주세요."
           value={formData.recentLiveLink}
           onChange={(e) => handleInputChange('recentLiveLink', e.target.value)}
         />
-      </div>
+      </FormSection>
 
       {/* 포트폴리오 */}
-      <div style={sectionStyle}>
-        <SectionTitle variant="default" marginBottom="12px">포트폴리오</SectionTitle>
+      <FormSection title="포트폴리오">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <FileUpload label="이력서" />
           <FileUpload label="포트폴리오" />
         </div>
-      </div>
+      </FormSection>
 
       {/* 연락처 */}
-      <div style={sectionStyle}>
-        <SectionTitle variant="default" marginBottom="12px">연락처</SectionTitle>
-        <div style={rowStyle}>
+      <FormSection title="연락처">
+        <FormRow>
           <div style={{ flex: 1, minWidth: 0 }}>
             <TextInput
               placeholder="내용을 입력해주세요."
@@ -205,13 +195,12 @@ const PortfolioRegisterPage: React.FC = () => {
             checked={toggles.contact}
             onChange={() => handleToggleChange('contact')}
           />
-        </div>
-      </div>
+        </FormRow>
+      </FormSection>
 
       {/* 오픈채팅방 */}
-      <div style={sectionStyle}>
-        <SectionTitle variant="default" marginBottom="12px">오픈채팅방</SectionTitle>
-        <div style={rowStyle}>
+      <FormSection title="오픈채팅방">
+        <FormRow>
           <div style={{ flex: 1, minWidth: 0 }}>
             <TextInput
               placeholder="내용을 입력해주세요."
@@ -223,16 +212,15 @@ const PortfolioRegisterPage: React.FC = () => {
             checked={toggles.openChat}
             onChange={() => handleToggleChange('openChat')}
           />
-        </div>
-      </div>
+        </FormRow>
+      </FormSection>
 
       {/* 태그 */}
-      <div style={sectionStyle}>
-        <SectionTitle variant="default" marginBottom="12px">태그</SectionTitle>
+      <FormSection title="태그">
         <VerticalList showDividers={false}>
           {[0, 1, 2, 3, 4].map((index) => (
             <ListItem key={index} style={{ padding: '0', marginBottom: '12px' }}>
-              <div style={rowStyle}>
+              <FormRow>
                 <span
                   style={{
                     fontSize: '12px',
@@ -256,17 +244,16 @@ const PortfolioRegisterPage: React.FC = () => {
                   checked={toggles.tags[index]}
                   onChange={() => handleToggleChange('tags', index)}
                 />
-              </div>
+              </FormRow>
             </ListItem>
           ))}
         </VerticalList>
-      </div>
+      </FormSection>
 
       {/* 갤러리 */}
-      <div style={sectionStyle}>
-        <SectionTitle variant="default" marginBottom="12px">갤러리</SectionTitle>
+      <FormSection title="갤러리">
         <ImageUpload size={120} />
-      </div>
+      </FormSection>
 
       {/* 하단 버튼 */}
       <div style={{ marginTop: '32px' }}>
@@ -279,7 +266,7 @@ const PortfolioRegisterPage: React.FC = () => {
           BUTTON
         </Button>
       </div>
-    </div>
+    </RegisterPageLayout>
   );
 };
 
