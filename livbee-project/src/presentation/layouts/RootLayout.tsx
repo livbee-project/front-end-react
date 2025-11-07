@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import BottomNavBar from '@/presentation/components/navigation/BottomNavBar';
+import { ToastProvider } from '@/presentation/contexts/ToastContext';
 // import CommonHeader from '@/presentation/components/CommonHeader'; // (주석 처리) Flutter의 CommonHeader에 해당하는 로고 헤더가 추후 이 자리에 추가될 수 있습니다.
 
 /**
@@ -42,7 +43,8 @@ const RootLayout: React.FC = () => {
   };
 
   return (
-    <div style={rootStyle}>
+    <ToastProvider>
+      <div style={rootStyle}>
       {/* (주석 처리) Flutter의 CommonHeader에 해당하는
         로고 헤더가 추후 이 자리에 추가될 수 있습니다.
       <header style={headerFooterStyle}>
@@ -64,6 +66,7 @@ const RootLayout: React.FC = () => {
         <BottomNavBar />
       </footer>
     </div>
+    </ToastProvider>
   );
 };
 

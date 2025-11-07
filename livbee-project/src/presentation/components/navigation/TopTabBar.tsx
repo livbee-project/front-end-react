@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useToast } from '@/presentation/contexts/ToastContext';
 // global.css의 CSS 변수(색상)와 .hide-scrollbar 클래스를 사용합니다.
 import '@/presentation/styles/global.css';
 
@@ -29,6 +30,7 @@ const TopTabBar: React.FC = () => {
     // 1. React Router의 훅을 사용하여 현재 경로와 네비게이션 함수를 가져옵니다.
     const location = useLocation();
     const navigate = useNavigate();
+    const { showToast } = useToast();
 
     /**
      * 2. 탭 클릭 시 실행될 핸들러
@@ -36,8 +38,7 @@ const TopTabBar: React.FC = () => {
     const handleTabClick = (path: string) => {
         // Flutter 원본의 "준비중" 토스트 로직
         if (COMING_SOON_PATHS.includes(path)) {
-            // (React에는 공통 Toast가 없으므로 임시로 alert 사용)
-            alert('준비중인 기능입니다.');
+            showToast('준비중인 기능입니다.');
         } else {
             // Flutter의 context.go(path) 로직
             navigate(path);

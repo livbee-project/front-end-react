@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import BottomNavItem from './BottomNavItem';
+import { useToast } from '@/presentation/contexts/ToastContext';
 // (추가) react-icons/ri (Remix Icon) 라이브러리에서 아이콘들을 임포트합니다.
 import {
   RiHomeLine,
@@ -52,6 +53,7 @@ const BottomNavBar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth(); // 인증 상태 가져오기
+  const { showToast } = useToast();
 
   /**
    * 탭 클릭 시 네비게이션을 처리하는 함수
@@ -63,7 +65,7 @@ const BottomNavBar: React.FC = () => {
     // 2. 로그인이 필요한 경로인지 확인
     if (AUTH_REQUIRED_PATHS.includes(path) && !isLoggedIn) {
       // Flutter의 showCommonPromptDialog 로직
-      alert('로그인이 필요합니다.\n회원 전용 서비스입니다.');
+      showToast('로그인이 필요합니다.\n회원 전용 서비스입니다.');
       // TODO: 로그인 페이지로 이동하는 로직 추가
       // navigate('/login');
     } else {
