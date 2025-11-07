@@ -12,6 +12,7 @@ import ModelDetailPage from '@/presentation/pages/model/ModelDetailPage';
 import PortfolioPage from '@/presentation/pages/portfolio/PortfolioPage';
 import PortfolioRegisterPage from '@/presentation/pages/portfolio/PortfolioRegisterPage';
 import PortfolioDetailPage from '@/presentation/pages/portfolio/PortfolioDetailPage';
+import MyPortfolioPage from '@/presentation/pages/portfolio/MyPortfolioPage';
 import MyPage from '@/presentation/pages/mypage/MyPage';
 
 const AppRouter = () => (
@@ -56,6 +57,7 @@ const AppRouter = () => (
             <Route path="/portfolios" element={<PortfolioPage />} />
             <Route path="/portfolios/register" element={<PortfolioRegisterPage />} />
             <Route path="/portfolios/:id" element={<PortfolioDetailPage />} />
+            <Route path="/mypage/portfolios" element={<MyPortfolioPage />} />
             <Route path="/mypage" element={<MyPage />} />
           </Route>
 

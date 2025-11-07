@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { RiArrowRightSLine } from 'react-icons/ri';
 import VerticalList from '@/presentation/components/VerticalList';
 import ListItem from '@/presentation/components/ListItem';
@@ -85,6 +86,8 @@ const SectionTitle: React.FC<SectionTitleProps> = ({ title, isFirst = false }) =
 };
 
 const MyPage: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <div style={{ padding: '0' }}>
       {/* 공통 섹션 */}
@@ -152,7 +155,7 @@ const MyPage: React.FC = () => {
           <MenuItem
             title="쇼호스트 포트폴리오 관리"
             subtitle={PLACEHOLDER_SUBTITLE}
-            onTap={() => console.log('쇼호스트 포트폴리오 관리 클릭')}
+            onTap={() => navigate('/mypage/portfolios')}
           />
           <MenuItem
             title="모델 포트폴리오 관리"
