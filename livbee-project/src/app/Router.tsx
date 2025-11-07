@@ -15,6 +15,7 @@ import PortfolioDetailPage from '@/presentation/pages/portfolio/PortfolioDetailP
 import MyPortfolioPage from '@/presentation/pages/portfolio/MyPortfolioPage';
 import MyPage from '@/presentation/pages/mypage/MyPage';
 import ClipsPage from '@/presentation/pages/clip/ClipsPage';
+import MyClipsPage from '@/presentation/pages/clip/MyClipsPage';
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -59,6 +60,7 @@ const AppRouter = () => (
             <Route path="/portfolios/register" element={<PortfolioRegisterPage />} />
             <Route path="/portfolios/:id" element={<PortfolioDetailPage />} />
             <Route path="/mypage/portfolios" element={<MyPortfolioPage />} />
+            <Route path="/mypage/clips" element={<MyClipsPage />} />
             <Route path="/mypage" element={<MyPage />} />
           </Route>
 

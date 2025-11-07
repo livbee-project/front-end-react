@@ -149,7 +149,7 @@ const MyPage: React.FC = () => {
           <MenuItem
             title="숏클립 관리"
             subtitle={PLACEHOLDER_SUBTITLE}
-            onTap={() => console.log('숏클립 관리 클릭')}
+            onTap={() => navigate('/mypage/clips')}
           />
           <MenuItem
             title="받은 제안"
