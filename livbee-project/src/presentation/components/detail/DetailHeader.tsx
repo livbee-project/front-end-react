@@ -1,9 +1,9 @@
 import React from 'react';
-import Tag from './Tag';
-import PlaceholderImage from './PlaceholderImage';
+import Tag from '@/presentation/components/ui/Tag';
+import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
 
 /**
- * CampaignDetailHeader 컴포넌트가 받을 props 타입을 정의합니다.
+ * DetailHeader 컴포넌트가 받을 props 타입을 정의합니다.
  * @param imageUrl - 상단 이미지 URL (선택)
  * @param brandName - 브랜드명
  * @param deadlineDay - 마감 D-DAY (선택, 예: "D-3")
@@ -11,7 +11,7 @@ import PlaceholderImage from './PlaceholderImage';
  * @param content - 공고 내용 요약
  * @param onImageClick - 이미지 클릭 시 실행될 함수 (선택)
  */
-interface CampaignDetailHeaderProps {
+interface DetailHeaderProps {
   imageUrl?: string;
   brandName: string;
   deadlineDay?: string;
@@ -21,10 +21,10 @@ interface CampaignDetailHeaderProps {
 }
 
 /**
- * 모집 공고 상세 페이지의 상단 헤더 컴포넌트입니다.
+ * 상세 페이지의 상단 헤더 컴포넌트입니다.
  * 이미지, 브랜드명, D-DAY 태그, 제목, 내용을 표시합니다.
  */
-const CampaignDetailHeader: React.FC<CampaignDetailHeaderProps> = ({
+const DetailHeader: React.FC<DetailHeaderProps> = ({
   imageUrl,
   brandName,
   deadlineDay,
@@ -38,7 +38,7 @@ const CampaignDetailHeader: React.FC<CampaignDetailHeaderProps> = ({
    */
   const imageContainerStyle: React.CSSProperties = {
     width: '100%',
-    aspectRatio: '16 / 9', // 가로로 긴 비율
+    aspectRatio: '16 / 9',
     backgroundColor: '#F7F8FA',
     border: '1px solid #ECEFF1',
     display: 'flex',
@@ -57,7 +57,6 @@ const CampaignDetailHeader: React.FC<CampaignDetailHeaderProps> = ({
     height: '100%',
     objectFit: 'cover',
   };
-
 
   /**
    * 정보 영역 컨테이너 스타일
@@ -84,7 +83,7 @@ const CampaignDetailHeader: React.FC<CampaignDetailHeaderProps> = ({
    * 브랜드명 스타일
    */
   const brandNameStyle: React.CSSProperties = {
-    fontSize: 'var(--p2)', // 14px
+    fontSize: 'var(--p2)',
     fontWeight: 400,
     color: 'var(--dark-gray)',
     flex: 1,
@@ -94,7 +93,7 @@ const CampaignDetailHeader: React.FC<CampaignDetailHeaderProps> = ({
    * 제목 스타일
    */
   const titleStyle: React.CSSProperties = {
-    fontSize: 'var(--h1)', // 20px
+    fontSize: 'var(--h1)',
     fontWeight: 700,
     color: 'var(--black)',
     lineHeight: 1.4,
@@ -104,7 +103,7 @@ const CampaignDetailHeader: React.FC<CampaignDetailHeaderProps> = ({
    * 내용 스타일
    */
   const contentStyle: React.CSSProperties = {
-    fontSize: 'var(--p2)', // 14px
+    fontSize: 'var(--p2)',
     fontWeight: 400,
     color: 'var(--dark-gray)',
     lineHeight: 1.5,
@@ -141,5 +140,5 @@ const CampaignDetailHeader: React.FC<CampaignDetailHeaderProps> = ({
   );
 };
 
-export default CampaignDetailHeader;
+export default DetailHeader;
 

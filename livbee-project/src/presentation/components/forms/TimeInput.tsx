@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { RiTimeLine } from 'react-icons/ri';
 import TimePickerModal from './TimePickerModal';
-import InputWrapper from '@/presentation/components/common/InputWrapper';
-import InputIcon from '@/presentation/components/common/InputIcon';
+import InputWrapper from '@/presentation/components/forms/InputWrapper';
+import InputIcon from '@/presentation/components/forms/InputIcon';
 import { INPUT_BASE_STYLE } from '@/presentation/styles/constants';
 
 /**

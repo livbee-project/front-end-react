@@ -1,14 +1,14 @@
 import React from 'react';
-import PlaceholderImage from './PlaceholderImage';
+import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
 
 /**
- * ModelProfileSection 컴포넌트가 받을 props 타입을 정의합니다.
- * @param name - 모델 이름
- * @param description - 모델 설명 텍스트
+ * ProfileSection 컴포넌트가 받을 props 타입을 정의합니다.
+ * @param name - 프로필 이름
+ * @param description - 프로필 설명 텍스트
  * @param profileImageUrl - 프로필 이미지 URL (선택)
  * @param onImageClick - 프로필 이미지 클릭 시 실행될 함수 (선택)
  */
-interface ModelProfileSectionProps {
+interface ProfileSectionProps {
   name: string;
   description: string;
   profileImageUrl?: string;
@@ -16,10 +16,11 @@ interface ModelProfileSectionProps {
 }
 
 /**
- * 모델 상세 페이지 상단의 프로필 정보 섹션 컴포넌트입니다.
- * 모델 이름, 설명, 프로필 이미지를 표시합니다.
+ * 상세 페이지 상단의 프로필 정보 섹션 컴포넌트입니다.
+ * 이름, 설명, 프로필 이미지를 표시합니다.
+ * 모델 상세 페이지와 포트폴리오 상세 페이지에서 공통으로 사용됩니다.
  */
-const ModelProfileSection: React.FC<ModelProfileSectionProps> = ({
+const ProfileSection: React.FC<ProfileSectionProps> = ({
   name,
   description,
   profileImageUrl,
@@ -48,24 +49,24 @@ const ModelProfileSection: React.FC<ModelProfileSectionProps> = ({
     display: 'flex',
     flexDirection: 'column',
     gap: '8px',
-    minWidth: 0, // 텍스트 말줄임표를 위한 설정
+    minWidth: 0,
   };
 
   /**
-   * 모델 이름 스타일
+   * 이름 스타일
    */
   const nameStyle: React.CSSProperties = {
-    fontSize: 'var(--h1)', // 20px
+    fontSize: 'var(--h1)',
     fontWeight: 700,
     color: 'var(--black)',
     lineHeight: 1.4,
   };
 
   /**
-   * 모델 설명 스타일
+   * 설명 스타일
    */
   const descriptionStyle: React.CSSProperties = {
-    fontSize: 'var(--p2)', // 14px
+    fontSize: 'var(--p2)',
     fontWeight: 400,
     color: 'var(--dark-gray)',
     lineHeight: 1.5,
@@ -99,7 +100,6 @@ const ModelProfileSection: React.FC<ModelProfileSectionProps> = ({
     objectFit: 'cover',
   };
 
-
   return (
     <div style={sectionStyle}>
       {/* 텍스트 영역 (왼쪽) */}
@@ -120,5 +120,5 @@ const ModelProfileSection: React.FC<ModelProfileSectionProps> = ({
   );
 };
 
-export default ModelProfileSection;
+export default ProfileSection;
 

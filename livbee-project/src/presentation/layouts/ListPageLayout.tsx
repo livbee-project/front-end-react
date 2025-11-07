@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import SearchInput from '@/presentation/components/common/SearchInput';
-import ListPageHint from '@/presentation/components/common/ListPageHint';
-import FloatingActionButton from '@/presentation/components/common/FloatingActionButton';
+import SearchInput from '@/presentation/components/search/SearchInput';
+import ListPageHint from '@/presentation/components/list/ListPageHint';
+import FloatingActionButton from '@/presentation/components/ui/FloatingActionButton';
 
 /**
  * ListPageLayout 컴포넌트가 받을 props 타입을 정의합니다.

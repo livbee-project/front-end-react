@@ -1,10 +1,10 @@
 import React from 'react';
-import ModelProfileSection from '@/presentation/components/common/ModelProfileSection';
-import Header from '@/presentation/components/common/Header';
-import GalleryGrid from '@/presentation/components/common/GalleryGrid';
-import InfoItem from '@/presentation/components/common/InfoItem';
-import TagContainer from '@/presentation/components/common/TagContainer';
-import Button from '@/presentation/components/common/Button';
+import ProfileSection from '@/presentation/components/detail/ProfileSection';
+import SectionHeader from '@/presentation/components/section/SectionHeader';
+import GalleryGrid from '@/presentation/components/detail/GalleryGrid';
+import InfoItem from '@/presentation/components/detail/InfoItem';
+import TagContainer from '@/presentation/components/ui/TagContainer';
+import Button from '@/presentation/components/ui/Button';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';
 import DetailContent from '@/presentation/layouts/DetailContent';
@@ -47,7 +47,7 @@ const PortfolioDetailPage: React.FC = () => {
   return (
     <DetailPageLayout>
       {/* 1. 포트폴리오 프로필 섹션 */}
-      <ModelProfileSection
+      <ProfileSection
         name="오해원"
         description="깔끔한 이미지의 모델로써 열정적인 활동을 하고 있습니다."
         onImageClick={handleProfileImageClick}
@@ -56,14 +56,14 @@ const PortfolioDetailPage: React.FC = () => {
       {/* 2. 상세소개 섹션 */}
       <DetailSection showDivider>
         <div style={{ paddingBottom: '16px' }}>
-          <Header title="상세소개" />
+          <SectionHeader title="상세소개" />
         </div>
         <DetailContent>내용을 입력해주세요</DetailContent>
       </DetailSection>
 
       {/* 3. 갤러리 섹션 */}
       <DetailSection>
-        <Header title="갤러리" />
+        <SectionHeader title="갤러리" />
         <div style={{ marginTop: '16px' }}>
           <GalleryGrid
             columns={3}

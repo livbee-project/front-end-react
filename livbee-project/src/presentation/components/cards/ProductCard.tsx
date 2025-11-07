@@ -1,5 +1,5 @@
 import React from 'react';
-import PlaceholderImage from './PlaceholderImage';
+import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
 
 /**
  * ProductCard 컴포넌트가 받을 props 타입을 정의합니다.

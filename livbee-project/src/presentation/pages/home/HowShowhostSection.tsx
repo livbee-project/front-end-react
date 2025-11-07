@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import SectionContainer from '@/presentation/components/common/SectionContainer';
-import VerticalList from '@/presentation/components/common/VerticalList';
-import ListItem from '@/presentation/components/common/ListItem';
+import SectionContainer from '@/presentation/components/section/SectionContainer';
+import VerticalList from '@/presentation/components/list/VerticalList';
+import ListItem from '@/presentation/components/list/ListItem';
 import PortfolioRowCard from '@/presentation/components/cards/PortfolioRowCard';
 
 /**

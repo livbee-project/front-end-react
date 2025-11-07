@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { RiArrowUpSLine, RiArrowDownSLine } from 'react-icons/ri';
-import Modal from '@/presentation/components/common/Modal';
+import Modal from '@/presentation/components/ui/Modal';
 import '@/presentation/styles/global.css';
 
 /**

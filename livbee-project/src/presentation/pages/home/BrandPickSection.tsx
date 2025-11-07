@@ -1,9 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 // 공통 컴포넌트 임포트
-import SectionContainer from '@/presentation/components/common/SectionContainer';
+import SectionContainer from '@/presentation/components/section/SectionContainer';
 import RecruitCard from '@/presentation/components/cards/RecruitCard';
-import Button from '@/presentation/components/common/Button';
+import Button from '@/presentation/components/ui/Button';
 // 스크롤바 숨기기 CSS 임포트
 import '@/presentation/styles/global.css';
 

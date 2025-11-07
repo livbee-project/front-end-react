@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
-import Modal from '@/presentation/components/common/Modal';
+import Modal from '@/presentation/components/ui/Modal';
 import '@/presentation/styles/global.css';
 import 'react-day-picker/dist/style.css';
 

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PortfolioRowCard from '@/presentation/components/cards/PortfolioRowCard';
-import VerticalList from '@/presentation/components/common/VerticalList';
-import ListItem from '@/presentation/components/common/ListItem';
-import Pagination from '@/presentation/components/common/Pagination';
-import FloatingActionButton from '@/presentation/components/common/FloatingActionButton';
+import VerticalList from '@/presentation/components/list/VerticalList';
+import ListItem from '@/presentation/components/list/ListItem';
+import Pagination from '@/presentation/components/list/Pagination';
+import FloatingActionButton from '@/presentation/components/ui/FloatingActionButton';
 
 /**
  * 리스트 렌더링을 위한 임시 목업 데이터

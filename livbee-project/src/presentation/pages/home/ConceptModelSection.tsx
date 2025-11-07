@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 // (추가) 필요한 공통 컴포넌트 임포트
-import SectionContainer from '@/presentation/components/common/SectionContainer';
+import SectionContainer from '@/presentation/components/section/SectionContainer';
 import PortraitCard from '@/presentation/components/cards/PortraitCard'; // PortraitCard 재사용
 // (추가) 스크롤바 숨기기 CSS 임포트
 import '@/presentation/styles/global.css';

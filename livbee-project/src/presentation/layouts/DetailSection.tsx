@@ -1,5 +1,5 @@
 import React from 'react';
-import SectionTitle from '@/presentation/components/common/SectionTitle';
+import SectionTitle from '@/presentation/components/ui/SectionTitle';
 
 /**
  * DetailSection 컴포넌트가 받을 props 타입을 정의합니다.

@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CampaignCard from '@/presentation/components/cards/CampaignCard';
-import VerticalList from '@/presentation/components/common/VerticalList';
-import ListItem from '@/presentation/components/common/ListItem';
+import VerticalList from '@/presentation/components/list/VerticalList';
+import ListItem from '@/presentation/components/list/ListItem';
 import ListPageLayout from '@/presentation/layouts/ListPageLayout';
 
 /**

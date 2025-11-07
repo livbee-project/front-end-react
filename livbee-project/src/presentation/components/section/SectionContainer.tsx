@@ -1,5 +1,5 @@
 import React from 'react';
-import Header from './Header';
+import SectionHeader from '@/presentation/components/section/SectionHeader';
 
 /**
  * SectionContainer가 받을 props 타입을 정의합니다.
@@ -30,7 +30,7 @@ const SectionContainer: React.FC<SectionContainerProps> = ({
         1. "제목 + 더보기" 헤더 영역
         props로 받은 title과 onMorePressed를 Header 컴포넌트에 그대로 전달합니다.
       */}
-      <Header title={title} onMorePressed={onMorePressed} />
+      <SectionHeader title={title} onMorePressed={onMorePressed} />
 
       {/*
         2. 섹션의 실제 컨텐츠 영역

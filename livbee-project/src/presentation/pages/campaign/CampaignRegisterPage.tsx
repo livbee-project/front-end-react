@@ -3,10 +3,10 @@ import TextInput from '@/presentation/components/forms/TextInput';
 import SelectInput from '@/presentation/components/forms/SelectInput';
 import DateInput from '@/presentation/components/forms/DateInput';
 import TimeInput from '@/presentation/components/forms/TimeInput';
-import ImageUpload from '@/presentation/components/common/ImageUpload';
-import Button from '@/presentation/components/common/Button';
+import ImageUpload from '@/presentation/components/upload/ImageUpload';
+import Button from '@/presentation/components/ui/Button';
 import RegisterPageLayout from '@/presentation/layouts/RegisterPageLayout';
-import FormSection from '@/presentation/components/common/FormSection';
+import FormSection from '@/presentation/components/forms/FormSection';
 
 /**
  * 모집공고 등록 페이지

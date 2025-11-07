@@ -1,9 +1,9 @@
 import React from 'react';
-import CampaignDetailHeader from '@/presentation/components/common/CampaignDetailHeader';
-import BulletList from '@/presentation/components/common/BulletList';
-import InfoItem from '@/presentation/components/common/InfoItem';
-import ProductCard from '@/presentation/components/common/ProductCard';
-import Button from '@/presentation/components/common/Button';
+import DetailHeader from '@/presentation/components/detail/DetailHeader';
+import BulletList from '@/presentation/components/detail/BulletList';
+import InfoItem from '@/presentation/components/detail/InfoItem';
+import ProductCard from '@/presentation/components/cards/ProductCard';
+import Button from '@/presentation/components/ui/Button';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';
 import '@/presentation/styles/global.css';
@@ -50,7 +50,7 @@ const CampaignDetailPage: React.FC = () => {
   return (
     <DetailPageLayout>
       {/* 1. 상단 헤더 */}
-      <CampaignDetailHeader
+      <DetailHeader
         brandName="브랜드명"
         deadlineDay="D-DAY"
         title="제목 EX 스니커즈 하우스"

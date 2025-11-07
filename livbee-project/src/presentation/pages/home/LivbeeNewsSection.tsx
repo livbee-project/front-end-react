@@ -1,7 +1,7 @@
 import React from 'react';
-import SectionContainer from '@/presentation/components/common/SectionContainer';
-import VerticalList from '@/presentation/components/common/VerticalList';
-import ListItem from '@/presentation/components/common/ListItem';
+import SectionContainer from '@/presentation/components/section/SectionContainer';
+import VerticalList from '@/presentation/components/list/VerticalList';
+import ListItem from '@/presentation/components/list/ListItem';
 
 /**
  * "라이비 뉴스" 섹션 컴포넌트

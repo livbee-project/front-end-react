@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import TextInput from '@/presentation/components/forms/TextInput';
-import ToggleSwitch from '@/presentation/components/common/ToggleSwitch';
-import FileUpload from '@/presentation/components/common/FileUpload';
-import ImageUpload from '@/presentation/components/common/ImageUpload';
-import VerticalList from '@/presentation/components/common/VerticalList';
-import ListItem from '@/presentation/components/common/ListItem';
-import Button from '@/presentation/components/common/Button';
-import SectionTitle from '@/presentation/components/common/SectionTitle';
+import ToggleSwitch from '@/presentation/components/ui/ToggleSwitch';
+import FileUpload from '@/presentation/components/upload/FileUpload';
+import ImageUpload from '@/presentation/components/upload/ImageUpload';
+import VerticalList from '@/presentation/components/list/VerticalList';
+import ListItem from '@/presentation/components/list/ListItem';
+import Button from '@/presentation/components/ui/Button';
+import SectionTitle from '@/presentation/components/ui/SectionTitle';
 import RegisterPageLayout from '@/presentation/layouts/RegisterPageLayout';
-import FormSection from '@/presentation/components/common/FormSection';
-import FormRow from '@/presentation/components/common/FormRow';
+import FormSection from '@/presentation/components/forms/FormSection';
+import FormRow from '@/presentation/components/forms/FormRow';
 
 /**
  * 포트폴리오 등록 페이지
