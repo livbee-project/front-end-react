@@ -62,14 +62,19 @@ const BottomNavBar: React.FC = () => {
     // 1. 현재 경로와 같으면 아무것도 하지 않음
     if (location.pathname === path) return;
 
-    // 2. 로그인이 필요한 경로인지 확인
+    // 2. 마이페이지 클릭 시 로그인 페이지로 이동
+    if (path === '/mypage' && !isLoggedIn) {
+      navigate('/login', { replace: true });
+      return;
+    }
+
+    // 3. 로그인이 필요한 경로인지 확인
     if (AUTH_REQUIRED_PATHS.includes(path) && !isLoggedIn) {
       // Flutter의 showCommonPromptDialog 로직
       showToast('로그인이 필요합니다.\n회원 전용 서비스입니다.');
-      // TODO: 로그인 페이지로 이동하는 로직 추가
-      // navigate('/login');
+      navigate('/login', { replace: true });
     } else {
-      // 3. 페이지 이동
+      // 4. 페이지 이동
       // Flutter의 context.replace와 동일하게 { replace: true } 옵션 사용
       navigate(path, { replace: true });
     }

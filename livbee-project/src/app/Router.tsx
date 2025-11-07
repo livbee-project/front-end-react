@@ -16,6 +16,7 @@ import MyPortfolioPage from '@/presentation/pages/portfolio/MyPortfolioPage';
 import MyPage from '@/presentation/pages/mypage/MyPage';
 import ClipsPage from '@/presentation/pages/clip/ClipsPage';
 import MyClipsPage from '@/presentation/pages/clip/MyClipsPage';
+import LoginPage from '@/presentation/pages/auth/LoginPage';
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -69,7 +70,7 @@ const AppRouter = () => (
             경로를 선언하면(예: /login), 상단 탭바는 없지만
             하단 탭바는 있는 페이지를 만들 수 있습니다.
           */}
-          {/* <Route path="/login" element={<div>로그인 페이지</div>} /> */}
+          <Route path="/login" element={<LoginPage />} />
         </Route>
       </Routes>
     </div>
