@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { RiArrowUpSLine, RiArrowDownSLine } from 'react-icons/ri';
+import Modal from '@/presentation/components/common/Modal';
 import '@/presentation/styles/global.css';
 
 /**
@@ -119,40 +120,6 @@ const TimePickerModal: React.FC<TimePickerModalProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hour, minute, period, isOpen]);
 
-  /**
-   * 모달이 열려있지 않으면 렌더링하지 않음
-   * 모든 Hooks 호출 후에 조건부 렌더링
-   */
-  if (!isOpen) return null;
-
-  /**
-   * 오버레이 스타일 (배경)
-   */
-  const overlayStyle: React.CSSProperties = {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000,
-  };
-
-  /**
-   * 모달 컨테이너 스타일
-   */
-  const modalStyle: React.CSSProperties = {
-    backgroundColor: 'var(--white)',
-    borderRadius: '16px',
-    padding: '24px',
-    maxWidth: '320px',
-    width: '90%',
-    position: 'relative',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
-  };
 
   /**
    * 시간/분 증가
@@ -260,8 +227,13 @@ const TimePickerModal: React.FC<TimePickerModalProps> = ({
   });
 
   return (
-    <div style={overlayStyle} onClick={onClose}>
-      <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      maxWidth="320px"
+      width="90%"
+      padding="24px"
+    >
         {/* 시간/분 선택기 */}
         <div style={pickerContainerStyle}>
           {/* 시간 선택 */}
@@ -305,8 +277,7 @@ const TimePickerModal: React.FC<TimePickerModalProps> = ({
             PM
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 };
 

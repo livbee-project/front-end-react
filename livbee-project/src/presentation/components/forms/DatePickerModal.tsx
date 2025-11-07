@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
+import Modal from '@/presentation/components/common/Modal';
 import '@/presentation/styles/global.css';
 import 'react-day-picker/dist/style.css';
 
@@ -30,42 +31,6 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
 }) => {
   const [view, setView] = useState<'date' | 'month' | 'year'>('date');
   const [currentMonth, setCurrentMonth] = useState(selectedDate || new Date());
-
-  /**
-   * 모달이 열려있지 않으면 렌더링하지 않음
-   */
-  if (!isOpen) return null;
-
-  /**
-   * 오버레이 스타일 (배경)
-   */
-  const overlayStyle: React.CSSProperties = {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000,
-  };
-
-  /**
-   * 모달 컨테이너 스타일
-   */
-  const modalStyle: React.CSSProperties = {
-    backgroundColor: 'var(--white)',
-    borderRadius: '16px',
-    padding: '24px',
-    maxWidth: '400px',
-    width: '90%',
-    maxHeight: '90vh',
-    overflow: 'auto',
-    position: 'relative',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
-  };
 
   /**
    * 날짜 선택 핸들러
@@ -359,9 +324,14 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
   return (
     <>
       <style>{customStyles}</style>
-      <div style={overlayStyle} onClick={onClose}>
-        <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
-          {view === 'date' && (
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        maxWidth="400px"
+        width="90%"
+        padding="24px"
+      >
+        {view === 'date' && (
             <>
               {/* 커스텀 헤더 */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
@@ -473,31 +443,29 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
               </div>
             </>
           )}
-
-          {view === 'month' && (
-            <>
-              {renderMonthView()}
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
-                <button
-                  onClick={() => setView('year')}
-                  style={{
-                    border: 'none',
-                    background: 'transparent',
-                    cursor: 'pointer',
-                    fontSize: 'var(--p2)',
-                    fontWeight: 400,
-                    color: 'var(--black)',
-                    padding: '8px 16px',
-                  }}
-                >
-                  {currentMonth.getFullYear()}
-                </button>
-              </div>
-            </>
-          )}
-          {view === 'year' && renderYearView()}
-        </div>
-      </div>
+        {view === 'month' && (
+          <>
+            {renderMonthView()}
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+              <button
+                onClick={() => setView('year')}
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  fontSize: 'var(--p2)',
+                  fontWeight: 400,
+                  color: 'var(--black)',
+                  padding: '8px 16px',
+                }}
+              >
+                {currentMonth.getFullYear()}
+              </button>
+            </div>
+          </>
+        )}
+        {view === 'year' && renderYearView()}
+      </Modal>
     </>
   );
 };
