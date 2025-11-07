@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import TextInput from '@/presentation/components/TextInput';
 import ToggleSwitch from '@/presentation/components/ToggleSwitch';
 import FileUpload from '@/presentation/components/FileUpload';
@@ -11,7 +11,7 @@ import ListItem from '@/presentation/components/ListItem';
  * 포트폴리오 등록 페이지
  */
 const PortfolioRegisterPage: React.FC = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // TODO: 추후 사용 예정
 
   // 폼 상태 관리
   const [formData, setFormData] = useState({
