@@ -1,6 +1,6 @@
 # front-end-react
 
-## Node.js 버전 고정 안내
+## Node.js 버전 고정 안내!
 
 이 프로젝트는 Node.js의 안정적인 버전 관리를 위해 `.nvmrc` 파일을 사용합니다.
 
