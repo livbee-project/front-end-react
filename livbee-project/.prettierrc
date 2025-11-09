@@ -1,0 +1,11 @@
+{
+  "printWidth": 100,
+  "tabWidth": 2,
+  "singleQuote": true,
+  "semi": true,
+  // JSX 각 속성은 줄바꿈, 요소별 세로로 자동정렬
+  "jsxSingleQuote": true,
+  "bracketSameLine": false,
+  "jsxBracketSameLine": false,
+  "arrowParens": "always"
+}

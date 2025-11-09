@@ -1,0 +1,75 @@
+@font-face {
+  font-family: 'NexonLv2Gothic';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/NEXON Lv2 Gothic Light.woff') format('woff');
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'NexonLv2Gothic';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/NEXON Lv2 Gothic.woff') format('woff');
+  font-weight: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'NexonLv2Gothic';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/NEXON Lv2 Gothic Bold.woff') format('woff');
+  font-weight: 700;
+  font-display: swap;
+}
+
+
+:root {
+  --font-size-h1: 20px;
+  --h1: 20px;
+  --h2: 18px;
+  --h3: 16px;
+  --p2: 14px;
+  --black: #000000;
+  --dark-gray: #5E5E5E;
+  --primary: #687CF4;
+  --white: #FFFFFF;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  font-family: 'NexonLv2Gothic', sans-serif !important;
+}
+
+.app-container {
+  max-width: 1200px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+/* --- (추가) 스크롤바 숨기기 유틸리티 클래스 --- */
+.hide-scrollbar {
+  /* Firefox */
+  scrollbar-width: none;
+  /* IE, Edge */
+  -ms-overflow-style: none;
+}
+
+/* Chrome, Safari, Opera 등 WebKit 기반 브라우저 */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* 스크롤바를 숨김 */
+}
+
+body {
+  /* Firefox */
+  scrollbar-width: none;
+  /* IE, Edge */
+  -ms-overflow-style: none;
+}
+
+body::-webkit-scrollbar {
+  /* Chrome, Safari, Opera (WebKit) */
+  display: none;
+}
