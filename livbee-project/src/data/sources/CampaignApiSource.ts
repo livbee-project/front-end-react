@@ -48,7 +48,7 @@ export class CampaignApiSource {
   /**
    * 모집 공고 상세 조회 (향후 구현 예정)
    */
-  async getCampaignById(id: string): Promise<any> {
+  async getCampaignById(_id: string): Promise<any> {
     // TODO: 상세 조회 API 구현 시 추가
     throw new Error('Not implemented yet');
   }
