@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import Toast from '@/presentation/components/ui/Toast';
+import type { ToastVariant } from '@/presentation/components/ui/Toast';
 
 /**
  * Toast 메시지 정보 타입
@@ -9,13 +10,14 @@ interface ToastMessage {
   id: string;
   message: string;
   duration?: number;
+  variant?: ToastVariant;
 }
 
 /**
  * ToastContext의 타입 정의
  */
 interface ToastContextType {
-  showToast: (message: string, duration?: number) => void;
+  showToast: (message: string, duration?: number, variant?: ToastVariant) => void;
 }
 
 /**
@@ -39,10 +41,13 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
 
   /**
    * 토스트 메시지를 표시하는 함수
+   * @param message - 표시할 메시지
+   * @param duration - 표시 시간 (밀리초)
+   * @param variant - 토스트 타입 ('info' 또는 'error', 기본값: 'info')
    */
-  const showToast = useCallback((message: string, duration?: number) => {
+  const showToast = useCallback((message: string, duration?: number, variant: ToastVariant = 'info') => {
     const id = `toast-${Date.now()}-${Math.random()}`;
-    setToasts((prev) => [...prev, { id, message, duration }]);
+    setToasts((prev) => [...prev, { id, message, duration, variant }]);
   }, []);
 
   /**
@@ -85,6 +90,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
             <Toast
               message={toast.message}
               duration={toast.duration}
+              variant={toast.variant}
               onClose={() => removeToast(toast.id)}
             />
           </div>

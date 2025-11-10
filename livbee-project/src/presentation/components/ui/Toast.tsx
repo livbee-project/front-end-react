@@ -1,16 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { RiInformationLine } from 'react-icons/ri';
+import { RiInformationLine, RiErrorWarningLine } from 'react-icons/ri';
 import { FONT_SIZE, FONT_WEIGHT, TEXT_COLOR, BORDER_RADIUS, SPACING, GAP } from '@/presentation/styles/constants';
+
+/**
+ * Toast 타입 (variant)
+ */
+export type ToastVariant = 'info' | 'error';
 
 /**
  * Toast 컴포넌트가 받을 props 타입을 정의합니다.
  * @param message - 표시할 메시지
  * @param duration - 표시 시간 (밀리초, 기본값: 2000)
+ * @param variant - 토스트 타입 ('info' 또는 'error', 기본값: 'info')
  * @param onClose - 토스트가 닫힐 때 호출되는 함수
  */
 interface ToastProps {
   message: string;
   duration?: number;
+  variant?: ToastVariant;
   onClose: () => void;
 }
 
@@ -21,10 +28,12 @@ type ToastAnimationState = 'entering' | 'visible' | 'exiting';
 
 /**
  * 토스트 메시지 컴포넌트입니다.
- * 오렌지색 배경에 정보 아이콘과 메시지를 표시합니다.
+ * variant에 따라 색상이 변경됩니다.
+ * - info: 오렌지색 배경 (기본값)
+ * - error: 빨간색 배경
  * 아래에서 위로 올라오는 애니메이션과 위에서 아래로 내려가는 애니메이션을 포함합니다.
  */
-const Toast: React.FC<ToastProps> = ({ message, duration = 2000, onClose }) => {
+const Toast: React.FC<ToastProps> = ({ message, duration = 2000, variant = 'info', onClose }) => {
   const [animationState, setAnimationState] = useState<ToastAnimationState>('entering');
 
   /**
@@ -58,10 +67,13 @@ const Toast: React.FC<ToastProps> = ({ message, duration = 2000, onClose }) => {
    * 그림자 효과를 포함합니다.
    * 위치는 ToastContext에서 제어됩니다.
    * 애니메이션 상태에 따라 transform과 opacity가 변경됩니다.
+   * variant에 따라 배경색이 변경됩니다.
    */
   const getToastStyle = (): React.CSSProperties => {
+    const backgroundColor = variant === 'error' ? '#E53E3E' : '#FF6B35'; // error: 빨간색, info: 오렌지색
+    
     const baseStyle: React.CSSProperties = {
-      backgroundColor: '#FF6B35', // 오렌지색
+      backgroundColor,
       borderRadius: BORDER_RADIUS.XL,
       padding: `${SPACING.MD} ${SPACING.XXL}`,
       display: 'flex',
@@ -119,7 +131,11 @@ const Toast: React.FC<ToastProps> = ({ message, duration = 2000, onClose }) => {
 
   return (
     <div style={getToastStyle()}>
-      <RiInformationLine size={20} style={iconStyle} />
+      {variant === 'error' ? (
+        <RiErrorWarningLine size={20} style={iconStyle} />
+      ) : (
+        <RiInformationLine size={20} style={iconStyle} />
+      )}
       <span style={messageStyle}>{message}</span>
     </div>
   );

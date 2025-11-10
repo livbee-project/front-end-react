@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@/presentation/components/ui/Button';
 import InputWrapper from '@/presentation/components/forms/InputWrapper';
 import { SPACING, BORDER_RADIUS, FONT_SIZE, FONT_WEIGHT, TEXT_COLOR, INPUT_BASE_STYLE } from '@/presentation/styles/constants';
+import { useAuth } from '@/presentation/hooks/useAuth';
+import { useToast } from '@/presentation/contexts/ToastContext';
 import liveelogo from '@/presentation/assets/images/liveelogo.png';
 
 /**
@@ -15,21 +17,71 @@ type UserType = 'brand' | 'showhost';
  */
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const { login, isLoggedIn } = useAuth();
+  const { showToast } = useToast();
   const [userType, setUserType] = useState<UserType>('brand');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const showhostButtonRef = useRef<HTMLButtonElement>(null);
   const tabContainerRef = useRef<HTMLDivElement>(null);
   const [bubbleLeft, setBubbleLeft] = useState<string>('75%');
 
   /**
+   * 이미 로그인된 경우 마이페이지로 리다이렉트
+   */
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/mypage', { replace: true });
+    }
+  }, [isLoggedIn, navigate]);
+
+  /**
    * 로그인 버튼 클릭 핸들러
    */
-  const handleLogin = () => {
-    // TODO: 실제 로그인 로직 구현
-    console.log('로그인 시도:', { userType, email, password });
-    // 로그인 성공 시 마이페이지로 이동
-    navigate('/mypage');
+  const handleLogin = async () => {
+    // 입력 검증
+    if (!email.trim()) {
+      const errorMsg = '이메일을 입력해주세요.';
+      setError(errorMsg);
+      showToast(errorMsg, undefined, 'error');
+      return;
+    }
+    if (!password.trim()) {
+      const errorMsg = '비밀번호를 입력해주세요.';
+      setError(errorMsg);
+      showToast(errorMsg, undefined, 'error');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await login({
+        email: email.trim(),
+        password,
+        role: userType,
+      });
+      // 로그인 성공 시 useAuth에서 자동으로 마이페이지로 이동
+      showToast('로그인되었습니다.');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : '로그인에 실패했습니다.';
+      setError(errorMessage);
+      showToast(errorMessage, undefined, 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /**
+   * Enter 키 입력 핸들러
+   */
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !isLoading) {
+      handleLogin();
+    }
   };
 
   /**
@@ -283,7 +335,9 @@ const LoginPage: React.FC = () => {
             placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onKeyPress={handleKeyPress}
             style={inputStyle}
+            disabled={isLoading}
           />
         </InputWrapper>
 
@@ -293,17 +347,34 @@ const LoginPage: React.FC = () => {
             placeholder="비밀번호"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onKeyPress={handleKeyPress}
             style={inputStyle}
+            disabled={isLoading}
           />
         </InputWrapper>
+
+        {/* 에러 메시지 표시 */}
+        {error && (
+          <div
+            style={{
+              color: '#E53E3E',
+              fontSize: FONT_SIZE.SM,
+              marginTop: SPACING.SM,
+              textAlign: 'center',
+            }}
+          >
+            {error}
+          </div>
+        )}
 
         <Button
           variant="primary"
           fullWidth
           onClick={handleLogin}
+          disabled={isLoading}
           style={{ marginTop: SPACING.MD }}
         >
-          로그인
+          {isLoading ? '로그인 중...' : '로그인'}
         </Button>
 
         {/* 회원가입 링크 */}

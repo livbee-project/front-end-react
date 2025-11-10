@@ -4,6 +4,8 @@ import { RiArrowRightSLine } from 'react-icons/ri';
 import VerticalList from '@/presentation/components/list/VerticalList';
 import ListItem from '@/presentation/components/list/ListItem';
 import SectionTitle from '@/presentation/components/ui/SectionTitle';
+import { useAuth } from '@/presentation/hooks/useAuth';
+import { useToast } from '@/presentation/contexts/ToastContext';
 
 const PLACEHOLDER_SUBTITLE = 'P.동해물과 백두산이 마르고 닳도록';
 
@@ -65,6 +67,16 @@ const MenuItem: React.FC<MenuItemProps> = ({ title, subtitle, onTap }) => {
 
 const MyPage: React.FC = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+  const { showToast } = useToast();
+
+  /**
+   * 로그아웃 핸들러
+   */
+  const handleLogout = () => {
+    logout();
+    showToast('로그아웃되었습니다.');
+  };
 
   return (
     <div style={{ padding: '0' }}>
@@ -91,7 +103,7 @@ const MyPage: React.FC = () => {
           />
           <MenuItem
             title="로그아웃"
-            onTap={() => console.log('로그아웃 클릭')}
+            onTap={handleLogout}
           />
         </VerticalList>
       </div>

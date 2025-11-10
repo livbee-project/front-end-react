@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import BottomNavItem from './BottomNavItem';
 import { useToast } from '@/presentation/contexts/ToastContext';
+import { useAuth } from '@/presentation/hooks/useAuth';
 // (추가) react-icons/ri (Remix Icon) 라이브러리에서 아이콘들을 임포트합니다.
 import {
   RiHomeLine,
@@ -12,19 +13,6 @@ import {
 } from 'react-icons/ri';
 // CSS 변수를 사용하기 위해 global.css 임포트
 import '@/presentation/styles/global.css';
-
-/**
- * (임시) 인증 상태를 확인하는 훅
- * TODO: 추후 React Context API 등을 사용한
- * 실제 useAuth 훅으로 교체해야 합니다.
- * Flutter의 AuthProvider 역할을 대신합니다.
- */
-const useAuth = () => {
-  // 테스트를 위해 'false'로 설정
-  // 이 값을 'true'로 바꾸면 '마이페이지' 탭이 정상 동작합니다.
-  const isLoggedIn = false;
-  return { isLoggedIn };
-};
 
 /**
  * (수정) 탭 메뉴의 데이터
