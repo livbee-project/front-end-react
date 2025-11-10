@@ -1,4 +1,10 @@
-import type { Campaign, CampaignListResponse, CampaignListQuery } from '@/domain/entities/Campaign';
+import type {
+  Campaign,
+  CampaignListResponse,
+  CampaignListQuery,
+  CreateCampaignRequest,
+  CreateCampaignResponse,
+} from '@/domain/entities/Campaign';
 import { CampaignApiSource } from '@/data/sources/CampaignApiSource';
 
 /**
@@ -20,6 +26,18 @@ export class CampaignRepository {
       return await this.apiSource.getCampaignList(query);
     } catch (error) {
       console.error('캠페인 목록 조회 실패:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 모집 공고 등록
+   */
+  async createCampaign(request: CreateCampaignRequest): Promise<CreateCampaignResponse> {
+    try {
+      return await this.apiSource.createCampaign(request);
+    } catch (error) {
+      console.error('캠페인 등록 실패:', error);
       throw error;
     }
   }

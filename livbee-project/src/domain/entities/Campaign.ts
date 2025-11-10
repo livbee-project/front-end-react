@@ -25,6 +25,82 @@ export interface Campaign {
 }
 
 /**
+ * 캠페인 등록 요청 타입
+ */
+export interface CreateCampaignRequest {
+  // 필수 필드
+  brandName: string;
+  title: string;
+  shootDate: string; // ISO 8601 형식
+  closeAt: string; // ISO 8601 형식
+  durationHours: number;
+  startTime: string; // "HH:mm" 형식
+  endTime: string; // "HH:mm" 형식
+
+  // 선택 필드
+  isPublic?: boolean;
+  prefix?: '쇼호스트모집' | '촬영스태프' | '모델모집' | '기타모집';
+  content?: string;
+  category?: '뷰티' | '패션' | '식품' | '가전' | '생활/리빙';
+  location?: string;
+  fee?: number;
+  feeNegotiable?: boolean;
+  coverImageUrl?: string;
+  liveVerticalCoverUrl?: string;
+  liveStreamUrl?: string;
+  productThumbnailUrl?: string;
+  productName?: string;
+  productUrl?: string;
+}
+
+/**
+ * 캠페인 등록 응답 타입
+ */
+export interface CreateCampaignResponse {
+  ok: boolean;
+  data: {
+    id: string;
+    brandName: string;
+    title: string;
+    category: string;
+    categoryCode: string;
+    categoryName: string;
+    prefix: string;
+    prefixCode: string;
+    prefixName: string;
+    content?: string;
+    imageUrl?: string;
+    thumbnailUrl?: string;
+    shootDate: string;
+    closeAt: string;
+    durationHours: number;
+    startTime: string;
+    endTime: string;
+    location?: string;
+    fee?: number;
+    feeNegotiable?: boolean;
+    isPublic: boolean;
+    createdAt: string;
+    updatedAt: string;
+  };
+}
+
+/**
+ * API 에러 응답 타입
+ */
+export interface CampaignApiErrorResponse {
+  ok: false;
+  code: string;
+  message: string;
+  userMessage?: string;
+  errors?: Array<{
+    msg: string;
+    param: string;
+    location: string;
+  }>;
+}
+
+/**
  * 캠페인 목록 조회 응답 타입
  */
 export interface CampaignListResponse {
@@ -44,4 +120,3 @@ export interface CampaignListQuery {
   search?: string;
   sort?: 'deadline' | 'latest';
 }
-

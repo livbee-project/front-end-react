@@ -1,5 +1,12 @@
-import type { CampaignListResponse, CampaignListQuery } from '@/domain/entities/Campaign';
+import type {
+  CampaignListResponse,
+  CampaignListQuery,
+  CreateCampaignRequest,
+  CreateCampaignResponse,
+  CampaignApiErrorResponse,
+} from '@/domain/entities/Campaign';
 import { buildApiUrl, getAuthHeaders } from '@/shared/config/apiConfig';
+import { getToken } from '@/shared/utils/storage';
 
 /**
  * 캠페인 API 소스
@@ -43,6 +50,44 @@ export class CampaignApiSource {
     }
 
     return await response.json();
+  }
+
+  /**
+   * 모집 공고 등록
+   * @param request - 등록 요청 데이터
+   * @returns 등록 응답
+   * @throws {Error} 등록 실패 시
+   */
+  async createCampaign(request: CreateCampaignRequest): Promise<CreateCampaignResponse> {
+    const token = getToken();
+    if (!token) {
+      throw new Error('인증 토큰이 없습니다.');
+    }
+
+    const url = buildApiUrl('/campaigns');
+    const headers = getAuthHeaders(token);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(request),
+    });
+
+    const data: CreateCampaignResponse | CampaignApiErrorResponse = await response.json();
+
+    if (!data.ok) {
+      const error = data as CampaignApiErrorResponse;
+      
+      // 유효성 검사 실패 시 상세 에러 메시지 처리
+      if (error.errors && Array.isArray(error.errors)) {
+        const errorMessages = error.errors.map((err) => err.msg).join(', ');
+        throw new Error(errorMessages);
+      }
+
+      throw new Error(error.userMessage || error.message || '모집 공고 등록에 실패했습니다.');
+    }
+
+    return data as CreateCampaignResponse;
   }
 
   /**

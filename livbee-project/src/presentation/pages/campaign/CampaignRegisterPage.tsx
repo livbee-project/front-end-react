@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import TextInput from '@/presentation/components/forms/TextInput';
 import SelectInput from '@/presentation/components/forms/SelectInput';
 import DateInput from '@/presentation/components/forms/DateInput';
@@ -7,18 +8,27 @@ import ImageUpload from '@/presentation/components/upload/ImageUpload';
 import Button from '@/presentation/components/ui/Button';
 import RegisterPageLayout from '@/presentation/layouts/RegisterPageLayout';
 import FormSection from '@/presentation/components/forms/FormSection';
+import { CampaignRepository } from '@/data/repositories/CampaignRepository';
+import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
+import { useToast } from '@/presentation/contexts/ToastContext';
+import type { CreateCampaignRequest } from '@/domain/entities/Campaign';
 
 /**
  * 모집공고 등록 페이지
  */
 const CampaignRegisterPage: React.FC = () => {
+  const navigate = useNavigate();
+  const campaignRepository = new CampaignRepository();
+  const { uploadFile, isUploading: isImageUploading } = useCloudinaryUpload();
+  const { showToast } = useToast();
+
   // 폼 상태 관리
   const [formData, setFormData] = useState({
     brandName: '',
     title: '',
     content: '',
     detailedContent: '',
-    recruitmentType: 'store',
+    recruitmentType: 'showhost',
     category: 'food',
     location: '',
     filmingDate: '',
@@ -28,13 +38,172 @@ const CampaignRegisterPage: React.FC = () => {
     productName: '',
   });
 
+  // 이미지 URL 상태 관리
+  const [coverImageUrl, setCoverImageUrl] = useState<string>('');
+  const [productImageUrl, setProductImageUrl] = useState<string>('');
+  const [liveCoverImageUrl, setLiveCoverImageUrl] = useState<string>('');
+
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
   };
 
-  const handleSubmit = () => {
-    console.log('모집공고 등록:', formData);
-    // TODO: 실제 등록 로직 구현
+  /**
+   * 날짜를 ISO 8601 형식으로 변환
+   */
+  const convertToISO8601 = (dateString: string): string => {
+    if (!dateString) return '';
+    // YYYY-MM-DD 형식을 ISO 8601로 변환 (자정 시간)
+    return `${dateString}T00:00:00.000Z`;
+  };
+
+  /**
+   * 시간 차이 계산 (durationHours)
+   */
+  const calculateDurationHours = (startTime: string, endTime: string): number => {
+    if (!startTime || !endTime) return 0;
+    
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+    
+    const startMinutes = startHour * 60 + startMinute;
+    const endMinutes = endHour * 60 + endMinute;
+    
+    const diffMinutes = endMinutes - startMinutes;
+    return Math.round((diffMinutes / 60) * 10) / 10; // 소수점 첫째 자리까지
+  };
+
+  /**
+   * 카테고리 영문 코드를 한글 값으로 변환
+   */
+  const convertCategoryToKorean = (categoryCode: string): string => {
+    const categoryMap: Record<string, string> = {
+      food: '식품',
+      fashion: '패션',
+      beauty: '뷰티',
+      electronics: '가전',
+      lifestyle: '생활/리빙',
+    };
+    return categoryMap[categoryCode] || '식품';
+  };
+
+  /**
+   * 모집구분 영문 코드를 한글 값으로 변환
+   */
+  const convertPrefixToKorean = (prefixCode: string): string => {
+    const prefixMap: Record<string, string> = {
+      showhost: '쇼호스트모집',
+      model: '모델모집',
+      staff: '촬영스태프',
+      other: '기타모집',
+      store: '쇼호스트모집', // 임시 매핑
+    };
+    return prefixMap[prefixCode] || '쇼호스트모집';
+  };
+
+  /**
+   * 이미지 업로드 핸들러
+   */
+  const handleImageSelect = async (
+    file: File,
+    type: 'cover' | 'product' | 'liveCover'
+  ) => {
+    try {
+      const imageUrl = await uploadFile(file, { type: 'image' });
+      if (imageUrl) {
+        if (type === 'cover') {
+          setCoverImageUrl(imageUrl);
+        } else if (type === 'product') {
+          setProductImageUrl(imageUrl);
+        } else if (type === 'liveCover') {
+          setLiveCoverImageUrl(imageUrl);
+        }
+      }
+    } catch (error) {
+      console.error('이미지 업로드 실패:', error);
+    }
+  };
+
+  /**
+   * 폼 제출 핸들러
+   */
+  const handleSubmit = async () => {
+    // 입력 검증
+    if (!formData.brandName.trim()) {
+      showToast('브랜드명을 입력해주세요.', undefined, 'error');
+      return;
+    }
+    if (!formData.title.trim()) {
+      showToast('제목을 입력해주세요.', undefined, 'error');
+      return;
+    }
+    if (!formData.filmingDate) {
+      showToast('촬영일을 선택해주세요.', undefined, 'error');
+      return;
+    }
+    if (!formData.deadline) {
+      showToast('공고 마감일을 선택해주세요.', undefined, 'error');
+      return;
+    }
+    if (!formData.startTime) {
+      showToast('시작시간을 선택해주세요.', undefined, 'error');
+      return;
+    }
+    if (!formData.endTime) {
+      showToast('종료시간을 선택해주세요.', undefined, 'error');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // durationHours 계산
+      const durationHours = calculateDurationHours(formData.startTime, formData.endTime);
+      if (durationHours <= 0) {
+        showToast('종료시간은 시작시간보다 늦어야 합니다.', undefined, 'error');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // content와 detailedContent 합치기
+      const combinedContent = formData.detailedContent
+        ? `${formData.content}\n\n${formData.detailedContent}`
+        : formData.content;
+
+      // 요청 데이터 구성
+      const request: CreateCampaignRequest = {
+        brandName: formData.brandName.trim(),
+        title: formData.title.trim(),
+        shootDate: convertToISO8601(formData.filmingDate),
+        closeAt: convertToISO8601(formData.deadline),
+        durationHours,
+        startTime: formData.startTime,
+        endTime: formData.endTime,
+        prefix: convertPrefixToKorean(formData.recruitmentType) as any,
+        category: convertCategoryToKorean(formData.category) as any,
+        content: combinedContent || undefined,
+        location: formData.location.trim() || undefined,
+        productName: formData.productName.trim() || undefined,
+        coverImageUrl: coverImageUrl || undefined,
+        productThumbnailUrl: productImageUrl || undefined,
+        liveVerticalCoverUrl: liveCoverImageUrl || undefined,
+        isPublic: true,
+      };
+
+      // API 호출
+      const response = await campaignRepository.createCampaign(request);
+
+      if (response.ok) {
+        showToast('모집 공고가 등록되었습니다.');
+        navigate('/campaigns', { replace: true });
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '모집 공고 등록에 실패했습니다.';
+      showToast(errorMessage, undefined, 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const recruitmentTypeOptions = [
@@ -54,7 +223,16 @@ const CampaignRegisterPage: React.FC = () => {
     <RegisterPageLayout>
       {/* 대표이미지 1:2 */}
       <FormSection title="대표이미지 1:2*">
-        <ImageUpload size={200} aspectRatio="1:2" />
+        <ImageUpload
+          size={200}
+          aspectRatio="1:2"
+          onImageSelect={(file) => handleImageSelect(file, 'cover')}
+        />
+        {coverImageUrl && (
+          <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--dark-gray)' }}>
+            이미지 업로드 완료
+          </div>
+        )}
       </FormSection>
 
       {/* 브랜드명 */}
@@ -181,12 +359,30 @@ const CampaignRegisterPage: React.FC = () => {
 
       {/* 상품 이미지 1:1 */}
       <FormSection title="상품 이미지 1:1">
-        <ImageUpload size={200} aspectRatio="1:1" />
+        <ImageUpload
+          size={200}
+          aspectRatio="1:1"
+          onImageSelect={(file) => handleImageSelect(file, 'product')}
+        />
+        {productImageUrl && (
+          <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--dark-gray)' }}>
+            이미지 업로드 완료
+          </div>
+        )}
       </FormSection>
 
       {/* 쇼핑라이브 커버 3:4 */}
       <FormSection title="쇼핑라이브 커버 3:4">
-        <ImageUpload size={200} aspectRatio="3:4" />
+        <ImageUpload
+          size={200}
+          aspectRatio="3:4"
+          onImageSelect={(file) => handleImageSelect(file, 'liveCover')}
+        />
+        {liveCoverImageUrl && (
+          <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--dark-gray)' }}>
+            이미지 업로드 완료
+          </div>
+        )}
       </FormSection>
 
       {/* 하단 버튼 */}
@@ -196,8 +392,9 @@ const CampaignRegisterPage: React.FC = () => {
           size="medium"
           fullWidth
           onClick={handleSubmit}
+          disabled={isSubmitting || isImageUploading}
         >
-          BUTTON
+          {isSubmitting || isImageUploading ? '등록 중...' : '등록하기'}
         </Button>
       </div>
     </RegisterPageLayout>
