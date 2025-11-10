@@ -75,31 +75,17 @@ const CampaignRegisterPage: React.FC = () => {
   };
 
   /**
-   * 카테고리 영문 코드를 한글 값으로 변환
+   * 모집구분 코드 매핑 (store → showhost)
    */
-  const convertCategoryToKorean = (categoryCode: string): string => {
-    const categoryMap: Record<string, string> = {
-      food: '식품',
-      fashion: '패션',
-      beauty: '뷰티',
-      electronics: '가전',
-      lifestyle: '생활/리빙',
+  const mapRecruitmentType = (type: string): 'showhost' | 'staff' | 'model' | 'other' => {
+    const typeMap: Record<string, 'showhost' | 'staff' | 'model' | 'other'> = {
+      store: 'showhost',
+      showhost: 'showhost',
+      model: 'model',
+      staff: 'staff',
+      other: 'other',
     };
-    return categoryMap[categoryCode] || '식품';
-  };
-
-  /**
-   * 모집구분 영문 코드를 한글 값으로 변환
-   */
-  const convertPrefixToKorean = (prefixCode: string): string => {
-    const prefixMap: Record<string, string> = {
-      showhost: '쇼호스트모집',
-      model: '모델모집',
-      staff: '촬영스태프',
-      other: '기타모집',
-      store: '쇼호스트모집', // 임시 매핑
-    };
-    return prefixMap[prefixCode] || '쇼호스트모집';
+    return typeMap[type] || 'showhost';
   };
 
   /**
@@ -158,18 +144,15 @@ const CampaignRegisterPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      // durationHours 계산
-      const durationHours = calculateDurationHours(formData.startTime, formData.endTime);
-      if (durationHours <= 0) {
-        showToast('종료시간은 시작시간보다 늦어야 합니다.', undefined, 'error');
-        setIsSubmitting(false);
-        return;
+      // 시간 검증
+      if (formData.startTime && formData.endTime) {
+        const durationHours = calculateDurationHours(formData.startTime, formData.endTime);
+        if (durationHours <= 0) {
+          showToast('종료시간은 시작시간보다 늦어야 합니다.', undefined, 'error');
+          setIsSubmitting(false);
+          return;
+        }
       }
-
-      // content와 detailedContent 합치기
-      const combinedContent = formData.detailedContent
-        ? `${formData.content}\n\n${formData.detailedContent}`
-        : formData.content;
 
       // 요청 데이터 구성
       const request: CreateCampaignRequest = {
@@ -177,12 +160,13 @@ const CampaignRegisterPage: React.FC = () => {
         title: formData.title.trim(),
         shootDate: convertToISO8601(formData.filmingDate),
         closeAt: convertToISO8601(formData.deadline),
-        durationHours,
         startTime: formData.startTime,
         endTime: formData.endTime,
-        prefix: convertPrefixToKorean(formData.recruitmentType) as any,
-        category: convertCategoryToKorean(formData.category) as any,
-        content: combinedContent || undefined,
+        // durationHours는 백엔드에서 자동 계산되므로 생략 가능
+        prefix: mapRecruitmentType(formData.recruitmentType),
+        category: formData.category as 'beauty' | 'fashion' | 'food' | 'electronics' | 'lifestyle',
+        content: formData.content.trim() || undefined,
+        detailedContent: formData.detailedContent.trim() || undefined, // 별도 필드로 전송
         location: formData.location.trim() || undefined,
         productName: formData.productName.trim() || undefined,
         coverImageUrl: coverImageUrl || undefined,

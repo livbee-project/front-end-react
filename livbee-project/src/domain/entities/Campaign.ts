@@ -33,16 +33,17 @@ export interface CreateCampaignRequest {
   title: string;
   shootDate: string; // ISO 8601 형식
   closeAt: string; // ISO 8601 형식
-  durationHours: number;
   startTime: string; // "HH:mm" 형식
   endTime: string; // "HH:mm" 형식
 
   // 선택 필드
   isPublic?: boolean;
-  prefix?: '쇼호스트모집' | '촬영스태프' | '모델모집' | '기타모집';
+  prefix?: 'showhost' | 'staff' | 'model' | 'other'; // 영문 코드 (백엔드에서 자동 한글 변환)
   content?: string;
-  category?: '뷰티' | '패션' | '식품' | '가전' | '생활/리빙';
+  detailedContent?: string; // 상세 내용 (content보다 우선 적용)
+  category?: 'beauty' | 'fashion' | 'food' | 'electronics' | 'lifestyle'; // 영문 코드 (백엔드에서 자동 한글 변환)
   location?: string;
+  durationHours?: number; // 선택 필드 (startTime과 endTime으로 자동 계산 가능)
   fee?: number;
   feeNegotiable?: boolean;
   coverImageUrl?: string;
