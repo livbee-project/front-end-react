@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserRepository } from '@/data/repositories/UserRepository';
 import { setToken, removeToken, getToken } from '@/shared/utils/storage';
-import type { LoginRequest, SignupRequest, User, UserRole } from '@/domain/entities/User';
+import type { LoginRequest, SignupRequest, User } from '@/domain/entities/User';
 
 /**
  * 인증 상태 타입
