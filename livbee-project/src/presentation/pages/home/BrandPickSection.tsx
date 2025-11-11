@@ -164,7 +164,7 @@ const BrandPickSection: React.FC = () => {
                   variant="primary"
                   size="small"
                   fullWidth
-                  onClick={(e) => {
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation(); // 카드 클릭 이벤트와 분리
                     navigate(`/campaigns/${campaign.id}`);
                   }}
