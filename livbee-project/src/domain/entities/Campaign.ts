@@ -121,3 +121,100 @@ export interface CampaignListQuery {
   search?: string;
   sort?: 'deadline' | 'latest';
 }
+
+/**
+ * 캠페인 상세 조회 응답 타입 (API 응답 구조)
+ */
+export interface CampaignDetailResponse {
+  ok: true;
+  data: {
+    id: string;
+    brandName: string;
+    prefix: 'showhost' | 'staff' | 'model' | 'other' | null;
+    prefixCode: string | null;
+    prefixName: string | null;
+    title: string;
+    content: string;
+    detailedContent: string;
+    category: 'beauty' | 'fashion' | 'food' | 'electronics' | 'lifestyle' | null;
+    categoryCode: string | null;
+    categoryName: string | null;
+    location: string | null;
+    shootDate: string;
+    closeAt: string;
+    durationHours: number;
+    startTime: string;
+    endTime: string;
+    fee: number | null;
+    feeNegotiable: boolean;
+    coverImageUrl: string | null;
+    imageUrl: string;
+    thumbnailUrl: string;
+    liveVerticalCoverUrl: string | null;
+    liveStreamUrl: string | null;
+    productThumbnailUrl: string | null;
+    productImageUrl: string;
+    productName: string | null;
+    productUrl: string | null;
+    brandIntroduction: string;
+    recruitmentSection: string;
+    qualifications: string[];
+    preferredQualifications: string[];
+    isPublic: boolean;
+    createdAt: string;
+    updatedAt: string;
+    createdBy: string;
+    metrics: {
+      views: number;
+      clicks: number;
+      applications: number;
+    };
+    isApplied?: boolean; // 로그인한 경우만 포함
+  };
+}
+
+/**
+ * 캠페인 상세 정보 타입 (프론트엔드에서 사용)
+ */
+export interface CampaignDetail {
+  id: string;
+  brandName: string;
+  prefix: '쇼호스트모집' | '촬영스태프' | '모델모집' | '기타모집' | null;
+  prefixName: string | null;
+  title: string;
+  content: string;
+  detailedContent: string;
+  category: '뷰티' | '패션' | '식품' | '가전' | '생활/리빙' | null;
+  categoryName: string | null;
+  location: string | null;
+  shootDate: string;
+  closeAt: string;
+  durationHours: number;
+  startTime: string;
+  endTime: string;
+  fee: number | null;
+  feeNegotiable: boolean;
+  coverImageUrl: string | null;
+  imageUrl: string;
+  thumbnailUrl: string;
+  liveVerticalCoverUrl: string | null;
+  liveStreamUrl: string | null;
+  productThumbnailUrl: string | null;
+  productImageUrl: string;
+  productName: string | null;
+  productUrl: string | null;
+  brandIntroduction: string;
+  recruitmentSection: string;
+  qualifications: string[];
+  preferredQualifications: string[];
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  metrics: {
+    views: number;
+    clicks: number;
+    applications: number;
+  };
+  isApplied?: boolean;
+}

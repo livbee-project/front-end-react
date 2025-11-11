@@ -4,6 +4,8 @@ import type {
   CreateCampaignRequest,
   CreateCampaignResponse,
   CampaignApiErrorResponse,
+  CampaignDetailResponse,
+  CampaignDetail,
 } from '@/domain/entities/Campaign';
 import { buildApiUrl, getAuthHeaders } from '@/shared/config/apiConfig';
 import { getToken } from '@/shared/utils/storage';
@@ -91,11 +93,102 @@ export class CampaignApiSource {
   }
 
   /**
-   * 모집 공고 상세 조회 (향후 구현 예정)
+   * 모집 공고 상세 조회
+   * @param id - 조회할 모집 공고의 ID
+   * @returns 상세 정보
+   * @throws {Error} 조회 실패 시
    */
-  async getCampaignById(_id: string): Promise<any> {
-    // TODO: 상세 조회 API 구현 시 추가
-    throw new Error('Not implemented yet');
+  async getCampaignById(id: string): Promise<CampaignDetail> {
+    const token = getToken();
+    const url = buildApiUrl(`/campaigns/${id}`);
+    const headers = getAuthHeaders(token || undefined);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+    });
+
+    const data: CampaignDetailResponse | CampaignApiErrorResponse = await response.json();
+
+    if (!data.ok) {
+      const error = data as CampaignApiErrorResponse;
+      throw new Error(error.userMessage || error.message || '모집 공고 상세 조회에 실패했습니다.');
+    }
+
+    const responseData = (data as CampaignDetailResponse).data;
+
+    // API 응답을 프론트엔드 타입으로 변환
+    const campaignDetail: CampaignDetail = {
+      id: responseData.id,
+      brandName: responseData.brandName,
+      prefix: this.mapPrefixToKorean(responseData.prefix),
+      prefixName: responseData.prefixName,
+      title: responseData.title,
+      content: responseData.content,
+      detailedContent: responseData.detailedContent,
+      category: this.mapCategoryToKorean(responseData.category),
+      categoryName: responseData.categoryName,
+      location: responseData.location,
+      shootDate: responseData.shootDate,
+      closeAt: responseData.closeAt,
+      durationHours: responseData.durationHours,
+      startTime: responseData.startTime,
+      endTime: responseData.endTime,
+      fee: responseData.fee,
+      feeNegotiable: responseData.feeNegotiable,
+      coverImageUrl: responseData.coverImageUrl,
+      imageUrl: responseData.imageUrl,
+      thumbnailUrl: responseData.thumbnailUrl,
+      liveVerticalCoverUrl: responseData.liveVerticalCoverUrl,
+      liveStreamUrl: responseData.liveStreamUrl,
+      productThumbnailUrl: responseData.productThumbnailUrl,
+      productImageUrl: responseData.productImageUrl,
+      productName: responseData.productName,
+      productUrl: responseData.productUrl,
+      brandIntroduction: responseData.brandIntroduction,
+      recruitmentSection: responseData.recruitmentSection,
+      qualifications: responseData.qualifications,
+      preferredQualifications: responseData.preferredQualifications,
+      isPublic: responseData.isPublic,
+      createdAt: responseData.createdAt,
+      updatedAt: responseData.updatedAt,
+      createdBy: responseData.createdBy,
+      metrics: responseData.metrics,
+      isApplied: responseData.isApplied,
+    };
+
+    return campaignDetail;
+  }
+
+  /**
+   * 모집구분 영문 코드를 한글명으로 변환
+   */
+  private mapPrefixToKorean(
+    prefix: 'showhost' | 'staff' | 'model' | 'other' | null
+  ): '쇼호스트모집' | '촬영스태프' | '모델모집' | '기타모집' | null {
+    const prefixMap: Record<string, '쇼호스트모집' | '촬영스태프' | '모델모집' | '기타모집'> = {
+      showhost: '쇼호스트모집',
+      staff: '촬영스태프',
+      model: '모델모집',
+      other: '기타모집',
+    };
+    return prefix ? prefixMap[prefix] || null : null;
+  }
+
+  /**
+   * 카테고리 영문 코드를 한글명으로 변환
+   */
+  private mapCategoryToKorean(
+    category: 'beauty' | 'fashion' | 'food' | 'electronics' | 'lifestyle' | null
+  ): '뷰티' | '패션' | '식품' | '가전' | '생활/리빙' | null {
+    const categoryMap: Record<string, '뷰티' | '패션' | '식품' | '가전' | '생활/리빙'> = {
+      beauty: '뷰티',
+      fashion: '패션',
+      food: '식품',
+      electronics: '가전',
+      lifestyle: '생활/리빙',
+    };
+    return category ? categoryMap[category] || null : null;
   }
 }
 

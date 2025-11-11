@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import DetailHeader from '@/presentation/components/detail/DetailHeader';
 import BulletList from '@/presentation/components/detail/BulletList';
 import InfoItem from '@/presentation/components/detail/InfoItem';
@@ -6,6 +7,8 @@ import ProductCard from '@/presentation/components/cards/ProductCard';
 import Button from '@/presentation/components/ui/Button';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';
+import { CampaignRepository } from '@/data/repositories/CampaignRepository';
+import type { CampaignDetail } from '@/domain/entities/Campaign';
 import '@/presentation/styles/global.css';
 
 /**
@@ -21,7 +24,82 @@ import '@/presentation/styles/global.css';
  * 8. 하단 액션 버튼
  */
 const CampaignDetailPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [campaign, setCampaign] = useState<CampaignDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  const campaignRepository = new CampaignRepository();
+
+  /**
+   * D-DAY 계산 함수
+   */
+  const calculateDDay = (closeAt: string): string => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const deadline = new Date(closeAt);
+    deadline.setHours(23, 59, 59, 999);
+
+    const diffTime = deadline.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) {
+      return '마감';
+    } else if (diffDays === 0) {
+      return 'D-DAY';
+    } else {
+      return `D-${diffDays}`;
+    }
+  };
+
+  /**
+   * 날짜 포맷팅 함수 (YYYY-MM-DD)
+   */
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  /**
+   * HTML 콘텐츠를 텍스트로 변환 (요약용)
+   */
+  const htmlToText = (html: string): string => {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || div.innerText || '';
+  };
+
+  /**
+   * 캠페인 상세 정보 로드
+   */
+  useEffect(() => {
+    const loadCampaign = async () => {
+      if (!id) {
+        setError('공고 ID가 없습니다.');
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await campaignRepository.getCampaignById(id);
+        setCampaign(data);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : '공고를 불러오는데 실패했습니다.';
+        setError(errorMessage);
+        console.error('캠페인 상세 조회 실패:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadCampaign();
+  }, [id]);
 
   /**
    * 이미지 클릭 핸들러
@@ -35,105 +113,162 @@ const CampaignDetailPage: React.FC = () => {
    * 상품 카드 클릭 핸들러
    */
   const handleProductClick = () => {
-    console.log('상품 카드 클릭');
-    // TODO: 상품 상세 페이지로 이동
+    if (campaign?.productUrl) {
+      window.open(campaign.productUrl, '_blank');
+    } else {
+      console.log('상품 링크가 없습니다.');
+    }
   };
 
   /**
    * 하단 버튼 클릭 핸들러
    */
   const handleButtonClick = () => {
-    console.log('버튼 클릭');
-    // TODO: 지원하기 또는 문의하기 기능 구현
+    if (campaign?.isApplied) {
+      // 이미 지원한 경우
+      alert('이미 지원하신 공고입니다.');
+    } else {
+      // 지원하기 기능 구현
+      console.log('지원하기');
+      // TODO: 지원하기 기능 구현
+    }
   };
+
+  // 로딩 중
+  if (isLoading) {
+    return (
+      <DetailPageLayout>
+        <div style={{ padding: '16px', textAlign: 'center' }}>
+          <p>로딩 중...</p>
+        </div>
+      </DetailPageLayout>
+    );
+  }
+
+  // 에러 발생
+  if (error || !campaign) {
+    return (
+      <DetailPageLayout>
+        <div style={{ padding: '16px', textAlign: 'center' }}>
+          <p style={{ color: 'var(--error)', marginBottom: '16px' }}>
+            {error || '공고를 찾을 수 없습니다.'}
+          </p>
+          <Button variant="primary" onClick={() => navigate('/campaigns')}>
+            목록으로 돌아가기
+          </Button>
+        </div>
+      </DetailPageLayout>
+    );
+  }
+
+  // 요약 내용 생성 (HTML 태그 제거 후 100자로 제한)
+  const summaryContent = htmlToText(campaign.content).substring(0, 100) + '...';
 
   return (
     <DetailPageLayout>
       {/* 1. 상단 헤더 */}
       <DetailHeader
-        brandName="브랜드명"
-        deadlineDay="D-DAY"
-        title="제목 EX 스니커즈 하우스"
-        content="내용 EX 원피스 여행 피크닉 베스트 셀러 슈엘리엘에서 원피"
+        imageUrl={campaign.imageUrl || campaign.coverImageUrl || undefined}
+        brandName={campaign.brandName}
+        deadlineDay={calculateDDay(campaign.closeAt)}
+        title={campaign.title}
+        content={summaryContent}
         onImageClick={handleImageClick}
       />
 
       {/* 2. 브랜드 소개 섹션 */}
-      <DetailSection title="브랜드 소개">
-        <div style={{ marginBottom: '16px' }}>
-          <p style={{ fontSize: 'var(--p2)', lineHeight: 1.6, marginBottom: '12px' }}>
-            <strong>[BRAND NAME]</strong>는 "움직임이 스타일이 된다 (Move with Style)"를 슬로건으로 한 프리미엄 스니커즈 브랜드입니다.
-          </p>
-          <p style={{ fontSize: 'var(--p2)', lineHeight: 1.6, marginBottom: '12px' }}>
-            우리는 단순히 신발을 판매하는 것이 아니라, 라이프스타일과 개성을 제안합니다.
-          </p>
-          <p style={{ fontSize: 'var(--p2)', lineHeight: 1.6, marginBottom: '16px' }}>
-            편안한 착화감, 감각적인 디자인, 지속가능한 소재 사용을 통해 도시에서 자신만의 길을 걷는 사람들을 위한 스니커즈를 만듭니다.
-          </p>
-        </div>
-        <BulletList
-          items={[
-            '설립연도: 2018년',
-            '주요제품: 프리미엄 라이프스타일 스니커즈, 친환경 러닝화, 리미티드 협업 라인',
-            '유통채널: 자사몰 / 무신사 / 네이버 브랜드스토어 / 오프라인 팝업스토어',
-          ]}
-        />
-      </DetailSection>
+      {campaign.brandIntroduction && (
+        <DetailSection title="브랜드 소개">
+          <div
+            style={{ fontSize: 'var(--p2)', lineHeight: 1.6 }}
+            dangerouslySetInnerHTML={{ __html: campaign.brandIntroduction }}
+          />
+        </DetailSection>
+      )}
 
       {/* 3. 모집부문 및 담당 업무 섹션 */}
-      <DetailSection title="모집부문: 라이브커머스 쇼호스트 (Live Commerce Host)">
-        <BulletList
-          items={[
-            '브랜드 공식 라이브커머스(네이버쇼핑 LIVE, 자사몰 LIVE 등) 진행',
-            '신제품 소개 및 스타일링 제안',
-            '실시간 고객 소통 및 상품 문의 응대',
-            '방송 전 리허설 및 제품 특성 파악',
-            '방송 기획 및 콘텐츠 아이디어 제안',
-          ]}
-        />
-      </DetailSection>
+      {campaign.recruitmentSection && (
+        <DetailSection
+          title={
+            campaign.prefixName
+              ? `모집부문: ${campaign.prefixName}`
+              : '모집부문'
+          }
+        >
+          <div
+            style={{ fontSize: 'var(--p2)', lineHeight: 1.6 }}
+            dangerouslySetInnerHTML={{ __html: campaign.recruitmentSection }}
+          />
+        </DetailSection>
+      )}
 
       {/* 4. 자격요건 섹션 */}
-      <DetailSection title="자격요건">
-        <BulletList
-          items={[
-            '나이/학력 무관',
-            '라이브커머스, 홈쇼핑, 유튜브, 인스타그램 등 영상 진행 경험자 우대',
-            '패션 및 스니커즈 트렌드에 대한 이해가 높은 분',
-            '밝고 명확한 톤으로 소통 능력이 뛰어난 분',
-            '브랜드의 감성과 메시지를 진정성 있게 전달할 수 있는 분',
-          ]}
-        />
-      </DetailSection>
+      {campaign.qualifications && campaign.qualifications.length > 0 && (
+        <DetailSection title="자격요건">
+          <BulletList items={campaign.qualifications} />
+        </DetailSection>
+      )}
 
       {/* 5. 우대사항 섹션 */}
-      <DetailSection title="우대사항">
-        <BulletList
-          items={[
-            '패션 크리에이터, 인플루언서 경력 보유자',
-            '영상 콘텐츠 기획 및 SNS 운영 경험자',
-          ]}
-        />
-      </DetailSection>
+      {campaign.preferredQualifications &&
+        campaign.preferredQualifications.length > 0 && (
+          <DetailSection title="우대사항">
+            <BulletList items={campaign.preferredQualifications} />
+          </DetailSection>
+        )}
 
       {/* 6. 모집 상세 정보 필드 섹션 */}
       <div>
-        <InfoItem title="모집구분" />
-        <InfoItem title="카테고리" />
-        <InfoItem title="장소" />
-        <InfoItem title="촬영일" />
-        <InfoItem title="공고마감일" />
-        <InfoItem title="시작시간" />
-        <InfoItem title="종료시간" />
+        <InfoItem
+          title="모집구분"
+          content={campaign.prefixName || '미지정'}
+        />
+        <InfoItem
+          title="카테고리"
+          content={campaign.categoryName || '미지정'}
+        />
+        <InfoItem
+          title="장소"
+          content={campaign.location || '미지정'}
+        />
+        <InfoItem
+          title="촬영일"
+          content={formatDate(campaign.shootDate)}
+        />
+        <InfoItem
+          title="공고마감일"
+          content={formatDate(campaign.closeAt)}
+        />
+        <InfoItem
+          title="시작시간"
+          content={campaign.startTime || '미지정'}
+        />
+        <InfoItem
+          title="종료시간"
+          content={campaign.endTime || '미지정'}
+        />
+        {campaign.fee !== null && (
+          <InfoItem
+            title="출연료"
+            content={
+              campaign.feeNegotiable
+                ? `${campaign.fee.toLocaleString()}원 (협의 가능)`
+                : `${campaign.fee.toLocaleString()}원`
+            }
+          />
+        )}
       </div>
 
       {/* 7. 관련 상품 정보 섹션 */}
-      <DetailSection>
-        <ProductCard
-          productName="스니커즈 (상품명)"
-          onClick={handleProductClick}
-        />
-      </DetailSection>
+      {campaign.productName && (
+        <DetailSection>
+          <ProductCard
+            imageUrl={campaign.productImageUrl || campaign.productThumbnailUrl || undefined}
+            productName={campaign.productName}
+            onClick={handleProductClick}
+          />
+        </DetailSection>
+      )}
 
       {/* 8. 하단 액션 버튼 */}
       <div style={{ padding: '16px' }}>
@@ -142,8 +277,9 @@ const CampaignDetailPage: React.FC = () => {
           size="large"
           fullWidth
           onClick={handleButtonClick}
+          disabled={campaign.isApplied}
         >
-          BUTTON
+          {campaign.isApplied ? '이미 지원한 공고입니다' : '지원하기'}
         </Button>
       </div>
     </DetailPageLayout>

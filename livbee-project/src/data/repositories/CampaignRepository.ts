@@ -4,6 +4,7 @@ import type {
   CampaignListQuery,
   CreateCampaignRequest,
   CreateCampaignResponse,
+  CampaignDetail,
 } from '@/domain/entities/Campaign';
 import { CampaignApiSource } from '@/data/sources/CampaignApiSource';
 
@@ -43,9 +44,9 @@ export class CampaignRepository {
   }
 
   /**
-   * 모집 공고 상세 조회 (향후 구현 예정)
+   * 모집 공고 상세 조회
    */
-  async getCampaignById(id: string): Promise<Campaign> {
+  async getCampaignById(id: string): Promise<CampaignDetail> {
     try {
       return await this.apiSource.getCampaignById(id);
     } catch (error) {
