@@ -1,5 +1,4 @@
 import type {
-  Campaign,
   CampaignListResponse,
   CampaignListQuery,
   CreateCampaignRequest,
