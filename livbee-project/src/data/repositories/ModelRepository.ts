@@ -2,6 +2,8 @@ import type {
   ModelListResponse,
   ModelListQuery,
   ModelDetail,
+  CreateModelRequest,
+  CreateModelResponse,
 } from '@/domain/entities/Model';
 import { ModelApiSource } from '@/data/sources/ModelApiSource';
 
@@ -36,6 +38,18 @@ export class ModelRepository {
       return await this.apiSource.getModelById(id);
     } catch (error) {
       console.error('모델 상세 조회 실패:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 모델 등록
+   */
+  async createModel(request: CreateModelRequest): Promise<CreateModelResponse> {
+    try {
+      return await this.apiSource.createModel(request);
+    } catch (error) {
+      console.error('모델 등록 실패:', error);
       throw error;
     }
   }

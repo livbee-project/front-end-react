@@ -4,8 +4,11 @@ import type {
   ModelDetailResponse,
   ModelDetail,
   ModelApiErrorResponse,
+  CreateModelRequest,
+  CreateModelResponse,
 } from '@/domain/entities/Model';
 import { buildApiUrl, getAuthHeaders } from '@/shared/config/apiConfig';
+import { getToken } from '@/shared/utils/storage';
 
 /**
  * 모델 API 소스
@@ -112,6 +115,46 @@ export class ModelApiSource {
     };
 
     return modelDetail;
+  }
+
+  /**
+   * 모델 등록
+   * @param request - 등록 요청 데이터
+   * @returns 등록 응답
+   * @throws {Error} 등록 실패 시
+   */
+  async createModel(request: CreateModelRequest): Promise<CreateModelResponse> {
+    const token = getToken();
+    if (!token) {
+      throw new Error('인증 토큰이 없습니다.');
+    }
+
+    const url = buildApiUrl('/models');
+    const headers = getAuthHeaders(token);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(request),
+    });
+
+    const data: CreateModelResponse | ModelApiErrorResponse = await response.json();
+
+    if (!data.ok) {
+      const error = data as ModelApiErrorResponse;
+      
+      // 인증 오류 처리
+      if (response.status === 401) {
+        throw new Error('인증이 필요합니다.');
+      }
+      if (response.status === 403) {
+        throw new Error('권한이 없습니다. 쇼호스트 역할만 등록 가능합니다.');
+      }
+
+      throw new Error(error.userMessage || error.message || '모델 등록에 실패했습니다.');
+    }
+
+    return data as CreateModelResponse;
   }
 }
 
