@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import ProfileSection from '@/presentation/components/detail/ProfileSection';
 import SectionHeader from '@/presentation/components/section/SectionHeader';
 import GalleryGrid from '@/presentation/components/detail/GalleryGrid';
@@ -8,6 +9,8 @@ import Button from '@/presentation/components/ui/Button';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';
 import DetailContent from '@/presentation/layouts/DetailContent';
+import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
+import type { PortfolioDetail } from '@/domain/entities/Portfolio';
 import '@/presentation/styles/global.css';
 
 /**
@@ -20,6 +23,42 @@ import '@/presentation/styles/global.css';
  * 5. 하단 버튼
  */
 const PortfolioDetailPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [portfolio, setPortfolio] = useState<PortfolioDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const portfolioRepository = new PortfolioRepository();
+
+  /**
+   * 포트폴리오 상세 정보 로드
+   */
+  useEffect(() => {
+    const loadPortfolio = async () => {
+      if (!id) {
+        setError('포트폴리오 ID가 없습니다.');
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await portfolioRepository.getPortfolioById(id);
+        setPortfolio(data);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : '포트폴리오를 불러오는데 실패했습니다.';
+        setError(errorMessage);
+        console.error('포트폴리오 상세 조회 실패:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPortfolio();
+  }, [id]);
+
   /**
    * 프로필 이미지 클릭 핸들러
    */
@@ -40,60 +79,172 @@ const PortfolioDetailPage: React.FC = () => {
    * 하단 버튼 클릭 핸들러
    */
   const handleButtonClick = () => {
-    console.log('버튼 클릭');
-    // TODO: 버튼 액션 구현 (예: 제안하기, 문의하기 등)
+    if (portfolio?.isReceivingOffers) {
+      console.log('제안하기');
+      // TODO: 제안하기 기능 구현
+    } else {
+      console.log('문의하기');
+      // TODO: 문의하기 기능 구현
+    }
   };
+
+  // 로딩 중
+  if (isLoading) {
+    return (
+      <DetailPageLayout>
+        <div style={{ padding: '16px', textAlign: 'center' }}>
+          <p>로딩 중...</p>
+        </div>
+      </DetailPageLayout>
+    );
+  }
+
+  // 에러 발생
+  if (error || !portfolio) {
+    return (
+      <DetailPageLayout>
+        <div style={{ padding: '16px', textAlign: 'center' }}>
+          <p style={{ color: 'var(--error)', marginBottom: '16px' }}>
+            {error || '포트폴리오를 찾을 수 없습니다.'}
+          </p>
+          <Button variant="primary" onClick={() => navigate('/portfolios')}>
+            목록으로 돌아가기
+          </Button>
+        </div>
+      </DetailPageLayout>
+    );
+  }
+
+  // SNS 링크 배열 생성
+  const snsLinks = [
+    portfolio.websiteUrl && { label: '웹사이트', url: portfolio.websiteUrl },
+    portfolio.instagramUrl && { label: '인스타그램', url: portfolio.instagramUrl },
+    portfolio.youtubeUrl && { label: '유튜브', url: portfolio.youtubeUrl },
+    portfolio.tiktokUrl && { label: '틱톡', url: portfolio.tiktokUrl },
+  ].filter(Boolean) as Array<{ label: string; url: string }>;
 
   return (
     <DetailPageLayout>
       {/* 1. 포트폴리오 프로필 섹션 */}
       <ProfileSection
-        name="오해원"
-        description="깔끔한 이미지의 모델로써 열정적인 활동을 하고 있습니다."
+        name={portfolio.nickname || '이름 없음'}
+        description={portfolio.oneLineIntro || '소개 없음'}
+        profileImageUrl={portfolio.mainThumbnailUrl || undefined}
         onImageClick={handleProfileImageClick}
       />
 
       {/* 2. 상세소개 섹션 */}
-      <DetailSection showDivider>
-        <div style={{ paddingBottom: '16px' }}>
-          <SectionHeader title="상세소개" />
-        </div>
-        <DetailContent>내용을 입력해주세요</DetailContent>
-      </DetailSection>
+      {portfolio.detailedIntro && (
+        <DetailSection showDivider>
+          <div style={{ paddingBottom: '16px' }}>
+            <SectionHeader title="상세소개" />
+          </div>
+          <DetailContent>
+            <div
+              style={{ fontSize: 'var(--p2)', lineHeight: 1.6 }}
+              dangerouslySetInnerHTML={{ __html: portfolio.detailedIntro }}
+            />
+          </DetailContent>
+        </DetailSection>
+      )}
 
       {/* 3. 갤러리 섹션 */}
-      <DetailSection>
-        <SectionHeader title="갤러리" />
-        <div style={{ marginTop: '16px' }}>
-          <GalleryGrid
-            columns={3}
-            onImageClick={handleGalleryImageClick}
-          />
-        </div>
-      </DetailSection>
+      {portfolio.subThumbnailUrls && portfolio.subThumbnailUrls.length > 0 && (
+        <DetailSection>
+          <SectionHeader title="갤러리" />
+          <div style={{ marginTop: '16px' }}>
+            <GalleryGrid
+              images={portfolio.subThumbnailUrls}
+              columns={3}
+              onImageClick={handleGalleryImageClick}
+            />
+          </div>
+        </DetailSection>
+      )}
 
       {/* 4. 정보 및 태그 섹션 */}
       <div>
-        {/* 정보 항목들 */}
-        <InfoItem title="타이틀" />
-        <InfoItem title="타이틀" />
-        <InfoItem title="타이틀" />
-        <InfoItem title="타이틀" />
-        <InfoItem title="타이틀" />
-        
-        {/* 태그가 포함된 정보 항목 */}
-        <InfoItem title="타이틀">
-          <TagContainer
-            tags={[
-              { label: 'CH', variant: 'circle' },
-              { label: 'CH', variant: 'circle' },
-              { label: 'CH', variant: 'circle' },
-              { label: 'CH', variant: 'circle' },
-              { label: 'CH', variant: 'circle' },
-              { label: 'CH', variant: 'circle' },
-            ]}
+        {portfolio.experienceYears !== null && (
+          <InfoItem
+            title="경력"
+            content={`${portfolio.experienceYears}년`}
           />
-        </InfoItem>
+        )}
+        {portfolio.isAgePublic && portfolio.age !== null && (
+          <InfoItem
+            title="나이"
+            content={`${portfolio.age}세`}
+          />
+        )}
+        {portfolio.detailedRegion && (
+          <InfoItem
+            title="지역"
+            content={portfolio.detailedRegion}
+          />
+        )}
+        {portfolio.gender && (
+          <InfoItem
+            title="성별"
+            content={portfolio.gender === 'male' ? '남성' : portfolio.gender === 'female' ? '여성' : portfolio.gender}
+          />
+        )}
+        {portfolio.isSizingPublic && (
+          <>
+            {portfolio.height !== null && (
+              <InfoItem
+                title="키"
+                content={`${portfolio.height}cm`}
+              />
+            )}
+            {portfolio.weight !== null && (
+              <InfoItem
+                title="몸무게"
+                content={`${portfolio.weight}kg`}
+              />
+            )}
+            {portfolio.topSize && (
+              <InfoItem
+                title="상의 사이즈"
+                content={portfolio.topSize}
+              />
+            )}
+            {portfolio.bottomSize && (
+              <InfoItem
+                title="하의 사이즈"
+                content={portfolio.bottomSize}
+              />
+            )}
+            {portfolio.shoeSize !== null && (
+              <InfoItem
+                title="신발 사이즈"
+                content={`${portfolio.shoeSize}mm`}
+              />
+            )}
+          </>
+        )}
+        
+        {/* SNS 링크 */}
+        {snsLinks.length > 0 && (
+          <InfoItem title="SNS">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {snsLinks.map((link, index) => (
+                <a
+                  key={index}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: 'var(--primary)',
+                    textDecoration: 'none',
+                    fontSize: 'var(--p2)',
+                  }}
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          </InfoItem>
+        )}
       </div>
 
       {/* 5. 하단 버튼 */}
@@ -103,8 +254,9 @@ const PortfolioDetailPage: React.FC = () => {
           size="large"
           fullWidth
           onClick={handleButtonClick}
+          disabled={!portfolio.isReceivingOffers}
         >
-          BUTTON
+          {portfolio.isReceivingOffers ? '제안하기' : '제안 받지 않음'}
         </Button>
       </div>
     </DetailPageLayout>

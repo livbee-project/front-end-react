@@ -1,21 +1,87 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PortfolioRowCard from '@/presentation/components/cards/PortfolioRowCard';
 import VerticalList from '@/presentation/components/list/VerticalList';
 import ListItem from '@/presentation/components/list/ListItem';
 import ListPageLayout from '@/presentation/layouts/ListPageLayout';
-
-/**
- * 리스트 렌더링을 위한 임시 목업 데이터
- */
-const MOCK_PORTFOLIOS = Array.from({ length: 15 }, (_, i) => ({
-  id: i + 1,
-  name: `이태웅${i + 1 > 1 ? ` ${i + 1}` : ''}`,
-  content: `P.동해물과 백두산이 마르고 닳도록 ${i + 1}`,
-}));
+import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
+import type { Portfolio } from '@/domain/entities/Portfolio';
 
 const PortfolioPage: React.FC = () => {
   const navigate = useNavigate();
+  const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+
+  // portfolioRepository를 useRef로 관리하여 매 렌더링마다 재생성되지 않도록 함
+  const portfolioRepositoryRef = useRef<PortfolioRepository | null>(null);
+  if (!portfolioRepositoryRef.current) {
+    portfolioRepositoryRef.current = new PortfolioRepository();
+  }
+  const portfolioRepository = portfolioRepositoryRef.current;
+
+  /**
+   * 포트폴리오 목록 조회
+   */
+  const fetchPortfolios = async (page: number = 1) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await portfolioRepository.getPortfolioList({
+        page,
+        limit: 20, // 페이지당 20개 항목
+      });
+
+      setPortfolios(response.items);
+      setCurrentPage(response.currentPage || page);
+      setTotalPages(response.totalPages || 1);
+    } catch (err) {
+      console.error('포트폴리오 목록 조회 실패:', err);
+      setError('포트폴리오 목록을 불러오는 중 오류가 발생했습니다.');
+      setPortfolios([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * 초기 로드 및 페이지 변경 시 데이터 조회
+   */
+  useEffect(() => {
+    fetchPortfolios(currentPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // portfolioRepository는 ref로 관리되므로 의존성 배열에서 제외
+
+  // 로딩 중
+  if (loading) {
+    return (
+      <ListPageLayout
+        searchPlaceholder="검색"
+        floatingActionButtonPath="/portfolios/register"
+      >
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <p>로딩 중...</p>
+        </div>
+      </ListPageLayout>
+    );
+  }
+
+  // 에러 발생
+  if (error) {
+    return (
+      <ListPageLayout
+        searchPlaceholder="검색"
+        floatingActionButtonPath="/portfolios/register"
+      >
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <p style={{ color: 'var(--error)' }}>{error}</p>
+        </div>
+      </ListPageLayout>
+    );
+  }
 
   return (
     <ListPageLayout
@@ -24,16 +90,17 @@ const PortfolioPage: React.FC = () => {
     >
       {/* 포트폴리오 리스트 */}
       <VerticalList showDividers={true}>
-        {MOCK_PORTFOLIOS.map((portfolio) => (
+        {portfolios.map((portfolio) => (
           <ListItem
             key={portfolio.id}
             onTap={() => navigate(`/portfolios/${portfolio.id}`)}
           >
             <PortfolioRowCard
-              title={portfolio.name}
-              content={portfolio.content}
+              title={portfolio.nickname || '이름 없음'}
+              content={portfolio.oneLineIntro || '소개 없음'}
+              imageUrl={portfolio.mainThumbnailUrl || undefined}
               onOfferPress={() => console.log(`제안하기 ${portfolio.id}`)}
-              onCardPress={() => console.log(`포트폴리오 ${portfolio.id} 클릭`)}
+              onCardPress={() => navigate(`/portfolios/${portfolio.id}`)}
             />
           </ListItem>
         ))}
