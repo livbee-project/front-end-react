@@ -4,7 +4,6 @@ import ProfileSection from '@/presentation/components/detail/ProfileSection';
 import SectionHeader from '@/presentation/components/section/SectionHeader';
 import GalleryGrid from '@/presentation/components/detail/GalleryGrid';
 import InfoItem from '@/presentation/components/detail/InfoItem';
-import TagContainer from '@/presentation/components/ui/TagContainer';
 import Button from '@/presentation/components/ui/Button';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';

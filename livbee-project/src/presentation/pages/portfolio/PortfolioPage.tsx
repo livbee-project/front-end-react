@@ -13,7 +13,7 @@ const PortfolioPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1);
+  const [_totalPages, setTotalPages] = useState<number>(1);
 
   // portfolioRepository를 useRef로 관리하여 매 렌더링마다 재생성되지 않도록 함
   const portfolioRepositoryRef = useRef<PortfolioRepository | null>(null);
