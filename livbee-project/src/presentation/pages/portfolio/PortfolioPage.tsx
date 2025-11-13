@@ -23,37 +23,48 @@ const PortfolioPage: React.FC = () => {
   const portfolioRepository = portfolioRepositoryRef.current;
 
   /**
-   * 포트폴리오 목록 조회
-   */
-  const fetchPortfolios = async (page: number = 1) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await portfolioRepository.getPortfolioList({
-        page,
-        limit: 20, // 페이지당 20개 항목
-      });
-
-      setPortfolios(response.items);
-      setCurrentPage(response.currentPage || page);
-      setTotalPages(response.totalPages || 1);
-    } catch (err) {
-      console.error('포트폴리오 목록 조회 실패:', err);
-      setError('포트폴리오 목록을 불러오는 중 오류가 발생했습니다.');
-      setPortfolios([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /**
    * 초기 로드 및 페이지 변경 시 데이터 조회
    */
   useEffect(() => {
-    fetchPortfolios(currentPage);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // portfolioRepository는 ref로 관리되므로 의존성 배열에서 제외
+    let isCancelled = false;
+
+    const loadData = async () => {
+      try {
+        if (!isCancelled) {
+          setLoading(true);
+          setError(null);
+        }
+
+        const response = await portfolioRepository.getPortfolioList({
+          page: currentPage,
+          limit: 20, // 페이지당 20개 항목
+        });
+
+        if (!isCancelled) {
+          setPortfolios(response.items);
+          setCurrentPage(response.currentPage || currentPage);
+          setTotalPages(response.totalPages || 1);
+        }
+      } catch (err) {
+        if (!isCancelled) {
+          console.error('포트폴리오 목록 조회 실패:', err);
+          setError('포트폴리오 목록을 불러오는 중 오류가 발생했습니다.');
+          setPortfolios([]);
+        }
+      } finally {
+        if (!isCancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadData();
+
+    // cleanup 함수: 컴포넌트가 언마운트되거나 currentPage가 변경되면 이전 요청을 취소
+    return () => {
+      isCancelled = true;
+    };
+  }, [currentPage, portfolioRepository]);
 
   // 로딩 중
   if (loading) {

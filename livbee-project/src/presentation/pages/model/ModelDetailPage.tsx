@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ProfileSection from '@/presentation/components/detail/ProfileSection';
 import SectionHeader from '@/presentation/components/section/SectionHeader';
@@ -28,35 +28,57 @@ const ModelDetailPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const modelRepository = new ModelRepository();
+  // modelRepository를 useRef로 관리하여 매 렌더링마다 재생성되지 않도록 함
+  const modelRepositoryRef = useRef<ModelRepository | null>(null);
+  if (!modelRepositoryRef.current) {
+    modelRepositoryRef.current = new ModelRepository();
+  }
+  const modelRepository = modelRepositoryRef.current;
 
   /**
    * 모델 상세 정보 로드
    */
   useEffect(() => {
+    let isCancelled = false;
+
     const loadModel = async () => {
       if (!id) {
-        setError('모델 ID가 없습니다.');
-        setIsLoading(false);
+        if (!isCancelled) {
+          setError('모델 ID가 없습니다.');
+          setIsLoading(false);
+        }
         return;
       }
 
       try {
-        setIsLoading(true);
-        setError(null);
+        if (!isCancelled) {
+          setIsLoading(true);
+          setError(null);
+        }
         const data = await modelRepository.getModelById(id);
-        setModel(data);
+        if (!isCancelled) {
+          setModel(data);
+        }
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : '모델을 불러오는데 실패했습니다.';
-        setError(errorMessage);
-        console.error('모델 상세 조회 실패:', err);
+        if (!isCancelled) {
+          const errorMessage = err instanceof Error ? err.message : '모델을 불러오는데 실패했습니다.';
+          setError(errorMessage);
+          console.error('모델 상세 조회 실패:', err);
+        }
       } finally {
-        setIsLoading(false);
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
       }
     };
 
     loadModel();
-  }, [id]);
+
+    // cleanup 함수: 컴포넌트가 언마운트되거나 id가 변경되면 이전 요청을 취소
+    return () => {
+      isCancelled = true;
+    };
+  }, [id, modelRepository]);
 
   /**
    * 프로필 이미지 클릭 핸들러

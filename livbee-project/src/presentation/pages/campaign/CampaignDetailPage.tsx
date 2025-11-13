@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DetailHeader from '@/presentation/components/detail/DetailHeader';
 import BulletList from '@/presentation/components/detail/BulletList';
@@ -30,7 +30,12 @@ const CampaignDetailPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const campaignRepository = new CampaignRepository();
+  // campaignRepository를 useRef로 관리하여 매 렌더링마다 재생성되지 않도록 함
+  const campaignRepositoryRef = useRef<CampaignRepository | null>(null);
+  if (!campaignRepositoryRef.current) {
+    campaignRepositoryRef.current = new CampaignRepository();
+  }
+  const campaignRepository = campaignRepositoryRef.current;
 
   /**
    * D-DAY 계산 함수
@@ -77,29 +82,46 @@ const CampaignDetailPage: React.FC = () => {
    * 캠페인 상세 정보 로드
    */
   useEffect(() => {
+    let isCancelled = false;
+
     const loadCampaign = async () => {
       if (!id) {
-        setError('공고 ID가 없습니다.');
-        setIsLoading(false);
+        if (!isCancelled) {
+          setError('공고 ID가 없습니다.');
+          setIsLoading(false);
+        }
         return;
       }
 
       try {
-        setIsLoading(true);
-        setError(null);
+        if (!isCancelled) {
+          setIsLoading(true);
+          setError(null);
+        }
         const data = await campaignRepository.getCampaignById(id);
-        setCampaign(data);
+        if (!isCancelled) {
+          setCampaign(data);
+        }
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : '공고를 불러오는데 실패했습니다.';
-        setError(errorMessage);
-        console.error('캠페인 상세 조회 실패:', err);
+        if (!isCancelled) {
+          const errorMessage = err instanceof Error ? err.message : '공고를 불러오는데 실패했습니다.';
+          setError(errorMessage);
+          console.error('캠페인 상세 조회 실패:', err);
+        }
       } finally {
-        setIsLoading(false);
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
       }
     };
 
     loadCampaign();
-  }, [id]);
+
+    // cleanup 함수: 컴포넌트가 언마운트되거나 id가 변경되면 이전 요청을 취소
+    return () => {
+      isCancelled = true;
+    };
+  }, [id, campaignRepository]);
 
   /**
    * 이미지 클릭 핸들러

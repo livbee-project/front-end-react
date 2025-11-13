@@ -38,26 +38,40 @@ const BrandPickSection: React.FC = () => {
    * 모집 공고 목록 조회
    */
   useEffect(() => {
+    let isCancelled = false;
+
     const fetchCampaigns = async () => {
       try {
-        setIsLoading(true);
+        if (!isCancelled) {
+          setIsLoading(true);
+        }
         const response = await campaignRepository.getCampaignList({
           page: 1,
           limit: 10, // 홈 페이지에서는 최대 10개만 표시
           sort: 'latest',
         });
-        setCampaigns(response.items);
+        if (!isCancelled) {
+          setCampaigns(response.items);
+        }
       } catch (error) {
-        console.error('브랜드 픽 목록 조회 실패:', error);
-        setCampaigns([]);
+        if (!isCancelled) {
+          console.error('브랜드 픽 목록 조회 실패:', error);
+          setCampaigns([]);
+        }
       } finally {
-        setIsLoading(false);
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchCampaigns();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // campaignRepository는 ref로 관리되므로 의존성 배열에서 제외
+
+    // cleanup 함수: 컴포넌트가 언마운트되면 이전 요청을 취소
+    return () => {
+      isCancelled = true;
+    };
+  }, [campaignRepository]);
 
   // 로딩 중이거나 데이터가 없을 때
   if (isLoading) {

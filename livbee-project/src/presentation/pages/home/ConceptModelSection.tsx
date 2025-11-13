@@ -26,25 +26,39 @@ const ConceptModelSection: React.FC = () => {
    * 모델 목록 조회
    */
   useEffect(() => {
+    let isCancelled = false;
+
     const fetchModels = async () => {
       try {
-        setIsLoading(true);
+        if (!isCancelled) {
+          setIsLoading(true);
+        }
         const response = await modelRepository.getModelList({
           page: 1,
           limit: 10, // 홈 페이지에서는 최대 10개 표시 (가로 스크롤)
         });
-        setModels(response.items);
+        if (!isCancelled) {
+          setModels(response.items);
+        }
       } catch (error) {
-        console.error('모델 목록 조회 실패:', error);
-        setModels([]);
+        if (!isCancelled) {
+          console.error('모델 목록 조회 실패:', error);
+          setModels([]);
+        }
       } finally {
-        setIsLoading(false);
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchModels();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // modelRepository는 ref로 관리되므로 의존성 배열에서 제외
+
+    // cleanup 함수: 컴포넌트가 언마운트되면 이전 요청을 취소
+    return () => {
+      isCancelled = true;
+    };
+  }, [modelRepository]);
 
   // 로딩 중
   if (isLoading) {

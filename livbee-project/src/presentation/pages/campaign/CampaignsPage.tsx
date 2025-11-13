@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CampaignCard from '@/presentation/components/cards/CampaignCard';
 import VerticalList from '@/presentation/components/list/VerticalList';
@@ -17,50 +17,66 @@ const CampaignsPage: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [_totalItems, setTotalItems] = useState<number>(0);
 
-  const campaignRepository = new CampaignRepository();
-
-  /**
-   * 캠페인 목록 조회
-   */
-  const fetchCampaigns = async (page: number = 1, search: string = '') => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await campaignRepository.getCampaignList({
-        page,
-        limit: 20, // 페이지당 20개 항목
-        search: search || undefined,
-        sort: 'latest', // 기본값: 최신순
-      });
-
-      setCampaigns(response.items);
-      setCurrentPage(response.currentPage);
-      setTotalPages(response.totalPages);
-      setTotalItems(response.totalItems);
-    } catch (err) {
-      console.error('캠페인 목록 조회 실패:', err);
-      setError('캠페인 목록을 불러오는 중 오류가 발생했습니다.');
-      setCampaigns([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // campaignRepository를 useRef로 관리하여 매 렌더링마다 재생성되지 않도록 함
+  const campaignRepositoryRef = useRef<CampaignRepository | null>(null);
+  if (!campaignRepositoryRef.current) {
+    campaignRepositoryRef.current = new CampaignRepository();
+  }
+  const campaignRepository = campaignRepositoryRef.current;
 
   /**
    * 초기 로드 및 페이지 변경 시 데이터 조회
    */
   useEffect(() => {
-    fetchCampaigns(currentPage, searchQuery);
-  }, [currentPage]);
+    let isCancelled = false;
+
+    const loadData = async () => {
+      try {
+        if (!isCancelled) {
+          setLoading(true);
+          setError(null);
+        }
+
+        const response = await campaignRepository.getCampaignList({
+          page: currentPage,
+          limit: 20, // 페이지당 20개 항목
+          search: searchQuery || undefined,
+          sort: 'latest', // 기본값: 최신순
+        });
+
+        if (!isCancelled) {
+          setCampaigns(response.items);
+          setCurrentPage(response.currentPage);
+          setTotalPages(response.totalPages);
+          setTotalItems(response.totalItems);
+        }
+      } catch (err) {
+        if (!isCancelled) {
+          console.error('캠페인 목록 조회 실패:', err);
+          setError('캠페인 목록을 불러오는 중 오류가 발생했습니다.');
+          setCampaigns([]);
+        }
+      } finally {
+        if (!isCancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadData();
+
+    // cleanup 함수: 컴포넌트가 언마운트되거나 currentPage/searchQuery가 변경되면 이전 요청을 취소
+    return () => {
+      isCancelled = true;
+    };
+  }, [currentPage, searchQuery, campaignRepository]);
 
   /**
    * 검색 실행 핸들러
    */
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    setCurrentPage(1); // 검색 시 첫 페이지로 리셋
-    fetchCampaigns(1, query);
+    setCurrentPage(1); // 검색 시 첫 페이지로 리셋 (useEffect가 자동으로 호출됨)
   };
 
   /**
@@ -93,7 +109,10 @@ const CampaignsPage: React.FC = () => {
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <p style={{ color: 'red' }}>{error}</p>
           <button
-            onClick={() => fetchCampaigns(currentPage, searchQuery)}
+            onClick={() => {
+              setCurrentPage(1);
+              setSearchQuery('');
+            }}
             style={{
               marginTop: '10px',
               padding: '8px 16px',

@@ -83,9 +83,54 @@ export const useAuth = (): UseAuthReturn => {
    * 초기 로드 시 토큰 확인 및 사용자 정보 조회
    */
   useEffect(() => {
-    refreshUser();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // 초기 마운트 시에만 실행
+    let isCancelled = false;
+
+    const loadUser = async () => {
+      const token = getToken();
+      if (!token) {
+        if (!isCancelled) {
+          setAuthState({
+            isLoggedIn: false,
+            user: null,
+            isLoading: false,
+          });
+        }
+        return;
+      }
+
+      try {
+        const meResponse = await userRepository.getMe();
+        if (!isCancelled) {
+          setAuthState({
+            isLoggedIn: true,
+            user: {
+              id: meResponse.id,
+              name: meResponse.name,
+              role: meResponse.role,
+            },
+            isLoading: false,
+          });
+        }
+      } catch (error) {
+        // 토큰이 유효하지 않은 경우
+        if (!isCancelled) {
+          removeToken();
+          setAuthState({
+            isLoggedIn: false,
+            user: null,
+            isLoading: false,
+          });
+        }
+      }
+    };
+
+    loadUser();
+
+    // cleanup 함수: 컴포넌트가 언마운트되면 이전 요청을 취소
+    return () => {
+      isCancelled = true;
+    };
+  }, [userRepository]);
 
   /**
    * 로그인

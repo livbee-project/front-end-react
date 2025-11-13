@@ -26,25 +26,39 @@ const HowShowhostSection: React.FC = () => {
    * 포트폴리오 목록 조회
    */
   useEffect(() => {
+    let isCancelled = false;
+
     const fetchPortfolios = async () => {
       try {
-        setIsLoading(true);
+        if (!isCancelled) {
+          setIsLoading(true);
+        }
         const response = await portfolioRepository.getPortfolioList({
           page: 1,
           limit: 5, // 홈 페이지에서는 최대 5개만 표시
         });
-        setPortfolios(response.items);
+        if (!isCancelled) {
+          setPortfolios(response.items);
+        }
       } catch (error) {
-        console.error('쇼호스트 목록 조회 실패:', error);
-        setPortfolios([]);
+        if (!isCancelled) {
+          console.error('쇼호스트 목록 조회 실패:', error);
+          setPortfolios([]);
+        }
       } finally {
-        setIsLoading(false);
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchPortfolios();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // portfolioRepository는 ref로 관리되므로 의존성 배열에서 제외
+
+    // cleanup 함수: 컴포넌트가 언마운트되면 이전 요청을 취소
+    return () => {
+      isCancelled = true;
+    };
+  }, [portfolioRepository]);
 
   // 로딩 중이거나 데이터가 없을 때
   if (isLoading) {
