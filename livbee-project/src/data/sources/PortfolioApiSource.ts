@@ -18,7 +18,7 @@ export class PortfolioApiSource {
   /**
    * 포트폴리오 목록 조회
    */
-  async getPortfolioList(query: PortfolioListQuery = {}): Promise<PortfolioListResponse> {
+  async getPortfolioList(query: PortfolioListQuery = {}, signal?: AbortSignal): Promise<PortfolioListResponse> {
     // 쿼리 파라미터 구성
     const params: Record<string, string | number | undefined> = {};
     
@@ -35,6 +35,7 @@ export class PortfolioApiSource {
     const response = await fetch(url, {
       method: 'GET',
       headers,
+      signal,
     });
 
     if (!response.ok) {
@@ -60,16 +61,18 @@ export class PortfolioApiSource {
   /**
    * 포트폴리오 상세 조회
    * @param id - 조회할 포트폴리오의 ID
+   * @param signal - 요청 취소를 위한 AbortSignal (선택)
    * @returns 상세 정보
    * @throws {Error} 조회 실패 시
    */
-  async getPortfolioById(id: string): Promise<PortfolioDetail> {
+  async getPortfolioById(id: string, signal?: AbortSignal): Promise<PortfolioDetail> {
     const url = buildApiUrl(`/portfolios/${id}`);
     const headers = getAuthHeaders();
 
     const response = await fetch(url, {
       method: 'GET',
       headers,
+      signal,
     });
 
     const data: PortfolioDetailResponse | PortfolioApiErrorResponse = await response.json();

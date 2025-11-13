@@ -21,9 +21,9 @@ export class PortfolioRepository {
   /**
    * 포트폴리오 목록 조회
    */
-  async getPortfolioList(query: PortfolioListQuery = {}): Promise<PortfolioListResponse> {
+  async getPortfolioList(query: PortfolioListQuery = {}, signal?: AbortSignal): Promise<PortfolioListResponse> {
     try {
-      return await this.apiSource.getPortfolioList(query);
+      return await this.apiSource.getPortfolioList(query, signal);
     } catch (error) {
       console.error('포트폴리오 목록 조회 실패:', error);
       throw error;
@@ -33,9 +33,9 @@ export class PortfolioRepository {
   /**
    * 포트폴리오 상세 조회
    */
-  async getPortfolioById(id: string): Promise<PortfolioDetail> {
+  async getPortfolioById(id: string, signal?: AbortSignal): Promise<PortfolioDetail> {
     try {
-      return await this.apiSource.getPortfolioById(id);
+      return await this.apiSource.getPortfolioById(id, signal);
     } catch (error) {
       console.error('포트폴리오 상세 조회 실패:', error);
       throw error;

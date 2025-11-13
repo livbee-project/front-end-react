@@ -18,7 +18,7 @@ export class ModelApiSource {
   /**
    * 모델 목록 조회
    */
-  async getModelList(query: ModelListQuery = {}): Promise<ModelListResponse> {
+  async getModelList(query: ModelListQuery = {}, signal?: AbortSignal): Promise<ModelListResponse> {
     // 쿼리 파라미터 구성
     const params: Record<string, string | number | undefined> = {};
     
@@ -35,6 +35,7 @@ export class ModelApiSource {
     const response = await fetch(url, {
       method: 'GET',
       headers,
+      signal,
     });
 
     if (!response.ok) {
@@ -60,16 +61,18 @@ export class ModelApiSource {
   /**
    * 모델 상세 조회
    * @param id - 조회할 모델의 ID
+   * @param signal - 요청 취소를 위한 AbortSignal (선택)
    * @returns 상세 정보
    * @throws {Error} 조회 실패 시
    */
-  async getModelById(id: string): Promise<ModelDetail> {
+  async getModelById(id: string, signal?: AbortSignal): Promise<ModelDetail> {
     const url = buildApiUrl(`/models/${id}`);
     const headers = getAuthHeaders();
 
     const response = await fetch(url, {
       method: 'GET',
       headers,
+      signal,
     });
 
     const data: ModelDetailResponse | ModelApiErrorResponse = await response.json();

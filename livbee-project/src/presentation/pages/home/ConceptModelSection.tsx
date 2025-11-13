@@ -26,6 +26,7 @@ const ConceptModelSection: React.FC = () => {
    * 모델 목록 조회
    */
   useEffect(() => {
+    const abortController = new AbortController();
     let isCancelled = false;
 
     const fetchModels = async () => {
@@ -33,20 +34,27 @@ const ConceptModelSection: React.FC = () => {
         if (!isCancelled) {
           setIsLoading(true);
         }
-        const response = await modelRepository.getModelList({
-          page: 1,
-          limit: 10, // 홈 페이지에서는 최대 10개 표시 (가로 스크롤)
-        });
-        if (!isCancelled) {
+        const response = await modelRepository.getModelList(
+          {
+            page: 1,
+            limit: 10, // 홈 페이지에서는 최대 10개 표시 (가로 스크롤)
+          },
+          abortController.signal
+        );
+        if (!isCancelled && !abortController.signal.aborted) {
           setModels(response.items);
         }
       } catch (error) {
-        if (!isCancelled) {
+        // AbortError는 무시 (요청이 취소된 경우)
+        if (error instanceof Error && error.name === 'AbortError') {
+          return;
+        }
+        if (!isCancelled && !abortController.signal.aborted) {
           console.error('모델 목록 조회 실패:', error);
           setModels([]);
         }
       } finally {
-        if (!isCancelled) {
+        if (!isCancelled && !abortController.signal.aborted) {
           setIsLoading(false);
         }
       }
@@ -57,8 +65,10 @@ const ConceptModelSection: React.FC = () => {
     // cleanup 함수: 컴포넌트가 언마운트되면 이전 요청을 취소
     return () => {
       isCancelled = true;
+      abortController.abort();
     };
-  }, [modelRepository]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // modelRepository는 ref로 관리되므로 의존성 배열에서 제외
 
   // 로딩 중
   if (isLoading) {

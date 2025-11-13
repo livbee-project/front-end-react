@@ -18,7 +18,7 @@ export class CampaignApiSource {
   /**
    * 모집 공고 목록 조회
    */
-  async getCampaignList(query: CampaignListQuery = {}): Promise<CampaignListResponse> {
+  async getCampaignList(query: CampaignListQuery = {}, signal?: AbortSignal): Promise<CampaignListResponse> {
     // 쿼리 파라미터 구성
     const params: Record<string, string | number | undefined> = {};
     
@@ -45,6 +45,7 @@ export class CampaignApiSource {
     const response = await fetch(url, {
       method: 'GET',
       headers,
+      signal,
     });
 
     if (!response.ok) {
@@ -95,10 +96,11 @@ export class CampaignApiSource {
   /**
    * 모집 공고 상세 조회
    * @param id - 조회할 모집 공고의 ID
+   * @param signal - 요청 취소를 위한 AbortSignal (선택)
    * @returns 상세 정보
    * @throws {Error} 조회 실패 시
    */
-  async getCampaignById(id: string): Promise<CampaignDetail> {
+  async getCampaignById(id: string, signal?: AbortSignal): Promise<CampaignDetail> {
     const token = getToken();
     const url = buildApiUrl(`/campaigns/${id}`);
     const headers = getAuthHeaders(token || undefined);
@@ -106,6 +108,7 @@ export class CampaignApiSource {
     const response = await fetch(url, {
       method: 'GET',
       headers,
+      signal,
     });
 
     const data: CampaignDetailResponse | CampaignApiErrorResponse = await response.json();

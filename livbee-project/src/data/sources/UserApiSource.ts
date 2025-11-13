@@ -75,10 +75,11 @@ export class UserApiSource {
 
   /**
    * 내 정보 조회
+   * @param signal - 요청 취소를 위한 AbortSignal (선택)
    * @returns 내 정보 응답
    * @throws {Error} 조회 실패 시
    */
-  async getMe(): Promise<MeResponse> {
+  async getMe(signal?: AbortSignal): Promise<MeResponse> {
     const token = getToken();
     if (!token) {
       throw new Error('인증 토큰이 없습니다.');
@@ -90,6 +91,7 @@ export class UserApiSource {
     const response = await fetch(url, {
       method: 'GET',
       headers,
+      signal,
     });
 
     const data: MeResponse | ApiErrorResponse = await response.json();

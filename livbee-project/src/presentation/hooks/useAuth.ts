@@ -83,6 +83,7 @@ export const useAuth = (): UseAuthReturn => {
    * 초기 로드 시 토큰 확인 및 사용자 정보 조회
    */
   useEffect(() => {
+    const abortController = new AbortController();
     let isCancelled = false;
 
     const loadUser = async () => {
@@ -99,8 +100,8 @@ export const useAuth = (): UseAuthReturn => {
       }
 
       try {
-        const meResponse = await userRepository.getMe();
-        if (!isCancelled) {
+        const meResponse = await userRepository.getMe(abortController.signal);
+        if (!isCancelled && !abortController.signal.aborted) {
           setAuthState({
             isLoggedIn: true,
             user: {
@@ -112,8 +113,12 @@ export const useAuth = (): UseAuthReturn => {
           });
         }
       } catch (error) {
+        // AbortError는 무시 (요청이 취소된 경우)
+        if (error instanceof Error && error.name === 'AbortError') {
+          return;
+        }
         // 토큰이 유효하지 않은 경우
-        if (!isCancelled) {
+        if (!isCancelled && !abortController.signal.aborted) {
           removeToken();
           setAuthState({
             isLoggedIn: false,
@@ -129,8 +134,10 @@ export const useAuth = (): UseAuthReturn => {
     // cleanup 함수: 컴포넌트가 언마운트되면 이전 요청을 취소
     return () => {
       isCancelled = true;
+      abortController.abort();
     };
-  }, [userRepository]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // userRepository는 ref로 관리되므로 의존성 배열에서 제외
 
   /**
    * 로그인

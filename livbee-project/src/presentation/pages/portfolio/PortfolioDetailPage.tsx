@@ -39,6 +39,7 @@ const PortfolioDetailPage: React.FC = () => {
    * 포트폴리오 상세 정보 로드
    */
   useEffect(() => {
+    const abortController = new AbortController();
     let isCancelled = false;
 
     const loadPortfolio = async () => {
@@ -55,18 +56,22 @@ const PortfolioDetailPage: React.FC = () => {
           setIsLoading(true);
           setError(null);
         }
-        const data = await portfolioRepository.getPortfolioById(id);
-        if (!isCancelled) {
+        const data = await portfolioRepository.getPortfolioById(id, abortController.signal);
+        if (!isCancelled && !abortController.signal.aborted) {
           setPortfolio(data);
         }
       } catch (err) {
-        if (!isCancelled) {
+        // AbortError는 무시 (요청이 취소된 경우)
+        if (err instanceof Error && err.name === 'AbortError') {
+          return;
+        }
+        if (!isCancelled && !abortController.signal.aborted) {
           const errorMessage = err instanceof Error ? err.message : '포트폴리오를 불러오는데 실패했습니다.';
           setError(errorMessage);
           console.error('포트폴리오 상세 조회 실패:', err);
         }
       } finally {
-        if (!isCancelled) {
+        if (!isCancelled && !abortController.signal.aborted) {
           setIsLoading(false);
         }
       }
@@ -77,8 +82,10 @@ const PortfolioDetailPage: React.FC = () => {
     // cleanup 함수: 컴포넌트가 언마운트되거나 id가 변경되면 이전 요청을 취소
     return () => {
       isCancelled = true;
+      abortController.abort();
     };
-  }, [id, portfolioRepository]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]); // portfolioRepository는 ref로 관리되므로 의존성 배열에서 제외
 
   /**
    * 프로필 이미지 클릭 핸들러

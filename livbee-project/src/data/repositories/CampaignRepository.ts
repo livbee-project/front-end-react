@@ -21,9 +21,9 @@ export class CampaignRepository {
   /**
    * 모집 공고 목록 조회
    */
-  async getCampaignList(query: CampaignListQuery = {}): Promise<CampaignListResponse> {
+  async getCampaignList(query: CampaignListQuery = {}, signal?: AbortSignal): Promise<CampaignListResponse> {
     try {
-      return await this.apiSource.getCampaignList(query);
+      return await this.apiSource.getCampaignList(query, signal);
     } catch (error) {
       console.error('캠페인 목록 조회 실패:', error);
       throw error;
@@ -45,9 +45,9 @@ export class CampaignRepository {
   /**
    * 모집 공고 상세 조회
    */
-  async getCampaignById(id: string): Promise<CampaignDetail> {
+  async getCampaignById(id: string, signal?: AbortSignal): Promise<CampaignDetail> {
     try {
-      return await this.apiSource.getCampaignById(id);
+      return await this.apiSource.getCampaignById(id, signal);
     } catch (error) {
       console.error('캠페인 상세 조회 실패:', error);
       throw error;

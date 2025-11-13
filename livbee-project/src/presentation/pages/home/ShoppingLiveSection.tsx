@@ -37,6 +37,7 @@ const ShoppingLiveSection: React.FC = () => {
    * 모집 공고 목록 조회
    */
   useEffect(() => {
+    const abortController = new AbortController();
     let isCancelled = false;
 
     const fetchCampaigns = async () => {
@@ -44,21 +45,28 @@ const ShoppingLiveSection: React.FC = () => {
         if (!isCancelled) {
           setIsLoading(true);
         }
-        const response = await campaignRepository.getCampaignList({
-          page: 1,
-          limit: 10, // 홈 페이지에서는 최대 10개만 표시
-          sort: 'latest',
-        });
-        if (!isCancelled) {
+        const response = await campaignRepository.getCampaignList(
+          {
+            page: 1,
+            limit: 10, // 홈 페이지에서는 최대 10개만 표시
+            sort: 'latest',
+          },
+          abortController.signal
+        );
+        if (!isCancelled && !abortController.signal.aborted) {
           setCampaigns(response.items);
         }
       } catch (error) {
-        if (!isCancelled) {
+        // AbortError는 무시 (요청이 취소된 경우)
+        if (error instanceof Error && error.name === 'AbortError') {
+          return;
+        }
+        if (!isCancelled && !abortController.signal.aborted) {
           console.error('쇼핑 라이브 목록 조회 실패:', error);
           setCampaigns([]);
         }
       } finally {
-        if (!isCancelled) {
+        if (!isCancelled && !abortController.signal.aborted) {
           setIsLoading(false);
         }
       }
@@ -69,8 +77,10 @@ const ShoppingLiveSection: React.FC = () => {
     // cleanup 함수: 컴포넌트가 언마운트되면 이전 요청을 취소
     return () => {
       isCancelled = true;
+      abortController.abort();
     };
-  }, [campaignRepository]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // campaignRepository는 ref로 관리되므로 의존성 배열에서 제외
 
   // 로딩 중이거나 데이터가 없을 때
   if (isLoading) {

@@ -45,9 +45,9 @@ export class UserRepository {
   /**
    * 내 정보 조회
    */
-  async getMe(): Promise<MeResponse> {
+  async getMe(signal?: AbortSignal): Promise<MeResponse> {
     try {
-      return await this.apiSource.getMe();
+      return await this.apiSource.getMe(signal);
     } catch (error) {
       console.error('내 정보 조회 실패:', error);
       throw error;

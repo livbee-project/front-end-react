@@ -21,9 +21,9 @@ export class ModelRepository {
   /**
    * 모델 목록 조회
    */
-  async getModelList(query: ModelListQuery = {}): Promise<ModelListResponse> {
+  async getModelList(query: ModelListQuery = {}, signal?: AbortSignal): Promise<ModelListResponse> {
     try {
-      return await this.apiSource.getModelList(query);
+      return await this.apiSource.getModelList(query, signal);
     } catch (error) {
       console.error('모델 목록 조회 실패:', error);
       throw error;
@@ -33,9 +33,9 @@ export class ModelRepository {
   /**
    * 모델 상세 조회
    */
-  async getModelById(id: string): Promise<ModelDetail> {
+  async getModelById(id: string, signal?: AbortSignal): Promise<ModelDetail> {
     try {
-      return await this.apiSource.getModelById(id);
+      return await this.apiSource.getModelById(id, signal);
     } catch (error) {
       console.error('모델 상세 조회 실패:', error);
       throw error;
