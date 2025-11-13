@@ -1,56 +1,84 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SectionContainer from '@/presentation/components/section/SectionContainer';
 import VerticalList from '@/presentation/components/list/VerticalList';
 import ListItem from '@/presentation/components/list/ListItem';
 import PortfolioRowCard from '@/presentation/components/cards/PortfolioRowCard';
+import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
+import type { Portfolio } from '@/domain/entities/Portfolio';
 
 /**
  * "이런 쇼호스트는 어떠세요?" 섹션 컴포넌트
  */
 const HowShowhostSection: React.FC = () => {
   const navigate = useNavigate();
-  // (추가) 섹션에서 사용할 임시 데이터
-  const showhostItems = [
-    {
-      id: 1,
-      title: '뷰티 전문 쇼호스트 OOO',
-      content: '원피스 여행 피크닉 베스트 셀러 슈엘리엘에서...',
-      // imageUrl: 'https://...' (테스트용 이미지 URL)
-    },
-    {
-      id: 2,
-      title: '가전 전문 쇼호스트 XXX',
-      content: '라이브 커머스 경력 3년차, 전문성 보장!',
-      // imageUrl: 'https://...'
-    },
-  ];
+  const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // portfolioRepository를 useRef로 관리하여 매 렌더링마다 재생성되지 않도록 함
+  const portfolioRepositoryRef = useRef<PortfolioRepository | null>(null);
+  if (!portfolioRepositoryRef.current) {
+    portfolioRepositoryRef.current = new PortfolioRepository();
+  }
+  const portfolioRepository = portfolioRepositoryRef.current;
+
+  /**
+   * 포트폴리오 목록 조회
+   */
+  useEffect(() => {
+    const fetchPortfolios = async () => {
+      try {
+        setIsLoading(true);
+        const response = await portfolioRepository.getPortfolioList({
+          page: 1,
+          limit: 5, // 홈 페이지에서는 최대 5개만 표시
+        });
+        setPortfolios(response.items);
+      } catch (error) {
+        console.error('쇼호스트 목록 조회 실패:', error);
+        setPortfolios([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPortfolios();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // portfolioRepository는 ref로 관리되므로 의존성 배열에서 제외
+
+  // 로딩 중이거나 데이터가 없을 때
+  if (isLoading) {
+    return (
+      <SectionContainer
+        title="이런 쇼호스트는 어떠세요?"
+        onMorePressed={() => navigate('/portfolios')}
+      >
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <p>로딩 중...</p>
+        </div>
+      </SectionContainer>
+    );
+  }
+
+  if (portfolios.length === 0) {
+    return null; // 데이터가 없으면 섹션을 표시하지 않음
+  }
 
   return (
-    // 1. 섹션 컨테이너 (재사용)
     <SectionContainer
       title="이런 쇼호스트는 어떠세요?"
       onMorePressed={() => navigate('/portfolios')}
     >
-      {/* Flutter 원본의 Container(padding: 10) 적용
-       */}
       <div style={{ padding: '0 10px' }}>
-        {/* 2. 구분선이 있는 리스트 (재사용) */}
         <VerticalList>
-          {/* 임시 데이터를 map으로 순회하며 리스트 아이템 렌더링
-           */}
-          {showhostItems.map((item) => (
-            // 3. 리스트 아이템 (재사용)
-            <ListItem key={item.id}>
-              {/* 4. 방금 생성한 공통 카드 (신규 사용)
-                Flutter의 _buildPortfolioCard를 대체합니다.
-              */}
+          {portfolios.map((portfolio) => (
+            <ListItem key={portfolio.id}>
               <PortfolioRowCard
-                title={item.title}
-                content={item.content}
-                // imageUrl={item.imageUrl} (이미지 URL prop)
-                onOfferPress={() => console.log(`제안하기 ${item.id}`)}
-                onCardPress={() => navigate(`/portfolios/${item.id}`)}
+                title={portfolio.nickname || '이름 없음'}
+                content={portfolio.oneLineIntro || '소개 없음'}
+                imageUrl={portfolio.mainThumbnailUrl || undefined}
+                onOfferPress={() => console.log(`제안하기 ${portfolio.id}`)}
+                onCardPress={() => navigate(`/portfolios/${portfolio.id}`)}
               />
             </ListItem>
           ))}
