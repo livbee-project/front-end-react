@@ -60,30 +60,34 @@ const HowShowhostSection: React.FC = () => {
     );
   }
 
-  if (portfolios.length === 0) {
-    return null; // 데이터가 없으면 섹션을 표시하지 않음
-  }
-
   return (
     <SectionContainer
       title="이런 쇼호스트는 어떠세요?"
       onMorePressed={() => navigate('/portfolios')}
     >
-      <div style={{ padding: '0 10px' }}>
-        <VerticalList>
-          {portfolios.map((portfolio) => (
-            <ListItem key={portfolio.id}>
-              <PortfolioRowCard
-                title={portfolio.nickname || '이름 없음'}
-                content={portfolio.oneLineIntro || '소개 없음'}
-                imageUrl={portfolio.mainThumbnailUrl || undefined}
-                onOfferPress={() => console.log(`제안하기 ${portfolio.id}`)}
-                onCardPress={() => navigate(`/portfolios/${portfolio.id}`)}
-              />
-            </ListItem>
-          ))}
-        </VerticalList>
-      </div>
+      {portfolios.length === 0 ? (
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <p style={{ color: 'var(--dark-gray)', fontSize: 'var(--p2)' }}>
+            데이터가 없습니다.
+          </p>
+        </div>
+      ) : (
+        <div style={{ padding: '0 10px' }}>
+          <VerticalList>
+            {portfolios.map((portfolio) => (
+              <ListItem key={portfolio.id}>
+                <PortfolioRowCard
+                  title={portfolio.nickname || '이름 없음'}
+                  content={portfolio.oneLineIntro || '소개 없음'}
+                  imageUrl={portfolio.mainThumbnailUrl || undefined}
+                  onOfferPress={() => console.log(`제안하기 ${portfolio.id}`)}
+                  onCardPress={() => navigate(`/portfolios/${portfolio.id}`)}
+                />
+              </ListItem>
+            ))}
+          </VerticalList>
+        </div>
+      )}
     </SectionContainer>
   );
 };
