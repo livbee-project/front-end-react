@@ -2,6 +2,8 @@ import type {
   PortfolioListResponse,
   PortfolioListQuery,
   PortfolioDetail,
+  CreatePortfolioRequest,
+  CreatePortfolioResponse,
 } from '@/domain/entities/Portfolio';
 import { PortfolioApiSource } from '@/data/sources/PortfolioApiSource';
 
@@ -36,6 +38,18 @@ export class PortfolioRepository {
       return await this.apiSource.getPortfolioById(id);
     } catch (error) {
       console.error('포트폴리오 상세 조회 실패:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 포트폴리오 등록
+   */
+  async createPortfolio(request: CreatePortfolioRequest): Promise<CreatePortfolioResponse> {
+    try {
+      return await this.apiSource.createPortfolio(request);
+    } catch (error) {
+      console.error('포트폴리오 등록 실패:', error);
       throw error;
     }
   }
