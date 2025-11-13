@@ -114,7 +114,7 @@ const PortfolioRegisterPage: React.FC = () => {
    */
   const handleResumeFileSelect = async (file: File) => {
     try {
-      const fileUrl = await uploadFile(file, { type: 'file' });
+      const fileUrl = await uploadFile(file, { type: 'raw' });
       if (fileUrl) {
         setResumeFileUrl(fileUrl);
       }
@@ -129,7 +129,7 @@ const PortfolioRegisterPage: React.FC = () => {
    */
   const handlePortfolioFileSelect = async (file: File) => {
     try {
-      const fileUrl = await uploadFile(file, { type: 'file' });
+      const fileUrl = await uploadFile(file, { type: 'raw' });
       if (fileUrl) {
         setPortfolioFileUrl(fileUrl);
       }
