@@ -1,19 +1,87 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PortraitCard from '@/presentation/components/cards/PortraitCard';
 import ListPageLayout from '@/presentation/layouts/ListPageLayout';
-
-/**
- * 리스트 렌더링을 위한 임시 목업 데이터
- */
-const MOCK_MODELS = Array.from({ length: 15 }, (_, i) => ({
-  id: i + 1,
-  name: `모델이름 ${i + 1}`,
-  content: `한줄소개한줄소개한줄소개... ${i + 1}`,
-}));
+import { ModelRepository } from '@/data/repositories/ModelRepository';
+import type { Model } from '@/domain/entities/Model';
 
 const ModelsPage: React.FC = () => {
   const navigate = useNavigate();
+  const [models, setModels] = useState<Model[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [_totalPages, setTotalPages] = useState<number>(1);
+
+  // modelRepository를 useRef로 관리하여 매 렌더링마다 재생성되지 않도록 함
+  const modelRepositoryRef = useRef<ModelRepository | null>(null);
+  if (!modelRepositoryRef.current) {
+    modelRepositoryRef.current = new ModelRepository();
+  }
+  const modelRepository = modelRepositoryRef.current;
+
+  /**
+   * 모델 목록 조회
+   */
+  const fetchModels = async (page: number = 1) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await modelRepository.getModelList({
+        page,
+        limit: 20, // 페이지당 20개 항목
+      });
+
+      setModels(response.items);
+      setCurrentPage(response.currentPage || page);
+      setTotalPages(response.totalPages || 1);
+    } catch (err) {
+      console.error('모델 목록 조회 실패:', err);
+      setError('모델 목록을 불러오는 중 오류가 발생했습니다.');
+      setModels([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * 초기 로드 및 페이지 변경 시 데이터 조회
+   */
+  useEffect(() => {
+    fetchModels(currentPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // modelRepository는 ref로 관리되므로 의존성 배열에서 제외
+
+  // 로딩 중
+  if (loading) {
+    return (
+      <ListPageLayout
+        searchPlaceholder="모델명·소개로 검색"
+        floatingActionButtonPath="/models/register"
+        pageStyle={{ padding: '16px 0' }}
+      >
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <p>로딩 중...</p>
+        </div>
+      </ListPageLayout>
+    );
+  }
+
+  // 에러 발생
+  if (error) {
+    return (
+      <ListPageLayout
+        searchPlaceholder="모델명·소개로 검색"
+        floatingActionButtonPath="/models/register"
+        pageStyle={{ padding: '16px 0' }}
+      >
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <p style={{ color: 'var(--error)' }}>{error}</p>
+        </div>
+      </ListPageLayout>
+    );
+  }
 
   return (
     <ListPageLayout
@@ -39,7 +107,7 @@ const ModelsPage: React.FC = () => {
             minWidth: 0,
           }}
         >
-          {MOCK_MODELS.map((model) => (
+          {models.map((model) => (
             <div
               key={model.id}
               style={{
@@ -50,8 +118,9 @@ const ModelsPage: React.FC = () => {
               }}
             >
               <PortraitCard
-                title={model.name}
-                content={model.content}
+                title={model.nickname || '이름 없음'}
+                content={model.oneLineIntro || '소개 없음'}
+                imageUrl={model.mainThumbnailUrl || undefined}
                 width="100%"
                 onPress={() => navigate(`/models/${model.id}`)}
               />

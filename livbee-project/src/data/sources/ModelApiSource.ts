@@ -1,0 +1,117 @@
+import type {
+  ModelListResponse,
+  ModelListQuery,
+  ModelDetailResponse,
+  ModelDetail,
+  ModelApiErrorResponse,
+} from '@/domain/entities/Model';
+import { buildApiUrl, getAuthHeaders } from '@/shared/config/apiConfig';
+
+/**
+ * 모델 API 소스
+ * 실제 HTTP 요청을 담당하는 레이어
+ */
+export class ModelApiSource {
+  /**
+   * 모델 목록 조회
+   */
+  async getModelList(query: ModelListQuery = {}): Promise<ModelListResponse> {
+    // 쿼리 파라미터 구성
+    const params: Record<string, string | number | undefined> = {};
+    
+    if (query.page !== undefined) {
+      params.page = query.page;
+    }
+    if (query.limit !== undefined) {
+      params.limit = query.limit;
+    }
+
+    const url = buildApiUrl('/models', params);
+    const headers = getAuthHeaders();
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+    });
+
+    if (!response.ok) {
+      throw new Error(`API 요청 실패: ${response.status} ${response.statusText}`);
+    }
+
+    const data: ModelListResponse = await response.json();
+
+    // _id를 id로 변환
+    if (data.items && Array.isArray(data.items)) {
+      data.items = data.items.map((item: any) => {
+        const { _id, ...rest } = item;
+        return {
+          ...rest,
+          id: _id || item.id,
+        };
+      });
+    }
+
+    return data;
+  }
+
+  /**
+   * 모델 상세 조회
+   * @param id - 조회할 모델의 ID
+   * @returns 상세 정보
+   * @throws {Error} 조회 실패 시
+   */
+  async getModelById(id: string): Promise<ModelDetail> {
+    const url = buildApiUrl(`/models/${id}`);
+    const headers = getAuthHeaders();
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+    });
+
+    const data: ModelDetailResponse | ModelApiErrorResponse = await response.json();
+
+    if (!data.ok) {
+      const error = data as ModelApiErrorResponse;
+      throw new Error(error.userMessage || error.message || '모델 상세 조회에 실패했습니다.');
+    }
+
+    const responseData = (data as ModelDetailResponse).data;
+
+    // API 응답을 프론트엔드 타입으로 변환 (_id → id)
+    const modelDetail: ModelDetail = {
+      id: responseData._id,
+      user: responseData.user,
+      nickname: responseData.nickname,
+      oneLineIntro: responseData.oneLineIntro,
+      detailedIntro: responseData.detailedIntro,
+      experienceYears: responseData.experienceYears,
+      age: responseData.age,
+      isAgePublic: responseData.isAgePublic,
+      mainThumbnailUrl: responseData.mainThumbnailUrl,
+      backgroundImageUrl: responseData.backgroundImageUrl,
+      subThumbnailUrls: responseData.subThumbnailUrls,
+      status: responseData.status,
+      detailedRegion: responseData.detailedRegion,
+      gender: responseData.gender,
+      height: responseData.height,
+      weight: responseData.weight,
+      topSize: responseData.topSize,
+      bottomSize: responseData.bottomSize,
+      shoeSize: responseData.shoeSize,
+      isSizingPublic: responseData.isSizingPublic,
+      websiteUrl: responseData.websiteUrl,
+      instagramUrl: responseData.instagramUrl,
+      youtubeUrl: responseData.youtubeUrl,
+      tiktokUrl: responseData.tiktokUrl,
+      publicScope: responseData.publicScope,
+      isReceivingOffers: responseData.isReceivingOffers,
+      attachedFileUrl: responseData.attachedFileUrl,
+      createdAt: responseData.createdAt,
+      updatedAt: responseData.updatedAt,
+    };
+
+    return modelDetail;
+  }
+}
+

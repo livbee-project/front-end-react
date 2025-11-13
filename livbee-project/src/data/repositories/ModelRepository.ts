@@ -1,0 +1,43 @@
+import type {
+  ModelListResponse,
+  ModelListQuery,
+  ModelDetail,
+} from '@/domain/entities/Model';
+import { ModelApiSource } from '@/data/sources/ModelApiSource';
+
+/**
+ * 모델 리포지토리
+ * 도메인 로직과 데이터 소스 사이의 인터페이스 역할
+ */
+export class ModelRepository {
+  private apiSource: ModelApiSource;
+
+  constructor() {
+    this.apiSource = new ModelApiSource();
+  }
+
+  /**
+   * 모델 목록 조회
+   */
+  async getModelList(query: ModelListQuery = {}): Promise<ModelListResponse> {
+    try {
+      return await this.apiSource.getModelList(query);
+    } catch (error) {
+      console.error('모델 목록 조회 실패:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 모델 상세 조회
+   */
+  async getModelById(id: string): Promise<ModelDetail> {
+    try {
+      return await this.apiSource.getModelById(id);
+    } catch (error) {
+      console.error('모델 상세 조회 실패:', error);
+      throw error;
+    }
+  }
+}
+

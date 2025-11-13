@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import ProfileSection from '@/presentation/components/detail/ProfileSection';
 import SectionHeader from '@/presentation/components/section/SectionHeader';
 import GalleryGrid from '@/presentation/components/detail/GalleryGrid';
 import InfoItem from '@/presentation/components/detail/InfoItem';
-import TagContainer from '@/presentation/components/ui/TagContainer';
 import Button from '@/presentation/components/ui/Button';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';
 import DetailContent from '@/presentation/layouts/DetailContent';
+import { ModelRepository } from '@/data/repositories/ModelRepository';
+import type { ModelDetail } from '@/domain/entities/Model';
 import '@/presentation/styles/global.css';
 
 /**
@@ -20,6 +22,42 @@ import '@/presentation/styles/global.css';
  * 5. 하단 버튼
  */
 const ModelDetailPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [model, setModel] = useState<ModelDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const modelRepository = new ModelRepository();
+
+  /**
+   * 모델 상세 정보 로드
+   */
+  useEffect(() => {
+    const loadModel = async () => {
+      if (!id) {
+        setError('모델 ID가 없습니다.');
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await modelRepository.getModelById(id);
+        setModel(data);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : '모델을 불러오는데 실패했습니다.';
+        setError(errorMessage);
+        console.error('모델 상세 조회 실패:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadModel();
+  }, [id]);
+
   /**
    * 프로필 이미지 클릭 핸들러
    */
@@ -40,60 +78,172 @@ const ModelDetailPage: React.FC = () => {
    * 하단 버튼 클릭 핸들러
    */
   const handleButtonClick = () => {
-    console.log('버튼 클릭');
-    // TODO: 버튼 액션 구현 (예: 모집 공고 신청, 문의하기 등)
+    if (model?.isReceivingOffers) {
+      console.log('제안하기');
+      // TODO: 제안하기 기능 구현
+    } else {
+      console.log('문의하기');
+      // TODO: 문의하기 기능 구현
+    }
   };
+
+  // 로딩 중
+  if (isLoading) {
+    return (
+      <DetailPageLayout>
+        <div style={{ padding: '16px', textAlign: 'center' }}>
+          <p>로딩 중...</p>
+        </div>
+      </DetailPageLayout>
+    );
+  }
+
+  // 에러 발생
+  if (error || !model) {
+    return (
+      <DetailPageLayout>
+        <div style={{ padding: '16px', textAlign: 'center' }}>
+          <p style={{ color: 'var(--error)', marginBottom: '16px' }}>
+            {error || '모델을 찾을 수 없습니다.'}
+          </p>
+          <Button variant="primary" onClick={() => navigate('/models')}>
+            목록으로 돌아가기
+          </Button>
+        </div>
+      </DetailPageLayout>
+    );
+  }
+
+  // SNS 링크 배열 생성
+  const snsLinks = [
+    model.websiteUrl && { label: '웹사이트', url: model.websiteUrl },
+    model.instagramUrl && { label: '인스타그램', url: model.instagramUrl },
+    model.youtubeUrl && { label: '유튜브', url: model.youtubeUrl },
+    model.tiktokUrl && { label: '틱톡', url: model.tiktokUrl },
+  ].filter(Boolean) as Array<{ label: string; url: string }>;
 
   return (
     <DetailPageLayout>
       {/* 1. 모델 프로필 섹션 */}
       <ProfileSection
-        name="오해원"
-        description="깔끔한 이미지의 모델로써 열정적인 활동을 하고 있습니다."
+        name={model.nickname || '이름 없음'}
+        description={model.oneLineIntro || '소개 없음'}
+        profileImageUrl={model.mainThumbnailUrl || undefined}
         onImageClick={handleProfileImageClick}
       />
 
       {/* 2. 상세소개 섹션 */}
-      <DetailSection showDivider>
-        <div style={{ paddingBottom: '16px' }}>
-          <SectionHeader title="상세소개" />
-        </div>
-        <DetailContent>내용을 입력해주세요</DetailContent>
-      </DetailSection>
+      {model.detailedIntro && (
+        <DetailSection showDivider>
+          <div style={{ paddingBottom: '16px' }}>
+            <SectionHeader title="상세소개" />
+          </div>
+          <DetailContent>
+            <div
+              style={{ fontSize: 'var(--p2)', lineHeight: 1.6 }}
+              dangerouslySetInnerHTML={{ __html: model.detailedIntro }}
+            />
+          </DetailContent>
+        </DetailSection>
+      )}
 
       {/* 3. 갤러리 섹션 */}
-      <DetailSection>
-        <SectionHeader title="갤러리" />
-        <div style={{ marginTop: '16px' }}>
-          <GalleryGrid
-            columns={3}
-            onImageClick={handleGalleryImageClick}
-          />
-        </div>
-      </DetailSection>
+      {model.subThumbnailUrls && model.subThumbnailUrls.length > 0 && (
+        <DetailSection>
+          <SectionHeader title="갤러리" />
+          <div style={{ marginTop: '16px' }}>
+            <GalleryGrid
+              images={model.subThumbnailUrls}
+              columns={3}
+              onImageClick={handleGalleryImageClick}
+            />
+          </div>
+        </DetailSection>
+      )}
 
       {/* 4. 정보 및 태그 섹션 */}
       <div>
-        {/* 정보 항목들 */}
-        <InfoItem title="타이틀" />
-        <InfoItem title="타이틀" />
-        <InfoItem title="타이틀" />
-        <InfoItem title="타이틀" />
-        <InfoItem title="타이틀" />
-        
-        {/* 태그가 포함된 정보 항목 */}
-        <InfoItem title="타이틀">
-          <TagContainer
-            tags={[
-              { label: '경력 5년', variant: 'rounded' },
-              { label: 'CH', variant: 'circle' },
-              { label: 'CH', variant: 'circle' },
-              { label: 'CH', variant: 'circle' },
-              { label: 'CH', variant: 'circle' },
-              { label: 'CH', variant: 'circle' },
-            ]}
+        {model.experienceYears !== null && (
+          <InfoItem
+            title="경력"
+            content={`${model.experienceYears}년`}
           />
-        </InfoItem>
+        )}
+        {model.isAgePublic && model.age !== null && (
+          <InfoItem
+            title="나이"
+            content={`${model.age}세`}
+          />
+        )}
+        {model.detailedRegion && (
+          <InfoItem
+            title="지역"
+            content={model.detailedRegion}
+          />
+        )}
+        {model.gender && (
+          <InfoItem
+            title="성별"
+            content={model.gender === 'male' ? '남성' : model.gender === 'female' ? '여성' : model.gender}
+          />
+        )}
+        {model.isSizingPublic && (
+          <>
+            {model.height !== null && (
+              <InfoItem
+                title="키"
+                content={`${model.height}cm`}
+              />
+            )}
+            {model.weight !== null && (
+              <InfoItem
+                title="몸무게"
+                content={`${model.weight}kg`}
+              />
+            )}
+            {model.topSize && (
+              <InfoItem
+                title="상의 사이즈"
+                content={model.topSize}
+              />
+            )}
+            {model.bottomSize && (
+              <InfoItem
+                title="하의 사이즈"
+                content={model.bottomSize}
+              />
+            )}
+            {model.shoeSize !== null && (
+              <InfoItem
+                title="신발 사이즈"
+                content={`${model.shoeSize}mm`}
+              />
+            )}
+          </>
+        )}
+        
+        {/* SNS 링크 */}
+        {snsLinks.length > 0 && (
+          <InfoItem title="SNS">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {snsLinks.map((link, index) => (
+                <a
+                  key={index}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: 'var(--primary)',
+                    textDecoration: 'none',
+                    fontSize: 'var(--p2)',
+                  }}
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          </InfoItem>
+        )}
       </div>
 
       {/* 5. 하단 버튼 */}
@@ -103,8 +253,9 @@ const ModelDetailPage: React.FC = () => {
           size="large"
           fullWidth
           onClick={handleButtonClick}
+          disabled={!model.isReceivingOffers}
         >
-          BUTTON
+          {model.isReceivingOffers ? '제안하기' : '제안 받지 않음'}
         </Button>
       </div>
     </DetailPageLayout>
