@@ -278,16 +278,16 @@ const CampaignDetailPage: React.FC = () => {
           title="종료시간"
           content={campaign.endTime || '-'}
         />
-        {campaign.fee != null && (
-          <InfoItem
-            title="출연료"
-            content={
-              campaign.feeNegotiable
+        <InfoItem
+          title="출연료"
+          content={
+            campaign.fee != null
+              ? campaign.feeNegotiable
                 ? `${campaign.fee.toLocaleString()}원 (협의 가능)`
                 : `${campaign.fee.toLocaleString()}원`
-            }
-          />
-        )}
+              : '-'
+          }
+        />
       </div>
 
       {/* 7. 관련 상품 정보 섹션 */}

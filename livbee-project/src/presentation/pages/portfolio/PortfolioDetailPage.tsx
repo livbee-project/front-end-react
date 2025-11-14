@@ -192,64 +192,42 @@ const PortfolioDetailPage: React.FC = () => {
 
       {/* 4. 정보 및 태그 섹션 */}
       <div>
-        {portfolio.experienceYears != null && (
-          <InfoItem
-            title="경력"
-            content={`${portfolio.experienceYears}년`}
-          />
-        )}
-        {portfolio.isAgePublic && portfolio.age != null && (
-          <InfoItem
-            title="나이"
-            content={`${portfolio.age}세`}
-          />
-        )}
-        {portfolio.detailedRegion && (
-          <InfoItem
-            title="지역"
-            content={portfolio.detailedRegion}
-          />
-        )}
-        {portfolio.gender && (
-          <InfoItem
-            title="성별"
-            content={portfolio.gender === 'male' ? '남성' : portfolio.gender === 'female' ? '여성' : '-'}
-          />
-        )}
-        {portfolio.isSizingPublic && (
-          <>
-            {portfolio.height != null && (
-              <InfoItem
-                title="키"
-                content={`${portfolio.height}cm`}
-              />
-            )}
-            {portfolio.weight != null && (
-              <InfoItem
-                title="몸무게"
-                content={`${portfolio.weight}kg`}
-              />
-            )}
-            {portfolio.topSize && (
-              <InfoItem
-                title="상의 사이즈"
-                content={portfolio.topSize}
-              />
-            )}
-            {portfolio.bottomSize && (
-              <InfoItem
-                title="하의 사이즈"
-                content={portfolio.bottomSize}
-              />
-            )}
-            {portfolio.shoeSize != null && (
-              <InfoItem
-                title="신발 사이즈"
-                content={`${portfolio.shoeSize}mm`}
-              />
-            )}
-          </>
-        )}
+        <InfoItem
+          title="경력"
+          content={portfolio.experienceYears != null ? `${portfolio.experienceYears}년` : '-'}
+        />
+        <InfoItem
+          title="나이"
+          content={portfolio.isAgePublic && portfolio.age != null ? `${portfolio.age}세` : '-'}
+        />
+        <InfoItem
+          title="지역"
+          content={portfolio.detailedRegion || '-'}
+        />
+        <InfoItem
+          title="성별"
+          content={portfolio.gender === 'male' ? '남성' : portfolio.gender === 'female' ? '여성' : '-'}
+        />
+        <InfoItem
+          title="키"
+          content={portfolio.isSizingPublic && portfolio.height != null ? `${portfolio.height}cm` : '-'}
+        />
+        <InfoItem
+          title="몸무게"
+          content={portfolio.isSizingPublic && portfolio.weight != null ? `${portfolio.weight}kg` : '-'}
+        />
+        <InfoItem
+          title="상의 사이즈"
+          content={portfolio.isSizingPublic && portfolio.topSize ? portfolio.topSize : '-'}
+        />
+        <InfoItem
+          title="하의 사이즈"
+          content={portfolio.isSizingPublic && portfolio.bottomSize ? portfolio.bottomSize : '-'}
+        />
+        <InfoItem
+          title="신발 사이즈"
+          content={portfolio.isSizingPublic && portfolio.shoeSize != null ? `${portfolio.shoeSize}mm` : '-'}
+        />
         
         {/* SNS 링크 */}
         {snsLinks.length > 0 && (

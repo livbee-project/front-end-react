@@ -192,64 +192,42 @@ const ModelDetailPage: React.FC = () => {
 
       {/* 4. 정보 및 태그 섹션 */}
       <div>
-        {model.experienceYears != null && (
-          <InfoItem
-            title="경력"
-            content={`${model.experienceYears}년`}
-          />
-        )}
-        {model.isAgePublic && model.age != null && (
-          <InfoItem
-            title="나이"
-            content={`${model.age}세`}
-          />
-        )}
-        {model.detailedRegion && (
-          <InfoItem
-            title="지역"
-            content={model.detailedRegion}
-          />
-        )}
-        {model.gender && (
-          <InfoItem
-            title="성별"
-            content={model.gender === 'male' ? '남성' : model.gender === 'female' ? '여성' : '-'}
-          />
-        )}
-        {model.isSizingPublic && (
-          <>
-            {model.height != null && (
-              <InfoItem
-                title="키"
-                content={`${model.height}cm`}
-              />
-            )}
-            {model.weight != null && (
-              <InfoItem
-                title="몸무게"
-                content={`${model.weight}kg`}
-              />
-            )}
-            {model.topSize && (
-              <InfoItem
-                title="상의 사이즈"
-                content={model.topSize}
-              />
-            )}
-            {model.bottomSize && (
-              <InfoItem
-                title="하의 사이즈"
-                content={model.bottomSize}
-              />
-            )}
-            {model.shoeSize != null && (
-              <InfoItem
-                title="신발 사이즈"
-                content={`${model.shoeSize}mm`}
-              />
-            )}
-          </>
-        )}
+        <InfoItem
+          title="경력"
+          content={model.experienceYears != null ? `${model.experienceYears}년` : '-'}
+        />
+        <InfoItem
+          title="나이"
+          content={model.isAgePublic && model.age != null ? `${model.age}세` : '-'}
+        />
+        <InfoItem
+          title="지역"
+          content={model.detailedRegion || '-'}
+        />
+        <InfoItem
+          title="성별"
+          content={model.gender === 'male' ? '남성' : model.gender === 'female' ? '여성' : '-'}
+        />
+        <InfoItem
+          title="키"
+          content={model.isSizingPublic && model.height != null ? `${model.height}cm` : '-'}
+        />
+        <InfoItem
+          title="몸무게"
+          content={model.isSizingPublic && model.weight != null ? `${model.weight}kg` : '-'}
+        />
+        <InfoItem
+          title="상의 사이즈"
+          content={model.isSizingPublic && model.topSize ? model.topSize : '-'}
+        />
+        <InfoItem
+          title="하의 사이즈"
+          content={model.isSizingPublic && model.bottomSize ? model.bottomSize : '-'}
+        />
+        <InfoItem
+          title="신발 사이즈"
+          content={model.isSizingPublic && model.shoeSize != null ? `${model.shoeSize}mm` : '-'}
+        />
         
         {/* SNS 링크 */}
         {snsLinks.length > 0 && (
