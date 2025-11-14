@@ -80,7 +80,6 @@ const ModelsPage: React.FC = () => {
       <ListPageLayout
         searchPlaceholder="모델명·소개로 검색"
         floatingActionButtonPath="/models/register"
-        pageStyle={{ padding: '16px 0' }}
       >
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <p>로딩 중...</p>
@@ -95,7 +94,6 @@ const ModelsPage: React.FC = () => {
       <ListPageLayout
         searchPlaceholder="모델명·소개로 검색"
         floatingActionButtonPath="/models/register"
-        pageStyle={{ padding: '16px 0' }}
       >
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <p style={{ color: 'var(--error)' }}>{error}</p>
@@ -108,12 +106,10 @@ const ModelsPage: React.FC = () => {
     <ListPageLayout
       searchPlaceholder="모델명·소개로 검색"
       floatingActionButtonPath="/models/register"
-      pageStyle={{ padding: '16px 0' }}
     >
       {/* 모델 리스트 - 2열 그리드 구조 */}
       <div
         style={{
-          padding: '0 10px',
           width: '100%',
           boxSizing: 'border-box',
         }}

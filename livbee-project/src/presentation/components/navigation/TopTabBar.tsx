@@ -89,14 +89,11 @@ const TopTabBar: React.FC = () => {
                 {TABS.map((tab) => {
                     const isActive = location.pathname === tab.path;
 
-                    /** (수정) 탭 텍스트 스타일 */
+                    /** 탭 텍스트 스타일 */
                     const textStyle: React.CSSProperties = {
-                        // (수정) 14px -> var(--h2) (18px)
                         fontSize: 'var(--h2)',
-                        // (수정) 비활성 색상: var(--black) -> var(--dark-gray)
-                        // (수정) 비활성 굵기: normal (유지)
-                        color: isActive ? 'var(--primary)' : 'var(--dark-gray)',
-                        fontWeight: isActive ? 'bold' : 'normal',
+                        color: 'var(--dark-gray)',
+                        fontWeight: 'normal',
                     };
 
                     /** 하단 밑줄 스타일 (변경 없음) */

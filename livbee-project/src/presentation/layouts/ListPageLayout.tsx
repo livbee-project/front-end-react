@@ -52,7 +52,7 @@ const ListPageLayout: React.FC<ListPageLayoutProps> = ({
    * 페이지 컨테이너 스타일
    */
   const defaultPageStyle: React.CSSProperties = {
-    padding: '16px',
+    padding: '10px',
   };
 
   const pageStyle: React.CSSProperties = customPageStyle || defaultPageStyle;
@@ -60,7 +60,7 @@ const ListPageLayout: React.FC<ListPageLayoutProps> = ({
   return (
     <div style={pageStyle}>
       {/* 검색 입력 및 안내 문구 */}
-      <div style={{ padding: pageStyle.padding === '16px 0' ? '0 10px' : '0' }}>
+      <div style={{ padding: '0' }}>
         <SearchInput
           placeholder={searchPlaceholder}
           value={searchQuery}
