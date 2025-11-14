@@ -192,13 +192,13 @@ const ModelDetailPage: React.FC = () => {
 
       {/* 4. 정보 및 태그 섹션 */}
       <div>
-        {model.experienceYears !== null && (
+        {model.experienceYears != null && (
           <InfoItem
             title="경력"
             content={`${model.experienceYears}년`}
           />
         )}
-        {model.isAgePublic && model.age !== null && (
+        {model.isAgePublic && model.age != null && (
           <InfoItem
             title="나이"
             content={`${model.age}세`}
@@ -213,18 +213,18 @@ const ModelDetailPage: React.FC = () => {
         {model.gender && (
           <InfoItem
             title="성별"
-            content={model.gender === 'male' ? '남성' : model.gender === 'female' ? '여성' : model.gender}
+            content={model.gender === 'male' ? '남성' : model.gender === 'female' ? '여성' : '-'}
           />
         )}
         {model.isSizingPublic && (
           <>
-            {model.height !== null && (
+            {model.height != null && (
               <InfoItem
                 title="키"
                 content={`${model.height}cm`}
               />
             )}
-            {model.weight !== null && (
+            {model.weight != null && (
               <InfoItem
                 title="몸무게"
                 content={`${model.weight}kg`}
@@ -242,7 +242,7 @@ const ModelDetailPage: React.FC = () => {
                 content={model.bottomSize}
               />
             )}
-            {model.shoeSize !== null && (
+            {model.shoeSize != null && (
               <InfoItem
                 title="신발 사이즈"
                 content={`${model.shoeSize}mm`}

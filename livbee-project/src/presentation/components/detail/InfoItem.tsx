@@ -78,7 +78,7 @@ const InfoItem: React.FC<InfoItemProps> = ({ title, content, children }) => {
         {children ? (
           children
         ) : (
-          <span style={contentStyle}>{content || '내용을 입력해주세요'}</span>
+          <span style={contentStyle}>{content != null ? content : '-'}</span>
         )}
       </div>
     </div>

@@ -192,13 +192,13 @@ const PortfolioDetailPage: React.FC = () => {
 
       {/* 4. 정보 및 태그 섹션 */}
       <div>
-        {portfolio.experienceYears !== null && (
+        {portfolio.experienceYears != null && (
           <InfoItem
             title="경력"
             content={`${portfolio.experienceYears}년`}
           />
         )}
-        {portfolio.isAgePublic && portfolio.age !== null && (
+        {portfolio.isAgePublic && portfolio.age != null && (
           <InfoItem
             title="나이"
             content={`${portfolio.age}세`}
@@ -213,18 +213,18 @@ const PortfolioDetailPage: React.FC = () => {
         {portfolio.gender && (
           <InfoItem
             title="성별"
-            content={portfolio.gender === 'male' ? '남성' : portfolio.gender === 'female' ? '여성' : portfolio.gender}
+            content={portfolio.gender === 'male' ? '남성' : portfolio.gender === 'female' ? '여성' : '-'}
           />
         )}
         {portfolio.isSizingPublic && (
           <>
-            {portfolio.height !== null && (
+            {portfolio.height != null && (
               <InfoItem
                 title="키"
                 content={`${portfolio.height}cm`}
               />
             )}
-            {portfolio.weight !== null && (
+            {portfolio.weight != null && (
               <InfoItem
                 title="몸무게"
                 content={`${portfolio.weight}kg`}
@@ -242,7 +242,7 @@ const PortfolioDetailPage: React.FC = () => {
                 content={portfolio.bottomSize}
               />
             )}
-            {portfolio.shoeSize !== null && (
+            {portfolio.shoeSize != null && (
               <InfoItem
                 title="신발 사이즈"
                 content={`${portfolio.shoeSize}mm`}

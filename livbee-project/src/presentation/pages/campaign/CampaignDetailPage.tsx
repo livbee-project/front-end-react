@@ -61,8 +61,10 @@ const CampaignDetailPage: React.FC = () => {
   /**
    * 날짜 포맷팅 함수 (YYYY-MM-DD)
    */
-  const formatDate = (dateString: string): string => {
+  const formatDate = (dateString: string | null | undefined): string => {
+    if (!dateString) return '-';
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '-';
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
@@ -250,15 +252,15 @@ const CampaignDetailPage: React.FC = () => {
       <div>
         <InfoItem
           title="모집구분"
-          content={campaign.prefixName || '미지정'}
+          content={campaign.prefixName || '-'}
         />
         <InfoItem
           title="카테고리"
-          content={campaign.categoryName || '미지정'}
+          content={campaign.categoryName || '-'}
         />
         <InfoItem
           title="장소"
-          content={campaign.location || '미지정'}
+          content={campaign.location || '-'}
         />
         <InfoItem
           title="촬영일"
@@ -270,13 +272,13 @@ const CampaignDetailPage: React.FC = () => {
         />
         <InfoItem
           title="시작시간"
-          content={campaign.startTime || '미지정'}
+          content={campaign.startTime || '-'}
         />
         <InfoItem
           title="종료시간"
-          content={campaign.endTime || '미지정'}
+          content={campaign.endTime || '-'}
         />
-        {campaign.fee !== null && (
+        {campaign.fee != null && (
           <InfoItem
             title="출연료"
             content={
