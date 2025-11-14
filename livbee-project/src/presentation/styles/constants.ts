@@ -61,6 +61,9 @@ export const FONT_SIZE = {
   MD: 'var(--h3)', // 16px
   LG: 'var(--h2)', // 18px
   XL: 'var(--h1)', // 20px
+  P: 'var(--p)', // 16px
+  P2: 'var(--p2)', // 14px
+  CT: 'var(--ct)', // 14px (caption text)
 } as const;
 
 export const FONT_WEIGHT = {
@@ -74,6 +77,10 @@ export const TEXT_COLOR = {
   BLACK: 'var(--black)',
   DARK_GRAY: 'var(--dark-gray)',
   PRIMARY: 'var(--primary)',
+  SLATE_GRAY: 'var(--slate-gray)',
+  LAVENDER_GRAY: 'var(--lavender-gray)',
+  PAINT_GRAY: 'var(--paint-gray)',
+  LIGHT_GRAY: 'var(--light-gray)',
   WHITE: 'var(--white)',
 } as const;
 
@@ -108,7 +115,7 @@ export const INPUT_BASE_STYLE: React.CSSProperties = {
   paddingRight: '40px',
   backgroundColor: TEXT_COLOR.WHITE,
   borderRadius: BORDER_RADIUS.LG,
-  border: '1px solid var(--paint-gray, #E5E7ED)',
+  border: '1px solid var(--paint-gray)',
   fontSize: FONT_SIZE.MD,
   color: TEXT_COLOR.BLACK,
   fontWeight: FONT_WEIGHT.NORMAL,
