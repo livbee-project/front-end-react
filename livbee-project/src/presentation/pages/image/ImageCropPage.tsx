@@ -489,9 +489,9 @@ const ImageCropPage: React.FC = () => {
         
         // 콜백이 비동기 함수일 수 있으므로 await 처리
         try {
-          const result = callback(croppedFile);
+          const result: unknown = callback(croppedFile);
           // Promise인 경우 완료될 때까지 대기
-          if (result && typeof (result as any).then === 'function') {
+          if (result != null && typeof result === 'object' && 'then' in result && typeof (result as any).then === 'function') {
             await (result as Promise<any>);
           }
         } catch (callbackError) {
