@@ -3,6 +3,17 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { RiImageLine } from 'react-icons/ri';
 
 /**
+ * 전역 타입 확장
+ */
+declare global {
+  interface Window {
+    __imageCropCallbacks?: {
+      [key: string]: (file: File) => void;
+    };
+  }
+}
+
+/**
  * ImageUpload가 받을 props 타입을 정의합니다.
  */
 interface ImageUploadProps {
@@ -35,15 +46,25 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
     // 크롭 기능이 활성화되어 있으면 크롭 페이지로 이동
     if (enableCrop) {
+      // 파일을 Blob URL로 변환하여 전달 (함수는 전달할 수 없으므로)
+      const imageUrl = URL.createObjectURL(file);
+      
+      // 콜백을 전역 이벤트로 등록
+      let callbackKey: string | undefined;
+      if (onImageSelect) {
+        callbackKey = `imageCrop_${Date.now()}_${Math.random()}`;
+        if (!window.__imageCropCallbacks) {
+          window.__imageCropCallbacks = {};
+        }
+        window.__imageCropCallbacks[callbackKey] = onImageSelect;
+      }
+      
       navigate('/image/crop', {
         state: {
-          imageFile: file,
-          onCropComplete: (croppedFile: File) => {
-            if (onImageSelect) {
-              onImageSelect(croppedFile);
-            }
-          },
+          imageUrl,
+          imageFileName: file.name,
           returnPath: location.pathname,
+          callbackKey,
         },
       });
     } else {

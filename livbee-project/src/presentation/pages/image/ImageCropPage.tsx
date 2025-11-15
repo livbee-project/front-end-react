@@ -3,6 +3,17 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { SPACING } from '@/presentation/styles/constants';
 
 /**
+ * 전역 타입 확장
+ */
+declare global {
+  interface Window {
+    __imageCropCallbacks?: {
+      [key: string]: (file: File) => void;
+    };
+  }
+}
+
+/**
  * 크롭 비율 타입
  */
 type CropRatio = 'original' | '1:1' | '1:2' | '2:3' | '4:3';
@@ -35,9 +46,10 @@ const ImageCropPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // location.state에서 이미지 파일과 콜백 함수 받기
-  const imageFile = (location.state as { imageFile?: File })?.imageFile;
-  const onCropComplete = (location.state as { onCropComplete?: (file: File) => void })?.onCropComplete;
+  // location.state에서 이미지 URL과 콜백 키 받기
+  const imageUrl = (location.state as { imageUrl?: string })?.imageUrl;
+  const imageFileName = (location.state as { imageFileName?: string })?.imageFileName || 'cropped-image.jpg';
+  const callbackKey = (location.state as { callbackKey?: string })?.callbackKey;
   const returnPath = (location.state as { returnPath?: string })?.returnPath || '/';
 
   const [selectedRatio, setSelectedRatio] = useState<CropRatio>('original');
@@ -51,18 +63,21 @@ const ImageCropPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // 이미지 파일이 없으면 이전 페이지로 이동
+  // 이미지 URL이 없으면 이전 페이지로 이동
   useEffect(() => {
-    if (!imageFile) {
+    if (!imageUrl) {
       navigate(returnPath);
     } else {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImageSrc(e.target?.result as string);
-      };
-      reader.readAsDataURL(imageFile);
+      setImageSrc(imageUrl);
     }
-  }, [imageFile, navigate, returnPath]);
+
+    // cleanup: Blob URL 해제
+    return () => {
+      if (imageUrl && imageUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(imageUrl);
+      }
+    };
+  }, [imageUrl, navigate, returnPath]);
 
   /**
    * 비율 값을 숫자로 변환
@@ -265,7 +280,7 @@ const ImageCropPage: React.FC = () => {
             reject(new Error('이미지 변환에 실패했습니다.'));
             return;
           }
-          const file = new File([blob], imageFile?.name || 'cropped-image.jpg', {
+          const file = new File([blob], imageFileName, {
             type: 'image/jpeg',
           });
           resolve(file);
@@ -282,9 +297,15 @@ const ImageCropPage: React.FC = () => {
   const handleSave = async () => {
     try {
       const croppedFile = await cropImage();
-      if (onCropComplete) {
-        onCropComplete(croppedFile);
+      
+      // 전역 콜백 호출
+      if (callbackKey && window.__imageCropCallbacks?.[callbackKey]) {
+        const callback = window.__imageCropCallbacks[callbackKey];
+        callback(croppedFile);
+        // 콜백 호출 후 정리
+        delete window.__imageCropCallbacks[callbackKey];
       }
+      
       navigate(returnPath);
     } catch (error) {
       console.error('이미지 크롭 실패:', error);
