@@ -1,74 +1,35 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import SectionContainer from '@/presentation/components/section/SectionContainer';
 import VerticalList from '@/presentation/components/list/VerticalList';
 import ListItem from '@/presentation/components/list/ListItem';
 import PortfolioRowCard from '@/presentation/components/cards/PortfolioRowCard';
+import { LoadingState } from '@/presentation/components/states/LoadingState';
+import { EmptyState } from '@/presentation/components/states/EmptyState';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { Portfolio } from '@/domain/entities/Portfolio';
+import { useRepository } from '@/presentation/hooks/useRepository';
+import { useListData } from '@/presentation/hooks/useListData';
 
 /**
  * "이런 쇼호스트는 어떠세요?" 섹션 컴포넌트
  */
 const HowShowhostSection: React.FC = () => {
   const navigate = useNavigate();
-  const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  // portfolioRepository를 useRef로 관리하여 매 렌더링마다 재생성되지 않도록 함
-  const portfolioRepositoryRef = useRef<PortfolioRepository | null>(null);
-  if (!portfolioRepositoryRef.current) {
-    portfolioRepositoryRef.current = new PortfolioRepository();
-  }
-  const portfolioRepository = portfolioRepositoryRef.current;
+  // portfolioRepository를 useRepository 훅으로 관리
+  const portfolioRepository = useRepository(PortfolioRepository);
 
-  /**
-   * 포트폴리오 목록 조회
-   */
-  useEffect(() => {
-    const abortController = new AbortController();
-    let isCancelled = false;
-
-    const fetchPortfolios = async () => {
-      try {
-        if (!isCancelled) {
-          setIsLoading(true);
-        }
-        const response = await portfolioRepository.getPortfolioList(
-          {
-            page: 1,
-            limit: 5, // 홈 페이지에서는 최대 5개만 표시
-          },
-          abortController.signal
-        );
-        if (!isCancelled && !abortController.signal.aborted) {
-          setPortfolios(response.items);
-        }
-      } catch (error) {
-        // AbortError는 무시 (요청이 취소된 경우)
-        if (error instanceof Error && error.name === 'AbortError') {
-          return;
-        }
-        if (!isCancelled && !abortController.signal.aborted) {
-          console.error('쇼호스트 목록 조회 실패:', error);
-          setPortfolios([]);
-        }
-      } finally {
-        if (!isCancelled && !abortController.signal.aborted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    fetchPortfolios();
-
-    // cleanup 함수: 컴포넌트가 언마운트되면 이전 요청을 취소
-    return () => {
-      isCancelled = true;
-      abortController.abort();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // portfolioRepository는 ref로 관리되므로 의존성 배열에서 제외
+  // 목록 데이터 조회
+  const { data: portfolios, loading: isLoading } = useListData<Portfolio, { page: number; limit: number }, { items: Portfolio[] }>(
+    (query, signal) => portfolioRepository.getPortfolioList(query, signal),
+    {
+      page: 1,
+      limit: 5, // 홈 페이지에서는 최대 5개만 표시
+    },
+    [],
+    '쇼호스트 목록을 불러오는 중 오류가 발생했습니다.'
+  );
 
   // 로딩 중이거나 데이터가 없을 때
   if (isLoading) {
@@ -77,9 +38,7 @@ const HowShowhostSection: React.FC = () => {
         title="이런 쇼호스트는 어떠세요?"
         onMorePressed={() => navigate('/portfolios')}
       >
-        <div style={{ padding: '20px', textAlign: 'center' }}>
-          <p>로딩 중...</p>
-        </div>
+        <LoadingState />
       </SectionContainer>
     );
   }
@@ -90,11 +49,7 @@ const HowShowhostSection: React.FC = () => {
       onMorePressed={() => navigate('/portfolios')}
     >
       {portfolios.length === 0 ? (
-        <div style={{ padding: '20px', textAlign: 'center' }}>
-          <p style={{ color: 'var(--dark-gray)', fontSize: 'var(--p2)' }}>
-            데이터가 없습니다.
-          </p>
-        </div>
+        <EmptyState message="데이터가 없습니다." />
       ) : (
         <div style={{ padding: '0 10px' }}>
           <VerticalList>

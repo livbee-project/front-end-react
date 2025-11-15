@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserRepository } from '@/data/repositories/UserRepository';
 import { setToken, removeToken, getToken } from '@/shared/utils/storage';
+import { useRepository } from '@/presentation/hooks/useRepository';
 import type { LoginRequest, SignupRequest, User } from '@/domain/entities/User';
 
 /**
@@ -35,12 +36,8 @@ export const useAuth = (): UseAuthReturn => {
     isLoading: true,
   });
 
-  // userRepository를 useRef로 관리하여 매 렌더링마다 재생성되지 않도록 함
-  const userRepositoryRef = useRef<UserRepository | null>(null);
-  if (!userRepositoryRef.current) {
-    userRepositoryRef.current = new UserRepository();
-  }
-  const userRepository = userRepositoryRef.current;
+  // userRepository를 useRepository 훅으로 관리
+  const userRepository = useRepository(UserRepository);
 
   /**
    * 내 정보 조회하여 사용자 상태 업데이트

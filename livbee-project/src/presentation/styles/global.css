@@ -36,6 +36,9 @@
   --paint-gray: #E5E7ED;
   --light-gray: #fbfcff;
   --white: #FFFFFF;
+  --placeholder-bg: #f0f0f0;
+  --product-bg: #F7F8FA;
+  --product-border: #ECEFF1;
 }
 
 body {

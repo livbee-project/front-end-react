@@ -1,7 +1,7 @@
 import React from 'react';
 import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
 import Button from '@/presentation/components/ui/Button';
-import { GAP, FONT_SIZE, FONT_WEIGHT, TEXT_COLOR, ELLIPSIS_TEXT, BORDER_RADIUS, SPACING } from '@/presentation/styles/constants';
+import { GAP, FONT_SIZE, FONT_WEIGHT, TEXT_COLOR, BACKGROUND_COLOR, ELLIPSIS_TEXT, BORDER_RADIUS, SPACING } from '@/presentation/styles/constants';
 
 /**
  * MyClipCard 컴포넌트가 받을 props 타입을 정의합니다.
@@ -47,7 +47,7 @@ const MyClipCard: React.FC<MyClipCardProps> = ({
   const thumbnailStyle: React.CSSProperties = {
     width: '100%',
     aspectRatio: '16 / 9', // 일반적인 비디오 비율
-    backgroundColor: '#f0f0f0',
+    backgroundColor: BACKGROUND_COLOR.PLACEHOLDER,
     borderRadius: BORDER_RADIUS.MD,
     border: imageUrl ? 'none' : `1px solid ${TEXT_COLOR.DARK_GRAY}`,
     backgroundImage: imageUrl ? `url(${imageUrl})` : 'none',
@@ -79,7 +79,7 @@ const MyClipCard: React.FC<MyClipCardProps> = ({
     height: '32px',
     flexShrink: 0,
     borderRadius: BORDER_RADIUS.CIRCLE,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: BACKGROUND_COLOR.PLACEHOLDER,
     border: profileImageUrl ? 'none' : `1px solid ${TEXT_COLOR.DARK_GRAY}`,
     display: 'flex',
     justifyContent: 'center',

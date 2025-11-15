@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TextInput from '@/presentation/components/forms/TextInput';
 import ToggleSwitch from '@/presentation/components/ui/ToggleSwitch';
@@ -14,6 +14,7 @@ import FormRow from '@/presentation/components/forms/FormRow';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
 import { useToast } from '@/presentation/contexts/ToastContext';
+import { useRepository } from '@/presentation/hooks/useRepository';
 import type { CreatePortfolioRequest } from '@/domain/entities/Portfolio';
 
 /**
@@ -24,12 +25,8 @@ const PortfolioRegisterPage: React.FC = () => {
   const { uploadFile, isUploading: isImageUploading } = useCloudinaryUpload();
   const { showToast } = useToast();
 
-  // portfolioRepository를 useRef로 관리하여 매 렌더링마다 재생성되지 않도록 함
-  const portfolioRepositoryRef = useRef<PortfolioRepository | null>(null);
-  if (!portfolioRepositoryRef.current) {
-    portfolioRepositoryRef.current = new PortfolioRepository();
-  }
-  const portfolioRepository = portfolioRepositoryRef.current;
+  // portfolioRepository를 useRepository 훅으로 관리
+  const portfolioRepository = useRepository(PortfolioRepository);
 
   // 폼 상태 관리
   const [formData, setFormData] = useState({

@@ -84,6 +84,14 @@ export const TEXT_COLOR = {
   WHITE: 'var(--white)',
 } as const;
 
+export const BACKGROUND_COLOR = {
+  PLACEHOLDER: 'var(--placeholder-bg)', // #f0f0f0
+  PRODUCT: 'var(--product-bg)', // #F7F8FA
+  PRODUCT_BORDER: 'var(--product-border)', // #ECEFF1
+  WHITE: 'var(--white)',
+  LIGHT_GRAY: 'var(--light-gray)',
+} as const;
+
 // ===== 공통 레이아웃 스타일 =====
 export const FLEX_CENTER: React.CSSProperties = {
   display: 'flex',

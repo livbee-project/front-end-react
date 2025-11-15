@@ -1,5 +1,5 @@
 import React from 'react';
-import { GAP, FONT_SIZE, FONT_WEIGHT, TEXT_COLOR, ELLIPSIS_TEXT, BORDER_RADIUS, SPACING } from '@/presentation/styles/constants';
+import { GAP, FONT_SIZE, FONT_WEIGHT, TEXT_COLOR, BACKGROUND_COLOR, ELLIPSIS_TEXT, BORDER_RADIUS, SPACING } from '@/presentation/styles/constants';
 
 /**
  * PortraitCard가 받을 props 타입을 정의합니다.
@@ -47,7 +47,7 @@ const PortraitCard: React.FC<PortraitCardProps> = ({
     width: isDefaultWidth ? 300 : '100%',
     height: isDefaultWidth ? 400 : undefined,
     aspectRatio: isDefaultWidth ? undefined : '3/4', // 비율 유지 (3:4) - 반응형일 때만 적용
-    backgroundColor: '#f0f0f0',
+    backgroundColor: BACKGROUND_COLOR.PLACEHOLDER,
     borderRadius: BORDER_RADIUS.MD,
     border: imageUrl ? 'none' : `1px solid ${TEXT_COLOR.DARK_GRAY}`,
 

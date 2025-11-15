@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TextInput from '@/presentation/components/forms/TextInput';
 import SelectInput from '@/presentation/components/forms/SelectInput';
@@ -11,6 +11,7 @@ import FormSection from '@/presentation/components/forms/FormSection';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
 import { useToast } from '@/presentation/contexts/ToastContext';
+import { useRepository } from '@/presentation/hooks/useRepository';
 import type { CreateCampaignRequest } from '@/domain/entities/Campaign';
 
 /**
@@ -21,12 +22,8 @@ const CampaignRegisterPage: React.FC = () => {
   const { uploadFile, isUploading: isImageUploading } = useCloudinaryUpload();
   const { showToast } = useToast();
 
-  // campaignRepository를 useRef로 관리하여 매 렌더링마다 재생성되지 않도록 함
-  const campaignRepositoryRef = useRef<CampaignRepository | null>(null);
-  if (!campaignRepositoryRef.current) {
-    campaignRepositoryRef.current = new CampaignRepository();
-  }
-  const campaignRepository = campaignRepositoryRef.current;
+  // campaignRepository를 useRepository 훅으로 관리
+  const campaignRepository = useRepository(CampaignRepository);
 
   // 폼 상태 관리
   const [formData, setFormData] = useState({

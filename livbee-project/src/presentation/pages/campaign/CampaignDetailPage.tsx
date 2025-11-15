@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DetailHeader from '@/presentation/components/detail/DetailHeader';
 import BulletList from '@/presentation/components/detail/BulletList';
@@ -7,8 +7,13 @@ import ProductCard from '@/presentation/components/cards/ProductCard';
 import Button from '@/presentation/components/ui/Button';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';
+import { LoadingState } from '@/presentation/components/states/LoadingState';
+import { ErrorState } from '@/presentation/components/states/ErrorState';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { CampaignDetail } from '@/domain/entities/Campaign';
+import { htmlToText } from '@/shared/utils/htmlUtils';
+import { useRepository } from '@/presentation/hooks/useRepository';
+import { useDetailData } from '@/presentation/hooks/useDetailData';
 import '@/presentation/styles/global.css';
 
 /**
@@ -26,16 +31,16 @@ import '@/presentation/styles/global.css';
 const CampaignDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [campaign, setCampaign] = useState<CampaignDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // campaignRepository를 useRef로 관리하여 매 렌더링마다 재생성되지 않도록 함
-  const campaignRepositoryRef = useRef<CampaignRepository | null>(null);
-  if (!campaignRepositoryRef.current) {
-    campaignRepositoryRef.current = new CampaignRepository();
-  }
-  const campaignRepository = campaignRepositoryRef.current;
+  // campaignRepository를 useRepository 훅으로 관리
+  const campaignRepository = useRepository(CampaignRepository);
+
+  // 상세 데이터 조회
+  const { data: campaign, loading: isLoading, error } = useDetailData<CampaignDetail>(
+    (id, signal) => campaignRepository.getCampaignById(id, signal),
+    id,
+    '공고를 불러오는데 실패했습니다.'
+  );
 
   /**
    * D-DAY 계산 함수
@@ -70,67 +75,6 @@ const CampaignDetailPage: React.FC = () => {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
-
-  /**
-   * HTML 콘텐츠를 텍스트로 변환 (요약용)
-   */
-  const htmlToText = (html: string): string => {
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    return div.textContent || div.innerText || '';
-  };
-
-  /**
-   * 캠페인 상세 정보 로드
-   */
-  useEffect(() => {
-    const abortController = new AbortController();
-    let isCancelled = false;
-
-    const loadCampaign = async () => {
-      if (!id) {
-        if (!isCancelled) {
-          setError('공고 ID가 없습니다.');
-          setIsLoading(false);
-        }
-        return;
-      }
-
-      try {
-        if (!isCancelled) {
-          setIsLoading(true);
-          setError(null);
-        }
-        const data = await campaignRepository.getCampaignById(id, abortController.signal);
-        if (!isCancelled && !abortController.signal.aborted) {
-          setCampaign(data);
-        }
-      } catch (err) {
-        // AbortError는 무시 (요청이 취소된 경우)
-        if (err instanceof Error && err.name === 'AbortError') {
-          return;
-        }
-        if (!isCancelled && !abortController.signal.aborted) {
-          const errorMessage = err instanceof Error ? err.message : '공고를 불러오는데 실패했습니다.';
-          setError(errorMessage);
-          console.error('캠페인 상세 조회 실패:', err);
-        }
-      } finally {
-        if (!isCancelled && !abortController.signal.aborted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    loadCampaign();
-
-    // cleanup 함수: 컴포넌트가 언마운트되거나 id가 변경되면 이전 요청을 취소
-    return () => {
-      isCancelled = true;
-      abortController.abort();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]); // campaignRepository는 ref로 관리되므로 의존성 배열에서 제외
 
   /**
    * 이미지 클릭 핸들러
@@ -180,14 +124,12 @@ const CampaignDetailPage: React.FC = () => {
   if (error || !campaign) {
     return (
       <DetailPageLayout>
-        <div style={{ padding: '16px', textAlign: 'center' }}>
-          <p style={{ color: 'var(--error)', marginBottom: '16px' }}>
-            {error || '공고를 찾을 수 없습니다.'}
-          </p>
-          <Button variant="primary" onClick={() => navigate('/campaigns')}>
-            목록으로 돌아가기
-          </Button>
-        </div>
+        <ErrorState
+          message={error || '공고를 찾을 수 없습니다.'}
+          padding="16px"
+          onRetry={() => navigate('/campaigns')}
+          retryLabel="목록으로 돌아가기"
+        />
       </DetailPageLayout>
     );
   }

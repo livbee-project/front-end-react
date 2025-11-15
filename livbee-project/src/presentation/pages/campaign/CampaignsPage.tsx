@@ -1,85 +1,38 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CampaignCard from '@/presentation/components/cards/CampaignCard';
 import VerticalList from '@/presentation/components/list/VerticalList';
 import ListItem from '@/presentation/components/list/ListItem';
 import ListPageLayout from '@/presentation/layouts/ListPageLayout';
+import Pagination from '@/presentation/components/list/Pagination';
+import { LoadingState } from '@/presentation/components/states/LoadingState';
+import { ErrorState } from '@/presentation/components/states/ErrorState';
+import { EmptyState } from '@/presentation/components/states/EmptyState';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { Campaign } from '@/domain/entities/Campaign';
+import { useRepository } from '@/presentation/hooks/useRepository';
+import { useListData } from '@/presentation/hooks/useListData';
 
 const CampaignsPage: React.FC = () => {
   const navigate = useNavigate();
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1);
-  const [_totalItems, setTotalItems] = useState<number>(0);
 
-  // campaignRepository를 useRef로 관리하여 매 렌더링마다 재생성되지 않도록 함
-  const campaignRepositoryRef = useRef<CampaignRepository | null>(null);
-  if (!campaignRepositoryRef.current) {
-    campaignRepositoryRef.current = new CampaignRepository();
-  }
-  const campaignRepository = campaignRepositoryRef.current;
+  // campaignRepository를 useRepository 훅으로 관리
+  const campaignRepository = useRepository(CampaignRepository);
 
-  /**
-   * 초기 로드 및 페이지 변경 시 데이터 조회
-   */
-  useEffect(() => {
-    const abortController = new AbortController();
-    let isCancelled = false;
-
-    const loadData = async () => {
-      try {
-        if (!isCancelled) {
-          setLoading(true);
-          setError(null);
-        }
-
-        const response = await campaignRepository.getCampaignList(
-          {
-            page: currentPage,
-            limit: 20, // 페이지당 20개 항목
-            search: searchQuery || undefined,
-            sort: 'latest', // 기본값: 최신순
-          },
-          abortController.signal
-        );
-
-        if (!isCancelled && !abortController.signal.aborted) {
-          setCampaigns(response.items);
-          setCurrentPage(response.currentPage);
-          setTotalPages(response.totalPages);
-          setTotalItems(response.totalItems);
-        }
-      } catch (err) {
-        // AbortError는 무시 (요청이 취소된 경우)
-        if (err instanceof Error && err.name === 'AbortError') {
-          return;
-        }
-        if (!isCancelled && !abortController.signal.aborted) {
-          console.error('캠페인 목록 조회 실패:', err);
-          setError('캠페인 목록을 불러오는 중 오류가 발생했습니다.');
-          setCampaigns([]);
-        }
-      } finally {
-        if (!isCancelled && !abortController.signal.aborted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadData();
-
-    // cleanup 함수: 컴포넌트가 언마운트되거나 currentPage/searchQuery가 변경되면 이전 요청을 취소
-    return () => {
-      isCancelled = true;
-      abortController.abort();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, searchQuery]); // campaignRepository는 ref로 관리되므로 의존성 배열에서 제외
+  // 목록 데이터 조회
+  const { data: campaigns, loading, error, totalPages } = useListData<Campaign, { page: number; limit: number; search?: string; sort?: 'latest' | 'deadline' }, { items: Campaign[]; currentPage?: number; totalPages?: number; totalItems?: number }>(
+    (query, signal) => campaignRepository.getCampaignList(query, signal),
+    {
+      page: currentPage,
+      limit: 20,
+      search: searchQuery || undefined,
+      sort: 'latest' as const,
+    },
+    [currentPage, searchQuery],
+    '캠페인 목록을 불러오는 중 오류가 발생했습니다.'
+  );
 
   /**
    * 검색 실행 핸들러
@@ -99,9 +52,7 @@ const CampaignsPage: React.FC = () => {
         floatingActionButtonPath="/campaigns/register"
         onSearch={handleSearch}
       >
-        <div style={{ padding: '20px', textAlign: 'center' }}>
-          <p>로딩 중...</p>
-        </div>
+        <LoadingState />
       </ListPageLayout>
     );
   }
@@ -116,22 +67,13 @@ const CampaignsPage: React.FC = () => {
         floatingActionButtonPath="/campaigns/register"
         onSearch={handleSearch}
       >
-        <div style={{ padding: '20px', textAlign: 'center' }}>
-          <p style={{ color: 'red' }}>{error}</p>
-          <button
-            onClick={() => {
-              setCurrentPage(1);
-              setSearchQuery('');
-            }}
-            style={{
-              marginTop: '10px',
-              padding: '8px 16px',
-              cursor: 'pointer',
-            }}
-          >
-            다시 시도
-          </button>
-        </div>
+        <ErrorState
+          message={error}
+          onRetry={() => {
+            setCurrentPage(1);
+            setSearchQuery('');
+          }}
+        />
       </ListPageLayout>
     );
   }
@@ -144,9 +86,7 @@ const CampaignsPage: React.FC = () => {
     >
       {/* 모집 공고 리스트 */}
       {campaigns.length === 0 ? (
-        <div style={{ padding: '20px', textAlign: 'center' }}>
-          <p>등록된 공고가 없습니다.</p>
-        </div>
+        <EmptyState message="등록된 공고가 없습니다." />
       ) : (
         <>
           <VerticalList showDividers={false}>
@@ -165,44 +105,13 @@ const CampaignsPage: React.FC = () => {
             ))}
           </VerticalList>
 
-          {/* 페이지네이션 (향후 개선 예정) */}
-          {totalPages > 1 && (
-            <div
-              style={{
-                padding: '20px',
-                display: 'flex',
-                justifyContent: 'center',
-                gap: '10px',
-              }}
-            >
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                style={{
-                  padding: '8px 16px',
-                  cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                  opacity: currentPage === 1 ? 0.5 : 1,
-                }}
-              >
-                이전
-              </button>
-              <span style={{ padding: '8px 16px' }}>
-                {currentPage} / {totalPages}
-              </span>
-              <button
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-                }
-                disabled={currentPage === totalPages}
-                style={{
-                  padding: '8px 16px',
-                  cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-                  opacity: currentPage === totalPages ? 0.5 : 1,
-                }}
-              >
-                다음
-              </button>
-            </div>
+          {/* 페이지네이션 */}
+          {totalPages && totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           )}
         </>
       )}

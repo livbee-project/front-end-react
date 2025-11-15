@@ -1,5 +1,6 @@
 import React from 'react';
 import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
+import { BACKGROUND_COLOR } from '@/presentation/styles/constants';
 
 /**
  * ProductCard 컴포넌트가 받을 props 타입을 정의합니다.
@@ -33,7 +34,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     padding: '12px',
     cursor: onClick ? 'pointer' : 'default',
     borderRadius: '8px',
-    border: '1px solid #F7F8FA',
+    border: `1px solid ${BACKGROUND_COLOR.PRODUCT}`,
   };
 
   /**
@@ -44,8 +45,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
     width: '60px',
     height: '60px',
     flexShrink: 0,
-    backgroundColor: '#F7F8FA',
-    border: imageUrl ? 'none' : '1px solid #ECEFF1',
+    backgroundColor: BACKGROUND_COLOR.PRODUCT,
+    border: imageUrl ? 'none' : `1px solid ${BACKGROUND_COLOR.PRODUCT_BORDER}`,
     borderRadius: '4px',
     display: 'flex',
     justifyContent: 'center',

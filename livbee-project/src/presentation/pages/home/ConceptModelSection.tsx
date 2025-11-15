@@ -1,9 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import SectionContainer from '@/presentation/components/section/SectionContainer';
 import PortraitCard from '@/presentation/components/cards/PortraitCard';
+import { LoadingState } from '@/presentation/components/states/LoadingState';
+import { EmptyState } from '@/presentation/components/states/EmptyState';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
 import type { Model } from '@/domain/entities/Model';
+import { useRepository } from '@/presentation/hooks/useRepository';
+import { useListData } from '@/presentation/hooks/useListData';
 import '@/presentation/styles/global.css';
 
 /**
@@ -12,63 +16,20 @@ import '@/presentation/styles/global.css';
  */
 const ConceptModelSection: React.FC = () => {
   const navigate = useNavigate();
-  const [models, setModels] = useState<Model[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  // modelRepository를 useRef로 관리하여 매 렌더링마다 재생성되지 않도록 함
-  const modelRepositoryRef = useRef<ModelRepository | null>(null);
-  if (!modelRepositoryRef.current) {
-    modelRepositoryRef.current = new ModelRepository();
-  }
-  const modelRepository = modelRepositoryRef.current;
+  // modelRepository를 useRepository 훅으로 관리
+  const modelRepository = useRepository(ModelRepository);
 
-  /**
-   * 모델 목록 조회
-   */
-  useEffect(() => {
-    const abortController = new AbortController();
-    let isCancelled = false;
-
-    const fetchModels = async () => {
-      try {
-        if (!isCancelled) {
-          setIsLoading(true);
-        }
-        const response = await modelRepository.getModelList(
-          {
-            page: 1,
-            limit: 10, // 홈 페이지에서는 최대 10개 표시 (가로 스크롤)
-          },
-          abortController.signal
-        );
-        if (!isCancelled && !abortController.signal.aborted) {
-          setModels(response.items);
-        }
-      } catch (error) {
-        // AbortError는 무시 (요청이 취소된 경우)
-        if (error instanceof Error && error.name === 'AbortError') {
-          return;
-        }
-        if (!isCancelled && !abortController.signal.aborted) {
-          console.error('모델 목록 조회 실패:', error);
-          setModels([]);
-        }
-      } finally {
-        if (!isCancelled && !abortController.signal.aborted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    fetchModels();
-
-    // cleanup 함수: 컴포넌트가 언마운트되면 이전 요청을 취소
-    return () => {
-      isCancelled = true;
-      abortController.abort();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // modelRepository는 ref로 관리되므로 의존성 배열에서 제외
+  // 목록 데이터 조회
+  const { data: models, loading: isLoading } = useListData<Model, { page: number; limit: number }, { items: Model[] }>(
+    (query, signal) => modelRepository.getModelList(query, signal),
+    {
+      page: 1,
+      limit: 10, // 홈 페이지에서는 최대 10개 표시 (가로 스크롤)
+    },
+    [],
+    '모델 목록을 불러오는 중 오류가 발생했습니다.'
+  );
 
   // 로딩 중
   if (isLoading) {
@@ -77,9 +38,7 @@ const ConceptModelSection: React.FC = () => {
         title="컨셉에 맞는 모델 찾기"
         onMorePressed={() => navigate('/models')}
       >
-        <div style={{ padding: '20px', textAlign: 'center' }}>
-          <p>로딩 중...</p>
-        </div>
+        <LoadingState />
       </SectionContainer>
     );
   }
@@ -90,11 +49,7 @@ const ConceptModelSection: React.FC = () => {
       onMorePressed={() => navigate('/models')}
     >
       {models.length === 0 ? (
-        <div style={{ padding: '20px', textAlign: 'center' }}>
-          <p style={{ color: 'var(--dark-gray)', fontSize: 'var(--p2)' }}>
-            데이터가 없습니다.
-          </p>
-        </div>
+        <EmptyState message="데이터가 없습니다." />
       ) : (
         <div
           className="hide-scrollbar"

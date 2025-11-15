@@ -1,15 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ProfileSection from '@/presentation/components/detail/ProfileSection';
 import SectionHeader from '@/presentation/components/section/SectionHeader';
 import GalleryGrid from '@/presentation/components/detail/GalleryGrid';
 import InfoItem from '@/presentation/components/detail/InfoItem';
+import { SnsLinks } from '@/presentation/components/detail/SnsLinks';
 import Button from '@/presentation/components/ui/Button';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';
 import DetailContent from '@/presentation/layouts/DetailContent';
+import { LoadingState } from '@/presentation/components/states/LoadingState';
+import { ErrorState } from '@/presentation/components/states/ErrorState';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
 import type { ModelDetail } from '@/domain/entities/Model';
+import { useRepository } from '@/presentation/hooks/useRepository';
+import { useDetailData } from '@/presentation/hooks/useDetailData';
 import '@/presentation/styles/global.css';
 
 /**
@@ -24,68 +29,16 @@ import '@/presentation/styles/global.css';
 const ModelDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [model, setModel] = useState<ModelDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // modelRepository를 useRef로 관리하여 매 렌더링마다 재생성되지 않도록 함
-  const modelRepositoryRef = useRef<ModelRepository | null>(null);
-  if (!modelRepositoryRef.current) {
-    modelRepositoryRef.current = new ModelRepository();
-  }
-  const modelRepository = modelRepositoryRef.current;
+  // modelRepository를 useRepository 훅으로 관리
+  const modelRepository = useRepository(ModelRepository);
 
-  /**
-   * 모델 상세 정보 로드
-   */
-  useEffect(() => {
-    const abortController = new AbortController();
-    let isCancelled = false;
-
-    const loadModel = async () => {
-      if (!id) {
-        if (!isCancelled) {
-          setError('모델 ID가 없습니다.');
-          setIsLoading(false);
-        }
-        return;
-      }
-
-      try {
-        if (!isCancelled) {
-          setIsLoading(true);
-          setError(null);
-        }
-        const data = await modelRepository.getModelById(id, abortController.signal);
-        if (!isCancelled && !abortController.signal.aborted) {
-          setModel(data);
-        }
-      } catch (err) {
-        // AbortError는 무시 (요청이 취소된 경우)
-        if (err instanceof Error && err.name === 'AbortError') {
-          return;
-        }
-        if (!isCancelled && !abortController.signal.aborted) {
-          const errorMessage = err instanceof Error ? err.message : '모델을 불러오는데 실패했습니다.';
-          setError(errorMessage);
-          console.error('모델 상세 조회 실패:', err);
-        }
-      } finally {
-        if (!isCancelled && !abortController.signal.aborted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    loadModel();
-
-    // cleanup 함수: 컴포넌트가 언마운트되거나 id가 변경되면 이전 요청을 취소
-    return () => {
-      isCancelled = true;
-      abortController.abort();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]); // modelRepository는 ref로 관리되므로 의존성 배열에서 제외
+  // 상세 데이터 조회
+  const { data: model, loading: isLoading, error } = useDetailData<ModelDetail>(
+    (id, signal) => modelRepository.getModelById(id, signal),
+    id,
+    '모델을 불러오는데 실패했습니다.'
+  );
 
   /**
    * 프로필 이미지 클릭 핸들러
@@ -131,14 +84,12 @@ const ModelDetailPage: React.FC = () => {
   if (error || !model) {
     return (
       <DetailPageLayout>
-        <div style={{ padding: '16px', textAlign: 'center' }}>
-          <p style={{ color: 'var(--error)', marginBottom: '16px' }}>
-            {error || '모델을 찾을 수 없습니다.'}
-          </p>
-          <Button variant="primary" onClick={() => navigate('/models')}>
-            목록으로 돌아가기
-          </Button>
-        </div>
+        <ErrorState
+          message={error || '모델을 찾을 수 없습니다.'}
+          padding="16px"
+          onRetry={() => navigate('/models')}
+          retryLabel="목록으로 돌아가기"
+        />
       </DetailPageLayout>
     );
   }
@@ -230,27 +181,7 @@ const ModelDetailPage: React.FC = () => {
         />
         
         {/* SNS 링크 */}
-        {snsLinks.length > 0 && (
-          <InfoItem title="SNS">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {snsLinks.map((link, index) => (
-                <a
-                  key={index}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    color: 'var(--primary)',
-                    textDecoration: 'none',
-                    fontSize: 'var(--p2)',
-                  }}
-                >
-                  {link.label}
-                </a>
-              ))}
-            </div>
-          </InfoItem>
-        )}
+        <SnsLinks links={snsLinks} />
       </div>
 
       {/* 5. 하단 버튼 */}
