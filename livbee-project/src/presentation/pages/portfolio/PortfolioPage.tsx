@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import PortfolioRowCard from '@/presentation/components/cards/PortfolioRowCard';
 import VerticalList from '@/presentation/components/list/VerticalList';
@@ -13,7 +13,6 @@ import { useListData } from '@/presentation/hooks/useListData';
 
 const PortfolioPage: React.FC = () => {
   const navigate = useNavigate();
-  const [currentPage] = useState<number>(1);
 
   // portfolioRepository를 useRepository 훅으로 관리
   const portfolioRepository = useRepository(PortfolioRepository);
@@ -21,8 +20,8 @@ const PortfolioPage: React.FC = () => {
   // 목록 데이터 조회
   const { data: portfolios, loading, error } = useListData<Portfolio, { page: number; limit: number }, { items: Portfolio[]; currentPage?: number; totalPages?: number }>(
     (query, signal) => portfolioRepository.getPortfolioList(query, signal),
-    { page: currentPage, limit: 20 },
-    [currentPage],
+    { page: 1, limit: 20 },
+    [],
     '포트폴리오 목록을 불러오는 중 오류가 발생했습니다.'
   );
 
@@ -66,7 +65,9 @@ const PortfolioPage: React.FC = () => {
               title={portfolio.nickname || '이름 없음'}
               content={portfolio.oneLineIntro || '소개 없음'}
               imageUrl={portfolio.mainThumbnailUrl || undefined}
-              onOfferPress={() => console.log(`제안하기 ${portfolio.id}`)}
+              onOfferPress={() => {
+                // TODO: 제안하기 기능 구현
+              }}
               onCardPress={() => navigate(`/portfolios/${portfolio.id}`)}
             />
           </ListItem>

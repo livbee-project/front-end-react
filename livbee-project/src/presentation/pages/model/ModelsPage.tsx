@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import PortraitCard from '@/presentation/components/cards/PortraitCard';
 import ListPageLayout from '@/presentation/layouts/ListPageLayout';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { ErrorState } from '@/presentation/components/states/ErrorState';
+import { SPACING } from '@/presentation/styles/constants';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
 import type { Model } from '@/domain/entities/Model';
 import { useRepository } from '@/presentation/hooks/useRepository';
@@ -11,7 +12,6 @@ import { useListData } from '@/presentation/hooks/useListData';
 
 const ModelsPage: React.FC = () => {
   const navigate = useNavigate();
-  const [currentPage] = useState<number>(1);
 
   // modelRepository를 useRepository 훅으로 관리
   const modelRepository = useRepository(ModelRepository);
@@ -19,8 +19,8 @@ const ModelsPage: React.FC = () => {
   // 목록 데이터 조회
   const { data: models, loading, error } = useListData<Model, { page: number; limit: number }, { items: Model[]; currentPage?: number; totalPages?: number }>(
     (query, signal) => modelRepository.getModelList(query, signal),
-    { page: currentPage, limit: 20 },
-    [currentPage],
+    { page: 1, limit: 20 },
+    [],
     '모델 목록을 불러오는 중 오류가 발생했습니다.'
   );
 
@@ -76,7 +76,7 @@ const ModelsPage: React.FC = () => {
               style={{
                 width: '100%',
                 minWidth: 0,
-                marginBottom: '20px',
+                marginBottom: SPACING.XL,
                 boxSizing: 'border-box',
               }}
             >

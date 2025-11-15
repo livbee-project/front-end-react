@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import MyClipCard from '@/presentation/components/cards/MyClipCard';
 import Pagination from '@/presentation/components/list/Pagination';
 import { SPACING, GAP } from '@/presentation/styles/constants';
+import { devLog } from '@/shared/utils/logger';
 
 /**
  * 내 숏클립 페이지 컴포넌트입니다.
@@ -48,7 +49,7 @@ const MyClipsPage: React.FC = () => {
    * 편집 버튼 클릭 핸들러
    */
   const handleEdit = (clipId: number) => {
-    console.log(`클립 ${clipId} 편집`);
+    devLog(`클립 ${clipId} 편집`);
     // TODO: 클립 편집 페이지로 이동 또는 모달 열기
   };
 
@@ -56,7 +57,7 @@ const MyClipsPage: React.FC = () => {
    * 삭제 버튼 클릭 핸들러
    */
   const handleDelete = (clipId: number) => {
-    console.log(`클립 ${clipId} 삭제`);
+    devLog(`클립 ${clipId} 삭제`);
     // TODO: 삭제 확인 모달 및 삭제 로직
   };
 
@@ -65,7 +66,7 @@ const MyClipsPage: React.FC = () => {
    */
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    console.log(`페이지 ${page}로 변경`);
+    devLog(`페이지 ${page}로 변경`);
     // TODO: 페이지 변경 시 데이터 로드
   };
 

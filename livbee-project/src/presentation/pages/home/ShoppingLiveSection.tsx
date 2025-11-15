@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import SectionContainer from '@/presentation/components/section/SectionContainer';
 import RecruitCard from '@/presentation/components/cards/RecruitCard';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
+import { SPACING } from '@/presentation/styles/constants';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { Campaign } from '@/domain/entities/Campaign';
 import { htmlToText } from '@/shared/utils/htmlUtils';
@@ -63,7 +64,7 @@ const ShoppingLiveSection: React.FC = () => {
           overflowY: 'hidden',
           height: 610, // Flutter 원본 높이
           gap: 10,
-          padding: '0 10px',
+          padding: `0 ${SPACING.SM}`,
         }}
       >
         {/* RecruitCard 렌더링 로직 */}

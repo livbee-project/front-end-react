@@ -6,6 +6,7 @@ import ListItem from '@/presentation/components/list/ListItem';
 import PortfolioRowCard from '@/presentation/components/cards/PortfolioRowCard';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { EmptyState } from '@/presentation/components/states/EmptyState';
+import { SPACING } from '@/presentation/styles/constants';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { Portfolio } from '@/domain/entities/Portfolio';
 import { useRepository } from '@/presentation/hooks/useRepository';
@@ -51,7 +52,7 @@ const HowShowhostSection: React.FC = () => {
       {portfolios.length === 0 ? (
         <EmptyState message="데이터가 없습니다." />
       ) : (
-        <div style={{ padding: '0 10px' }}>
+        <div style={{ padding: `0 ${SPACING.SM}` }}>
           <VerticalList>
             {portfolios.map((portfolio) => (
               <ListItem key={portfolio.id}>

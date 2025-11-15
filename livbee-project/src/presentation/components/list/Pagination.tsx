@@ -1,4 +1,5 @@
 import React from 'react';
+import { SPACING, GAP } from '@/presentation/styles/constants';
 
 /**
  * Pagination 컴포넌트가 받을 props 타입을 정의합니다.
@@ -29,8 +30,8 @@ const Pagination: React.FC<PaginationProps> = ({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: '8px',
-    padding: '24px 16px',
+    gap: GAP.SM,
+    padding: `${SPACING.XXL} ${SPACING.LG}`,
   };
 
   /**
@@ -50,7 +51,7 @@ const Pagination: React.FC<PaginationProps> = ({
       backgroundColor: 'transparent',
       border: 'none',
       cursor: 'pointer',
-      padding: '0 8px',
+      padding: `0 ${GAP.SM}`,
     };
   };
 

@@ -4,6 +4,7 @@ import SectionContainer from '@/presentation/components/section/SectionContainer
 import PortraitCard from '@/presentation/components/cards/PortraitCard';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { EmptyState } from '@/presentation/components/states/EmptyState';
+import { SPACING } from '@/presentation/styles/constants';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
 import type { Model } from '@/domain/entities/Model';
 import { useRepository } from '@/presentation/hooks/useRepository';
@@ -59,7 +60,7 @@ const ConceptModelSection: React.FC = () => {
             overflowY: 'hidden',
             height: 488, // Flutter 원본 높이
             gap: 10, // Flutter 원본(separatorBuilder)
-            padding: '0 10px', // Flutter 원본(padding)
+            padding: `0 ${SPACING.SM}`, // Flutter 원본(padding)
           }}
         >
           {/* PortraitCard 렌더링 */}

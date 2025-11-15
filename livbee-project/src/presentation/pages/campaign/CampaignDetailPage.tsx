@@ -7,7 +7,9 @@ import ProductCard from '@/presentation/components/cards/ProductCard';
 import Button from '@/presentation/components/ui/Button';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';
+import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { ErrorState } from '@/presentation/components/states/ErrorState';
+import { SPACING } from '@/presentation/styles/constants';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { CampaignDetail } from '@/domain/entities/Campaign';
 import { htmlToText } from '@/shared/utils/htmlUtils';
@@ -79,7 +81,6 @@ const CampaignDetailPage: React.FC = () => {
    * 이미지 클릭 핸들러
    */
   const handleImageClick = () => {
-    console.log('이미지 클릭');
     // TODO: 이미지 확대 또는 갤러리 열기 기능 구현
   };
 
@@ -89,8 +90,6 @@ const CampaignDetailPage: React.FC = () => {
   const handleProductClick = () => {
     if (campaign?.productUrl) {
       window.open(campaign.productUrl, '_blank');
-    } else {
-      console.log('상품 링크가 없습니다.');
     }
   };
 
@@ -102,8 +101,6 @@ const CampaignDetailPage: React.FC = () => {
       // 이미 지원한 경우
       alert('이미 지원하신 공고입니다.');
     } else {
-      // 지원하기 기능 구현
-      console.log('지원하기');
       // TODO: 지원하기 기능 구현
     }
   };
@@ -112,9 +109,7 @@ const CampaignDetailPage: React.FC = () => {
   if (isLoading) {
     return (
       <DetailPageLayout>
-        <div style={{ padding: '16px', textAlign: 'center' }}>
-          <p>로딩 중...</p>
-        </div>
+        <LoadingState padding="16px" />
       </DetailPageLayout>
     );
   }
@@ -243,7 +238,7 @@ const CampaignDetailPage: React.FC = () => {
       )}
 
       {/* 8. 하단 액션 버튼 */}
-      <div style={{ padding: '16px' }}>
+      <div style={{ padding: SPACING.LG }}>
         <Button
           variant="primary"
           size="large"

@@ -2,6 +2,8 @@ import React from 'react';
 import SectionContainer from '@/presentation/components/section/SectionContainer';
 import VerticalList from '@/presentation/components/list/VerticalList';
 import ListItem from '@/presentation/components/list/ListItem';
+import { SPACING } from '@/presentation/styles/constants';
+import { devLog } from '@/shared/utils/logger';
 
 /**
  * "라이비 뉴스" 섹션 컴포넌트
@@ -27,17 +29,17 @@ const LivbeeNewsSection: React.FC = () => {
   return (
     <SectionContainer
       title="라이비 뉴스"
-      onMorePressed={() => console.log('라이비 뉴스 더보기 클릭')}
+      onMorePressed={() => devLog('라이비 뉴스 더보기 클릭')}
     >
       {/*
         Flutter 원본의 Padding(horizontal: 10)을 적용합니다.
         (Home.tsx에서 그대로 복사)
       */}
-      <div style={{ padding: '0 10px' }}>
+      <div style={{ padding: `0 ${SPACING.SM}` }}>
         <VerticalList>
           {/* (Home.tsx에서 그대로 복사) */}
           {newsItems.map((news) => (
-            <ListItem key={news.id} onTap={() => console.log(`뉴스 ${news.id} 클릭`)}>
+            <ListItem key={news.id} onTap={() => devLog(`뉴스 ${news.id} 클릭`)}>
               <div
                 style={{
                   display: 'flex',

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 // 공통 컴포넌트 임포트
 import SectionContainer from '@/presentation/components/section/SectionContainer';
 import PortraitCard from '@/presentation/components/cards/PortraitCard'; // PortraitCard 재사용
+import { SPACING } from '@/presentation/styles/constants';
 // 스크롤바 숨기기 CSS 임포트
 import '@/presentation/styles/global.css';
 
@@ -44,7 +45,7 @@ const HotClipSection: React.FC = () => {
           overflowY: 'hidden',
           height: 488, // Flutter 원본 높이
           gap: 10, // Flutter 원본(separatorBuilder)
-          padding: '0 10px', // Flutter 원본(padding)
+          padding: `0 ${SPACING.SM}`, // Flutter 원본(padding)
         }}
       >
         {/* 3. PortraitCard 렌더링 */}
@@ -54,7 +55,7 @@ const HotClipSection: React.FC = () => {
             title={item.title}
             content={item.content}
             // imageUrl={item.imageUrl} (테스트용 이미지)
-            onPress={() => console.log(`클립 ${item.id} 클릭`)}
+            onPress={() => devLog(`클립 ${item.id} 클릭`)}
           />
         ))}
       </div>

@@ -9,7 +9,9 @@ import Button from '@/presentation/components/ui/Button';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';
 import DetailContent from '@/presentation/layouts/DetailContent';
+import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { ErrorState } from '@/presentation/components/states/ErrorState';
+import { SPACING } from '@/presentation/styles/constants';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { PortfolioDetail } from '@/domain/entities/Portfolio';
 import { useRepository } from '@/presentation/hooks/useRepository';
@@ -43,7 +45,6 @@ const PortfolioDetailPage: React.FC = () => {
    * 프로필 이미지 클릭 핸들러
    */
   const handleProfileImageClick = () => {
-    console.log('프로필 이미지 클릭');
     // TODO: 이미지 확대 또는 갤러리 열기 기능 구현
   };
 
@@ -51,7 +52,6 @@ const PortfolioDetailPage: React.FC = () => {
    * 갤러리 이미지 클릭 핸들러
    */
   const handleGalleryImageClick = (index: number) => {
-    console.log(`갤러리 이미지 ${index + 1} 클릭`);
     // TODO: 이미지 확대 또는 갤러리 뷰어 열기 기능 구현
   };
 
@@ -60,10 +60,8 @@ const PortfolioDetailPage: React.FC = () => {
    */
   const handleButtonClick = () => {
     if (portfolio?.isReceivingOffers) {
-      console.log('제안하기');
       // TODO: 제안하기 기능 구현
     } else {
-      console.log('문의하기');
       // TODO: 문의하기 기능 구현
     }
   };
@@ -72,9 +70,7 @@ const PortfolioDetailPage: React.FC = () => {
   if (isLoading) {
     return (
       <DetailPageLayout>
-        <div style={{ padding: '16px', textAlign: 'center' }}>
-          <p>로딩 중...</p>
-        </div>
+        <LoadingState padding="16px" />
       </DetailPageLayout>
     );
   }
@@ -114,7 +110,7 @@ const PortfolioDetailPage: React.FC = () => {
       {/* 2. 상세소개 섹션 */}
       {portfolio.detailedIntro && (
         <DetailSection showDivider>
-          <div style={{ paddingBottom: '16px' }}>
+          <div style={{ paddingBottom: SPACING.LG }}>
             <SectionHeader title="상세소개" />
           </div>
           <DetailContent>
@@ -184,7 +180,7 @@ const PortfolioDetailPage: React.FC = () => {
       </div>
 
       {/* 5. 하단 버튼 */}
-      <div style={{ padding: '16px' }}>
+      <div style={{ padding: SPACING.LG }}>
         <Button
           variant="primary"
           size="large"

@@ -5,6 +5,7 @@ import SectionContainer from '@/presentation/components/section/SectionContainer
 import RecruitCard from '@/presentation/components/cards/RecruitCard';
 import Button from '@/presentation/components/ui/Button';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
+import { SPACING } from '@/presentation/styles/constants';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { Campaign } from '@/domain/entities/Campaign';
 import { htmlToText } from '@/shared/utils/htmlUtils';
@@ -64,7 +65,7 @@ const BrandPickSection: React.FC = () => {
           overflowY: 'hidden',
           height: 360, // Flutter 원본 높이
           gap: 10,
-          padding: '0 10px',
+          padding: `0 ${SPACING.SM}`,
         }}
       >
         {/* RecruitCard 렌더링 로직 */}
