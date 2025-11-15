@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { RiImageLine } from 'react-icons/ri';
 
 /**
@@ -8,6 +9,7 @@ interface ImageUploadProps {
   size?: number;
   aspectRatio?: string; // 예: '1:2', '1:1', '3:4'
   onImageSelect?: (file: File) => void;
+  enableCrop?: boolean; // 크롭 기능 활성화 여부 (기본값: true)
 }
 
 /**
@@ -17,7 +19,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   size = 100,
   aspectRatio,
   onImageSelect,
+  enableCrop = true,
 }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleClick = () => {
@@ -26,8 +31,31 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && onImageSelect) {
-      onImageSelect(file);
+    if (!file) return;
+
+    // 크롭 기능이 활성화되어 있으면 크롭 페이지로 이동
+    if (enableCrop) {
+      navigate('/image/crop', {
+        state: {
+          imageFile: file,
+          onCropComplete: (croppedFile: File) => {
+            if (onImageSelect) {
+              onImageSelect(croppedFile);
+            }
+          },
+          returnPath: location.pathname,
+        },
+      });
+    } else {
+      // 크롭 기능이 비활성화되어 있으면 바로 콜백 호출
+      if (onImageSelect) {
+        onImageSelect(file);
+      }
+    }
+
+    // 같은 파일을 다시 선택할 수 있도록 input 값 초기화
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 

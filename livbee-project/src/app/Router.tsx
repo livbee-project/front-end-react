@@ -17,6 +17,7 @@ import MyPage from '@/presentation/pages/mypage/MyPage';
 import ClipsPage from '@/presentation/pages/clip/ClipsPage';
 import MyClipsPage from '@/presentation/pages/clip/MyClipsPage';
 import LoginPage from '@/presentation/pages/auth/LoginPage';
+import ImageCropPage from '@/presentation/pages/image/ImageCropPage';
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -72,6 +73,9 @@ const AppRouter = () => (
           */}
           <Route path="/login" element={<LoginPage />} />
         </Route>
+
+        {/* 이미지 크롭 페이지 - 레이아웃 없이 전체 화면 */}
+        <Route path="/image/crop" element={<ImageCropPage />} />
       </Routes>
     </div>
   </BrowserRouter>
