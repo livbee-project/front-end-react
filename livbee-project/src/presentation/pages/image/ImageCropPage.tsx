@@ -123,8 +123,8 @@ const ImageCropPage: React.FC = () => {
           ? imgAspect 
           : getRatioValue(selectedRatio, displayWidth, displayHeight);
         
-        // 이미지 크기의 90% 또는 컨테이너 크기의 90% 중 작은 값 사용
-        const maxCropWidth = Math.min(displayWidth, containerWidth) * 0.9;
+        // 이미지 크기와 컨테이너 크기 중 작은 값의 거의 전체 사용 (98%)
+        const maxCropWidth = Math.min(displayWidth, containerWidth) * 0.98;
         const maxCropHeight = maxCropWidth / ratio;
         
         // 실제 크롭 영역 크기 결정 (이미지 범위 내에서)
@@ -163,7 +163,7 @@ const ImageCropPage: React.FC = () => {
     if (!container) return;
 
     const containerWidth = container.clientWidth;
-    const maxCropWidth = Math.min(imageSize.width, containerWidth) * 0.9;
+    const maxCropWidth = Math.min(imageSize.width, containerWidth) * 0.98;
     const maxCropHeight = maxCropWidth / ratio;
     const newWidth = Math.min(maxCropWidth, imageSize.width);
     const newHeight = Math.min(maxCropHeight, imageSize.height);
@@ -281,8 +281,9 @@ const ImageCropPage: React.FC = () => {
       
       // 최소/최대 크기 제한
       const minSize = 100;
-      const maxWidth = Math.min(imageSize.width, containerRef.current.clientWidth);
-      const maxHeight = Math.min(imageSize.height, containerRef.current.clientHeight);
+      // 최대 크기는 이미지 크기의 98%까지 허용
+      const maxWidth = Math.min(imageSize.width * 0.98, containerRef.current.clientWidth * 0.98);
+      const maxHeight = Math.min(imageSize.height * 0.98, containerRef.current.clientHeight * 0.98);
       
       newWidth = Math.max(minSize, Math.min(newWidth, maxWidth));
       newHeight = Math.max(minSize, Math.min(newHeight, maxHeight));
