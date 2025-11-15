@@ -57,10 +57,15 @@ const ModelRegisterPage: React.FC = () => {
     tags: [true, true, true, true, true],
   });
 
-  // 이미지 및 파일 URL 상태 관리
+  // 이미지 및 파일 URL 상태 관리 (미리보기용)
   const [mainThumbnailUrl, setMainThumbnailUrl] = useState<string>('');
   const [galleryImageUrls, setGalleryImageUrls] = useState<string[]>([]);
   const [portfolioFileUrl, setPortfolioFileUrl] = useState<string>('');
+
+  // 업로드할 파일 객체 저장 (등록하기 버튼 클릭 시 업로드)
+  const [mainThumbnailFile, setMainThumbnailFile] = useState<File | null>(null);
+  const [galleryImageFiles, setGalleryImageFiles] = useState<File[]>([]);
+  const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -98,58 +103,53 @@ const ModelRegisterPage: React.FC = () => {
   };
 
   /**
-   * 프로필 이미지 업로드 핸들러
+   * 프로필 이미지 선택 핸들러 (크롭 후 파일만 저장, 업로드는 나중에)
    */
-  const handleProfileImageSelect = async (file: File) => {
-    try {
-      const imageUrl = await uploadFile(file, { type: 'image' });
-      if (imageUrl) {
-        setMainThumbnailUrl(imageUrl);
-      }
-    } catch (error) {
-      console.error('프로필 이미지 업로드 실패:', error);
-      showToast('프로필 이미지 업로드에 실패했습니다.', undefined, 'error');
-    }
+  const handleProfileImageSelect = (file: File) => {
+    // 파일 객체 저장
+    setMainThumbnailFile(file);
+    // 미리보기를 위한 Blob URL 생성
+    const blobUrl = URL.createObjectURL(file);
+    setMainThumbnailUrl(blobUrl);
   };
 
   /**
-   * 갤러리 이미지 업로드 핸들러
+   * 갤러리 이미지 선택 핸들러 (크롭 후 파일만 저장, 업로드는 나중에)
    */
-  const handleGalleryImageSelect = async (file: File) => {
-    try {
-      const imageUrl = await uploadFile(file, { type: 'image' });
-      if (imageUrl) {
-        if (galleryImageUrls.length < 5) {
-          setGalleryImageUrls([...galleryImageUrls, imageUrl]);
-        } else {
-          showToast('갤러리 이미지는 최대 5개까지 업로드 가능합니다.', undefined, 'error');
-        }
-      }
-    } catch (error) {
-      console.error('갤러리 이미지 업로드 실패:', error);
-      showToast('갤러리 이미지 업로드에 실패했습니다.', undefined, 'error');
+  const handleGalleryImageSelect = (file: File) => {
+    if (galleryImageFiles.length >= 5) {
+      showToast('갤러리 이미지는 최대 5개까지 업로드 가능합니다.', undefined, 'error');
+      return;
     }
+    
+    // 파일 객체 저장
+    setGalleryImageFiles([...galleryImageFiles, file]);
+    // 미리보기를 위한 Blob URL 생성
+    const blobUrl = URL.createObjectURL(file);
+    setGalleryImageUrls([...galleryImageUrls, blobUrl]);
   };
 
   /**
-   * 포트폴리오 파일 업로드 핸들러
+   * 포트폴리오 파일 선택 핸들러 (파일만 저장, 업로드는 나중에)
    */
-  const handlePortfolioFileSelect = async (file: File) => {
-    try {
-      const fileUrl = await uploadFile(file, { type: 'raw' });
-      if (fileUrl) {
-        setPortfolioFileUrl(fileUrl);
-      }
-    } catch (error) {
-      console.error('포트폴리오 파일 업로드 실패:', error);
-      showToast('포트폴리오 파일 업로드에 실패했습니다.', undefined, 'error');
-    }
+  const handlePortfolioFileSelect = (file: File) => {
+    // 파일 객체 저장
+    setPortfolioFile(file);
+    // 파일명 표시용 (URL은 나중에 업로드 후 설정)
+    setPortfolioFileUrl(file.name);
   };
 
   /**
    * 갤러리 이미지 삭제 핸들러
    */
   const handleGalleryImageRemove = (index: number) => {
+    // Blob URL 정리
+    const urlToRemove = galleryImageUrls[index];
+    if (urlToRemove && urlToRemove.startsWith('blob:')) {
+      URL.revokeObjectURL(urlToRemove);
+    }
+    // 파일 객체와 URL 모두 삭제
+    setGalleryImageFiles(galleryImageFiles.filter((_, i) => i !== index));
     setGalleryImageUrls(galleryImageUrls.filter((_, i) => i !== index));
   };
 
@@ -168,6 +168,44 @@ const ModelRegisterPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
+      // 이미지 파일들을 Cloudinary에 업로드
+      let uploadedMainThumbnailUrl: string | undefined;
+      const uploadedGalleryUrls: string[] = [];
+      let uploadedPortfolioFileUrl: string | undefined;
+
+      // 프로필 이미지 업로드
+      if (mainThumbnailFile) {
+        const url = await uploadFile(mainThumbnailFile, { type: 'image' });
+        if (!url) {
+          showToast('프로필 이미지 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
+          setIsSubmitting(false);
+          return;
+        }
+        uploadedMainThumbnailUrl = url;
+      }
+
+      // 갤러리 이미지 업로드
+      for (const file of galleryImageFiles) {
+        const url = await uploadFile(file, { type: 'image' });
+        if (!url) {
+          showToast('갤러리 이미지 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
+          setIsSubmitting(false);
+          return;
+        }
+        uploadedGalleryUrls.push(url);
+      }
+
+      // 포트폴리오 파일 업로드
+      if (portfolioFile) {
+        const url = await uploadFile(portfolioFile, { type: 'raw' });
+        if (!url) {
+          showToast('포트폴리오 파일 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
+          setIsSubmitting(false);
+          return;
+        }
+        uploadedPortfolioFileUrl = url;
+      }
+
       // 웹사이트 배열을 개별 URL 필드로 매핑
       const websiteUrl = formData.websites[0]?.content?.trim() || undefined;
       const instagramUrl = formData.websites[1]?.content?.trim() || undefined;
@@ -185,12 +223,12 @@ const ModelRegisterPage: React.FC = () => {
         nickname: formData.name.trim() || undefined,
         oneLineIntro: formData.oneLineIntro.trim() || undefined,
         detailedIntro: formData.detailedIntro.trim() || undefined,
-        mainThumbnailUrl: mainThumbnailUrl || undefined,
-        subThumbnailUrls: galleryImageUrls.length > 0 ? galleryImageUrls.slice(0, 5) : undefined,
+        mainThumbnailUrl: uploadedMainThumbnailUrl,
+        subThumbnailUrls: uploadedGalleryUrls.length > 0 ? uploadedGalleryUrls : undefined,
         websiteUrl,
         instagramUrl,
         youtubeUrl,
-        attachedFileUrl: portfolioFileUrl || undefined,
+        attachedFileUrl: uploadedPortfolioFileUrl,
         height,
         weight,
         topSize,
@@ -246,7 +284,14 @@ const ModelRegisterPage: React.FC = () => {
                 }}
               />
               <button
-                onClick={() => setMainThumbnailUrl('')}
+                onClick={() => {
+                  // Blob URL 정리
+                  if (mainThumbnailUrl && mainThumbnailUrl.startsWith('blob:')) {
+                    URL.revokeObjectURL(mainThumbnailUrl);
+                  }
+                  setMainThumbnailFile(null);
+                  setMainThumbnailUrl('');
+                }}
                 style={{
                   position: 'absolute',
                   top: -8,

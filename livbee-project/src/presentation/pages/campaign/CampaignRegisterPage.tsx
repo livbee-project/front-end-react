@@ -41,10 +41,15 @@ const CampaignRegisterPage: React.FC = () => {
     productName: '',
   });
 
-  // 이미지 URL 상태 관리
+  // 이미지 URL 상태 관리 (미리보기용)
   const [coverImageUrl, setCoverImageUrl] = useState<string>('');
   const [productImageUrl, setProductImageUrl] = useState<string>('');
   const [liveCoverImageUrl, setLiveCoverImageUrl] = useState<string>('');
+
+  // 업로드할 파일 객체 저장 (등록하기 버튼 클릭 시 업로드)
+  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
+  const [productImageFile, setProductImageFile] = useState<File | null>(null);
+  const [liveCoverImageFile, setLiveCoverImageFile] = useState<File | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -92,25 +97,25 @@ const CampaignRegisterPage: React.FC = () => {
   };
 
   /**
-   * 이미지 업로드 핸들러
+   * 이미지 선택 핸들러 (크롭 후 파일만 저장, 업로드는 나중에)
    */
-  const handleImageSelect = async (
+  const handleImageSelect = (
     file: File,
     type: 'cover' | 'product' | 'liveCover'
   ) => {
-    try {
-      const imageUrl = await uploadFile(file, { type: 'image' });
-      if (imageUrl) {
-        if (type === 'cover') {
-          setCoverImageUrl(imageUrl);
-        } else if (type === 'product') {
-          setProductImageUrl(imageUrl);
-        } else if (type === 'liveCover') {
-          setLiveCoverImageUrl(imageUrl);
-        }
-      }
-    } catch (error) {
-      console.error('이미지 업로드 실패:', error);
+    // 파일 객체 저장
+    if (type === 'cover') {
+      setCoverImageFile(file);
+      const blobUrl = URL.createObjectURL(file);
+      setCoverImageUrl(blobUrl);
+    } else if (type === 'product') {
+      setProductImageFile(file);
+      const blobUrl = URL.createObjectURL(file);
+      setProductImageUrl(blobUrl);
+    } else if (type === 'liveCover') {
+      setLiveCoverImageFile(file);
+      const blobUrl = URL.createObjectURL(file);
+      setLiveCoverImageUrl(blobUrl);
     }
   };
 
@@ -157,6 +162,44 @@ const CampaignRegisterPage: React.FC = () => {
         }
       }
 
+      // 이미지 파일들을 Cloudinary에 업로드
+      let uploadedCoverImageUrl: string | undefined;
+      let uploadedProductImageUrl: string | undefined;
+      let uploadedLiveCoverImageUrl: string | undefined;
+
+      // 커버 이미지 업로드
+      if (coverImageFile) {
+        const url = await uploadFile(coverImageFile, { type: 'image' });
+        if (!url) {
+          showToast('커버 이미지 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
+          setIsSubmitting(false);
+          return;
+        }
+        uploadedCoverImageUrl = url;
+      }
+
+      // 상품 이미지 업로드
+      if (productImageFile) {
+        const url = await uploadFile(productImageFile, { type: 'image' });
+        if (!url) {
+          showToast('상품 이미지 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
+          setIsSubmitting(false);
+          return;
+        }
+        uploadedProductImageUrl = url;
+      }
+
+      // 라이브 커버 이미지 업로드
+      if (liveCoverImageFile) {
+        const url = await uploadFile(liveCoverImageFile, { type: 'image' });
+        if (!url) {
+          showToast('라이브 커버 이미지 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
+          setIsSubmitting(false);
+          return;
+        }
+        uploadedLiveCoverImageUrl = url;
+      }
+
       // 요청 데이터 구성
       const request: CreateCampaignRequest = {
         brandName: formData.brandName.trim(),
@@ -172,9 +215,9 @@ const CampaignRegisterPage: React.FC = () => {
         detailedContent: formData.detailedContent.trim() || undefined, // 별도 필드로 전송
         location: formData.location.trim() || undefined,
         productName: formData.productName.trim() || undefined,
-        coverImageUrl: coverImageUrl || undefined,
-        productThumbnailUrl: productImageUrl || undefined,
-        liveVerticalCoverUrl: liveCoverImageUrl || undefined,
+        coverImageUrl: uploadedCoverImageUrl,
+        productThumbnailUrl: uploadedProductImageUrl,
+        liveVerticalCoverUrl: uploadedLiveCoverImageUrl,
         isPublic: true,
       };
 

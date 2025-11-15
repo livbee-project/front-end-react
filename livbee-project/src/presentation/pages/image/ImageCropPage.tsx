@@ -486,7 +486,19 @@ const ImageCropPage: React.FC = () => {
       // 전역 콜백 호출
       if (callbackKey && window.__imageCropCallbacks?.[callbackKey]) {
         const callback = window.__imageCropCallbacks[callbackKey];
-        callback(croppedFile);
+        
+        // 콜백이 비동기 함수일 수 있으므로 await 처리
+        try {
+          const result = callback(croppedFile);
+          // Promise인 경우 완료될 때까지 대기
+          if (result instanceof Promise) {
+            await result;
+          }
+        } catch (callbackError) {
+          console.error('이미지 업로드 콜백 실패:', callbackError);
+          // 콜백 실패해도 페이지는 이동 (사용자가 다시 시도할 수 있도록)
+        }
+        
         // 콜백 호출 후 정리
         delete window.__imageCropCallbacks[callbackKey];
       }

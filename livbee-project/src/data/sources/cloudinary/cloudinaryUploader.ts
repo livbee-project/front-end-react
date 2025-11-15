@@ -25,9 +25,14 @@ export class CloudinaryUploader {
    */
   private async getUploadSignature(type: UploadType = 'image'): Promise<UploadSignatureResponse> {
     const token = getToken();
+    
+    if (!token) {
+      throw new Error('인증 토큰이 없습니다. 로그인이 필요합니다.');
+    }
+    
     const url = buildApiUrl('/uploads/signature', { type });
 
-    const headers = getAuthHeaders(token || undefined);
+    const headers = getAuthHeaders(token);
 
     const response = await fetch(url, {
       method: 'GET',
@@ -35,7 +40,11 @@ export class CloudinaryUploader {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to get upload signature: ${response.status} ${response.statusText}`);
+      if (response.status === 401) {
+        throw new Error('인증에 실패했습니다. 로그인을 다시 해주세요.');
+      }
+      const errorText = await response.text().catch(() => '');
+      throw new Error(`Failed to get upload signature: ${response.status} ${response.statusText}${errorText ? ` - ${errorText}` : ''}`);
     }
 
     const data: UploadSignatureResponse = await response.json();
