@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { SPACING } from '@/presentation/styles/constants';
 
@@ -92,90 +92,108 @@ const ImageCropPage: React.FC = () => {
     return w / h;
   };
 
+  /**
+   * 이미지 크기 및 크롭 영역 업데이트 함수
+   */
+  const updateImageSizeAndCropArea = useCallback(() => {
+    if (!imageSrc || !imageRef.current || !containerRef.current) return;
+    
+    const img = imageRef.current;
+    const container = containerRef.current;
+
+    if (!img.complete) return;
+
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    const imgAspect = img.naturalWidth / img.naturalHeight;
+    const containerAspect = containerWidth / containerHeight;
+
+    // 이미지 비율 유지하면서 컨테이너에 맞춤
+    let displayWidth: number;
+    let displayHeight: number;
+
+    if (imgAspect > containerAspect) {
+      // 이미지가 더 넓음 - 높이를 컨테이너에 맞춤
+      displayHeight = containerHeight;
+      displayWidth = displayHeight * imgAspect;
+    } else {
+      // 이미지가 더 높음 - 너비를 컨테이너에 맞춤
+      displayWidth = containerWidth;
+      displayHeight = displayWidth / imgAspect;
+    }
+
+    setImageSize({ width: displayWidth, height: displayHeight });
+
+    // 초기 크롭 영역 설정 (최대 크기, 중앙에 위치)
+    const ratio = selectedRatio === 'original' 
+      ? imgAspect 
+      : getRatioValue(selectedRatio, displayWidth, displayHeight);
+    
+    // 최대 크기: 이미지의 너비 또는 높이 중 하나가 먼저 같아질 때까지
+    let maxCropWidth: number;
+    let maxCropHeight: number;
+    
+    if (ratio > displayWidth / displayHeight) {
+      // 크롭 비율이 이미지보다 더 넓음 - 너비를 기준
+      maxCropWidth = displayWidth;
+      maxCropHeight = maxCropWidth / ratio;
+    } else {
+      // 크롭 비율이 이미지보다 더 높음 - 높이를 기준
+      maxCropHeight = displayHeight;
+      maxCropWidth = maxCropHeight * ratio;
+    }
+    
+    // 실제 크롭 영역 크기 결정
+    const cropWidth = maxCropWidth;
+    const cropHeight = maxCropHeight;
+    
+    // 정확히 중앙에 위치하도록 계산
+    const x = (displayWidth - cropWidth) / 2;
+    const y = (displayHeight - cropHeight) / 2;
+
+    setCropArea({
+      x: Math.max(0, x),
+      y: Math.max(0, y),
+      width: cropWidth,
+      height: cropHeight,
+    });
+  }, [imageSrc, selectedRatio]);
+
   // 이미지 로드 후 초기 크롭 영역 설정
   useEffect(() => {
     if (imageSrc && imageRef.current) {
       const img = imageRef.current;
-      const updateImageSize = () => {
-        const container = containerRef.current;
-        if (!img || !container) return;
-
-        const containerWidth = container.clientWidth;
-        const containerHeight = container.clientHeight;
-        const imgAspect = img.naturalWidth / img.naturalHeight;
-        const containerAspect = containerWidth / containerHeight;
-
-        // 이미지 비율 유지하면서 컨테이너에 맞춤
-        let displayWidth: number;
-        let displayHeight: number;
-
-        if (imgAspect > containerAspect) {
-          // 이미지가 더 넓음 - 높이를 컨테이너에 맞춤
-          displayHeight = containerHeight;
-          displayWidth = displayHeight * imgAspect;
-        } else {
-          // 이미지가 더 높음 - 너비를 컨테이너에 맞춤
-          displayWidth = containerWidth;
-          displayHeight = displayWidth / imgAspect;
-        }
-
-        setImageSize({ width: displayWidth, height: displayHeight });
-
-        // 초기 크롭 영역 설정 (최대 크기, 중앙에 위치)
-        const ratio = selectedRatio === 'original' 
-          ? imgAspect 
-          : getRatioValue(selectedRatio, displayWidth, displayHeight);
-        
-        // 최대 크기: 이미지의 너비 또는 높이 중 하나가 먼저 같아질 때까지
-        let maxCropWidth: number;
-        let maxCropHeight: number;
-        
-        if (ratio > displayWidth / displayHeight) {
-          // 크롭 비율이 이미지보다 더 넓음 - 너비를 기준
-          maxCropWidth = displayWidth;
-          maxCropHeight = maxCropWidth / ratio;
-        } else {
-          // 크롭 비율이 이미지보다 더 높음 - 높이를 기준
-          maxCropHeight = displayHeight;
-          maxCropWidth = maxCropHeight * ratio;
-        }
-        
-        // 실제 크롭 영역 크기 결정
-        const cropWidth = maxCropWidth;
-        const cropHeight = maxCropHeight;
-        
-        // 정확히 중앙에 위치하도록 계산
-        const x = (displayWidth - cropWidth) / 2;
-        const y = (displayHeight - cropHeight) / 2;
-
-        setCropArea({
-          x: Math.max(0, x),
-          y: Math.max(0, y),
-          width: cropWidth,
-          height: cropHeight,
-        });
-      };
-
+      
       if (img.complete) {
-        updateImageSize();
+        updateImageSizeAndCropArea();
       } else {
-        img.onload = updateImageSize;
+        img.onload = updateImageSizeAndCropArea;
       }
     }
-  }, [imageSrc, selectedRatio]);
+  }, [imageSrc, selectedRatio, updateImageSizeAndCropArea]);
 
-  // 비율 변경 시 크롭 영역 업데이트
+  // 윈도우 리사이즈 이벤트 처리 (반응형)
+  useEffect(() => {
+    const handleResize = () => {
+      updateImageSizeAndCropArea();
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [updateImageSizeAndCropArea]);
+
+  // 비율 변경 시 크롭 영역 업데이트 (중심점 유지)
   useEffect(() => {
     if (imageSize.width === 0 || imageSize.height === 0) return;
+    if (!imageRef.current) return;
 
+    const img = imageRef.current;
+    const imgAspect = img.naturalWidth / img.naturalHeight;
     const ratio = selectedRatio === 'original' 
-      ? imageSize.width / imageSize.height 
+      ? imgAspect 
       : getRatioValue(selectedRatio, imageSize.width, imageSize.height);
-    
-    const container = containerRef.current;
-    if (!container) return;
-
-    const containerWidth = container.clientWidth;
     
     // 최대 크기: 이미지의 너비 또는 높이 중 하나가 먼저 같아질 때까지
     let maxCropWidth: number;
