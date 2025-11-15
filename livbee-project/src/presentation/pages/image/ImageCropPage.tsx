@@ -184,7 +184,6 @@ const ImageCropPage: React.FC = () => {
    */
   const handleDragStart = (clientX: number, clientY: number) => {
     if (!containerRef.current || !imageRef.current) return;
-    const containerRect = containerRef.current.getBoundingClientRect();
     const imageRect = imageRef.current.getBoundingClientRect();
     
     // 이미지 기준 좌표 계산
