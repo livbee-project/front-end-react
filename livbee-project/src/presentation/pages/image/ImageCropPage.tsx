@@ -109,6 +109,7 @@ const ImageCropPage: React.FC = () => {
     const containerAspect = containerWidth / containerHeight;
 
     // 이미지 비율 유지하면서 컨테이너에 맞춤
+    // 실제 렌더링된 이미지 크기를 계산
     let displayWidth: number;
     let displayHeight: number;
 
@@ -122,24 +123,33 @@ const ImageCropPage: React.FC = () => {
       displayHeight = displayWidth / imgAspect;
     }
 
-    setImageSize({ width: displayWidth, height: displayHeight });
+    // 실제 렌더링된 이미지 크기 확인 (getBoundingClientRect 사용)
+    const imgRect = img.getBoundingClientRect();
+    const actualDisplayWidth = imgRect.width;
+    const actualDisplayHeight = imgRect.height;
+
+    // 실제 렌더링된 크기를 사용 (objectFit: contain 때문에 실제 크기가 다를 수 있음)
+    const finalDisplayWidth = actualDisplayWidth > 0 ? actualDisplayWidth : displayWidth;
+    const finalDisplayHeight = actualDisplayHeight > 0 ? actualDisplayHeight : displayHeight;
+
+    setImageSize({ width: finalDisplayWidth, height: finalDisplayHeight });
 
     // 초기 크롭 영역 설정 (최대 크기, 중앙에 위치)
     const ratio = selectedRatio === 'original' 
       ? imgAspect 
-      : getRatioValue(selectedRatio, displayWidth, displayHeight);
+      : getRatioValue(selectedRatio, finalDisplayWidth, finalDisplayHeight);
     
-    // 최대 크기: 이미지의 너비 또는 높이 중 하나가 먼저 같아질 때까지
+    // 최대 크기: 실제 표시된 이미지의 너비 또는 높이 중 하나가 먼저 같아질 때까지
     let maxCropWidth: number;
     let maxCropHeight: number;
     
-    if (ratio > displayWidth / displayHeight) {
+    if (ratio > finalDisplayWidth / finalDisplayHeight) {
       // 크롭 비율이 이미지보다 더 넓음 - 너비를 기준
-      maxCropWidth = displayWidth;
+      maxCropWidth = finalDisplayWidth;
       maxCropHeight = maxCropWidth / ratio;
     } else {
       // 크롭 비율이 이미지보다 더 높음 - 높이를 기준
-      maxCropHeight = displayHeight;
+      maxCropHeight = finalDisplayHeight;
       maxCropWidth = maxCropHeight * ratio;
     }
     
@@ -147,9 +157,9 @@ const ImageCropPage: React.FC = () => {
     const cropWidth = maxCropWidth;
     const cropHeight = maxCropHeight;
     
-    // 정확히 중앙에 위치하도록 계산
-    const x = (displayWidth - cropWidth) / 2;
-    const y = (displayHeight - cropHeight) / 2;
+    // 정확히 중앙에 위치하도록 계산 (실제 표시된 이미지 기준)
+    const x = (finalDisplayWidth - cropWidth) / 2;
+    const y = (finalDisplayHeight - cropHeight) / 2;
 
     setCropArea({
       x: Math.max(0, x),
@@ -563,8 +573,8 @@ const ImageCropPage: React.FC = () => {
         <div
           style={{
             position: 'relative',
-            width: imageSize.width > 0 ? `${imageSize.width}px` : 'auto',
-            height: imageSize.height > 0 ? `${imageSize.height}px` : 'auto',
+            width: '100%',
+            height: '100%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -575,8 +585,8 @@ const ImageCropPage: React.FC = () => {
             src={imageSrc}
             alt="크롭할 이미지"
             style={{
-              width: imageSize.width > 0 ? `${imageSize.width}px` : 'auto',
-              height: imageSize.height > 0 ? `${imageSize.height}px` : 'auto',
+              width: '100%',
+              height: '100%',
               maxWidth: '100%',
               maxHeight: '100%',
               userSelect: 'none',
