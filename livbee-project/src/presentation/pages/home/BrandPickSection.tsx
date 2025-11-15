@@ -139,7 +139,7 @@ const BrandPickSection: React.FC = () => {
               topContent={
                 <div
                   style={{
-                    width: 300,
+                    width: 240,
                     height: 150, // Flutter 원본 높이
                     border: '1px solid var(--dark-gray)',
                     borderRadius: 10,
