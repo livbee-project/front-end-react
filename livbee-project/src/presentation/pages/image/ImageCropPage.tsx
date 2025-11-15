@@ -103,53 +103,55 @@ const ImageCropPage: React.FC = () => {
 
     if (!img.complete) return;
 
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
-    const imgAspect = img.naturalWidth / img.naturalHeight;
-    const containerAspect = containerWidth / containerHeight;
-
-    // 이미지 비율 유지하면서 컨테이너에 맞춤
-    // 실제 렌더링된 이미지 크기를 계산
-    let displayWidth: number;
-    let displayHeight: number;
-
-    if (imgAspect > containerAspect) {
-      // 이미지가 더 넓음 - 높이를 컨테이너에 맞춤
-      displayHeight = containerHeight;
-      displayWidth = displayHeight * imgAspect;
-    } else {
-      // 이미지가 더 높음 - 너비를 컨테이너에 맞춤
-      displayWidth = containerWidth;
-      displayHeight = displayWidth / imgAspect;
-    }
-
     // 실제 렌더링된 이미지 크기 확인 (getBoundingClientRect 사용)
+    // 이 값이 실제 이미지가 표시되는 크기입니다 (검은 여백 제외)
     const imgRect = img.getBoundingClientRect();
     const actualDisplayWidth = imgRect.width;
     const actualDisplayHeight = imgRect.height;
 
-    // 실제 렌더링된 크기를 사용 (objectFit: contain 때문에 실제 크기가 다를 수 있음)
-    const finalDisplayWidth = actualDisplayWidth > 0 ? actualDisplayWidth : displayWidth;
-    const finalDisplayHeight = actualDisplayHeight > 0 ? actualDisplayHeight : displayHeight;
+    // 이미지가 아직 렌더링되지 않았으면 계산
+    if (actualDisplayWidth === 0 || actualDisplayHeight === 0) {
+      const containerWidth = container.clientWidth;
+      const containerHeight = container.clientHeight;
+      const imgAspect = img.naturalWidth / img.naturalHeight;
+      const containerAspect = containerWidth / containerHeight;
 
-    setImageSize({ width: finalDisplayWidth, height: finalDisplayHeight });
+      let displayWidth: number;
+      let displayHeight: number;
 
+      if (imgAspect > containerAspect) {
+        displayHeight = containerHeight;
+        displayWidth = displayHeight * imgAspect;
+      } else {
+        displayWidth = containerWidth;
+        displayHeight = displayWidth / imgAspect;
+      }
+
+      setImageSize({ width: displayWidth, height: displayHeight });
+      return; // 다음 프레임에서 다시 시도
+    }
+
+    // 실제 렌더링된 이미지 크기를 사용 (검은 여백 제외)
+    setImageSize({ width: actualDisplayWidth, height: actualDisplayHeight });
+
+    const imgAspect = img.naturalWidth / img.naturalHeight;
+    
     // 초기 크롭 영역 설정 (최대 크기, 중앙에 위치)
     const ratio = selectedRatio === 'original' 
       ? imgAspect 
-      : getRatioValue(selectedRatio, finalDisplayWidth, finalDisplayHeight);
+      : getRatioValue(selectedRatio, actualDisplayWidth, actualDisplayHeight);
     
     // 최대 크기: 실제 표시된 이미지의 너비 또는 높이 중 하나가 먼저 같아질 때까지
     let maxCropWidth: number;
     let maxCropHeight: number;
     
-    if (ratio > finalDisplayWidth / finalDisplayHeight) {
+    if (ratio > actualDisplayWidth / actualDisplayHeight) {
       // 크롭 비율이 이미지보다 더 넓음 - 너비를 기준
-      maxCropWidth = finalDisplayWidth;
+      maxCropWidth = actualDisplayWidth;
       maxCropHeight = maxCropWidth / ratio;
     } else {
       // 크롭 비율이 이미지보다 더 높음 - 높이를 기준
-      maxCropHeight = finalDisplayHeight;
+      maxCropHeight = actualDisplayHeight;
       maxCropWidth = maxCropHeight * ratio;
     }
     
@@ -157,9 +159,9 @@ const ImageCropPage: React.FC = () => {
     const cropWidth = maxCropWidth;
     const cropHeight = maxCropHeight;
     
-    // 정확히 중앙에 위치하도록 계산 (실제 표시된 이미지 기준)
-    const x = (finalDisplayWidth - cropWidth) / 2;
-    const y = (finalDisplayHeight - cropHeight) / 2;
+    // 정확히 중앙에 위치하도록 계산 (실제 표시된 이미지 기준, 검은 여백 제외)
+    const x = (actualDisplayWidth - cropWidth) / 2;
+    const y = (actualDisplayHeight - cropHeight) / 2;
 
     setCropArea({
       x: Math.max(0, x),
@@ -174,10 +176,20 @@ const ImageCropPage: React.FC = () => {
     if (imageSrc && imageRef.current) {
       const img = imageRef.current;
       
+      const updateAfterLoad = () => {
+        // 이미지가 완전히 렌더링된 후 약간의 지연을 두고 업데이트
+        // requestAnimationFrame을 사용하여 레이아웃이 완료된 후 실행
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            updateImageSizeAndCropArea();
+          });
+        });
+      };
+      
       if (img.complete) {
-        updateImageSizeAndCropArea();
+        updateAfterLoad();
       } else {
-        img.onload = updateImageSizeAndCropArea;
+        img.onload = updateAfterLoad;
       }
     }
   }, [imageSrc, selectedRatio, updateImageSizeAndCropArea]);
@@ -573,11 +585,12 @@ const ImageCropPage: React.FC = () => {
         <div
           style={{
             position: 'relative',
-            width: '100%',
-            height: '100%',
+            width: imageSize.width > 0 ? `${imageSize.width}px` : 'auto',
+            height: imageSize.height > 0 ? `${imageSize.height}px` : 'auto',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            margin: 'auto', // 중앙 정렬
           }}
         >
           <img
@@ -585,8 +598,8 @@ const ImageCropPage: React.FC = () => {
             src={imageSrc}
             alt="크롭할 이미지"
             style={{
-              width: '100%',
-              height: '100%',
+              width: imageSize.width > 0 ? `${imageSize.width}px` : 'auto',
+              height: imageSize.height > 0 ? `${imageSize.height}px` : 'auto',
               maxWidth: '100%',
               maxHeight: '100%',
               userSelect: 'none',
