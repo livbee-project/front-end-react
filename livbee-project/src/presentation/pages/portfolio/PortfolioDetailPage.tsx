@@ -51,7 +51,7 @@ const PortfolioDetailPage: React.FC = () => {
   /**
    * 갤러리 이미지 클릭 핸들러
    */
-  const handleGalleryImageClick = (index: number) => {
+  const handleGalleryImageClick = (_index: number) => {
     // TODO: 이미지 확대 또는 갤러리 뷰어 열기 기능 구현
   };
 

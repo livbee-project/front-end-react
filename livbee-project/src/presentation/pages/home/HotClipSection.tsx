@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import SectionContainer from '@/presentation/components/section/SectionContainer';
 import PortraitCard from '@/presentation/components/cards/PortraitCard'; // PortraitCard 재사용
 import { SPACING } from '@/presentation/styles/constants';
+import { devLog } from '@/shared/utils/logger';
 // 스크롤바 숨기기 CSS 임포트
 import '@/presentation/styles/global.css';
 
