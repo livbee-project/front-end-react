@@ -491,8 +491,8 @@ const ImageCropPage: React.FC = () => {
         try {
           const result = callback(croppedFile);
           // Promise인 경우 완료될 때까지 대기
-          if (result instanceof Promise) {
-            await result;
+          if (result && typeof (result as any).then === 'function') {
+            await (result as Promise<any>);
           }
         } catch (callbackError) {
           console.error('이미지 업로드 콜백 실패:', callbackError);
