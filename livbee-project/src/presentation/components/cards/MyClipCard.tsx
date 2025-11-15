@@ -49,7 +49,7 @@ const MyClipCard: React.FC<MyClipCardProps> = ({
     aspectRatio: '16 / 9', // 일반적인 비디오 비율
     backgroundColor: '#f0f0f0',
     borderRadius: BORDER_RADIUS.MD,
-    border: `1px solid ${TEXT_COLOR.DARK_GRAY}`,
+    border: imageUrl ? 'none' : `1px solid ${TEXT_COLOR.DARK_GRAY}`,
     backgroundImage: imageUrl ? `url(${imageUrl})` : 'none',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
@@ -80,7 +80,7 @@ const MyClipCard: React.FC<MyClipCardProps> = ({
     flexShrink: 0,
     borderRadius: BORDER_RADIUS.CIRCLE,
     backgroundColor: '#f0f0f0',
-    border: `1px solid ${TEXT_COLOR.DARK_GRAY}`,
+    border: profileImageUrl ? 'none' : `1px solid ${TEXT_COLOR.DARK_GRAY}`,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',

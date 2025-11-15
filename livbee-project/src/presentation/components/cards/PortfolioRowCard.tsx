@@ -79,7 +79,7 @@ const PortfolioRowCard: React.FC<PortfolioRowCardProps> = ({
     height: 100,
     flexShrink: 0,
     borderRadius: BORDER_RADIUS.CIRCLE,
-    border: `1px solid ${TEXT_COLOR.DARK_GRAY}`,
+    border: imageUrl ? 'none' : `1px solid ${TEXT_COLOR.DARK_GRAY}`,
     // 이미지 URL이 있으면 배경 이미지로, 없으면 회색 배경
     backgroundColor: imageUrl ? 'transparent' : 'var(--bs-gray-200)',
     backgroundImage: imageUrl ? `url(${imageUrl})` : 'none',

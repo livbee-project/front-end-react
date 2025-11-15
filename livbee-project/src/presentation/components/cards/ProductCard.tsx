@@ -45,7 +45,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     height: '60px',
     flexShrink: 0,
     backgroundColor: '#F7F8FA',
-    border: '1px solid #ECEFF1',
+    border: imageUrl ? 'none' : '1px solid #ECEFF1',
     borderRadius: '4px',
     display: 'flex',
     justifyContent: 'center',

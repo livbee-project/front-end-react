@@ -139,7 +139,7 @@ const ShoppingLiveSection: React.FC = () => {
                   style={{
                     width: 240,
                     height: 400,
-                    border: '1px solid var(--dark-gray)',
+                    border: imageUrl ? 'none' : '1px solid var(--dark-gray)',
                     borderRadius: 10,
                     position: 'relative',
                     backgroundColor: '#f0f0f0',

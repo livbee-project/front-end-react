@@ -49,7 +49,7 @@ const PortraitCard: React.FC<PortraitCardProps> = ({
     aspectRatio: isDefaultWidth ? undefined : '3/4', // 비율 유지 (3:4) - 반응형일 때만 적용
     backgroundColor: '#f0f0f0',
     borderRadius: BORDER_RADIUS.MD,
-    border: `1px solid ${TEXT_COLOR.DARK_GRAY}`,
+    border: imageUrl ? 'none' : `1px solid ${TEXT_COLOR.DARK_GRAY}`,
 
     // 이미지 처리
     backgroundImage: imageUrl ? `url(${imageUrl})` : 'none',

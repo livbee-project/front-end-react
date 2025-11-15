@@ -141,7 +141,7 @@ const BrandPickSection: React.FC = () => {
                   style={{
                     width: 240,
                     height: 150, // Flutter 원본 높이
-                    border: '1px solid var(--dark-gray)',
+                    border: imageUrl ? 'none' : '1px solid var(--dark-gray)',
                     borderRadius: 10,
                     position: 'relative',
                     backgroundColor: '#f0f0f0',
