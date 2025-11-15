@@ -71,7 +71,7 @@ const TopTabBar: React.FC = () => {
     const tabButtonStyle: React.CSSProperties = {
         background: 'none',
         border: 'none',
-        padding: '40px 20px',
+        padding: '20px 20px',
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
