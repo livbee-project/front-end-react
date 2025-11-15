@@ -2,7 +2,6 @@ import React from 'react';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { ErrorState } from '@/presentation/components/states/ErrorState';
-import Button from '@/presentation/components/ui/Button';
 
 interface DetailPageWrapperProps {
   loading: boolean;

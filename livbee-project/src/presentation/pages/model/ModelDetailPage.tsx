@@ -9,7 +9,6 @@ import Button from '@/presentation/components/ui/Button';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';
 import DetailContent from '@/presentation/layouts/DetailContent';
-import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { ErrorState } from '@/presentation/components/states/ErrorState';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
 import type { ModelDetail } from '@/domain/entities/Model';

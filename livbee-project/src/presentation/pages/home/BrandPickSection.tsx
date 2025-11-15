@@ -23,12 +23,12 @@ const BrandPickSection: React.FC = () => {
   const campaignRepository = useRepository(CampaignRepository);
 
   // 목록 데이터 조회
-  const { data: campaigns, loading: isLoading } = useListData<Campaign, { page: number; limit: number; sort?: string }, { items: Campaign[] }>(
+  const { data: campaigns, loading: isLoading } = useListData<Campaign, { page: number; limit: number; sort?: 'latest' | 'deadline' }, { items: Campaign[] }>(
     (query, signal) => campaignRepository.getCampaignList(query, signal),
     {
       page: 1,
       limit: 10, // 홈 페이지에서는 최대 10개만 표시
-      sort: 'latest',
+      sort: 'latest' as const,
     },
     [],
     '브랜드 픽 목록을 불러오는 중 오류가 발생했습니다.'

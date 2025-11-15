@@ -4,7 +4,6 @@ import PortraitCard from '@/presentation/components/cards/PortraitCard';
 import ListPageLayout from '@/presentation/layouts/ListPageLayout';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { ErrorState } from '@/presentation/components/states/ErrorState';
-import { EmptyState } from '@/presentation/components/states/EmptyState';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
 import type { Model } from '@/domain/entities/Model';
 import { useRepository } from '@/presentation/hooks/useRepository';
@@ -12,7 +11,7 @@ import { useListData } from '@/presentation/hooks/useListData';
 
 const ModelsPage: React.FC = () => {
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPage] = useState<number>(1);
 
   // modelRepository를 useRepository 훅으로 관리
   const modelRepository = useRepository(ModelRepository);

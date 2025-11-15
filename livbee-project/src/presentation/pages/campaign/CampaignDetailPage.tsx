@@ -7,7 +7,6 @@ import ProductCard from '@/presentation/components/cards/ProductCard';
 import Button from '@/presentation/components/ui/Button';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';
-import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { ErrorState } from '@/presentation/components/states/ErrorState';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { CampaignDetail } from '@/domain/entities/Campaign';

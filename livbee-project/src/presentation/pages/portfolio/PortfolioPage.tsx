@@ -4,6 +4,8 @@ import PortfolioRowCard from '@/presentation/components/cards/PortfolioRowCard';
 import VerticalList from '@/presentation/components/list/VerticalList';
 import ListItem from '@/presentation/components/list/ListItem';
 import ListPageLayout from '@/presentation/layouts/ListPageLayout';
+import { LoadingState } from '@/presentation/components/states/LoadingState';
+import { ErrorState } from '@/presentation/components/states/ErrorState';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { Portfolio } from '@/domain/entities/Portfolio';
 import { useRepository } from '@/presentation/hooks/useRepository';
@@ -11,7 +13,7 @@ import { useListData } from '@/presentation/hooks/useListData';
 
 const PortfolioPage: React.FC = () => {
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPage] = useState<number>(1);
 
   // portfolioRepository를 useRepository 훅으로 관리
   const portfolioRepository = useRepository(PortfolioRepository);
