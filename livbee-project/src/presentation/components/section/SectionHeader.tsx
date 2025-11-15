@@ -15,6 +15,49 @@ interface SectionHeaderProps {
  * 제목과 '더보기' 버튼을 표시합니다.
  */
 const SectionHeader: React.FC<SectionHeaderProps> = ({ title, onMorePressed }) => {
+  /**
+   * 제목에서 강조할 부분을 찾아서 분리하는 함수
+   */
+  const renderTitleWithHighlight = () => {
+    // 강조할 키워드와 제목 매핑
+    const highlightMap: { [key: string]: string } = {
+      '지금 뜨는 쇼핑라이브': '쇼핑라이브',
+      '브랜드 PICK': 'PICK',
+      '라이비 뉴스': '뉴스',
+      '이런 쇼호스트는 어떠세요?': '쇼호스트는 어떠세요?',
+      '컨셉에 맞는 모델 찾기': '모델 찾기',
+      'HOT CLIP': 'CLIP',
+    };
+
+    const highlightText = highlightMap[title];
+    
+    if (!highlightText) {
+      // 강조할 부분이 없으면 그대로 반환
+      return <span>{title}</span>;
+    }
+
+    // 강조할 부분의 시작 인덱스 찾기
+    const highlightIndex = title.indexOf(highlightText);
+    
+    if (highlightIndex === -1) {
+      // 찾지 못하면 그대로 반환
+      return <span>{title}</span>;
+    }
+
+    // 제목을 세 부분으로 나눔: 앞부분, 강조부분, 뒷부분
+    const beforeText = title.substring(0, highlightIndex);
+    const highlightPart = title.substring(highlightIndex, highlightIndex + highlightText.length);
+    const afterText = title.substring(highlightIndex + highlightText.length);
+
+    return (
+      <>
+        {beforeText && <span>{beforeText}</span>}
+        <span style={{ color: 'var(--primary)' }}>{highlightPart}</span>
+        {afterText && <span>{afterText}</span>}
+      </>
+    );
+  };
+
   return (
     <div
       style={{
@@ -34,7 +77,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ title, onMorePressed }) =
           color: 'var(--black)',
         }}
       >
-        {title}
+        {renderTitleWithHighlight()}
       </span>
       {onMorePressed && (
         <span
