@@ -183,10 +183,13 @@ const ImageCropPage: React.FC = () => {
    * 마우스/터치 드래그 시작
    */
   const handleDragStart = (clientX: number, clientY: number) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    if (!containerRef.current || !imageRef.current) return;
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const imageRect = imageRef.current.getBoundingClientRect();
+    
+    // 이미지 기준 좌표 계산
+    const x = clientX - imageRect.left;
+    const y = clientY - imageRect.top;
 
     // 크롭 영역 내부인지 확인
     if (
@@ -204,10 +207,10 @@ const ImageCropPage: React.FC = () => {
    * 마우스/터치 드래그 중
    */
   const handleDragMove = (clientX: number, clientY: number) => {
-    if (!isDragging || !containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = clientX - rect.left - dragStart.x;
-    const y = clientY - rect.top - dragStart.y;
+    if (!isDragging || !containerRef.current || !imageRef.current) return;
+    const imageRect = imageRef.current.getBoundingClientRect();
+    const x = clientX - imageRect.left - dragStart.x;
+    const y = clientY - imageRect.top - dragStart.y;
 
     // 이미지 범위 내에서만 이동
     const maxX = imageSize.width - cropArea.width;
@@ -397,77 +400,95 @@ const ImageCropPage: React.FC = () => {
         onTouchMove={(e) => handleDragMove(e.touches[0].clientX, e.touches[0].clientY)}
         onTouchEnd={handleDragEnd}
       >
-        <img
-          ref={imageRef}
-          src={imageSrc}
-          alt="크롭할 이미지"
-          style={{
-            maxWidth: '100%',
-            maxHeight: '100%',
-            userSelect: 'none',
-            pointerEvents: 'none',
-          }}
-        />
-
-        {/* 크롭 영역 오버레이 */}
         <div
           style={{
-            position: 'absolute',
-            left: `${cropArea.x}px`,
-            top: `${cropArea.y}px`,
-            width: `${cropArea.width}px`,
-            height: `${cropArea.height}px`,
-            border: '2px solid #fff',
-            boxSizing: 'border-box',
-            cursor: isDragging ? 'grabbing' : 'grab',
+            position: 'relative',
+            width: imageSize.width > 0 ? `${imageSize.width}px` : 'auto',
+            height: imageSize.height > 0 ? `${imageSize.height}px` : 'auto',
           }}
         >
-          {/* 그리드 */}
-          <div
+          <img
+            ref={imageRef}
+            src={imageSrc}
+            alt="크롭할 이미지"
             style={{
-              width: '100%',
-              height: '100%',
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gridTemplateRows: 'repeat(3, 1fr)',
-              border: '1px solid rgba(255, 255, 255, 0.5)',
+              width: imageSize.width > 0 ? `${imageSize.width}px` : 'auto',
+              height: imageSize.height > 0 ? `${imageSize.height}px` : 'auto',
+              maxWidth: '100%',
+              maxHeight: '100%',
+              userSelect: 'none',
+              pointerEvents: 'none',
+              display: 'block',
             }}
-          >
-            {Array.from({ length: 9 }).map((_, i) => (
-              <div
-                key={i}
-                style={{
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                }}
-              />
-            ))}
-          </div>
-        </div>
+          />
 
-        {/* 어두운 오버레이 (크롭 영역 외부) */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            clipPath: `polygon(
-              0% 0%,
-              0% 100%,
-              ${(cropArea.x / imageSize.width) * 100}% 100%,
-              ${(cropArea.x / imageSize.width) * 100}% ${(cropArea.y / imageSize.height) * 100}%,
-              ${((cropArea.x + cropArea.width) / imageSize.width) * 100}% ${(cropArea.y / imageSize.height) * 100}%,
-              ${((cropArea.x + cropArea.width) / imageSize.width) * 100}% ${((cropArea.y + cropArea.height) / imageSize.height) * 100}%,
-              ${(cropArea.x / imageSize.width) * 100}% ${((cropArea.y + cropArea.height) / imageSize.height) * 100}%,
-              ${(cropArea.x / imageSize.width) * 100}% 100%,
-              100% 100%,
-              100% 0%
-            )`,
-            pointerEvents: 'none',
-          }}
-        />
+          {/* 크롭 영역 오버레이 */}
+          {imageSize.width > 0 && imageSize.height > 0 && (
+            <>
+              <div
+                style={{
+                  position: 'absolute',
+                  left: `${cropArea.x}px`,
+                  top: `${cropArea.y}px`,
+                  width: `${cropArea.width}px`,
+                  height: `${cropArea.height}px`,
+                  border: '2px solid #fff',
+                  boxSizing: 'border-box',
+                  cursor: isDragging ? 'grabbing' : 'grab',
+                  zIndex: 10,
+                }}
+              >
+                {/* 그리드 */}
+                <div
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gridTemplateRows: 'repeat(3, 1fr)',
+                    border: '1px solid rgba(255, 255, 255, 0.5)',
+                  }}
+                >
+                  {Array.from({ length: 9 }).map((_, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        border: '1px solid rgba(255, 255, 255, 0.3)',
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* 어두운 오버레이 (크롭 영역 외부) */}
+              {imageSize.width > 0 && imageSize.height > 0 && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: `${imageSize.width}px`,
+                    height: `${imageSize.height}px`,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    clipPath: `polygon(
+                      0% 0%,
+                      0% 100%,
+                      ${(cropArea.x / imageSize.width) * 100}% 100%,
+                      ${(cropArea.x / imageSize.width) * 100}% ${(cropArea.y / imageSize.height) * 100}%,
+                      ${((cropArea.x + cropArea.width) / imageSize.width) * 100}% ${(cropArea.y / imageSize.height) * 100}%,
+                      ${((cropArea.x + cropArea.width) / imageSize.width) * 100}% ${((cropArea.y + cropArea.height) / imageSize.height) * 100}%,
+                      ${(cropArea.x / imageSize.width) * 100}% ${((cropArea.y + cropArea.height) / imageSize.height) * 100}%,
+                      ${(cropArea.x / imageSize.width) * 100}% 100%,
+                      100% 100%,
+                      100% 0%
+                    )`,
+                    pointerEvents: 'none',
+                  }}
+                />
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       {/* 하단 바 - 크롭 비율 선택 */}
