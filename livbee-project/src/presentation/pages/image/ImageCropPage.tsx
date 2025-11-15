@@ -56,7 +56,9 @@ const ImageCropPage: React.FC = () => {
   const [imageSrc, setImageSrc] = useState<string>('');
   const [cropArea, setCropArea] = useState<CropArea>({ x: 0, y: 0, width: 0, height: 0 });
   const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
   
   const imageRef = useRef<HTMLImageElement>(null);
@@ -116,20 +118,26 @@ const ImageCropPage: React.FC = () => {
 
         setImageSize({ width: displayWidth, height: displayHeight });
 
-        // 초기 크롭 영역 설정
+        // 초기 크롭 영역 설정 (더 크게, 중앙에 위치)
         const ratio = selectedRatio === 'original' 
           ? imgAspect 
           : getRatioValue(selectedRatio, displayWidth, displayHeight);
-        const cropWidth = Math.min(displayWidth, containerWidth) * 0.8;
-        const cropHeight = cropWidth / ratio;
-
-        // 크롭 영역이 이미지 범위를 벗어나지 않도록 조정
-        const maxX = displayWidth - cropWidth;
-        const maxY = displayHeight - cropHeight;
+        
+        // 이미지 크기의 90% 또는 컨테이너 크기의 90% 중 작은 값 사용
+        const maxCropWidth = Math.min(displayWidth, containerWidth) * 0.9;
+        const maxCropHeight = maxCropWidth / ratio;
+        
+        // 실제 크롭 영역 크기 결정 (이미지 범위 내에서)
+        const cropWidth = Math.min(maxCropWidth, displayWidth);
+        const cropHeight = Math.min(maxCropHeight, displayHeight);
+        
+        // 중앙에 위치하도록 계산
+        const x = (displayWidth - cropWidth) / 2;
+        const y = (displayHeight - cropHeight) / 2;
 
         setCropArea({
-          x: Math.max(0, Math.min(maxX / 2, maxX)),
-          y: Math.max(0, Math.min(maxY / 2, maxY)),
+          x: Math.max(0, x),
+          y: Math.max(0, y),
           width: cropWidth,
           height: cropHeight,
         });
@@ -155,8 +163,10 @@ const ImageCropPage: React.FC = () => {
     if (!container) return;
 
     const containerWidth = container.clientWidth;
-    const newWidth = Math.min(imageSize.width, containerWidth) * 0.8;
-    const newHeight = newWidth / ratio;
+    const maxCropWidth = Math.min(imageSize.width, containerWidth) * 0.9;
+    const maxCropHeight = maxCropWidth / ratio;
+    const newWidth = Math.min(maxCropWidth, imageSize.width);
+    const newHeight = Math.min(maxCropHeight, imageSize.height);
 
     // 크롭 영역이 이미지 범위를 벗어나지 않도록 조정
     const maxX = imageSize.width - newWidth;
@@ -180,6 +190,28 @@ const ImageCropPage: React.FC = () => {
   }, [selectedRatio, imageSize]);
 
   /**
+   * 크롭 영역 모서리/가장자리 감지 (리사이즈 영역)
+   */
+  const getResizeHandle = (x: number, y: number): string | null => {
+    const handleSize = 20; // 핸들 감지 영역 크기
+    const { x: cx, y: cy, width, height } = cropArea;
+    
+    // 모서리 체크
+    if (Math.abs(x - cx) < handleSize && Math.abs(y - cy) < handleSize) return 'nw';
+    if (Math.abs(x - (cx + width)) < handleSize && Math.abs(y - cy) < handleSize) return 'ne';
+    if (Math.abs(x - cx) < handleSize && Math.abs(y - (cy + height)) < handleSize) return 'sw';
+    if (Math.abs(x - (cx + width)) < handleSize && Math.abs(y - (cy + height)) < handleSize) return 'se';
+    
+    // 가장자리 체크
+    if (Math.abs(x - cx) < handleSize && y >= cy && y <= cy + height) return 'w';
+    if (Math.abs(x - (cx + width)) < handleSize && y >= cy && y <= cy + height) return 'e';
+    if (Math.abs(y - cy) < handleSize && x >= cx && x <= cx + width) return 'n';
+    if (Math.abs(y - (cy + height)) < handleSize && x >= cx && x <= cx + width) return 's';
+    
+    return null;
+  };
+
+  /**
    * 마우스/터치 드래그 시작
    */
   const handleDragStart = (clientX: number, clientY: number) => {
@@ -190,7 +222,15 @@ const ImageCropPage: React.FC = () => {
     const x = clientX - imageRect.left;
     const y = clientY - imageRect.top;
 
-    // 크롭 영역 내부인지 확인
+    // 리사이즈 핸들 체크
+    const resizeHandle = getResizeHandle(x, y);
+    if (resizeHandle) {
+      setIsResizing(true);
+      setResizeStart({ x, y, width: cropArea.width, height: cropArea.height });
+      return;
+    }
+
+    // 크롭 영역 내부인지 확인 (드래그 이동)
     if (
       x >= cropArea.x &&
       x <= cropArea.x + cropArea.width &&
@@ -206,20 +246,84 @@ const ImageCropPage: React.FC = () => {
    * 마우스/터치 드래그 중
    */
   const handleDragMove = (clientX: number, clientY: number) => {
-    if (!isDragging || !containerRef.current || !imageRef.current) return;
+    if (!containerRef.current || !imageRef.current) return;
     const imageRect = imageRef.current.getBoundingClientRect();
-    const x = clientX - imageRect.left - dragStart.x;
-    const y = clientY - imageRect.top - dragStart.y;
+    const currentX = clientX - imageRect.left;
+    const currentY = clientY - imageRect.top;
 
-    // 이미지 범위 내에서만 이동
-    const maxX = imageSize.width - cropArea.width;
-    const maxY = imageSize.height - cropArea.height;
+    // 리사이즈 중
+    if (isResizing) {
+      const ratio = selectedRatio === 'original' 
+        ? imageSize.width / imageSize.height 
+        : getRatioValue(selectedRatio, imageSize.width, imageSize.height);
+      
+      // 중심점 고정
+      const centerX = cropArea.x + cropArea.width / 2;
+      const centerY = cropArea.y + cropArea.height / 2;
+      
+      // 현재 마우스 위치에서 중심점까지의 거리 계산
+      const deltaX = currentX - centerX;
+      const deltaY = currentY - centerY;
+      
+      // 비율에 맞는 크기 계산 (대각선 거리 사용)
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      const baseDistance = Math.sqrt(
+        (resizeStart.width / 2) * (resizeStart.width / 2) + 
+        (resizeStart.height / 2) * (resizeStart.height / 2)
+      );
+      
+      // 스케일 계산
+      const scale = distance / baseDistance;
+      
+      // 새로운 크기 계산 (비율 유지)
+      let newWidth = resizeStart.width * scale;
+      let newHeight = newWidth / ratio;
+      
+      // 최소/최대 크기 제한
+      const minSize = 100;
+      const maxWidth = Math.min(imageSize.width, containerRef.current.clientWidth);
+      const maxHeight = Math.min(imageSize.height, containerRef.current.clientHeight);
+      
+      newWidth = Math.max(minSize, Math.min(newWidth, maxWidth));
+      newHeight = Math.max(minSize, Math.min(newHeight, maxHeight));
+      
+      // 비율 재조정
+      if (newWidth / newHeight !== ratio) {
+        newHeight = newWidth / ratio;
+      }
+      
+      // 새로운 위치 계산 (중심점 유지)
+      const newX = centerX - newWidth / 2;
+      const newY = centerY - newHeight / 2;
+      
+      // 이미지 범위 내에서만 조절
+      const maxX = imageSize.width - newWidth;
+      const maxY = imageSize.height - newHeight;
+      
+      setCropArea({
+        x: Math.max(0, Math.min(newX, maxX)),
+        y: Math.max(0, Math.min(newY, maxY)),
+        width: newWidth,
+        height: newHeight,
+      });
+      return;
+    }
 
-    setCropArea((prev) => ({
-      ...prev,
-      x: Math.max(0, Math.min(x, maxX)),
-      y: Math.max(0, Math.min(y, maxY)),
-    }));
+    // 드래그 이동 중
+    if (isDragging) {
+      const x = currentX - dragStart.x;
+      const y = currentY - dragStart.y;
+
+      // 이미지 범위 내에서만 이동
+      const maxX = imageSize.width - cropArea.width;
+      const maxY = imageSize.height - cropArea.height;
+
+      setCropArea((prev) => ({
+        ...prev,
+        x: Math.max(0, Math.min(x, maxX)),
+        y: Math.max(0, Math.min(y, maxY)),
+      }));
+    }
   };
 
   /**
@@ -227,6 +331,7 @@ const ImageCropPage: React.FC = () => {
    */
   const handleDragEnd = () => {
     setIsDragging(false);
+    setIsResizing(false);
   };
 
   /**
