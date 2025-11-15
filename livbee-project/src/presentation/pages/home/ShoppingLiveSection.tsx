@@ -137,7 +137,7 @@ const ShoppingLiveSection: React.FC = () => {
               topContent={
                 <div
                   style={{
-                    width: 300,
+                    width: 240,
                     height: 400,
                     border: '1px solid var(--dark-gray)',
                     borderRadius: 10,

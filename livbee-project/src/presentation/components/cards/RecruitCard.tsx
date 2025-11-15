@@ -86,7 +86,7 @@ const RecruitCard: React.FC<RecruitCardProps> = ({
     <div
       onClick={onPress}
       style={{
-        width: 300, // 카드 고정 너비
+        width: 240, // 카드 고정 너비
         flexShrink: 0, // 가로 스크롤 시 찌그러짐 방지
         height: '100%', // 부모 컨테이너(가로 스크롤 div)의 높이를 채움
         display: 'flex',
