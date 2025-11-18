@@ -29,10 +29,9 @@ const Card = styled.article`
   border-radius: ${({ theme }) => theme.radii.lg};
   padding: 1rem;
   background-color: ${({ theme }) => theme.colors.card};
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition: transform 0.2s ease;
 
   &:hover {
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
   }
 `;

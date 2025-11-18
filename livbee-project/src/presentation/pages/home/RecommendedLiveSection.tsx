@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import HomeSection from './components/HomeSection';
+import HomeSection, { Highlight } from './components/HomeSection';
 import Button from '@/presentation/components/ui/Button';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
@@ -24,10 +24,13 @@ const ScrollArea = styled.div`
 
 const Card = styled.article`
   flex: 0 0 240px;
-  background-color: ${({ theme }) => theme.colors.card};
+  background: linear-gradient(
+    180deg,
+    rgba(104, 124, 244, 0.15) 0%,
+    rgba(104, 124, 244, 0.05) 100%
+  );
   border-radius: ${({ theme }) => theme.radii.lg};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(104, 124, 244, 0.3);
   padding: 0.75rem;
   display: flex;
   flex-direction: column;
@@ -129,7 +132,7 @@ const RecommendedLiveSection: React.FC = () => {
 
   if (loading) {
     return (
-      <HomeSection title="라이브 PICK!!">
+      <HomeSection title={<><Highlight>라이브</Highlight><span> PICK!!</span></>}>
         <LoadingState />
       </HomeSection>
     );
@@ -140,7 +143,10 @@ const RecommendedLiveSection: React.FC = () => {
   }
 
   return (
-    <HomeSection title="라이브 PICK!!" onMore={() => navigate('/campaigns')}>
+    <HomeSection
+      title={<><Highlight>라이브</Highlight><span> PICK!!</span></>}
+      onMore={() => navigate('/campaigns')}
+    >
       <ScrollArea>
         {campaigns.map((campaign) => {
           const imageUrl = campaign.imageUrl || campaign.thumbnailUrl || undefined;

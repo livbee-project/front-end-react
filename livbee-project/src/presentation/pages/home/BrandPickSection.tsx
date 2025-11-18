@@ -15,7 +15,6 @@ const Card = styled.article`
   background-color: ${({ theme }) => theme.colors.card};
   border-radius: ${({ theme }) => theme.radii.lg};
   border: 1px solid ${({ theme }) => theme.colors.border};
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   padding: 0.75rem;
   display: flex;
   flex-direction: column;

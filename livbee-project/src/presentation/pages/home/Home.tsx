@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import HomeNavigation from './components/HomeNavigation';
 import TopTabs from './components/TopTabs';
-import HeroBannerSection from './HeroBannerSection';
 import StoryHighlightsSection from './StoryHighlightsSection';
 import ShoppingLiveSection from './ShoppingLiveSection';
 import BrandPickSection from './BrandPickSection';
@@ -11,6 +10,7 @@ import RecommendedLiveSection from './RecommendedLiveSection';
 import ConceptModelSection from './ConceptModelSection';
 import HotClipSection from './HotClipSection';
 import LivbeeNewsSection from './LivbeeNewsSection';
+import BannerSliderSection from './BannerSliderSection';
 
 const Page = styled.div`
   background-color: ${({ theme }) => theme.colors.background};
@@ -35,7 +35,9 @@ const Home: React.FC = () => (
     <HomeNavigation />
     <TopTabs />
     <Content>
-      <HeroBannerSection />
+      <div style={{ margin: '1rem 0' }}>
+        <BannerSliderSection />
+      </div>
       <StoryHighlightsSection />
       <ShoppingLiveSection />
       <BrandPickSection />

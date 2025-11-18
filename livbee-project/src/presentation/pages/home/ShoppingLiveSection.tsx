@@ -16,10 +16,8 @@ const Card = styled.article`
   background-color: ${({ theme }) => theme.colors.card};
   border-radius: ${({ theme }) => theme.radii.lg};
   border: 1px solid ${({ theme }) => theme.colors.border};
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   cursor: pointer;
-  transition: box-shadow 0.2s ease;
 
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     flex: 0 0 280px;
@@ -29,9 +27,6 @@ const Card = styled.article`
     flex: 0 0 300px;
   }
 
-  &:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  }
 `;
 
 const ImageWrapper = styled.div`
