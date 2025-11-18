@@ -126,6 +126,14 @@ export const useSlider = ({
             goToPage(index);
             startTimer();
         },
+        goToNext: () => {
+            goToNextPage();
+            startTimer();
+        },
+        goToPrev: () => {
+            goToPrevPage();
+            startTimer();
+        },
     };
 };
 

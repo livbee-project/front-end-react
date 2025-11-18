@@ -1,89 +1,86 @@
 import React from 'react';
-import SectionContainer from '@/presentation/components/section/SectionContainer';
-import VerticalList from '@/presentation/components/list/VerticalList';
-import ListItem from '@/presentation/components/list/ListItem';
-import { SPACING } from '@/presentation/styles/constants';
-import { devLog } from '@/shared/utils/logger';
+import styled from 'styled-components';
+import { Calendar } from 'lucide-react';
+import HomeSection from './components/HomeSection';
 
-/**
- * "라이비 뉴스" 섹션 컴포넌트
- * Home.tsx에 있던 로직을 이 파일로 이동
- */
-const LivbeeNewsSection: React.FC = () => {
-  // (추가) "라이비 뉴스" 섹션을 위한 임시 데이터 (Home.tsx에서 이동)
-  const newsItems = [
-    {
-      id: 1,
-      title: '라이비, 2025년 상반기 파트너사 모집',
-      time: '5분 전',
-      content: '브랜드와 쇼호스트를 위한 새로운...',
-    },
-    {
-      id: 2,
-      title: '새로운 기능 업데이트 안내 (v1.2)',
-      time: '3일 전',
-      content: '스튜디오 예약 기능이 추가되었습니다...',
-    },
-  ];
+const newsItems = [
+  {
+    id: 1,
+    title: '라이비, 2025년 상반기 파트너사 모집',
+    time: '5분 전',
+    content: '브랜드와 쇼호스트를 위한 새로운 협업 프로그램이 시작됩니다.',
+  },
+  {
+    id: 2,
+    title: '새로운 기능 업데이트 안내 (v1.2)',
+    time: '3일 전',
+    content: '스튜디오 예약 기능과 자동 편성 도구가 추가되었습니다.',
+  },
+];
 
-  return (
-    <SectionContainer
-      title="라이비 뉴스"
-      onMorePressed={() => devLog('라이비 뉴스 더보기 클릭')}
-    >
-      {/*
-        Flutter 원본의 Padding(horizontal: 10)을 적용합니다.
-        (Home.tsx에서 그대로 복사)
-      */}
-      <div style={{ padding: `0 ${SPACING.SM}` }}>
-        <VerticalList>
-          {/* (Home.tsx에서 그대로 복사) */}
-          {newsItems.map((news) => (
-            <ListItem key={news.id} onTap={() => devLog(`뉴스 ${news.id} 클릭`)}>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  gap: 8, // Flutter 원본
-                }}
-              >
-                {/* 1. 뉴스 제목 */}
-                <span
-                  style={{
-                    fontWeight: 700,
-                    fontSize: 'var(--h3)',
-                    color: 'var(--black)',
-                    width: '100%',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >
-                  {news.title}
-                </span>
+const List = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
 
-                {/* 2. 시간 및 내용 요약 */}
-                <span
-                  style={{
-                    fontWeight: 400,
-                    fontSize: '12px',
-                    color: 'var(--dark-gray)',
-                    width: '100%',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >
-                  {news.time} · {news.content}
-                </span>
-              </div>
-            </ListItem>
-          ))}
-        </VerticalList>
-      </div>
-    </SectionContainer>
-  );
-};
+const Card = styled.article`
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  padding: 1rem;
+  background-color: ${({ theme }) => theme.colors.card};
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+`;
+
+const Title = styled.h3`
+  margin: 0 0 0.5rem;
+  font-size: 14px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.foreground};
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+`;
+
+const Description = styled.p`
+  margin: 0 0 0.75rem;
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.muted};
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+`;
+
+const Meta = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
+const LivbeeNewsSection: React.FC = () => (
+  <HomeSection title="뉴스" onMore={() => console.log('뉴스 더보기')}>
+    <List>
+      {newsItems.map((news) => (
+        <Card key={news.id}>
+          <Title>{news.title}</Title>
+          <Description>{news.content}</Description>
+          <Meta>
+            <Calendar size={14} />
+            <span>{news.time}</span>
+          </Meta>
+        </Card>
+      ))}
+    </List>
+  </HomeSection>
+);
 
 export default LivbeeNewsSection;

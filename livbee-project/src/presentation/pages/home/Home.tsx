@@ -1,54 +1,51 @@
 import React from 'react';
-
-import BannerSliderSection from './BannerSliderSection';
+import styled from 'styled-components';
+import HomeNavigation from './components/HomeNavigation';
+import TopTabs from './components/TopTabs';
+import HeroBannerSection from './HeroBannerSection';
+import StoryHighlightsSection from './StoryHighlightsSection';
 import ShoppingLiveSection from './ShoppingLiveSection';
 import BrandPickSection from './BrandPickSection';
-import LivbeeNewsSection from './LivbeeNewsSection';
 import HowShowhostSection from './HowShowhostSection';
+import RecommendedLiveSection from './RecommendedLiveSection';
 import ConceptModelSection from './ConceptModelSection';
 import HotClipSection from './HotClipSection';
+import LivbeeNewsSection from './LivbeeNewsSection';
 
-// (유지) 스크롤바 숨기기 클래스를 위해 import
-import '@/presentation/styles/global.css';
+const Page = styled.div`
+  background-color: ${({ theme }) => theme.colors.background};
+`;
 
-/**
- * 홈 페이지 컴포넌트
- * 이제 이 컴포넌트는 공통 컴포넌트(SectionContainer, RecruitCard)를
- * 조립하는 역할만 담당합니다.
- */
-const Home: React.FC = () => {
-  // (수정) React.FC 반환 타입에 맞게 <></> (Fragment) 대신
-  // 최상위 <div className="app-container">로 변경합니다.
-  return (
-    <div className="app-container">
-      {/* 1. (추가) 배너 슬라이더 섹션 */}
-      {/*
-        Flutter 원본의 BannerSliderSection 위치와
-        간격(SizedBox(height: 24))을 동일하게 적용
-      */}
-      <div style={{ marginBottom: 24 }}>
-        <BannerSliderSection />
-      </div>
+const Content = styled.main`
+  max-width: ${({ theme }) => theme.layout.maxWidth};
+  margin: 0 auto;
+  padding: 0 ${({ theme }) => theme.layout.pagePadding.mobile} 4rem;
 
-      {/* "지금 뜨는 쇼핑라이브" 섹션 */}
+  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    padding: 0 ${({ theme }) => theme.layout.pagePadding.tablet} 4rem;
+  }
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.desktop}) {
+    padding: 0 ${({ theme }) => theme.layout.pagePadding.desktop} 4rem;
+  }
+`;
+
+const Home: React.FC = () => (
+  <Page>
+    <HomeNavigation />
+    <TopTabs />
+    <Content>
+      <HeroBannerSection />
+      <StoryHighlightsSection />
       <ShoppingLiveSection />
-
-      {/* "브랜드 픽" 섹션 */}
       <BrandPickSection />
-
-      {/* "라이비 뉴스" 섹션 */}
-      <LivbeeNewsSection />
-
-      {/* "이런 쇼호스트는 어떠세요?" 섹션 */}
       <HowShowhostSection />
-
-      {/* "컨셉에 맞는 모델찾기" 섹션 */}
+      <RecommendedLiveSection />
       <ConceptModelSection />
-
-      {/* "HOT CLIP" 섹션 */}
       <HotClipSection />
-    </div>
-  );
-};
+      <LivbeeNewsSection />
+    </Content>
+  </Page>
+);
 
 export default Home;

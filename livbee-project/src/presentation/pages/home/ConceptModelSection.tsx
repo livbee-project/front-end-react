@@ -1,81 +1,127 @@
 import React from 'react';
+import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import SectionContainer from '@/presentation/components/section/SectionContainer';
-import PortraitCard from '@/presentation/components/cards/PortraitCard';
+import HomeSection, { Highlight, HorizontalScroll } from './components/HomeSection';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { EmptyState } from '@/presentation/components/states/EmptyState';
-import { SPACING } from '@/presentation/styles/constants';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
 import type { Model } from '@/domain/entities/Model';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
-import '@/presentation/styles/global.css';
 
-/**
- * "컨셉에 맞는 모델찾기" 섹션 컴포넌트
- * Flutter 원본을 기반으로 함
- */
+const Card = styled.article`
+  flex: 0 0 65vw;
+  min-width: 200px;
+  max-width: 220px;
+  background-color: ${({ theme }) => theme.colors.card};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    flex: 0 0 200px;
+  }
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.desktop}) {
+    flex: 0 0 220px;
+  }
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+`;
+
+const ImageWrapper = styled.div`
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background-color: ${({ theme }) => theme.colors.secondary};
+`;
+
+const Portrait = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+
+  ${Card}:hover & {
+    transform: scale(1.05);
+  }
+`;
+
+const CardBody = styled.div`
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+`;
+
+const Name = styled.h3`
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+`;
+
+const Intro = styled.p`
+  margin: 0;
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
 const ConceptModelSection: React.FC = () => {
   const navigate = useNavigate();
-
-  // modelRepository를 useRepository 훅으로 관리
   const modelRepository = useRepository(ModelRepository);
-
-  // 목록 데이터 조회
-  const { data: models, loading: isLoading } = useListData<Model, { page: number; limit: number }, { items: Model[] }>(
+  const { data: models, loading } = useListData<
+    Model,
+    { page: number; limit: number },
+    { items: Model[] }
+  >(
     (query, signal) => modelRepository.getModelList(query, signal),
-    {
-      page: 1,
-      limit: 10, // 홈 페이지에서는 최대 10개 표시 (가로 스크롤)
-    },
+    { page: 1, limit: 10 },
     [],
     '모델 목록을 불러오는 중 오류가 발생했습니다.'
   );
 
-  // 로딩 중
-  if (isLoading) {
+  if (loading) {
     return (
-      <SectionContainer
-        title="컨셉에 맞는 모델 찾기"
-        onMorePressed={() => navigate('/models')}
-      >
+      <HomeSection title={<><span>이런 </span><Highlight>모델</Highlight><span>은 어떠세요?</span></>}>
         <LoadingState />
-      </SectionContainer>
+      </HomeSection>
+    );
+  }
+
+  if (models.length === 0) {
+    return (
+      <HomeSection title={<><span>이런 </span><Highlight>모델</Highlight><span>은 어떠세요?</span></>}>
+        <EmptyState message="데이터가 없습니다." />
+      </HomeSection>
     );
   }
 
   return (
-    <SectionContainer
-      title="컨셉에 맞는 모델 찾기"
-      onMorePressed={() => navigate('/models')}
+    <HomeSection
+      title={<><span>이런 </span><Highlight>모델</Highlight><span>은 어떠세요?</span></>}
+      onMore={() => navigate('/models')}
     >
-      {models.length === 0 ? (
-        <EmptyState message="데이터가 없습니다." />
-      ) : (
-        <div
-          className="hide-scrollbar"
-          style={{
-            display: 'flex',
-            overflowX: 'auto',
-            overflowY: 'hidden',
-            height: 488, // Flutter 원본 높이
-            gap: 10, // Flutter 원본(separatorBuilder)
-            padding: `0 ${SPACING.SM}`, // Flutter 원본(padding)
-          }}
-        >
-          {/* PortraitCard 렌더링 */}
-          {models.map((model) => (
-            <PortraitCard
-              key={model.id}
-              title={model.nickname || '이름 없음'}
-              content={model.oneLineIntro || '소개 없음'}
-              imageUrl={model.mainThumbnailUrl || undefined}
-              onPress={() => navigate(`/models/${model.id}`)}
-            />
-          ))}
-        </div>
-      )}
-    </SectionContainer>
+      <HorizontalScroll>
+        {models.map((model) => (
+          <Card key={model.id} onClick={() => navigate(`/models/${model.id}`)}>
+            <ImageWrapper>
+              {model.mainThumbnailUrl && (
+                <Portrait src={model.mainThumbnailUrl} alt={model.nickname || '모델'} />
+              )}
+            </ImageWrapper>
+            <CardBody>
+              <Name>{model.nickname || '이름 없음'}</Name>
+              <Intro>{model.oneLineIntro || '소개 없음'}</Intro>
+            </CardBody>
+          </Card>
+        ))}
+      </HorizontalScroll>
+    </HomeSection>
   );
 };
 

@@ -1,191 +1,222 @@
 import React from 'react';
+import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-// 공통 컴포넌트 임포트
-import SectionContainer from '@/presentation/components/section/SectionContainer';
-import RecruitCard from '@/presentation/components/cards/RecruitCard';
+import HomeSection, { Highlight, HorizontalScroll } from './components/HomeSection';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
-import { SPACING } from '@/presentation/styles/constants';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { Campaign } from '@/domain/entities/Campaign';
 import { htmlToText } from '@/shared/utils/htmlUtils';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
-// 스크롤바 숨기기 CSS 임포트
-import '@/presentation/styles/global.css';
 
-/**
- * "지금 뜨는 쇼핑라이브" 섹션 컴포넌트
- */
+const Card = styled.article`
+  flex: 0 0 65vw;
+  min-width: 240px;
+  max-width: 300px;
+  background-color: ${({ theme }) => theme.colors.card};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    flex: 0 0 280px;
+  }
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.desktop}) {
+    flex: 0 0 300px;
+  }
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+`;
+
+const ImageWrapper = styled.div`
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  overflow: hidden;
+`;
+
+const CoverImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+
+  ${Card}:hover & {
+    transform: scale(1.05);
+  }
+`;
+
+const Badge = styled.span`
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primaryForeground};
+  padding: 0.25rem 0.85rem;
+  border-radius: ${({ theme }) => theme.radii.lg};
+  font-size: 12px;
+  font-weight: 500;
+`;
+
+const CardBody = styled.div`
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const Brand = styled.p`
+  margin: 0;
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
+const Title = styled.h3`
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.foreground};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const Description = styled.p`
+  margin: 0;
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.muted};
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.5rem;
+`;
+
+const ProductInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid ${({ theme }) => theme.colors.border};
+`;
+
+const ProductThumb = styled.div`
+  width: 50px;
+  height: 50px;
+  border-radius: ${({ theme }) => theme.radii.lg};
+  overflow: hidden;
+  background-color: ${({ theme }) => theme.colors.secondary};
+  flex-shrink: 0;
+`;
+
+const ProductText = styled.div`
+  flex: 1;
+  min-width: 0;
+`;
+
+const PriceLabel = styled.p`
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.primary};
+`;
+
+const PriceValue = styled.p`
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.foreground};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
 const ShoppingLiveSection: React.FC = () => {
   const navigate = useNavigate();
-  
-  // campaignRepository를 useRepository 훅으로 관리
   const campaignRepository = useRepository(CampaignRepository);
-
-  // 목록 데이터 조회
-  const { data: campaigns, loading: isLoading } = useListData<Campaign, { page: number; limit: number; sort?: 'latest' | 'deadline' }, { items: Campaign[] }>(
+  const { data: campaigns, loading } = useListData<
+    Campaign,
+    { page: number; limit: number; sort?: 'latest' | 'deadline' },
+    { items: Campaign[] }
+  >(
     (query, signal) => campaignRepository.getCampaignList(query, signal),
-    {
-      page: 1,
-      limit: 10, // 홈 페이지에서는 최대 10개만 표시
-      sort: 'latest' as const,
-    },
+    { page: 1, limit: 10, sort: 'latest' },
     [],
     '쇼핑 라이브 목록을 불러오는 중 오류가 발생했습니다.'
   );
 
-  // 로딩 중이거나 데이터가 없을 때
-  if (isLoading) {
+  const calculateDDay = (closeAt?: string | null) => {
+    if (!closeAt) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const deadline = new Date(closeAt);
+    deadline.setHours(23, 59, 59, 999);
+    const diffDays = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays < 0) return '마감';
+    if (diffDays === 0) return 'D-DAY';
+    return `D-${diffDays}`;
+  };
+
+  if (loading) {
     return (
-      <SectionContainer
-        title="지금 뜨는 쇼핑라이브"
-        onMorePressed={() => navigate('/campaigns')}
-      >
+      <HomeSection title={<><span>지금 뜨는 </span><Highlight>쇼핑라이브</Highlight></>}>
         <LoadingState />
-      </SectionContainer>
+      </HomeSection>
     );
   }
 
   if (campaigns.length === 0) {
-    return null; // 데이터가 없으면 섹션을 표시하지 않음
+    return null;
   }
 
   return (
-    <SectionContainer
-      title="지금 뜨는 쇼핑라이브"
-      onMorePressed={() => navigate('/campaigns')}
+    <HomeSection
+      title={<><span>지금 뜨는 </span><Highlight>쇼핑라이브</Highlight></>}
+      onMore={() => navigate('/campaigns')}
     >
-      {/* 가로 스크롤 리스트 컨테이너 */}
-      <div
-        className="hide-scrollbar"
-        style={{
-          display: 'flex',
-          overflowX: 'auto',
-          overflowY: 'hidden',
-          height: 610, // Flutter 원본 높이
-          gap: 10,
-          padding: `0 ${SPACING.SM}`,
-        }}
-      >
-        {/* RecruitCard 렌더링 로직 */}
+      <HorizontalScroll>
         {campaigns.map((campaign) => {
           const imageUrl = campaign.imageUrl || campaign.thumbnailUrl || undefined;
-          const contentText = htmlToText(campaign.content);
-          const summaryContent = contentText.length > 50 
-            ? contentText.substring(0, 50) + '...' 
-            : contentText;
+          const summary = htmlToText(campaign.content).slice(0, 60);
+          const dday = calculateDDay(campaign.closeAt);
 
           return (
-            <RecruitCard
-              key={campaign.id}
-              // --- 1. 공통 Props 전달 ---
-              brandName={campaign.brandName}
-              title={campaign.title}
-              content={summaryContent}
-              onPress={() => navigate(`/campaigns/${campaign.id}`)}
-              // --- 2. 상단 (TopContent) Prop 전달 ---
-              topContent={
-                <div
-                  style={{
-                    width: 240,
-                    height: 400,
-                    border: imageUrl ? 'none' : '1px solid var(--dark-gray)',
-                    borderRadius: 10,
-                    position: 'relative',
-                    backgroundColor: 'var(--placeholder-bg)',
-                    overflow: 'hidden',
-                  }}
-                >
-                  {imageUrl ? (
-                    <img
-                      src={imageUrl}
-                      alt={campaign.title}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                      }}
-                    />
-                  ) : null}
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: 8,
-                      right: 10,
-                      padding: '4px 17px',
-                      background: 'var(--primary)',
-                      color: 'var(--white)',
-                      fontSize: 'var(--h3)',
-                      fontWeight: 400,
-                      borderRadius: 20,
-                    }}
-                  >
-                    CH
-                  </span>
-                </div>
-              }
-              // --- 3. 하단 (BottomContent) Prop 전달 ---
-              bottomContent={
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    width: '100%',
-                    gap: 20,
-                  }}
-                >
-                  {/* 상품 이미지가 있는 경우에만 표시 */}
-                  {campaign.imageUrl || campaign.thumbnailUrl ? (
-                    <div
-                      style={{
-                        width: 50,
-                        height: 50,
-                        background: 'var(--dark-gray)',
-                        flexShrink: 0,
-                        borderRadius: 4,
-                        overflow: 'hidden',
-                      }}
-                    >
+            <Card key={campaign.id} onClick={() => navigate(`/campaigns/${campaign.id}`)}>
+              <ImageWrapper>
+                {imageUrl ? <CoverImage src={imageUrl} alt={campaign.title} /> : <div />}
+                {dday && <Badge>{dday}</Badge>}
+              </ImageWrapper>
+              <CardBody>
+                <Brand>{campaign.brandName}</Brand>
+                <Title>{campaign.title}</Title>
+                <Description>{summary}</Description>
+                <ProductInfo>
+                  <ProductThumb>
+                    {campaign.thumbnailUrl && (
                       <img
-                        src={campaign.thumbnailUrl || campaign.imageUrl}
-                        alt="상품"
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                        }}
+                        src={campaign.thumbnailUrl}
+                        alt={campaign.title}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
-                    </div>
-                  ) : (
-                    <div
-                      style={{
-                        width: 50,
-                        height: 50,
-                        background: 'var(--dark-gray)',
-                        flexShrink: 0,
-                      }}
-                    />
-                  )}
-                  <span
-                    style={{
-                      fontWeight: 400,
-                      fontSize: '12px',
-                      color: 'var(--dark-gray)',
-                      flex: 1,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {campaign.title}
-                  </span>
-                </div>
-              }
-            />
+                    )}
+                  </ProductThumb>
+                  <ProductText>
+                    <PriceLabel>특딜가</PriceLabel>
+                    <PriceValue>{campaign.title}</PriceValue>
+                  </ProductText>
+                </ProductInfo>
+              </CardBody>
+            </Card>
           );
         })}
-      </div>
-    </SectionContainer>
+      </HorizontalScroll>
+    </HomeSection>
   );
 };
 

@@ -1,74 +1,123 @@
 import React from 'react';
+import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import SectionContainer from '@/presentation/components/section/SectionContainer';
-import VerticalList from '@/presentation/components/list/VerticalList';
-import ListItem from '@/presentation/components/list/ListItem';
-import PortfolioRowCard from '@/presentation/components/cards/PortfolioRowCard';
+import HomeSection, { Highlight } from './components/HomeSection';
+import Button from '@/presentation/components/ui/Button';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { EmptyState } from '@/presentation/components/states/EmptyState';
-import { SPACING } from '@/presentation/styles/constants';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { Portfolio } from '@/domain/entities/Portfolio';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
 
-/**
- * "이런 쇼호스트는 어떠세요?" 섹션 컴포넌트
- */
+const List = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const Card = styled.article`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  background-color: ${({ theme }) => theme.colors.card};
+`;
+
+const Avatar = styled.div`
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: ${({ theme }) => theme.colors.secondary};
+  flex-shrink: 0;
+`;
+
+const Info = styled.div`
+  flex: 1;
+  min-width: 0;
+`;
+
+const Name = styled.h3`
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.foreground};
+`;
+
+const Intro = styled.p`
+  margin: 0.25rem 0 0;
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
 const HowShowhostSection: React.FC = () => {
   const navigate = useNavigate();
-
-  // portfolioRepository를 useRepository 훅으로 관리
   const portfolioRepository = useRepository(PortfolioRepository);
-
-  // 목록 데이터 조회
-  const { data: portfolios, loading: isLoading } = useListData<Portfolio, { page: number; limit: number }, { items: Portfolio[] }>(
+  const { data: portfolios, loading } = useListData<
+    Portfolio,
+    { page: number; limit: number },
+    { items: Portfolio[] }
+  >(
     (query, signal) => portfolioRepository.getPortfolioList(query, signal),
-    {
-      page: 1,
-      limit: 5, // 홈 페이지에서는 최대 5개만 표시
-    },
+    { page: 1, limit: 5 },
     [],
     '쇼호스트 목록을 불러오는 중 오류가 발생했습니다.'
   );
 
-  // 로딩 중이거나 데이터가 없을 때
-  if (isLoading) {
+  if (loading) {
     return (
-      <SectionContainer
-        title="이런 쇼호스트는 어떠세요?"
-        onMorePressed={() => navigate('/portfolios')}
-      >
+      <HomeSection title={<><span>이런 </span><Highlight>쇼호스트</Highlight><span>는<br />어떠세요?</span></>}>
         <LoadingState />
-      </SectionContainer>
+      </HomeSection>
+    );
+  }
+
+  if (portfolios.length === 0) {
+    return (
+      <HomeSection title={<><span>이런 </span><Highlight>쇼호스트</Highlight><span>는<br />어떠세요?</span></>}>
+        <EmptyState message="데이터가 없습니다." />
+      </HomeSection>
     );
   }
 
   return (
-    <SectionContainer
-      title="이런 쇼호스트는 어떠세요?"
-      onMorePressed={() => navigate('/portfolios')}
+    <HomeSection
+      title={<><span>이런 </span><Highlight>쇼호스트</Highlight><span>는<br />어떠세요?</span></>}
+      onMore={() => navigate('/portfolios')}
     >
-      {portfolios.length === 0 ? (
-        <EmptyState message="데이터가 없습니다." />
-      ) : (
-        <div style={{ padding: `0 ${SPACING.SM}` }}>
-          <VerticalList>
-            {portfolios.map((portfolio) => (
-              <ListItem key={portfolio.id}>
-                <PortfolioRowCard
-                  title={portfolio.nickname || '이름 없음'}
-                  content={portfolio.oneLineIntro || '소개 없음'}
-                  imageUrl={portfolio.mainThumbnailUrl || undefined}
-                  onOfferPress={() => console.log(`제안하기 ${portfolio.id}`)}
-                  onCardPress={() => navigate(`/portfolios/${portfolio.id}`)}
+      <List>
+        {portfolios.map((portfolio) => (
+          <Card key={portfolio.id} onClick={() => navigate(`/portfolios/${portfolio.id}`)}>
+            <Avatar>
+              {portfolio.mainThumbnailUrl && (
+                <img
+                  src={portfolio.mainThumbnailUrl}
+                  alt={portfolio.nickname || '쇼호스트'}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
-              </ListItem>
-            ))}
-          </VerticalList>
-        </div>
-      )}
-    </SectionContainer>
+              )}
+            </Avatar>
+            <Info>
+              <Name>{portfolio.nickname || '이름 없음'}</Name>
+              <Intro>{portfolio.oneLineIntro || '소개 없음'}</Intro>
+            </Info>
+            <Button
+              variant="outline"
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/portfolios/${portfolio.id}`);
+              }}
+            >
+              제안하기
+            </Button>
+          </Card>
+        ))}
+      </List>
+    </HomeSection>
   );
 };
 

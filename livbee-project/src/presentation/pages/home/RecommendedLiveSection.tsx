@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import HomeSection, { HorizontalScroll } from './components/HomeSection';
+import HomeSection from './components/HomeSection';
 import Button from '@/presentation/components/ui/Button';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
@@ -9,6 +9,18 @@ import type { Campaign } from '@/domain/entities/Campaign';
 import { htmlToText } from '@/shared/utils/htmlUtils';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
+
+const ScrollArea = styled.div`
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
 
 const Card = styled.article`
   flex: 0 0 240px;
@@ -37,20 +49,27 @@ const CoverImage = styled.img`
   object-fit: cover;
 `;
 
-const CornerBadge = styled.span`
+const FeeBadge = styled.span`
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  padding: 0.2rem 0.5rem;
+  border-radius: ${({ theme }) => theme.radii.sm};
+  font-size: 12px;
+`;
+
+const DdayBadge = styled.span`
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
   background-color: ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.primaryForeground};
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 14px;
+  padding: 0.2rem 0.6rem;
+  border-radius: ${({ theme }) => theme.radii.lg};
+  font-size: 12px;
+  font-weight: 500;
 `;
 
 const Brand = styled.p`
@@ -82,7 +101,7 @@ const Description = styled.p`
   min-height: 2.5rem;
 `;
 
-const BrandPickSection: React.FC = () => {
+const RecommendedLiveSection: React.FC = () => {
   const navigate = useNavigate();
   const campaignRepository = useRepository(CampaignRepository);
   const { data: campaigns, loading } = useListData<
@@ -91,14 +110,26 @@ const BrandPickSection: React.FC = () => {
     { items: Campaign[] }
   >(
     (query, signal) => campaignRepository.getCampaignList(query, signal),
-    { page: 1, limit: 10, sort: 'latest' },
+    { page: 1, limit: 10, sort: 'deadline' },
     [],
-    '브랜드 픽 목록을 불러오는 중 오류가 발생했습니다.'
+    '라이브 추천 목록을 불러오는 중 오류가 발생했습니다.'
   );
+
+  const calculateDDay = (closeAt?: string | null) => {
+    if (!closeAt) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const deadline = new Date(closeAt);
+    deadline.setHours(23, 59, 59, 999);
+    const diffDays = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays < 0) return '마감';
+    if (diffDays === 0) return 'D-DAY';
+    return `D-${diffDays}`;
+  };
 
   if (loading) {
     return (
-      <HomeSection title="브랜드 PICK">
+      <HomeSection title="라이브 PICK!!">
         <LoadingState />
       </HomeSection>
     );
@@ -109,17 +140,20 @@ const BrandPickSection: React.FC = () => {
   }
 
   return (
-    <HomeSection title="브랜드 PICK" onMore={() => navigate('/campaigns')}>
-      <HorizontalScroll>
+    <HomeSection title="라이브 PICK!!" onMore={() => navigate('/campaigns')}>
+      <ScrollArea>
         {campaigns.map((campaign) => {
           const imageUrl = campaign.imageUrl || campaign.thumbnailUrl || undefined;
           const summary = htmlToText(campaign.content).slice(0, 60);
+          const dday = calculateDDay(campaign.closeAt);
+          const fee = campaign.fee ? `${campaign.fee.toLocaleString()}원` : '협의';
 
           return (
             <Card key={campaign.id}>
               <ImageWrapper>
                 {imageUrl && <CoverImage src={imageUrl} alt={campaign.title} />}
-                <CornerBadge>CH</CornerBadge>
+                <FeeBadge>{fee}</FeeBadge>
+                {dday && <DdayBadge>{dday}</DdayBadge>}
               </ImageWrapper>
               <Brand>{campaign.brandName}</Brand>
               <Title>{campaign.title}</Title>
@@ -130,15 +164,15 @@ const BrandPickSection: React.FC = () => {
                 fullWidth
                 onClick={() => navigate(`/campaigns/${campaign.id}`)}
               >
-                BUTTON
+                지원하기
               </Button>
             </Card>
           );
         })}
-      </HorizontalScroll>
+      </ScrollArea>
     </HomeSection>
   );
 };
 
-export default BrandPickSection;
+export default RecommendedLiveSection;
 
