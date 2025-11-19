@@ -367,7 +367,7 @@ const FilterBadge = styled.button<{ $isActive: boolean }>`
           color: ${theme.colors.foreground};
         `}
   &:hover {
-    background: ${({ theme }) => 'rgba(104, 124, 244, 0.1)'};
+    background: rgba(104, 124, 244, 0.1);
     color: ${({ theme }) => theme.colors.primary};
   }
   &:active {
