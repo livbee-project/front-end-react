@@ -1,21 +1,544 @@
-import React, { useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import TextInput from '@/presentation/components/forms/TextInput';
+import styled, { css } from 'styled-components';
+import {
+  Upload,
+  Plus,
+  Youtube,
+  Instagram,
+  Video,
+  FileText,
+  X,
+} from 'lucide-react';
 import ToggleSwitch from '@/presentation/components/ui/ToggleSwitch';
-import FileUpload from '@/presentation/components/upload/FileUpload';
-import ImageUpload from '@/presentation/components/upload/ImageUpload';
-import VerticalList from '@/presentation/components/list/VerticalList';
-import ListItem from '@/presentation/components/list/ListItem';
-import Button from '@/presentation/components/ui/Button';
-import SectionTitle from '@/presentation/components/ui/SectionTitle';
-import RegisterPageLayout from '@/presentation/layouts/RegisterPageLayout';
-import FormSection from '@/presentation/components/forms/FormSection';
-import FormRow from '@/presentation/components/forms/FormRow';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import type { CreatePortfolioRequest } from '@/domain/entities/Portfolio';
+
+const PageWrapper = styled.div`
+  min-height: 100vh;
+  background: ${({ theme }) => theme.colors.background};
+  padding: 40px 20px;
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    padding: 30px 16px;
+  }
+`;
+
+const FormContainer = styled.div`
+  max-width: 680px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: ${({ theme }) => theme.radii.xl};
+  box-shadow: 0 12px 32px rgba(3, 2, 19, 0.06);
+  padding: 40px;
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    padding: 24px;
+  }
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+`;
+
+const FormSection = styled.section`
+  padding: 30px 0;
+  border-bottom: 1px solid #e5e7eb;
+  &:last-of-type {
+    border-bottom: none;
+  }
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    padding: 24px 0;
+  }
+`;
+
+const SectionTitle = styled.h2`
+  font-size: 18px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.foreground};
+  margin: 0 0 12px;
+`;
+
+const SectionDescription = styled.p`
+  font-size: 13px;
+  font-weight: 300;
+  color: ${({ theme }) => theme.colors.muted};
+  margin: 0 0 20px;
+  line-height: 1.5;
+`;
+
+const ProfileSection = styled.div`
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    flex-direction: column;
+    text-align: center;
+  }
+`;
+
+const ProfileInfo = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    order: 2;
+  }
+`;
+
+const ProfileLabel = styled.span`
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.muted};
+  font-weight: 300;
+`;
+
+const ProfileTitle = styled.h3`
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.foreground};
+`;
+
+const ProfileHint = styled.span`
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
+const ProfileImageWrapper = styled.button<{ $hasImage: boolean }>`
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 1px solid #e5e7eb;
+  background: ${({ $hasImage }) => ($hasImage ? 'transparent' : '#f5f5f5')};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: ${({ theme }) => theme.colors.muted};
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    order: 1;
+  }
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary};
+    transform: scale(1.02);
+  }
+`;
+
+const ProfileImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+`;
+
+const ProfileOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  opacity: 0;
+  transition: opacity 0.2s;
+  ${ProfileImageWrapper}:hover & {
+    opacity: 1;
+  }
+`;
+
+const OverlayText = styled.span`
+  font-size: 14px;
+  font-weight: 500;
+`;
+
+const HiddenInput = styled.input`
+  display: none;
+`;
+
+const StyledSelect = styled.select`
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+  border-radius: 0;
+  padding: 12px 0;
+  font-size: 16px;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.foreground};
+  &:focus {
+    outline: none;
+    border-bottom-color: ${({ theme }) => theme.colors.primary};
+  }
+`;
+
+const InputGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const LabelText = styled.div`
+  font-size: 16px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.foreground};
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+`;
+
+const LabelNote = styled.span`
+  font-size: 12px;
+  font-weight: 300;
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
+const underlineField = css`
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+  border-radius: 0;
+  padding: 12px 0;
+  font-size: 16px;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.foreground};
+  &::placeholder {
+    color: #9ca3af;
+    font-weight: 300;
+  }
+  &:focus {
+    outline: none;
+    border-bottom-color: ${({ theme }) => theme.colors.primary};
+  }
+  &:disabled {
+    opacity: 0.5;
+  }
+`;
+
+const StyledInput = styled.input`
+  ${underlineField}
+`;
+
+const StyledTextarea = styled.textarea`
+  ${underlineField};
+  min-height: 120px;
+  resize: vertical;
+`;
+
+const FieldRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const SnsGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const SnsItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`;
+
+const SnsIconWrapper = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
+const SnsInputWrapper = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const SnsLabel = styled.span`
+  font-size: 14px;
+  font-weight: 500;
+`;
+
+const SnsInput = styled.input`
+  ${underlineField};
+  font-size: 14px;
+  padding: 8px 0;
+`;
+
+const PortfolioHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
+const AddButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+  border-radius: 8px;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.primary};
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  &:hover {
+    background: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.primaryForeground};
+  }
+`;
+
+const PortfolioList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+const EmptyState = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  border: 2px dashed #e5e7eb;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
+const PortfolioItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  transition: border-color 0.2s, background-color 0.2s;
+  &:hover {
+    background: #f5f5f5;
+    border-color: ${({ theme }) => theme.colors.primary};
+  }
+`;
+
+const FileIcon = styled.div<{ $variant: 'video' | 'file' }>`
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: ${({ theme }) => `${theme.colors.primary}1a`};
+  color: ${({ theme }) => theme.colors.primary};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const FileInfo = styled.div`
+  flex: 1;
+  min-width: 0;
+`;
+
+const FileName = styled.div`
+  font-size: 15px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.foreground};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const FileSize = styled.div`
+  font-size: 13px;
+  font-weight: 300;
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
+const RemoveButton = styled.button`
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.muted};
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:hover {
+    background: #ffeeee;
+    color: #ff4d4f;
+  }
+`;
+
+const TagList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const TagItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`;
+
+const TagLabel = styled.span`
+  min-width: 80px;
+  font-size: 15px;
+  font-weight: 500;
+`;
+
+const TagInputWrapper = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const TagInput = styled.input`
+  ${underlineField};
+  font-size: 15px;
+  padding: 8px 0;
+`;
+
+const GalleryGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    gap: 8px;
+  }
+`;
+
+const GalleryItem = styled.div`
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  cursor: pointer;
+`;
+
+const GalleryImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.2s;
+  ${GalleryItem}:hover & {
+    transform: scale(1.05);
+  }
+`;
+
+const GalleryOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+  ${GalleryItem}:hover & {
+    opacity: 1;
+  }
+`;
+
+const DeleteButton = styled.button`
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: #ffffff;
+  color: #ff4d4f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, background 0.2s, color 0.2s;
+  &:hover {
+    transform: scale(1.1);
+    background: #ff4d4f;
+    color: #ffffff;
+  }
+`;
+
+const AddImageButton = styled.button`
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary};
+    background: ${({ theme }) => `${theme.colors.primary}0d`};
+  }
+`;
+
+const ButtonGroup = styled.div`
+  padding-top: 30px;
+  margin-top: 40px;
+  border-top: 1px solid #e5e7eb;
+`;
+
+const SubmitButton = styled.button`
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 8px;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primaryForeground};
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  &:not(:disabled):hover {
+    background: #5b6de0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(104, 124, 244, 0.25);
+  }
+`;
 
 /**
  * 포트폴리오 등록 페이지
@@ -63,72 +586,68 @@ const PortfolioRegisterPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const handleInputChange = (field: string, value: string, index?: number) => {
-    if (index !== undefined) {
-      if (field === 'websites' || field === 'tags') {
-        const newArray = [...formData[field as keyof typeof formData] as string[]];
+    if (index !== undefined && (field === 'websites' || field === 'tags')) {
+      const currentArray = formData[field as keyof typeof formData] as string[];
+      const newArray = [...currentArray];
         newArray[index] = value;
         setFormData({ ...formData, [field]: newArray });
+      return;
       }
-    } else {
       setFormData({ ...formData, [field]: value });
-    }
   };
 
   const handleToggleChange = (field: string, index?: number) => {
     if (index !== undefined) {
-      const newArray = [...toggles[field as keyof typeof toggles] as boolean[]];
+      const currentArray = toggles[field as keyof typeof toggles] as boolean[];
+      const newArray = [...currentArray];
       newArray[index] = !newArray[index];
       setToggles({ ...toggles, [field]: newArray });
-    } else {
-      setToggles({ ...toggles, [field]: !toggles[field as keyof typeof toggles] });
+      return;
     }
+    setToggles({ ...toggles, [field]: !toggles[field as keyof typeof toggles] });
   };
 
+  const profileInputRef = useRef<HTMLInputElement | null>(null);
+  const galleryInputRef = useRef<HTMLInputElement | null>(null);
+  const portfolioInputRef = useRef<HTMLInputElement | null>(null);
+
   /**
-   * 프로필 이미지 선택 핸들러 (크롭 후 파일만 저장, 업로드는 나중에)
+   * 프로필 이미지 선택 핸들러
    */
   const handleProfileImageSelect = (file: File) => {
-    // 파일 객체 저장
     setMainThumbnailFile(file);
-    // 미리보기를 위한 Blob URL 생성
     const blobUrl = URL.createObjectURL(file);
     setMainThumbnailUrl(blobUrl);
   };
 
-  /**
-   * 갤러리 이미지 선택 핸들러 (크롭 후 파일만 저장, 업로드는 나중에)
-   */
   const handleGalleryImageSelect = (file: File) => {
-    if (galleryImageFiles.length >= 5) {
-      showToast('갤러리 이미지는 최대 5개까지 업로드 가능합니다.', undefined, 'error');
+    if (galleryImageFiles.length >= 9) {
+      showToast('갤러리 이미지는 최대 9개까지 업로드 가능합니다.', undefined, 'error');
       return;
     }
-    
-    // 파일 객체 저장
-    setGalleryImageFiles([...galleryImageFiles, file]);
-    // 미리보기를 위한 Blob URL 생성
+    setGalleryImageFiles((prev) => [...prev, file]);
     const blobUrl = URL.createObjectURL(file);
-    setGalleryImageUrls([...galleryImageUrls, blobUrl]);
+    setGalleryImageUrls((prev) => [...prev, blobUrl]);
   };
 
-  /**
-   * 이력서 파일 선택 핸들러 (파일만 저장, 업로드는 나중에)
-   */
-  const handleResumeFileSelect = (file: File) => {
-    // 파일 객체 저장
+  const handlePortfolioFileAdd = (file: File) => {
+    if (file.type.startsWith('video')) {
+      setPortfolioFile(file);
+      setPortfolioFileUrl(`${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`);
+    } else {
     setResumeFile(file);
-    // 파일명 표시용 (URL은 나중에 업로드 후 설정)
-    setResumeFileUrl(file.name);
+      setResumeFileUrl(`${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`);
+    }
   };
 
-  /**
-   * 포트폴리오 파일 선택 핸들러 (파일만 저장, 업로드는 나중에)
-   */
-  const handlePortfolioFileSelect = (file: File) => {
-    // 파일 객체 저장
-    setPortfolioFile(file);
-    // 파일명 표시용 (URL은 나중에 업로드 후 설정)
-    setPortfolioFileUrl(file.name);
+  const handleResumeFileRemove = () => {
+    setResumeFile(null);
+    setResumeFileUrl('');
+  };
+
+  const handlePortfolioFileRemove = () => {
+    setPortfolioFile(null);
+    setPortfolioFileUrl('');
   };
 
   /**
@@ -145,9 +664,6 @@ const PortfolioRegisterPage: React.FC = () => {
     setGalleryImageUrls(galleryImageUrls.filter((_, i) => i !== index));
   };
 
-  /**
-   * 폼 제출 핸들러
-   */
   const handleSubmit = async () => {
     setIsSubmitting(true);
 
@@ -249,324 +765,336 @@ const PortfolioRegisterPage: React.FC = () => {
     }
   };
 
+  const snsEntries = useMemo(
+    () => [
+      {
+        id: 0,
+        label: '유튜브',
+        placeholder: 'https://youtube.com/...',
+        icon: Youtube,
+      },
+      {
+        id: 1,
+        label: '인스타그램',
+        placeholder: 'https://instagram.com/...',
+        icon: Instagram,
+      },
+      {
+        id: 2,
+        label: '틱톡',
+        placeholder: 'https://tiktok.com/@...',
+        icon: Video,
+      },
+    ],
+    []
+  );
+
+  const tagEntries = useMemo(
+    () => [
+      { id: 0, label: '키', placeholder: '165cm' },
+      { id: 1, label: '몸무게', placeholder: '50kg' },
+      { id: 2, label: '사이즈', placeholder: '55' },
+      { id: 3, label: '경력', placeholder: '5년' },
+      { id: 4, label: '나이', placeholder: '25세' },
+    ],
+    []
+  );
+
+  const handleSubmitForm = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!isSubmitting && !isImageUploading) {
+      handleSubmit();
+    }
+  };
+
+  const renderFileItem = (type: 'resume' | 'portfolio', fileLabel: string, fileInfo: string) => {
+    if (!fileInfo) return null;
+    const isVideo = type === 'portfolio';
   return (
-    <RegisterPageLayout>
-      {/* 이름 섹션 (이미지 업로드 포함) */}
+      <PortfolioItem key={type}>
+        <FileIcon $variant={isVideo ? 'video' : 'file'}>
+          {isVideo ? <Video size={20} /> : <FileText size={20} />}
+        </FileIcon>
+        <FileInfo>
+          <FileName>{fileInfo.split(' (')[0]}</FileName>
+          <FileSize>{fileInfo.split(' (')[1] ? fileInfo.split(' (')[1].replace(')', '') : ''}</FileSize>
+        </FileInfo>
+        <RemoveButton
+          type="button"
+          onClick={type === 'resume' ? handleResumeFileRemove : handlePortfolioFileRemove}
+          aria-label={`${fileLabel} 삭제`}
+        >
+          <X size={18} />
+        </RemoveButton>
+      </PortfolioItem>
+    );
+  };
+
+  return (
+    <PageWrapper>
+      <FormContainer>
+        <Form onSubmit={handleSubmitForm}>
       <FormSection>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-          <div style={{ flex: 1 }}>
-            <SectionTitle variant="default" marginBottom="12px">이름</SectionTitle>
-            <div
-              style={{
-                fontSize: '12px',
-                color: 'var(--dark-gray)',
-                marginBottom: '12px',
-              }}
-            >
-              P.농해물과 백두산이 마르고 덮도록
-            </div>
-          </div>
+            <SectionTitle>프로필 사진</SectionTitle>
+            <SectionDescription>활동 시 사용할 대표 이미지를 등록해주세요.</SectionDescription>
+            <ProfileSection>
+              <ProfileInfo>
+                <ProfileLabel>대표 프로필</ProfileLabel>
+                <ProfileTitle>프로필 사진을 업로드하세요</ProfileTitle>
+                <ProfileHint>최대 10MB, JPG/PNG 권장</ProfileHint>
+              </ProfileInfo>
+              <ProfileImageWrapper
+                onClick={() => profileInputRef.current?.click()}
+                $hasImage={Boolean(mainThumbnailUrl)}
+              >
           {mainThumbnailUrl ? (
-            <div style={{ position: 'relative', display: 'inline-block' }}>
-              <img
-                src={mainThumbnailUrl}
-                alt="프로필"
-                style={{
-                  width: 100,
-                  height: 100,
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                  border: '1px solid var(--paint-gray)',
+                  <>
+                    <ProfileImage src={mainThumbnailUrl} alt="프로필 미리보기" />
+                    <ProfileOverlay>
+                      <OverlayText>변경하기</OverlayText>
+                    </ProfileOverlay>
+                  </>
+                ) : (
+                  <>
+                    <Upload size={40} />
+                    <span>이미지 업로드</span>
+                  </>
+                )}
+                <HiddenInput
+                  ref={profileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (file) {
+                      handleProfileImageSelect(file);
+                      event.target.value = '';
+                    }
+                  }}
+                />
+              </ProfileImageWrapper>
+            </ProfileSection>
+      </FormSection>
+
+      <FormSection>
+            <SectionTitle>등록 구분</SectionTitle>
+            <SectionDescription>활동 형태를 선택하면 맞춤 정보를 안내해드려요.</SectionDescription>
+            <StyledSelect
+          value={formData.registrationType}
+              onChange={(event) => handleInputChange('registrationType', event.target.value)}
+            >
+              <option value="">등록 유형을 선택하세요</option>
+              <option value="showhost">쇼호스트 - 라이브 커머스 진행</option>
+              <option value="model">모델 - 촬영 및 홍보 활동</option>
+            </StyledSelect>
+      </FormSection>
+
+      <FormSection>
+            <SectionTitle>기본 정보</SectionTitle>
+            <SectionDescription>소개에 사용할 기본 정보를 입력해주세요.</SectionDescription>
+            <InputGroup>
+              <label>
+                <LabelText>
+                  이름
+                  <LabelNote>실제 계약에 사용되는 이름</LabelNote>
+                </LabelText>
+                <StyledInput
+          value={formData.name}
+                  onChange={(event) => handleInputChange('name', event.target.value)}
+                  placeholder="이름을 입력해주세요."
+                />
+              </label>
+
+              <label>
+                <LabelText>
+                  한 줄 소개
+                  <LabelNote>최대 50자까지 입력 가능</LabelNote>
+                </LabelText>
+                <StyledInput
+          value={formData.oneLineIntro}
+                  onChange={(event) => handleInputChange('oneLineIntro', event.target.value.slice(0, 50))}
+                  placeholder="예) 패션 전문 라이브 쇼호스트"
+                />
+              </label>
+
+              <label>
+                <LabelText>상세 소개</LabelText>
+                <StyledTextarea
+          value={formData.detailedIntro}
+                  onChange={(event) => handleInputChange('detailedIntro', event.target.value)}
+                  placeholder="활동 이력, 전문 분야 등을 자세히 작성해주세요."
+        />
+              </label>
+            </InputGroup>
+      </FormSection>
+
+      <FormSection>
+            <SectionTitle>연락처</SectionTitle>
+            <SectionDescription>브랜드와의 원활한 소통을 위해 정확히 입력해주세요.</SectionDescription>
+            <InputGroup>
+              <label>
+                <LabelText>
+                  연락처
+                  <LabelNote>계약 완료 시 브랜드에 전달됩니다</LabelNote>
+                </LabelText>
+                <FieldRow>
+                  <StyledInput
+                    value={formData.contact}
+                    onChange={(event) => handleInputChange('contact', event.target.value)}
+                    placeholder="010-1234-5678"
+                    disabled={!toggles.contact}
+                  />
+                  <ToggleSwitch checked={toggles.contact} onChange={() => handleToggleChange('contact')} />
+                </FieldRow>
+              </label>
+
+              <label>
+                <LabelText>오픈채팅방</LabelText>
+                <FieldRow>
+                  <StyledInput
+                    value={formData.openChat}
+                    onChange={(event) => handleInputChange('openChat', event.target.value)}
+                    placeholder="https://open.kakao.com/..."
+                    disabled={!toggles.openChat}
+                  />
+                  <ToggleSwitch checked={toggles.openChat} onChange={() => handleToggleChange('openChat')} />
+                </FieldRow>
+              </label>
+            </InputGroup>
+      </FormSection>
+
+          <FormSection>
+            <SectionTitle>SNS / 사이트</SectionTitle>
+            <SectionDescription>활동 채널을 등록하면 검색 노출이 향상돼요.</SectionDescription>
+            <SnsGroup>
+              {snsEntries.map((sns) => (
+                <SnsItem key={sns.id}>
+                  <SnsIconWrapper>
+                    <sns.icon size={20} />
+                  </SnsIconWrapper>
+                  <SnsInputWrapper>
+                    <SnsLabel>{sns.label}</SnsLabel>
+                    <SnsInput
+                      value={formData.websites[sns.id]}
+                      onChange={(event) => handleInputChange('websites', event.target.value, sns.id)}
+                      placeholder={sns.placeholder}
+                      disabled={!toggles.websites[sns.id]}
+                    />
+                  </SnsInputWrapper>
+          <ToggleSwitch
+                    checked={toggles.websites[sns.id]}
+                    onChange={() => handleToggleChange('websites', sns.id)}
+          />
+                </SnsItem>
+              ))}
+            </SnsGroup>
+      </FormSection>
+
+          <FormSection>
+            <SectionTitle>포트폴리오</SectionTitle>
+            <SectionDescription>PDF, 영상 등 관련 자료를 업로드해주세요.</SectionDescription>
+            <PortfolioHeader>
+              <div>
+                추가로 등록할 자료가 있나요?
+          </div>
+              <AddButton type="button" onClick={() => portfolioInputRef.current?.click()}>
+                <Plus size={16} />
+                파일 추가
+              </AddButton>
+              <HiddenInput
+                ref={portfolioInputRef}
+                type="file"
+                accept=".pdf,.ppt,.pptx,.mp4,.mov,.avi,.mkv"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) {
+                    handlePortfolioFileAdd(file);
+                    event.target.value = '';
+                  }
                 }}
               />
-              <button
-                onClick={() => {
-                  // Blob URL 정리
-                  if (mainThumbnailUrl && mainThumbnailUrl.startsWith('blob:')) {
-                    URL.revokeObjectURL(mainThumbnailUrl);
-                  }
-                  setMainThumbnailFile(null);
-                  setMainThumbnailUrl('');
-                }}
-                style={{
-                  position: 'absolute',
-                  top: -8,
-                  right: -8,
-                  width: 24,
-                  height: 24,
-                  borderRadius: '50%',
-                  backgroundColor: 'var(--error)',
-                  color: 'white',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                }}
-              >
-                ×
-              </button>
-            </div>
-          ) : (
-            <ImageUpload
-              size={100}
-              onImageSelect={handleProfileImageSelect}
-            />
-          )}
-        </div>
+            </PortfolioHeader>
+
+            <PortfolioList>
+              {!resumeFileUrl && !portfolioFileUrl && (
+                <EmptyState>
+                  <Upload size={24} />
+                  <div>추가된 파일이 없습니다. 버튼을 눌러 업로드하세요.</div>
+                </EmptyState>
+              )}
+
+              {renderFileItem('resume', '이력서', resumeFileUrl)}
+              {renderFileItem('portfolio', '포트폴리오', portfolioFileUrl)}
+            </PortfolioList>
       </FormSection>
 
-      {/* 등록구분 */}
-      <FormSection>
-        <TextInput
-          label="등록구분"
-          placeholder="내용을 입력해주세요."
-          value={formData.registrationType}
-          onChange={(e) => handleInputChange('registrationType', e.target.value)}
-        />
-      </FormSection>
-
-      {/* 이름 (두 번째) */}
-      <FormSection>
-        <TextInput
-          label="이름"
-          placeholder="내용을 입력해주세요."
-          value={formData.name}
-          onChange={(e) => handleInputChange('name', e.target.value)}
-        />
-      </FormSection>
-
-      {/* 한줄 소개 */}
-      <FormSection>
-        <TextInput
-          label="한줄 소개"
-          placeholder="내용을 입력해주세요."
-          value={formData.oneLineIntro}
-          onChange={(e) => handleInputChange('oneLineIntro', e.target.value)}
-        />
-      </FormSection>
-
-      {/* 상세소개 */}
-      <FormSection>
-        <TextInput
-          label="상세소개"
-          placeholder="내용을 입력해주세요."
-          value={formData.detailedIntro}
-          onChange={(e) => handleInputChange('detailedIntro', e.target.value)}
-        />
-      </FormSection>
-
-      {/* 웹사이트 */}
-      <FormSection title="웹사이트">
-        <VerticalList showDividers={false}>
-          {[0, 1, 2].map((index) => (
-            <ListItem key={index} style={{ padding: '0', marginBottom: '12px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <FormRow>
-                  <span
-                    style={{
-                      fontSize: '12px',
-                      color: 'var(--dark-gray)',
-                      flexShrink: 0,
-                      width: '80px',
-                    }}
-                  >
-                    관리자 입력
-                  </span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <TextInput
-                      placeholder="내용을 입력해주세요."
-                      value={formData.websites[index]}
-                      onChange={(e) =>
-                        handleInputChange('websites', e.target.value, index)
-                      }
+          <FormSection>
+            <SectionTitle>태그</SectionTitle>
+            <SectionDescription>키, 사이즈 등 공개하고 싶은 정보를 선택하세요.</SectionDescription>
+            <TagList>
+              {tagEntries.map((tag) => (
+                <TagItem key={tag.id}>
+                  <TagLabel>{tag.label}</TagLabel>
+                  <TagInputWrapper>
+                    <TagInput
+                      value={formData.tags[tag.id]}
+                      onChange={(event) => handleInputChange('tags', event.target.value, tag.id)}
+                      placeholder={tag.placeholder}
+                      disabled={!toggles.tags[tag.id]}
                     />
-                  </div>
-                  <ToggleSwitch
-                    checked={toggles.websites[index]}
-                    onChange={() => handleToggleChange('websites', index)}
-                  />
-                </FormRow>
-              </div>
-            </ListItem>
-          ))}
-        </VerticalList>
-      </FormSection>
-
-      {/* 최근 라이브 링크 */}
-      <FormSection>
-        <TextInput
-          label="최근 라이브 링크"
-          placeholder="내용을 입력해주세요."
-          value={formData.recentLiveLink}
-          onChange={(e) => handleInputChange('recentLiveLink', e.target.value)}
-        />
-      </FormSection>
-
-      {/* 포트폴리오 */}
-      <FormSection title="포트폴리오">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <FileUpload
-            label="이력서"
-            onFileSelect={handleResumeFileSelect}
-          />
-          {resumeFileUrl && (
-            <div style={{ fontSize: '12px', color: 'var(--primary)' }}>
-              ✓ 이력서 파일이 업로드되었습니다.
-            </div>
-          )}
-          <FileUpload
-            label="포트폴리오"
-            onFileSelect={handlePortfolioFileSelect}
-          />
-          {portfolioFileUrl && (
-            <div style={{ fontSize: '12px', color: 'var(--primary)' }}>
-              ✓ 포트폴리오 파일이 업로드되었습니다.
-            </div>
-          )}
-        </div>
-      </FormSection>
-
-      {/* 연락처 */}
-      <FormSection title="연락처">
-        <FormRow>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <TextInput
-              placeholder="내용을 입력해주세요."
-              value={formData.contact}
-              onChange={(e) => handleInputChange('contact', e.target.value)}
-            />
-          </div>
-          <ToggleSwitch
-            checked={toggles.contact}
-            onChange={() => handleToggleChange('contact')}
-          />
-        </FormRow>
-      </FormSection>
-
-      {/* 오픈채팅방 */}
-      <FormSection title="오픈채팅방">
-        <FormRow>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <TextInput
-              placeholder="내용을 입력해주세요."
-              value={formData.openChat}
-              onChange={(e) => handleInputChange('openChat', e.target.value)}
-            />
-          </div>
-          <ToggleSwitch
-            checked={toggles.openChat}
-            onChange={() => handleToggleChange('openChat')}
-          />
-        </FormRow>
-      </FormSection>
-
-      {/* 태그 */}
-      <FormSection title="태그">
-        <VerticalList showDividers={false}>
-          {[0, 1, 2, 3, 4].map((index) => (
-            <ListItem key={index} style={{ padding: '0', marginBottom: '12px' }}>
-              <FormRow>
-                <span
-                  style={{
-                    fontSize: '12px',
-                    color: 'var(--dark-gray)',
-                    flexShrink: 0,
-                    width: '80px',
-                  }}
-                >
-                  관리자 입력
-                </span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <TextInput
-                    placeholder="내용을 입력해주세요."
-                    value={formData.tags[index]}
-                    onChange={(e) =>
-                      handleInputChange('tags', e.target.value, index)
-                    }
-                  />
-                </div>
                 <ToggleSwitch
-                  checked={toggles.tags[index]}
-                  onChange={() => handleToggleChange('tags', index)}
+                      checked={toggles.tags[tag.id]}
+                      onChange={() => handleToggleChange('tags', tag.id)}
                 />
-              </FormRow>
-            </ListItem>
+                  </TagInputWrapper>
+                </TagItem>
           ))}
-        </VerticalList>
+            </TagList>
       </FormSection>
 
-      {/* 갤러리 */}
-      <FormSection title="갤러리">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {galleryImageUrls.length < 5 && (
-            <ImageUpload
-              size={120}
-              onImageSelect={handleGalleryImageSelect}
-            />
-          )}
-          {galleryImageUrls.length > 0 && (
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '8px',
-              }}
-            >
+          <FormSection>
+            <SectionTitle>갤러리</SectionTitle>
+            <SectionDescription>최대 9장의 활동 이미지를 등록할 수 있습니다.</SectionDescription>
+            <GalleryGrid>
               {galleryImageUrls.map((url, index) => (
-                <div key={index} style={{ position: 'relative' }}>
-                  <img
-                    src={url}
-                    alt={`갤러리 ${index + 1}`}
-                    style={{
-                      width: '100%',
-                      aspectRatio: '1 / 1',
-                      objectFit: 'cover',
-                      borderRadius: '8px',
-                      border: '1px solid var(--paint-gray)',
+                <GalleryItem key={url}>
+                  <GalleryImage src={url} alt={`갤러리 ${index + 1}`} />
+                  <GalleryOverlay>
+                    <DeleteButton type="button" onClick={() => handleGalleryImageRemove(index)}>
+                      <X size={18} />
+                    </DeleteButton>
+                  </GalleryOverlay>
+                </GalleryItem>
+              ))}
+              {galleryImageUrls.length < 9 && (
+                <AddImageButton type="button" onClick={() => galleryInputRef.current?.click()}>
+                  <Plus size={28} />
+                  <span>추가</span>
+                  <HiddenInput
+                    ref={galleryInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      if (file) {
+                        handleGalleryImageSelect(file);
+                        event.target.value = '';
+                      }
                     }}
                   />
-                  <button
-                    onClick={() => handleGalleryImageRemove(index)}
-                    style={{
-                      position: 'absolute',
-                      top: -8,
-                      right: -8,
-                      width: 24,
-                      height: 24,
-                      borderRadius: '50%',
-                      backgroundColor: 'var(--error)',
-                      color: 'white',
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontSize: '12px',
-                    }}
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-          {galleryImageUrls.length >= 5 && (
-            <div style={{ fontSize: '12px', color: 'var(--dark-gray)' }}>
-              갤러리 이미지는 최대 5개까지 업로드 가능합니다.
-            </div>
-          )}
-        </div>
+                </AddImageButton>
+              )}
+            </GalleryGrid>
       </FormSection>
 
-      {/* 하단 버튼 */}
-      <div style={{ marginTop: '32px' }}>
-        <Button
-          variant="primary"
-          size="medium"
-          fullWidth
-          onClick={handleSubmit}
-          disabled={isSubmitting || isImageUploading}
-        >
-          {isSubmitting ? '등록 중...' : '등록하기'}
-        </Button>
-      </div>
-    </RegisterPageLayout>
+          <ButtonGroup>
+            <SubmitButton type="submit" disabled={isSubmitting || isImageUploading}>
+              {isSubmitting ? '등록 중...' : '등록하기'}
+            </SubmitButton>
+          </ButtonGroup>
+        </Form>
+      </FormContainer>
+    </PageWrapper>
   );
 };
 
