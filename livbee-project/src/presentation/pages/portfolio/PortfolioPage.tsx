@@ -1,81 +1,534 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import PortfolioRowCard from '@/presentation/components/cards/PortfolioRowCard';
-import VerticalList from '@/presentation/components/list/VerticalList';
-import ListItem from '@/presentation/components/list/ListItem';
-import ListPageLayout from '@/presentation/layouts/ListPageLayout';
+import styled, { css } from 'styled-components';
+import { Search as SearchIcon, Star, Plus } from 'lucide-react';
+import Pagination from '@/presentation/components/list/Pagination';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { ErrorState } from '@/presentation/components/states/ErrorState';
+import { EmptyState } from '@/presentation/components/states/EmptyState';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { Portfolio } from '@/domain/entities/Portfolio';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
 
+const filters: Array<{ label: string; value: string }> = [
+  { label: '전체', value: '전체' },
+  { label: '뷰티', value: '뷰티' },
+  { label: '패션', value: '패션' },
+  { label: '식품', value: '식품' },
+  { label: '가전', value: '가전' },
+  { label: '생활/리빙', value: '생활/리빙' },
+];
+
 const PortfolioPage: React.FC = () => {
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = React.useState<number>(1);
+  const [searchQuery, setSearchQuery] = React.useState<string>('');
+  const [searchInputValue, setSearchInputValue] = React.useState<string>('');
+  const [activeFilter, setActiveFilter] = React.useState<string>('전체');
+  const [scrapMap, setScrapMap] = React.useState<Record<string, boolean>>({});
 
-  // portfolioRepository를 useRepository 훅으로 관리
   const portfolioRepository = useRepository(PortfolioRepository);
 
-  // 목록 데이터 조회
-  const { data: portfolios, loading, error } = useListData<Portfolio, { page: number; limit: number }, { items: Portfolio[]; currentPage?: number; totalPages?: number }>(
+  const {
+    data: portfolios,
+    loading,
+    error,
+    totalPages,
+  } = useListData<
+    Portfolio,
+    { page: number; limit: number; search?: string },
+    { items: Portfolio[]; currentPage?: number; totalPages?: number; totalItems?: number }
+  >(
     (query, signal) => portfolioRepository.getPortfolioList(query, signal),
-    { page: 1, limit: 20 },
-    [],
+    {
+      page: currentPage,
+      limit: 20,
+      search: searchQuery || undefined,
+    },
+    [currentPage, searchQuery],
     '포트폴리오 목록을 불러오는 중 오류가 발생했습니다.'
   );
 
-  // 로딩 중
-  if (loading) {
-    return (
-      <ListPageLayout
-        searchPlaceholder="검색"
-        floatingActionButtonPath="/portfolios/register"
-      >
-        <LoadingState />
-      </ListPageLayout>
-    );
-  }
+  const filteredPortfolios = React.useMemo(() => {
+    // TODO: 필터 기능은 추후 카테고리 데이터 추가 시 구현
+    return portfolios;
+  }, [portfolios, activeFilter]);
 
-  // 에러 발생
-  if (error) {
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+  };
+
+  const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    handleSearch(searchInputValue.trim());
+  };
+
+  const handleFilterChange = (value: string) => {
+    setActiveFilter(value);
+  };
+
+  const handleScrapToggle = (portfolioId: string) => {
+    setScrapMap((prev) => ({
+      ...prev,
+      [portfolioId]: !prev[portfolioId],
+    }));
+  };
+
+  const buildBadgeItems = (portfolio: Portfolio): string[] => {
+    const badges: string[] = [];
+    // TODO: 카테고리 데이터 추가 시 categories 사용
+    if (portfolio.detailedRegion) {
+      badges.push(portfolio.detailedRegion);
+    }
+    return badges;
+  };
+
+  const formatExperience = (years: number | null): string => {
+    if (years == null || years === 0) return '';
+    return `· 경력 ${years}년`;
+  };
+
+  const renderState = () => {
+    if (loading && portfolios.length === 0) {
+      return (
+        <StateWrapper>
+          <LoadingState />
+        </StateWrapper>
+      );
+    }
+
+    if (error && portfolios.length === 0) {
+      return (
+        <StateWrapper>
+          <ErrorState
+            message={error}
+            onRetry={() => {
+              setCurrentPage(1);
+              setSearchQuery('');
+            }}
+          />
+        </StateWrapper>
+      );
+    }
+
+    if (!loading && filteredPortfolios.length === 0) {
+      return (
+        <StateWrapper>
+          <EmptyState message="등록된 쇼호스트가 없습니다." />
+        </StateWrapper>
+      );
+    }
+
     return (
-      <ListPageLayout
-        searchPlaceholder="검색"
-        floatingActionButtonPath="/portfolios/register"
-      >
-        <ErrorState message={error} />
-      </ListPageLayout>
+      <>
+        <CardsColumn>
+          {filteredPortfolios.map((portfolio) => (
+            <PortfolioCard
+              key={portfolio.id}
+              onClick={() => navigate(`/portfolios/${portfolio.id}`)}
+            >
+              <TopSection>
+                <ProfileImageContainer>
+                  {portfolio.mainThumbnailUrl ? (
+                    <ProfileImage src={portfolio.mainThumbnailUrl} alt={portfolio.nickname || '프로필'} />
+                  ) : (
+                    <PlaceholderImage />
+                  )}
+                </ProfileImageContainer>
+
+                <HostContent>
+                  <HostNameRow>
+                    <HostName>{portfolio.nickname || '이름 없음'}</HostName>
+                    <ScrapButton
+                      type="button"
+                      aria-label="스크랩"
+                      aria-pressed={Boolean(scrapMap[portfolio.id])}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleScrapToggle(portfolio.id);
+                      }}
+                    >
+                      <StyledStar
+                        size={16}
+                        $active={Boolean(scrapMap[portfolio.id])}
+                        aria-hidden="true"
+                      />
+                    </ScrapButton>
+                  </HostNameRow>
+
+                  <HostIntro>{portfolio.oneLineIntro || '소개 없음'}</HostIntro>
+                </HostContent>
+              </TopSection>
+
+              <BadgeContainer>
+                {buildBadgeItems(portfolio).map((badge, index) => (
+                  <CategoryBadge key={`${portfolio.id}-${index}`}>{badge}</CategoryBadge>
+                ))}
+                {portfolio.experienceYears != null && portfolio.experienceYears > 0 && (
+                  <InfoText>{formatExperience(portfolio.experienceYears)}</InfoText>
+                )}
+              </BadgeContainer>
+            </PortfolioCard>
+          ))}
+        </CardsColumn>
+
+        {totalPages && totalPages > 1 && (
+          <PaginationWrapper>
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+          </PaginationWrapper>
+        )}
+      </>
     );
-  }
+  };
 
   return (
-    <ListPageLayout
-      searchPlaceholder="검색"
-      floatingActionButtonPath="/portfolios/register"
-    >
-      {/* 포트폴리오 리스트 */}
-      <VerticalList showDividers={true}>
-        {portfolios.map((portfolio) => (
-          <ListItem
-            key={portfolio.id}
-            onTap={() => navigate(`/portfolios/${portfolio.id}`)}
-          >
-            <PortfolioRowCard
-              title={portfolio.nickname || '이름 없음'}
-              content={portfolio.oneLineIntro || '소개 없음'}
-              imageUrl={portfolio.mainThumbnailUrl || undefined}
-              onOfferPress={() => {
-                // TODO: 제안하기 기능 구현
-              }}
-              onCardPress={() => navigate(`/portfolios/${portfolio.id}`)}
-            />
-          </ListItem>
-        ))}
-      </VerticalList>
-    </ListPageLayout>
+    <PageWrapper>
+      <PageInner>
+        <HeaderSection>
+          <PageTitle>
+            쇼호스트 <Highlight>찾기</Highlight>
+          </PageTitle>
+          <PageDescription>브랜드에 맞는 쇼호스트를 찾아보세요</PageDescription>
+        </HeaderSection>
+
+        <SearchSection onSubmit={handleSearchSubmit}>
+          <SearchIconWrapper size={18} aria-hidden="true" />
+          <SearchInput
+            type="text"
+            placeholder="이름, 카테고리로 검색"
+            value={searchInputValue}
+            onChange={(event) => setSearchInputValue(event.target.value)}
+          />
+        </SearchSection>
+
+        <FilterRow>
+          {filters.map((filter) => (
+            <FilterBadge
+              key={filter.value}
+              type="button"
+              $isActive={activeFilter === filter.value}
+              onClick={() => handleFilterChange(filter.value)}
+            >
+              {filter.label}
+            </FilterBadge>
+          ))}
+        </FilterRow>
+
+        {renderState()}
+      </PageInner>
+
+      <RegisterFab type="button" onClick={() => navigate('/portfolios/register')} aria-label="쇼호스트 등록">
+        <Plus size={24} strokeWidth={2.5} />
+      </RegisterFab>
+    </PageWrapper>
   );
 };
 
-export default PortfolioPage;
+const PageWrapper = styled.div`
+  min-height: 100vh;
+  background: ${({ theme }) => theme.colors.background};
+  padding: 2rem 1rem 6rem;
+  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    padding: 2.5rem 1.5rem 6rem;
+  }
+  @media (min-width: ${({ theme }) => theme.breakpoints.desktop}) {
+    padding: 3rem 2rem 6rem;
+  }
+`;
 
+const PageInner = styled.div`
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+`;
+
+const HeaderSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+`;
+
+const PageTitle = styled.h1`
+  font-size: 1.75rem;
+  line-height: 1.3;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.foreground};
+  margin: 0;
+`;
+
+const Highlight = styled.span`
+  color: ${({ theme }) => theme.colors.primary};
+`;
+
+const PageDescription = styled.p`
+  margin: 0;
+  color: ${({ theme }) => theme.colors.muted};
+  font-size: 1rem;
+`;
+
+const SearchSection = styled.form`
+  position: relative;
+  width: 100%;
+  margin-bottom: 1.5rem;
+`;
+
+const SearchInput = styled.input`
+  width: 100%;
+  padding: 0.875rem 1rem;
+  padding-left: 2.5rem;
+  border-radius: ${({ theme }) => theme.radii.lg};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  background: ${({ theme }) => theme.colors.inputBackground};
+  font-size: 0.95rem;
+  color: ${({ theme }) => theme.colors.foreground};
+  transition: border-color 0.2s, box-shadow 0.2s;
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.muted};
+  }
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 3px rgba(104, 124, 244, 0.15);
+  }
+`;
+
+const SearchIconWrapper = styled(SearchIcon)`
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
+const FilterRow = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  margin-bottom: 1.5rem;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+const FilterBadge = styled.button<{ $isActive: boolean }>`
+  border: none;
+  border-radius: ${({ theme }) => theme.radii.md};
+  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, transform 0.2s;
+  ${({ $isActive }) =>
+    $isActive
+      ? css`
+          background: ${({ theme }) => theme.colors.primary};
+          color: ${({ theme }) => theme.colors.primaryForeground};
+        `
+      : css`
+          background: ${({ theme }) => theme.colors.secondary};
+          color: ${({ theme }) => theme.colors.foreground};
+        `}
+  &:hover {
+    background: rgba(104, 124, 244, 0.1);
+    color: ${({ theme }) => theme.colors.primary};
+  }
+  &:active {
+    transform: scale(0.98);
+  }
+`;
+
+const CardsColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const PortfolioCard = styled.article`
+  background: ${({ theme }) => theme.colors.card};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 2px 8px rgba(104, 124, 244, 0.1);
+    transform: translateY(-2px);
+  }
+`;
+
+const TopSection = styled.div`
+  display: flex;
+  gap: 1rem;
+`;
+
+const ProfileImageContainer = styled.div`
+  flex-shrink: 0;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 9999px;
+  background: ${({ theme }) => theme.colors.secondary};
+  overflow: hidden;
+`;
+
+const ProfileImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+const PlaceholderImage = styled.div`
+  width: 100%;
+  height: 100%;
+  background: ${({ theme }) => theme.colors.secondary};
+`;
+
+const HostContent = styled.div`
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const HostNameRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+`;
+
+const HostName = styled.h3`
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.foreground};
+`;
+
+const ScrapButton = styled.button`
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.375rem;
+  background: transparent;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background-color 0.2s;
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary};
+    background: rgba(104, 124, 244, 0.05);
+  }
+`;
+
+const StyledStar = styled(Star)<{ $active: boolean }>`
+  color: ${({ theme, $active }) => ($active ? theme.colors.primary : theme.colors.muted)};
+  ${({ $active }) =>
+    $active &&
+    css`
+      fill: ${({ theme }) => theme.colors.primary};
+    `}
+  transition: color 0.2s, fill 0.2s;
+  ${ScrapButton}:hover & {
+    color: ${({ theme }) => theme.colors.primary};
+  }
+`;
+
+const HostIntro = styled.p`
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: ${({ theme }) => theme.colors.muted};
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+`;
+
+const BadgeContainer = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  align-items: center;
+  min-width: 0;
+  width: 100%;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+const CategoryBadge = styled.span`
+  display: inline-flex;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.625rem;
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.foreground};
+  white-space: nowrap;
+  flex-shrink: 0;
+`;
+
+const InfoText = styled.span`
+  color: ${({ theme }) => theme.colors.muted};
+  font-size: 0.75rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+`;
+
+const PaginationWrapper = styled.div`
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+`;
+
+const RegisterFab = styled.button`
+  position: fixed;
+  right: 1.5rem;
+  bottom: 6rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  border: none;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primaryForeground};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 24px rgba(104, 124, 244, 0.35);
+  cursor: pointer;
+  z-index: 50;
+  transition: transform 0.2s, background 0.2s;
+  &:hover {
+    background: #5b6de0;
+    transform: scale(1.05);
+  }
+  &:active {
+    transform: scale(0.98);
+  }
+`;
+
+const StateWrapper = styled.div`
+  padding: 2rem 0;
+`;
+
+export default PortfolioPage;
