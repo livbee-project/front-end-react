@@ -96,7 +96,7 @@ const MyPage: React.FC = () => {
   }, [userType]);
 
   // 유저 타입별 메뉴 데이터
-  const menuItems = React.useMemo(() => {
+  const menuItems = React.useMemo<MenuItemData[][]>(() => {
     const commonMenu: MenuItemData[] = [
       {
         icon: User,
