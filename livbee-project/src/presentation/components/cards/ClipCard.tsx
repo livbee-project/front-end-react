@@ -26,13 +26,13 @@ const CardContainer = styled.div<{ $hasClick: boolean }>`
   box-sizing: border-box;
 `;
 
-const Thumbnail = styled.div<{ $hasImage: boolean }>`
+const Thumbnail = styled.div<{ $hasImage: boolean; $imageUrl?: string }>`
   width: 100%;
   aspect-ratio: 16 / 9;
   background-color: ${({ theme }) => theme.colors.secondary};
   border-radius: ${({ theme }) => theme.radii.lg};
   border: ${({ $hasImage, theme }) => ($hasImage ? 'none' : `1px solid ${theme.colors.border}`)};
-  background-image: ${({ $hasImage, imageUrl }) => ($hasImage && imageUrl ? `url(${imageUrl})` : 'none')};
+  background-image: ${({ $hasImage, $imageUrl }) => ($hasImage && $imageUrl ? `url(${$imageUrl})` : 'none')};
   background-size: cover;
   background-position: center;
   display: flex;
@@ -100,7 +100,7 @@ const ClipCard: React.FC<ClipCardProps> = ({
   return (
     <CardContainer $hasClick={!!onClick} onClick={onClick}>
       {/* 썸네일 이미지 */}
-      <Thumbnail $hasImage={!!imageUrl} imageUrl={imageUrl}>
+      <Thumbnail $hasImage={!!imageUrl} $imageUrl={imageUrl}>
         {!imageUrl && <PlaceholderImage size={48} />}
       </Thumbnail>
 
