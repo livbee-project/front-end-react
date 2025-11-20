@@ -1,7 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import HomeNavigation from './components/HomeNavigation';
-import TopTabs from './components/TopTabs';
 import StoryHighlightsSection from './StoryHighlightsSection';
 import ShoppingLiveSection from './ShoppingLiveSection';
 import BrandPickSection from './BrandPickSection';
@@ -32,8 +30,6 @@ const Content = styled.main`
 
 const Home: React.FC = () => (
   <Page>
-    <HomeNavigation />
-    <TopTabs />
     <Content>
       <div style={{ margin: '1rem 0' }}>
         <BannerSliderSection />

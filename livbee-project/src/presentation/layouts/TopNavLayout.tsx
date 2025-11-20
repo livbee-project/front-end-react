@@ -1,14 +1,13 @@
 import React from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
-import TopTabBar from '@/presentation/components/navigation/TopTabBar';
+import { Outlet } from 'react-router-dom';
+import HomeNavigation from '@/presentation/components/navigation/HomeNavigation';
+import TopTabs from '@/presentation/components/navigation/TopTabs';
 
 const TopNavLayout: React.FC = () => {
-  const location = useLocation();
-  const shouldRenderTabs = location.pathname !== '/';
-
   return (
     <div>
-      {shouldRenderTabs && <TopTabBar />}
+      <HomeNavigation />
+      <TopTabs />
       <main>
         <Outlet />
       </main>
