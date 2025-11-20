@@ -1,6 +1,5 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
 
 /**
  * GalleryGrid 컴포넌트가 받을 props 타입을 정의합니다.
@@ -17,11 +16,7 @@ interface GalleryGridProps {
 const GridContainer = styled.div<{ $columns: number }>`
   display: grid;
   grid-template-columns: repeat(${({ $columns }) => $columns}, 1fr);
-  gap: ${({ theme }) => theme.spacing.lg};
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    gap: ${({ theme }) => theme.spacing.md};
-  }
+  gap: ${({ theme }) => theme.spacing.xs};
 `;
 
 const ImageItem = styled.div<{ $hasClick: boolean }>`
@@ -35,14 +30,13 @@ const ImageItem = styled.div<{ $hasClick: boolean }>`
   cursor: ${({ $hasClick }) => ($hasClick ? 'pointer' : 'default')};
   position: relative;
   overflow: hidden;
-  transition: transform 0.2s, border-color 0.2s;
+  transition: opacity 0.2s;
 
-  ${({ $hasClick, theme }) =>
+  ${({ $hasClick }) =>
     $hasClick &&
     css`
       &:hover {
-        transform: scale(1.02);
-        border-color: ${theme.colors.primary};
+        opacity: 0.9;
       }
     `}
 `;
@@ -63,30 +57,22 @@ const GalleryGrid: React.FC<GalleryGridProps> = ({
   columns = 3,
   onImageClick,
 }) => {
+  // 최대 6개 이미지로 제한
+  const displayImages = images.slice(0, 6);
 
-
-  /**
-   * 기본 플레이스홀더 개수 계산
-   * 최소 9개(3x3)를 표시합니다.
-   */
-  const placeholderCount = Math.max(9, Math.ceil(images.length / (columns * columns)) * columns * columns);
-  const displayItems = images.length > 0 
-    ? images 
-    : Array(placeholderCount).fill(null);
+  if (displayImages.length === 0) {
+    return null;
+  }
 
   return (
     <GridContainer $columns={columns}>
-      {displayItems.map((imageUrl, index) => (
+      {displayImages.map((imageUrl, index) => (
         <ImageItem
           key={index}
           $hasClick={!!onImageClick}
           onClick={() => onImageClick && onImageClick(index)}
         >
-          {imageUrl ? (
-            <Image src={imageUrl} alt={`갤러리 이미지 ${index + 1}`} />
-          ) : (
-            <PlaceholderImage size={40} />
-          )}
+          <Image src={imageUrl} alt={`갤러리 이미지 ${index + 1}`} />
         </ImageItem>
       ))}
     </GridContainer>

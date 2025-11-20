@@ -1,124 +1,205 @@
 import React from 'react';
+import styled from 'styled-components';
+import { ExternalLink } from 'lucide-react';
 import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
+import { H1, PMuted, Caption } from '@/presentation/components/styled/Typography';
+import { Badge } from '@/presentation/components/styled/CommonStyles';
 
 /**
  * ProfileSection 컴포넌트가 받을 props 타입을 정의합니다.
  * @param name - 프로필 이름
- * @param description - 프로필 설명 텍스트
+ * @param description - 한 줄 소개
+ * @param detailedIntro - 여러 줄 설명 (HTML 가능)
  * @param profileImageUrl - 프로필 이미지 URL (선택)
+ * @param type - 타입 ('showhost' | 'model')
+ * @param categories - 카테고리 배열 (선택)
+ * @param tags - 태그 배열 (예: ['키 168cm', '사이즈 55', '경력 5년'])
+ * @param websiteUrl - 웹사이트 URL (선택)
  * @param onImageClick - 프로필 이미지 클릭 시 실행될 함수 (선택)
  */
 interface ProfileSectionProps {
   name: string;
-  description: string;
+  description?: string | null;
+  detailedIntro?: string | null;
   profileImageUrl?: string;
+  type: 'showhost' | 'model';
+  categories?: string[];
+  tags?: string[];
+  websiteUrl?: string | null;
   onImageClick?: () => void;
 }
 
+const Section = styled.section`
+  max-width: 672px;
+  margin: 0 auto;
+  padding: ${({ theme }) => theme.spacing.xl} ${({ theme }) => theme.spacing.lg};
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.lg};
+`;
+
+const ProfileHeader = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: ${({ theme }) => theme.spacing.lg};
+`;
+
+const ProfileImageContainer = styled.div<{ $hasClick: boolean }>`
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  border-radius: ${({ theme }) => theme.radii.full};
+  background-color: ${({ theme }) => theme.colors.secondary};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: ${({ $hasClick }) => ($hasClick ? 'pointer' : 'default')};
+  overflow: hidden;
+  position: relative;
+`;
+
+const ProfileImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+const ProfileInfo = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.sm};
+  min-width: 0;
+`;
+
+const Name = styled(H1)`
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: ${({ theme }) => theme.colors.foreground};
+`;
+
+const BadgeContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing.xs};
+  align-items: center;
+`;
+
+const TypeBadge = styled(Badge)`
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+  background-color: transparent;
+  color: ${({ theme }) => theme.colors.primary};
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
+`;
+
+const CategoryBadge = styled(Badge)`
+  background-color: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.foreground};
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
+`;
+
+const Description = styled(PMuted)`
+  color: ${({ theme }) => theme.colors.muted};
+  margin-top: ${({ theme }) => theme.spacing.xs};
+`;
+
+const DetailedIntro = styled.div`
+  color: ${({ theme }) => theme.colors.foreground};
+  font: ${({ theme }) => theme.fonts.body};
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+`;
+
+const TagsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing.xs};
+  margin-top: ${({ theme }) => theme.spacing.sm};
+`;
+
+const Tag = styled(Caption)`
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
+  background-color: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.foreground};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  white-space: nowrap;
+`;
+
+const WebsiteLink = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.xs};
+  color: ${({ theme }) => theme.colors.primary};
+  text-decoration: none;
+  font: ${({ theme }) => theme.fonts.body};
+  margin-top: ${({ theme }) => theme.spacing.sm};
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
 /**
  * 상세 페이지 상단의 프로필 정보 섹션 컴포넌트입니다.
- * 이름, 설명, 프로필 이미지를 표시합니다.
- * 모델 상세 페이지와 포트폴리오 상세 페이지에서 공통으로 사용됩니다.
+ * 이름, 타입 뱃지, 카테고리 뱃지, 설명, 태그, 웹사이트 링크를 표시합니다.
  */
 const ProfileSection: React.FC<ProfileSectionProps> = ({
   name,
   description,
+  detailedIntro,
   profileImageUrl,
+  type,
+  categories = [],
+  tags = [],
+  websiteUrl,
   onImageClick,
 }) => {
-  /**
-   * 섹션 컨테이너 스타일
-   * 하단 구분선을 포함합니다.
-   */
-  const sectionStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    padding: '16px',
-    borderBottom: '1px solid #F7F8FA',
-    gap: '16px',
-  };
-
-  /**
-   * 텍스트 영역 스타일
-   * 왼쪽에 위치하며 flex: 1로 남은 공간을 차지합니다.
-   */
-  const textAreaStyle: React.CSSProperties = {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-    minWidth: 0,
-  };
-
-  /**
-   * 이름 스타일
-   */
-  const nameStyle: React.CSSProperties = {
-    fontSize: 'var(--h1)',
-    fontWeight: 700,
-    color: 'var(--black)',
-    lineHeight: 1.4,
-  };
-
-  /**
-   * 설명 스타일
-   */
-  const descriptionStyle: React.CSSProperties = {
-    fontSize: 'var(--p2)',
-    fontWeight: 400,
-    color: 'var(--dark-gray)',
-    lineHeight: 1.5,
-  };
-
-  /**
-   * 프로필 이미지 컨테이너 스타일
-   * 원형 이미지를 표시합니다.
-   */
-  const imageContainerStyle: React.CSSProperties = {
-    width: '120px',
-    height: '120px',
-    flexShrink: 0,
-    borderRadius: '50%',
-    backgroundColor: '#F7F8FA',
-    border: '1px solid #ECEFF1',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    cursor: onImageClick ? 'pointer' : 'default',
-    overflow: 'hidden',
-    position: 'relative',
-  };
-
-  /**
-   * 프로필 이미지 스타일
-   */
-  const imageStyle: React.CSSProperties = {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-  };
-
   return (
-    <div style={sectionStyle}>
-      {/* 텍스트 영역 (왼쪽) */}
-      <div style={textAreaStyle}>
-        <h1 style={nameStyle}>{name}</h1>
-        <p style={descriptionStyle}>{description}</p>
-      </div>
+    <Section>
+      <ProfileHeader>
+        <ProfileImageContainer $hasClick={!!onImageClick} onClick={onImageClick}>
+          {profileImageUrl ? (
+            <ProfileImage src={profileImageUrl} alt={name} />
+          ) : (
+            <PlaceholderImage size={40} />
+          )}
+        </ProfileImageContainer>
+        <ProfileInfo>
+          <Name>{name}</Name>
+          <BadgeContainer>
+            <TypeBadge as="span">[{type === 'showhost' ? '쇼호스트' : '모델'}]</TypeBadge>
+            {categories.map((category, index) => (
+              <CategoryBadge key={index} as="span">[{category}]</CategoryBadge>
+            ))}
+          </BadgeContainer>
+          {description && <Description>{description}</Description>}
+        </ProfileInfo>
+      </ProfileHeader>
 
-      {/* 프로필 이미지 (오른쪽) */}
-      <div style={imageContainerStyle} onClick={onImageClick}>
-        {profileImageUrl ? (
-          <img src={profileImageUrl} alt={name} style={imageStyle} />
-        ) : (
-          <PlaceholderImage size={48} />
-        )}
-      </div>
-    </div>
+      {detailedIntro && (
+        <DetailedIntro dangerouslySetInnerHTML={{ __html: detailedIntro }} />
+      )}
+
+      {tags.length > 0 && (
+        <TagsContainer>
+          {tags.map((tag, index) => (
+            <Tag key={index}>[{tag}]</Tag>
+          ))}
+        </TagsContainer>
+      )}
+
+      {websiteUrl && (
+        <WebsiteLink href={websiteUrl} target="_blank" rel="noopener noreferrer">
+          <ExternalLink size={16} />
+          <span>웹사이트</span>
+        </WebsiteLink>
+      )}
+    </Section>
   );
 };
 
 export default ProfileSection;
-

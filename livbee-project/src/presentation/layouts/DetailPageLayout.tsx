@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 
 /**
  * DetailPageLayout 컴포넌트가 받을 props 타입을 정의합니다.
@@ -8,20 +9,27 @@ interface DetailPageLayoutProps {
   children: React.ReactNode;
 }
 
+const PageContainer = styled.div`
+  width: 100%;
+  background-color: ${({ theme }) => theme.colors.background};
+`;
+
+const ContentContainer = styled.div`
+  max-width: 672px;
+  margin: 0 auto;
+  width: 100%;
+`;
+
 /**
  * 상세 페이지의 공통 레이아웃 래퍼 컴포넌트입니다.
  * 모든 상세 페이지에 공통으로 적용되는 스타일을 제공합니다.
  */
 const DetailPageLayout: React.FC<DetailPageLayoutProps> = ({ children }) => {
-  /**
-   * 페이지 컨테이너 스타일
-   */
-  const pageStyle: React.CSSProperties = {
-    width: '100%',
-    backgroundColor: 'var(--white)',
-  };
-
-  return <div style={pageStyle}>{children}</div>;
+  return (
+    <PageContainer>
+      <ContentContainer>{children}</ContentContainer>
+    </PageContainer>
+  );
 };
 
 export default DetailPageLayout;
