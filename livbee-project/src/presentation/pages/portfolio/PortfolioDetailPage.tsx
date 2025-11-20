@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import StickyHeader from '@/presentation/components/detail/StickyHeader';
 import ProfileSection from '@/presentation/components/detail/ProfileSection';
-import SectionHeader from '@/presentation/components/section/SectionHeader';
+import HomeSectionHeader from '@/presentation/components/section/HomeSectionHeader';
 import GalleryGrid from '@/presentation/components/detail/GalleryGrid';
 import ActionSection from '@/presentation/components/detail/ActionSection';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
@@ -125,7 +125,7 @@ const PortfolioDetailPage: React.FC = () => {
 
       {portfolio.subThumbnailUrls && portfolio.subThumbnailUrls.length > 0 && (
         <GallerySection>
-          <SectionHeader title="갤러리" />
+          <HomeSectionHeader title="갤러리" />
           <div style={{ marginTop: theme.spacing.lg }}>
             <GalleryGrid
               images={portfolio.subThumbnailUrls}

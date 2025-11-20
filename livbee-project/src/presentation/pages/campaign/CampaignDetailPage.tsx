@@ -1,9 +1,9 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import DetailHeader from '@/presentation/components/detail/DetailHeader';
+import DetailHeader from '@/presentation/components/detail/campaign/DetailHeader';
 import BulletList from '@/presentation/components/detail/BulletList';
-import InfoItem from '@/presentation/components/detail/InfoItem';
+import InfoItem from '@/presentation/components/detail/campaign/InfoItem';
 import ProductCard from '@/presentation/components/cards/ProductCard';
 import Button from '@/presentation/components/ui/Button';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';

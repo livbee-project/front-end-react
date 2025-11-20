@@ -57,7 +57,7 @@ const IconButton = styled.button`
   }
 `;
 
-const HomeNavigation: React.FC = () => (
+const HomeNavBar: React.FC = () => (
   <NavBar>
     <NavInner>
       <Logo>쇼핑라이브</Logo>
@@ -73,5 +73,5 @@ const HomeNavigation: React.FC = () => (
   </NavBar>
 );
 
-export default HomeNavigation;
+export default HomeNavBar;
 

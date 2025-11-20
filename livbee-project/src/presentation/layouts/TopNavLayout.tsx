@@ -1,13 +1,13 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import HomeNavigation from '@/presentation/components/navigation/HomeNavigation';
-import TopTabs from '@/presentation/components/navigation/TopTabs';
+import HomeNavBar from '@/presentation/components/navigation/HomeNavBar';
+import HomeTopTabs from '@/presentation/components/navigation/HomeTopTabs';
 
 const TopNavLayout: React.FC = () => {
   return (
     <div>
-      <HomeNavigation />
-      <TopTabs />
+      <HomeNavBar />
+      <HomeTopTabs />
       <main>
         <Outlet />
       </main>

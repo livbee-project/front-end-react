@@ -63,7 +63,7 @@ const TabButton = styled.button<{ $active: boolean }>`
   }
 `;
 
-const TopTabs: React.FC = () => {
+const HomeTopTabs: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -80,12 +80,7 @@ const TopTabs: React.FC = () => {
     <TabsWrapper>
       <TabsInner>
         {TAB_ITEMS.map((tab) => (
-          <TabButton
-            key={tab.path}
-            $active={location.pathname === tab.path}
-            onClick={() => handleClick(tab.path)}
-            type="button"
-          >
+          <TabButton key={tab.path} $active={location.pathname === tab.path} onClick={() => handleClick(tab.path)} type="button">
             {tab.label}
           </TabButton>
         ))}
@@ -94,5 +89,5 @@ const TopTabs: React.FC = () => {
   );
 };
 
-export default TopTabs;
+export default HomeTopTabs;
 
