@@ -5,7 +5,7 @@
  * 이 파일의 모든 상수는 theme.legacy에서 re-export됩니다.
  */
 
-import React from 'react';
+import type { CSSProperties } from 'react';
 import { theme } from './theme';
 
 /**
@@ -21,13 +21,7 @@ export const GAP = theme.legacy.gap;
 /**
  * @deprecated theme.radii를 사용하세요
  */
-export const BORDER_RADIUS = {
-  SM: 8,
-  MD: 10,
-  LG: 12,
-  XL: 16,
-  CIRCLE: '50%',
-} as const;
+export const BORDER_RADIUS = theme.legacy.borderRadius;
 
 /**
  * @deprecated theme.fonts를 사용하세요
@@ -58,7 +52,7 @@ export const BACKGROUND_COLOR = {
 /**
  * @deprecated CommonStyles의 FlexCenter, FlexRow, FlexColumn을 사용하세요
  */
-export const FLEX_CENTER: React.CSSProperties = {
+export const FLEX_CENTER: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -67,7 +61,7 @@ export const FLEX_CENTER: React.CSSProperties = {
 /**
  * @deprecated CommonStyles의 FlexRow를 사용하세요
  */
-export const FLEX_ROW: React.CSSProperties = {
+export const FLEX_ROW: CSSProperties = {
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
@@ -76,7 +70,7 @@ export const FLEX_ROW: React.CSSProperties = {
 /**
  * @deprecated CommonStyles의 FlexColumn을 사용하세요
  */
-export const FLEX_COLUMN: React.CSSProperties = {
+export const FLEX_COLUMN: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
 };
@@ -84,7 +78,7 @@ export const FLEX_COLUMN: React.CSSProperties = {
 /**
  * @deprecated CommonStyles의 EllipsisText를 사용하세요
  */
-export const ELLIPSIS_TEXT: React.CSSProperties = {
+export const ELLIPSIS_TEXT: CSSProperties = {
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
@@ -93,7 +87,7 @@ export const ELLIPSIS_TEXT: React.CSSProperties = {
 /**
  * @deprecated theme.input을 사용하세요
  */
-export const INPUT_BASE_STYLE: React.CSSProperties = {
+export const INPUT_BASE_STYLE: CSSProperties = {
   width: '100%',
   padding: theme.input.padding,
   paddingRight: '40px',
@@ -110,14 +104,14 @@ export const INPUT_BASE_STYLE: React.CSSProperties = {
 /**
  * @deprecated theme.input.focusBorderColor를 사용하세요
  */
-export const INPUT_FOCUS_STYLE: React.CSSProperties = {
+export const INPUT_FOCUS_STYLE: CSSProperties = {
   borderColor: theme.input.focusBorderColor,
 };
 
 /**
  * @deprecated theme.colors.error를 사용하세요
  */
-export const INPUT_ERROR_STYLE: React.CSSProperties = {
+export const INPUT_ERROR_STYLE: CSSProperties = {
   borderColor: theme.colors.error,
 };
 
