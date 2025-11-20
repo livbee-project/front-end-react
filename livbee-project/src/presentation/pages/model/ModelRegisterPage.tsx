@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import TextInput from '@/presentation/components/forms/TextInput';
 import ToggleSwitch from '@/presentation/components/ui/ToggleSwitch';
-import FileUpload from '@/presentation/components/upload/FileUpload';
 import ImageUpload from '@/presentation/components/upload/ImageUpload';
 import VerticalList from '@/presentation/components/list/VerticalList';
 import ListItem from '@/presentation/components/list/ListItem';
@@ -78,6 +77,8 @@ const ModelRegisterPage: React.FC = () => {
   const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  const portfolioInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleInputChange = (
     field: string,
@@ -397,11 +398,49 @@ const ModelRegisterPage: React.FC = () => {
       {/* 포트폴리오 */}
       <FormSection title="포트폴리오">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <FileUpload
-            label="아바타"
-            onFileSelect={handlePortfolioFileSelect}
+          <input
+            type="file"
+            ref={portfolioInputRef}
+            style={{ display: 'none' }}
+            accept=".pdf,.ppt,.pptx,.mp4,.mov,.avi,.mkv"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) {
+                handlePortfolioFileSelect(file);
+                event.target.value = '';
+              }
+            }}
           />
-          {portfolioFileUrl && (
+          {!portfolioFileUrl ? (
+            <button
+              type="button"
+              onClick={() => portfolioInputRef.current?.click()}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '12px',
+                padding: '20px',
+                border: '2px dashed #e5e7eb',
+                borderRadius: '8px',
+                background: '#fafafa',
+                fontSize: '14px',
+                color: '#717182',
+                cursor: 'pointer',
+                transition: 'border-color 0.2s, background 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#687CF4';
+                e.currentTarget.style.background = '#f5f6ff';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#e5e7eb';
+                e.currentTarget.style.background = '#fafafa';
+              }}
+            >
+              <span>추가된 파일이 없습니다</span>
+            </button>
+          ) : (
             <SuccessText>✓ 포트폴리오 파일이 업로드되었습니다.</SuccessText>
           )}
         </div>

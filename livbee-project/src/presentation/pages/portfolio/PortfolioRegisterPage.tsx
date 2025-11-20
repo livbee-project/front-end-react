@@ -262,35 +262,6 @@ const SnsInput = styled.input`
   padding: ${({ theme }) => theme.spacing.sm} 0;
 `;
 
-const PortfolioHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: ${({ theme }) => theme.spacing.lg};
-  margin-bottom: ${({ theme }) => theme.spacing.xl};
-  ${PMuted} {
-    color: ${({ theme }) => theme.colors.muted};
-  }
-`;
-
-const AddButton = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing.xs};
-  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.lg};
-  border: 1px solid ${({ theme }) => theme.colors.primary};
-  border-radius: ${({ theme }) => theme.radii.md};
-  background: transparent;
-  color: ${({ theme }) => theme.colors.primary};
-  font: ${({ theme }) => theme.fonts.button};
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  &:hover {
-    background: ${({ theme }) => theme.colors.primary};
-    color: ${({ theme }) => theme.colors.primaryForeground};
-  }
-`;
-
 const PortfolioList = styled.div`
   display: flex;
   flex-direction: column;
@@ -856,7 +827,6 @@ const PortfolioRegisterPage: React.FC = () => {
 
       <FormSection>
             <SectionTitle>등록 구분</SectionTitle>
-            <SectionDescription>활동 형태를 선택하면 맞춤 정보를 안내해드려요.</SectionDescription>
             <StyledSelect
           value={formData.registrationType}
               onChange={(event) => handleInputChange('registrationType', event.target.value)}
@@ -872,10 +842,7 @@ const PortfolioRegisterPage: React.FC = () => {
             <SectionDescription>소개에 사용할 기본 정보를 입력해주세요.</SectionDescription>
             <InputGroup>
               <label>
-                <LabelText>
-                  이름
-                  <LabelNote>실제 계약에 사용되는 이름</LabelNote>
-                </LabelText>
+                <LabelText>이름</LabelText>
                 <StyledInput
           value={formData.name}
                   onChange={(event) => handleInputChange('name', event.target.value)}
@@ -971,33 +938,29 @@ const PortfolioRegisterPage: React.FC = () => {
           <FormSection>
             <SectionTitle>포트폴리오</SectionTitle>
             <SectionDescription>PDF, 영상 등 관련 자료를 업로드해주세요.</SectionDescription>
-            <PortfolioHeader>
-              <div>
-                추가로 등록할 자료가 있나요?
-          </div>
-              <AddButton type="button" onClick={() => portfolioInputRef.current?.click()}>
-                <Plus size={16} />
-                파일 추가
-              </AddButton>
-              <HiddenInput
-                ref={portfolioInputRef}
-                type="file"
-                accept=".pdf,.ppt,.pptx,.mp4,.mov,.avi,.mkv"
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  if (file) {
-                    handlePortfolioFileAdd(file);
-                    event.target.value = '';
-                  }
-                }}
-              />
-            </PortfolioHeader>
+            <HiddenInput
+              ref={portfolioInputRef}
+              type="file"
+              accept=".pdf,.ppt,.pptx,.mp4,.mov,.avi,.mkv"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) {
+                  handlePortfolioFileAdd(file);
+                  event.target.value = '';
+                }
+              }}
+            />
 
             <PortfolioList>
               {!resumeFileUrl && !portfolioFileUrl && (
-                <EmptyState>
+                <EmptyState
+                  as="button"
+                  type="button"
+                  onClick={() => portfolioInputRef.current?.click()}
+                  style={{ cursor: 'pointer' }}
+                >
                   <Upload size={24} />
-                  <div>추가된 파일이 없습니다. 버튼을 눌러 업로드하세요.</div>
+                  <div>추가된 파일이 없습니다</div>
                 </EmptyState>
               )}
 
