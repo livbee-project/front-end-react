@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import StoryHighlightsSection from './StoryHighlightsSection';
 import ShoppingLiveSection from './ShoppingLiveSection';
-import BrandPickSection from './BrandPickSection';
 import HowShowhostSection from './HowShowhostSection';
 import RecommendedLiveSection from './RecommendedLiveSection';
 import ConceptModelSection from './ConceptModelSection';
@@ -36,9 +35,8 @@ const Home: React.FC = () => (
       </div>
       <StoryHighlightsSection />
       <ShoppingLiveSection />
-      <BrandPickSection />
-      <HowShowhostSection />
       <RecommendedLiveSection />
+      <HowShowhostSection />
       <ConceptModelSection />
       <HotClipSection />
       <LivbeeNewsSection />
