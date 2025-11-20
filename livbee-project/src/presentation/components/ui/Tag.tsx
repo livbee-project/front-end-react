@@ -1,4 +1,7 @@
 import React from 'react';
+import styled, { css } from 'styled-components';
+import { PrimaryBadge } from '@/presentation/components/styled/CommonStyles';
+import { Caption } from '@/presentation/components/styled/Typography';
 
 /**
  * Tag 컴포넌트가 받을 props 타입을 정의합니다.
@@ -13,36 +16,47 @@ interface TagProps {
 }
 
 /**
+ * StyledTag - styled-components 기반 태그
+ */
+const StyledTag = styled(PrimaryBadge)<{ $variant: 'rounded' | 'circle' }>`
+  ${({ $variant }) =>
+    $variant === 'rounded'
+      ? css`
+          padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.md};
+          border-radius: ${({ theme }) => theme.radii.xl};
+        `
+      : css`
+          padding: 0;
+          width: 2rem;
+          height: 2rem;
+          border-radius: ${({ theme }) => theme.radii.full};
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        `}
+  flex-shrink: 0;
+  cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
+  transition: opacity 0.2s;
+
+  &:hover {
+    ${({ onClick }) =>
+      onClick &&
+      css`
+        opacity: 0.9;
+      `}
+  }
+`;
+
+/**
  * 정보 및 태그 섹션에서 사용되는 태그 컴포넌트입니다.
  * 둥근 사각형 또는 원형 스타일을 지원합니다.
  */
 const Tag: React.FC<TagProps> = ({ label, variant = 'rounded', onClick }) => {
-  /**
-   * 태그 컨테이너 스타일
-   * variant에 따라 borderRadius가 달라집니다.
-   */
-  const tagStyle: React.CSSProperties = {
-    display: 'inline-flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'var(--primary)',
-    color: 'var(--white)',
-    fontSize: 'var(--p2)', // 14px
-    fontWeight: 400,
-    padding: variant === 'rounded' ? '6px 12px' : '0',
-    borderRadius: variant === 'rounded' ? '16px' : '50%',
-    width: variant === 'circle' ? '32px' : 'auto',
-    height: variant === 'circle' ? '32px' : 'auto',
-    cursor: onClick ? 'pointer' : 'default',
-    flexShrink: 0,
-  };
-
   return (
-    <div style={tagStyle} onClick={onClick}>
-      {label}
-    </div>
+    <StyledTag $variant={variant} onClick={onClick}>
+      <Caption>{label}</Caption>
+    </StyledTag>
   );
 };
 
 export default Tag;
-
