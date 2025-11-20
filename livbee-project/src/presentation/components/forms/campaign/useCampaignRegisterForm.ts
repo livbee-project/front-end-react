@@ -40,19 +40,6 @@ const convertToISO8601 = (dateString: string): string => {
   return `${dateString}T00:00:00.000Z`;
 };
 
-const calculateDurationHours = (startTime: string, endTime: string): number => {
-  if (!startTime || !endTime) return 0;
-
-  const [startHour, startMinute] = startTime.split(':').map(Number);
-  const [endHour, endMinute] = endTime.split(':').map(Number);
-
-  const startMinutes = startHour * 60 + startMinute;
-  const endMinutes = endHour * 60 + endMinute;
-
-  const diffMinutes = endMinutes - startMinutes;
-  return Math.round((diffMinutes / 60) * 10) / 10;
-};
-
 export const useCampaignRegisterForm = () => {
   const navigate = useNavigate();
   const { uploadFile, isUploading: isImageUploading } = useCloudinaryUpload();

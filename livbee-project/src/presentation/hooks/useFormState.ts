@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 /**
  * 범용 폼 상태를 관리하는 훅
  */
-export const useFormState = <T extends Record<string, unknown>>(initialState: T) => {
+export const useFormState = <T>(initialState: T) => {
   const [formData, setFormData] = useState<T>(initialState);
 
   /**

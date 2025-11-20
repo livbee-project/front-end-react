@@ -91,7 +91,7 @@ const ShoppingLiveSection: React.FC = () => {
           const imageUrl = campaign.imageUrl || campaign.thumbnailUrl || undefined;
           const summary = htmlToText(campaign.content).slice(0, 60);
           const dday = campaign.closeAt ? calculateDDay(campaign.closeAt) : '';
-          const price = campaign.minPrice != null ? formatCurrency(campaign.minPrice) : '가격 미정';
+          const price = campaign.fee != null ? formatCurrency(campaign.fee) : '가격 미정';
 
           return (
             <HomeCard key={campaign.id} onClick={() => navigate(`/campaigns/${campaign.id}`)}>
