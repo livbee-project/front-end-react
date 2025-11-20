@@ -76,6 +76,7 @@ export const usePortfolioRegisterForm = () => {
         const currentValue = (toggles[field] as boolean[])[index];
         updateToggleArrayField(field, index, !currentValue);
         return;
+      }
       const currentValue = toggles[field];
       if (typeof currentValue === 'boolean') {
         updateToggleField(field, (!currentValue) as PortfolioToggleState[typeof field]);
