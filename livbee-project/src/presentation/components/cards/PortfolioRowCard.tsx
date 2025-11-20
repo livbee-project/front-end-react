@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { H2, PMuted } from '@/presentation/components/styled/Typography';
+import { H2, PMuted, Caption } from '@/presentation/components/styled/Typography';
 import { EllipsisText } from '@/presentation/components/styled/CommonStyles';
 
 /**
@@ -71,8 +71,8 @@ const ImageContainer = styled.div<{ $hasImage: boolean; $imageUrl?: string }>`
   align-items: center;
 `;
 
-const PlaceholderIcon = styled.span`
-  font-size: 40px;
+const PlaceholderIcon = styled(Caption)`
+  font-size: 2.5rem;
   color: ${({ theme }) => theme.colors.muted};
 `;
 
