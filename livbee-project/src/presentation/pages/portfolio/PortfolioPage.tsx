@@ -10,7 +10,7 @@ import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { Portfolio } from '@/domain/entities/Portfolio';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
-import { H1, H2, H3, PMuted, Caption, Highlight } from '@/presentation/components/styled/Typography';
+import { H1, H3, PMuted, Caption, Highlight } from '@/presentation/components/styled/Typography';
 import { Input, SecondaryBadge } from '@/presentation/components/styled/CommonStyles';
 import { Card } from '@/presentation/components/styled/SectionStyles';
 

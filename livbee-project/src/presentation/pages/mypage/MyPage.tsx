@@ -17,7 +17,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';
-import { H2, H3, PMuted, PrimaryBadge } from '@/presentation/components/styled/Typography';
+import { H2, H3, PMuted } from '@/presentation/components/styled/Typography';
+import { PrimaryBadge } from '@/presentation/components/styled/CommonStyles';
 import { Card } from '@/presentation/components/styled/SectionStyles';
 
 type UserType = 'brand' | 'showhost' | 'model';
