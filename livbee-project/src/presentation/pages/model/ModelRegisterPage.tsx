@@ -17,7 +17,7 @@ import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import type { CreateModelRequest } from '@/domain/entities/Model';
-import { Caption, PMuted } from '@/presentation/components/styled/Typography';
+import { Caption } from '@/presentation/components/styled/Typography';
 
 const HelperText = styled(Caption)`
   color: ${({ theme }) => theme.colors.muted};
@@ -25,10 +25,6 @@ const HelperText = styled(Caption)`
 
 const SuccessText = styled(Caption)`
   color: ${({ theme }) => theme.colors.primary};
-`;
-
-const ErrorText = styled(Caption)`
-  color: ${({ theme }) => theme.colors.error};
 `;
 
 /**

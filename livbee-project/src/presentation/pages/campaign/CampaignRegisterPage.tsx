@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import TextInput from '@/presentation/components/forms/TextInput';
 import SelectInput from '@/presentation/components/forms/SelectInput';
 import DateInput from '@/presentation/components/forms/DateInput';
@@ -13,6 +14,7 @@ import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import type { CreateCampaignRequest } from '@/domain/entities/Campaign';
+import { Caption } from '@/presentation/components/styled/Typography';
 
 const UploadMessage = styled(Caption)`
   margin-top: ${({ theme }) => theme.spacing.sm};
