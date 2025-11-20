@@ -1,5 +1,4 @@
 import React from 'react';
-import React from 'react';
 import styled from 'styled-components';
 import VerticalList from '@/presentation/components/list/VerticalList';
 import ListItem from '@/presentation/components/list/ListItem';
