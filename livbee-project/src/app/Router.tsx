@@ -54,17 +54,19 @@ const AppRouter = () => (
             {/* (추가) BottomNavBar의 탭 경로들을 추가합니다. */}
             <Route path="/campaigns" element={<CampaignsPage />} />
             <Route path="/campaigns/register" element={<CampaignRegisterPage />} />
-            <Route path="/campaigns/:id" element={<CampaignDetailPage />} />
             <Route path="/models" element={<ModelsPage />} />
             <Route path="/models/register" element={<ModelRegisterPage />} />
-            <Route path="/models/:id" element={<ModelDetailPage />} />
             <Route path="/portfolios" element={<PortfolioPage />} />
             <Route path="/portfolios/register" element={<PortfolioRegisterPage />} />
-            <Route path="/portfolios/:id" element={<PortfolioDetailPage />} />
             <Route path="/mypage/portfolios" element={<MyPortfolioPage />} />
             <Route path="/mypage/clips" element={<MyClipsPage />} />
             <Route path="/mypage" element={<MyPage />} />
           </Route>
+
+          {/* 상세 페이지는 TopNavLayout을 사용하지 않아 상단 바를 숨깁니다. */}
+          <Route path="/campaigns/:id" element={<CampaignDetailPage />} />
+          <Route path="/models/:id" element={<ModelDetailPage />} />
+          <Route path="/portfolios/:id" element={<PortfolioDetailPage />} />
 
           {/*
             (참고) 3. TopNavLayout 밖에, RootLayout 안에

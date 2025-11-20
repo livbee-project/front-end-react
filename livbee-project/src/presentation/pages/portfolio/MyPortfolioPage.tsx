@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { Star, Pencil, Trash2 } from 'lucide-react';
 import Pagination from '@/presentation/components/list/Pagination';
 import FloatingActionButton from '@/presentation/components/ui/FloatingActionButton';
