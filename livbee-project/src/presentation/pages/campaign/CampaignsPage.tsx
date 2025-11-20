@@ -10,6 +10,9 @@ import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { Campaign } from '@/domain/entities/Campaign';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
+import { H1, H2, H3, PMuted, CaptionMedium, Highlight } from '@/presentation/components/styled/Typography';
+import { Input, SecondaryBadge } from '@/presentation/components/styled/CommonStyles';
+import { Card, CardHeader, CardFooter } from '@/presentation/components/styled/SectionStyles';
 
 const filters: Array<{ label: string; value: '전체' | Campaign['category'] }> = [
   { label: '전체', value: '전체' },
@@ -118,7 +121,7 @@ const CampaignsPage: React.FC = () => {
               key={campaign.id}
               onClick={() => navigate(`/campaigns/${campaign.id}`)}
             >
-              <CardHeader>
+              <StyledCardHeader>
                 <BrandName>{campaign.brandName}</BrandName>
                 <ScrapButton
                   type="button"
@@ -135,20 +138,20 @@ const CampaignsPage: React.FC = () => {
                     aria-hidden="true"
                   />
                 </ScrapButton>
-              </CardHeader>
+              </StyledCardHeader>
 
-              <CampaignTitle>{campaign.title}</CampaignTitle>
+              <CampaignTitle as={H2}>{campaign.title}</CampaignTitle>
 
               <BadgeContainer>
                 {buildBadgeItems(campaign).map((badge) => (
-                  <InfoBadge key={`${campaign.id}-${badge}`}>{badge}</InfoBadge>
+                  <SecondaryBadge key={`${campaign.id}-${badge}`} as="span">{badge}</SecondaryBadge>
                 ))}
               </BadgeContainer>
 
-              <CardFooter>
+              <StyledCardFooter>
                 <FeeText>{formatFee(campaign.fee)}</FeeText>
                 <DeadlineText>{formatDeadline(campaign.closeAt)}</DeadlineText>
-              </CardFooter>
+              </StyledCardFooter>
             </CampaignCard>
           ))}
         </CardsColumn>
@@ -174,7 +177,7 @@ const CampaignsPage: React.FC = () => {
 
         <SearchSection onSubmit={handleSearchSubmit}>
           <SearchIconWrapper size={18} aria-hidden="true" />
-          <SearchInput
+          <StyledInput
             type="text"
             placeholder="브랜드명, 카테고리로 검색"
             value={searchInputValue}
@@ -272,59 +275,34 @@ const PageInner = styled.div`
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: ${({ theme }) => theme.spacing.xl};
 `;
 
 const HeaderSection = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding-bottom: 2rem;
+  gap: ${({ theme }) => theme.spacing.md};
+  padding-bottom: ${({ theme }) => theme.spacing['2xl']};
   border-bottom: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
-const PageTitle = styled.h1`
+const PageTitle = styled(H1)`
   font-size: 1.75rem;
   line-height: 1.3;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.foreground};
-  margin: 0;
 `;
 
-const Highlight = styled.span`
-  color: ${({ theme }) => theme.colors.primary};
-`;
-
-const PageDescription = styled.p`
-  margin: 0;
-  color: ${({ theme }) => theme.colors.muted};
+const PageDescription = styled(PMuted)`
   font-size: 1rem;
 `;
 
 const SearchSection = styled.form`
   position: relative;
   width: 100%;
-  margin-bottom: 1.5rem;
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
 `;
 
-const SearchInput = styled.input`
-  width: 100%;
-  padding: 0.875rem 1rem;
+const StyledInput = styled(Input)`
   padding-left: 2.5rem;
-  border-radius: ${({ theme }) => theme.radii.lg};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  background: ${({ theme }) => theme.colors.inputBackground};
-  font-size: 0.95rem;
-  color: ${({ theme }) => theme.colors.foreground};
-  transition: border-color 0.2s, box-shadow 0.2s;
-  &::placeholder {
-    color: ${({ theme }) => theme.colors.muted};
-  }
-  &:focus {
-    outline: none;
-    border-color: ${({ theme }) => theme.colors.primary};
-    box-shadow: 0 0 0 3px rgba(104, 124, 244, 0.15);
-  }
 `;
 
 const SearchIconWrapper = styled(SearchIcon)`
@@ -337,10 +315,10 @@ const SearchIconWrapper = styled(SearchIcon)`
 
 const FilterRow = styled.div`
   display: flex;
-  gap: 0.5rem;
+  gap: ${({ theme }) => theme.spacing.sm};
   overflow-x: auto;
-  padding-bottom: 0.25rem;
-  margin-bottom: 1.5rem;
+  padding-bottom: ${({ theme }) => theme.spacing.xs};
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
   -ms-overflow-style: none;
   scrollbar-width: none;
   &::-webkit-scrollbar {
@@ -352,8 +330,8 @@ const FilterBadge = styled.button<{ $isActive: boolean }>`
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
   white-space: nowrap;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.lg};
+  font: ${({ theme }) => theme.fonts.caption};
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s, transform 0.2s;
   ${({ $isActive, theme }) =>
@@ -378,17 +356,11 @@ const FilterBadge = styled.button<{ $isActive: boolean }>`
 const CardsColumn = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: ${({ theme }) => theme.spacing.lg};
 `;
 
-const CampaignCard = styled.article`
-  background: ${({ theme }) => theme.colors.card};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+const CampaignCard = styled(Card)`
+  padding: ${({ theme }) => theme.spacing.xl};
   cursor: pointer;
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
   &:hover {
@@ -398,18 +370,11 @@ const CampaignCard = styled.article`
   }
 `;
 
-const CardHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+const StyledCardHeader = styled(CardHeader)`
+  margin-bottom: ${({ theme }) => theme.spacing.md};
 `;
 
-const BrandName = styled.h3`
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.foreground};
-`;
+const BrandName = styled(H3)``;
 
 const ScrapButton = styled.button`
   background: none;
@@ -436,64 +401,44 @@ const StyledStar = styled(Star)<{ $active: boolean }>`
   }
 `;
 
-const CampaignTitle = styled.h2`
-  margin: 0;
-  font-size: 1.15rem;
-  line-height: 1.4;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.foreground};
+const CampaignTitle = styled(H2)`
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  margin-bottom: ${({ theme }) => theme.spacing.md};
 `;
 
 const BadgeContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: ${({ theme }) => theme.spacing.sm};
+  margin-bottom: ${({ theme }) => theme.spacing.sm};
 `;
 
-const InfoBadge = styled.span`
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 0.25rem 0.625rem;
-  border-radius: ${({ theme }) => theme.radii.sm};
-  background: ${({ theme }) => theme.colors.secondary};
-  color: ${({ theme }) => theme.colors.foreground};
-`;
+const StyledCardFooter = styled(CardFooter)``;
 
-const CardFooter = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 0.5rem;
-  border-top: 1px solid ${({ theme }) => theme.colors.border};
-`;
-
-const FeeText = styled.span`
-  font-weight: 700;
+const FeeText = styled(CaptionMedium)`
   color: ${({ theme }) => theme.colors.primary};
 `;
 
-const DeadlineText = styled.span`
-  font-weight: 500;
+const DeadlineText = styled(CaptionMedium)`
   color: #ff5a5f;
 `;
 
 const PaginationWrapper = styled.div`
-  margin-top: 1.5rem;
+  margin-top: ${({ theme }) => theme.spacing.xl};
   display: flex;
   justify-content: center;
 `;
 
 const RegisterFab = styled.button`
   position: fixed;
-  right: 1.5rem;
+  right: ${({ theme }) => theme.spacing.xl};
   bottom: 6rem;
   width: 3.5rem;
   height: 3.5rem;
-  border-radius: 50%;
+  border-radius: ${({ theme }) => theme.radii.full};
   border: none;
   background: ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.primaryForeground};
@@ -514,7 +459,7 @@ const RegisterFab = styled.button`
 `;
 
 const StateWrapper = styled.div`
-  padding: 2rem 0;
+  padding: ${({ theme }) => theme.spacing['2xl']} 0;
 `;
 
 export default CampaignsPage;

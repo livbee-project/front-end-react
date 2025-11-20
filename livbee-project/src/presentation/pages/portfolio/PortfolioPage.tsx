@@ -10,6 +10,9 @@ import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { Portfolio } from '@/domain/entities/Portfolio';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
+import { H1, H2, H3, PMuted, Caption, Highlight } from '@/presentation/components/styled/Typography';
+import { Input, SecondaryBadge } from '@/presentation/components/styled/CommonStyles';
+import { Card } from '@/presentation/components/styled/SectionStyles';
 
 const filters: Array<{ label: string; value: string }> = [
   { label: '전체', value: '전체' },
@@ -140,7 +143,7 @@ const PortfolioPage: React.FC = () => {
 
                 <HostContent>
                   <HostNameRow>
-                    <HostName>{portfolio.nickname || '이름 없음'}</HostName>
+                    <HostName as={H3}>{portfolio.nickname || '이름 없음'}</HostName>
                     <ScrapButton
                       type="button"
                       aria-label="스크랩"
@@ -158,16 +161,16 @@ const PortfolioPage: React.FC = () => {
                     </ScrapButton>
                   </HostNameRow>
 
-                  <HostIntro>{portfolio.oneLineIntro || '소개 없음'}</HostIntro>
+                  <HostIntro as={PMuted}>{portfolio.oneLineIntro || '소개 없음'}</HostIntro>
                 </HostContent>
               </TopSection>
 
               <BadgeContainer>
                 {buildBadgeItems(portfolio).map((badge, index) => (
-                  <CategoryBadge key={`${portfolio.id}-${index}`}>{badge}</CategoryBadge>
+                  <SecondaryBadge key={`${portfolio.id}-${index}`} as="span">{badge}</SecondaryBadge>
                 ))}
                 {portfolio.experienceYears != null && portfolio.experienceYears > 0 && (
-                  <InfoText>{formatExperience(portfolio.experienceYears)}</InfoText>
+                  <InfoText as={Caption}>{formatExperience(portfolio.experienceYears)}</InfoText>
                 )}
               </BadgeContainer>
             </PortfolioCard>
@@ -195,7 +198,7 @@ const PortfolioPage: React.FC = () => {
 
         <SearchSection onSubmit={handleSearchSubmit}>
           <SearchIconWrapper size={18} aria-hidden="true" />
-          <SearchInput
+          <StyledInput
             type="text"
             placeholder="이름, 카테고리로 검색"
             value={searchInputValue}
@@ -243,59 +246,34 @@ const PageInner = styled.div`
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: ${({ theme }) => theme.spacing.xl};
 `;
 
 const HeaderSection = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding-bottom: 2rem;
+  gap: ${({ theme }) => theme.spacing.md};
+  padding-bottom: ${({ theme }) => theme.spacing['2xl']};
   border-bottom: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
-const PageTitle = styled.h1`
+const PageTitle = styled(H1)`
   font-size: 1.75rem;
   line-height: 1.3;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.foreground};
-  margin: 0;
 `;
 
-const Highlight = styled.span`
-  color: ${({ theme }) => theme.colors.primary};
-`;
-
-const PageDescription = styled.p`
-  margin: 0;
-  color: ${({ theme }) => theme.colors.muted};
+const PageDescription = styled(PMuted)`
   font-size: 1rem;
 `;
 
 const SearchSection = styled.form`
   position: relative;
   width: 100%;
-  margin-bottom: 1.5rem;
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
 `;
 
-const SearchInput = styled.input`
-  width: 100%;
-  padding: 0.875rem 1rem;
+const StyledInput = styled(Input)`
   padding-left: 2.5rem;
-  border-radius: ${({ theme }) => theme.radii.lg};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  background: ${({ theme }) => theme.colors.inputBackground};
-  font-size: 0.95rem;
-  color: ${({ theme }) => theme.colors.foreground};
-  transition: border-color 0.2s, box-shadow 0.2s;
-  &::placeholder {
-    color: ${({ theme }) => theme.colors.muted};
-  }
-  &:focus {
-    outline: none;
-    border-color: ${({ theme }) => theme.colors.primary};
-    box-shadow: 0 0 0 3px rgba(104, 124, 244, 0.15);
-  }
 `;
 
 const SearchIconWrapper = styled(SearchIcon)`
@@ -308,10 +286,10 @@ const SearchIconWrapper = styled(SearchIcon)`
 
 const FilterRow = styled.div`
   display: flex;
-  gap: 0.5rem;
+  gap: ${({ theme }) => theme.spacing.sm};
   overflow-x: auto;
-  padding-bottom: 0.25rem;
-  margin-bottom: 1.5rem;
+  padding-bottom: ${({ theme }) => theme.spacing.xs};
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
   -ms-overflow-style: none;
   scrollbar-width: none;
   &::-webkit-scrollbar {
@@ -323,8 +301,8 @@ const FilterBadge = styled.button<{ $isActive: boolean }>`
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
   white-space: nowrap;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.lg};
+  font: ${({ theme }) => theme.fonts.caption};
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s, transform 0.2s;
   ${({ $isActive }) =>
@@ -349,17 +327,11 @@ const FilterBadge = styled.button<{ $isActive: boolean }>`
 const CardsColumn = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: ${({ theme }) => theme.spacing.lg};
 `;
 
-const PortfolioCard = styled.article`
-  background: ${({ theme }) => theme.colors.card};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+const PortfolioCard = styled(Card)`
+  padding: ${({ theme }) => theme.spacing.xl};
   cursor: pointer;
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
   &:hover {
@@ -371,14 +343,15 @@ const PortfolioCard = styled.article`
 
 const TopSection = styled.div`
   display: flex;
-  gap: 1rem;
+  gap: ${({ theme }) => theme.spacing.lg};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
 `;
 
 const ProfileImageContainer = styled.div`
   flex-shrink: 0;
   width: 5rem;
   height: 5rem;
-  border-radius: 9999px;
+  border-radius: ${({ theme }) => theme.radii.full};
   background: ${({ theme }) => theme.colors.secondary};
   overflow: hidden;
 `;
@@ -400,29 +373,24 @@ const HostContent = styled.div`
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: ${({ theme }) => theme.spacing.sm};
 `;
 
 const HostNameRow = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
+  gap: ${({ theme }) => theme.spacing.sm};
+  margin-bottom: ${({ theme }) => theme.spacing.xs};
 `;
 
-const HostName = styled.h3`
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.foreground};
-`;
+const HostName = styled(H3)``;
 
 const ScrapButton = styled.button`
   flex-shrink: 0;
   width: 2rem;
   height: 2rem;
-  border-radius: 0.375rem;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: transparent;
   border: 1px solid ${({ theme }) => theme.colors.border};
   padding: 0;
@@ -450,11 +418,7 @@ const StyledStar = styled(Star)<{ $active: boolean }>`
   }
 `;
 
-const HostIntro = styled.p`
-  margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.4;
-  color: ${({ theme }) => theme.colors.muted};
+const HostIntro = styled(PMuted)`
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -463,7 +427,7 @@ const HostIntro = styled.p`
 
 const BadgeContainer = styled.div`
   display: flex;
-  gap: 0.5rem;
+  gap: ${({ theme }) => theme.spacing.sm};
   flex-wrap: nowrap;
   overflow-x: auto;
   align-items: center;
@@ -476,38 +440,24 @@ const BadgeContainer = styled.div`
   }
 `;
 
-const CategoryBadge = styled.span`
-  display: inline-flex;
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 0.25rem 0.625rem;
-  border-radius: ${({ theme }) => theme.radii.sm};
-  background: ${({ theme }) => theme.colors.secondary};
-  color: ${({ theme }) => theme.colors.foreground};
-  white-space: nowrap;
-  flex-shrink: 0;
-`;
-
-const InfoText = styled.span`
-  color: ${({ theme }) => theme.colors.muted};
-  font-size: 0.75rem;
+const InfoText = styled(Caption)`
   white-space: nowrap;
   flex-shrink: 0;
 `;
 
 const PaginationWrapper = styled.div`
-  margin-top: 1.5rem;
+  margin-top: ${({ theme }) => theme.spacing.xl};
   display: flex;
   justify-content: center;
 `;
 
 const RegisterFab = styled.button`
   position: fixed;
-  right: 1.5rem;
+  right: ${({ theme }) => theme.spacing.xl};
   bottom: 6rem;
   width: 3.5rem;
   height: 3.5rem;
-  border-radius: 50%;
+  border-radius: ${({ theme }) => theme.radii.full};
   border: none;
   background: ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.primaryForeground};
@@ -528,7 +478,7 @@ const RegisterFab = styled.button`
 `;
 
 const StateWrapper = styled.div`
-  padding: 2rem 0;
+  padding: ${({ theme }) => theme.spacing['2xl']} 0;
 `;
 
 export default PortfolioPage;

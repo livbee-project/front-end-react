@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';
+import { H2, H3, PMuted, PrimaryBadge } from '@/presentation/components/styled/Typography';
+import { Card } from '@/presentation/components/styled/SectionStyles';
 
 type UserType = 'brand' | 'showhost' | 'model';
 
@@ -228,11 +230,11 @@ const MyPage: React.FC = () => {
               <User size={40} strokeWidth={2} />
             </Avatar>
             <ProfileInfo>
-              <ProfileName>{profileData.name}</ProfileName>
-              <ProfileRole>{profileData.role}</ProfileRole>
+              <ProfileName as={H2}>{profileData.name}</ProfileName>
+              <ProfileRole as={PMuted}>{profileData.role}</ProfileRole>
               <ProfileBadges>
                 {profileData.badges.map((badge) => (
-                  <SmallBadge key={badge}>{badge}</SmallBadge>
+                  <SmallBadge key={badge} as={PrimaryBadge}>{badge}</SmallBadge>
                 ))}
               </ProfileBadges>
             </ProfileInfo>
@@ -241,8 +243,8 @@ const MyPage: React.FC = () => {
           <StatsContainer>
             {profileData.stats.map((stat) => (
               <StatItem key={stat.label}>
-                <StatLabel>{stat.label}</StatLabel>
-                <StatValue>{stat.value}</StatValue>
+                <StatLabel as={PMuted}>{stat.label}</StatLabel>
+                <StatValue as={H3}>{stat.value}</StatValue>
               </StatItem>
             ))}
           </StatsContainer>
@@ -261,10 +263,10 @@ const MyPage: React.FC = () => {
                 </MenuIcon>
                 <MenuContent>
                   <MenuHeader>
-                    <MenuLabel>{item.label}</MenuLabel>
+                    <MenuLabel as={H3}>{item.label}</MenuLabel>
                     {item.count != null && <CountBadge>{item.count}</CountBadge>}
                   </MenuHeader>
-                  <MenuDescription>{item.description}</MenuDescription>
+                  <MenuDescription as={PMuted}>{item.description}</MenuDescription>
                 </MenuContent>
                 <MenuChevron>
                   <ChevronRight size={20} />
@@ -280,7 +282,7 @@ const MyPage: React.FC = () => {
         </LogoutButton>
 
         <AppInfo>
-          <AppVersion>버전 1.0.0</AppVersion>
+          <AppVersion as={PMuted}>버전 1.0.0</AppVersion>
           <AppLinks>
             <AppLink href="#" onClick={(e) => e.preventDefault()}>
               이용약관
@@ -317,17 +319,17 @@ const PageInner = styled.div`
 
 const TypeSwitcher = styled.div`
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  gap: ${({ theme }) => theme.spacing.sm};
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
 `;
 
 const TypeBadge = styled.button<{ $isActive: boolean }>`
-  padding: 0.5rem 1rem;
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.lg};
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 0.875rem;
+  font: ${({ theme }) => theme.fonts.caption};
   ${({ $isActive }) =>
     $isActive
       ? css`
@@ -344,26 +346,23 @@ const TypeBadge = styled.button<{ $isActive: boolean }>`
   }
 `;
 
-const ProfileCard = styled.div`
-  background: ${({ theme }) => theme.colors.card};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
+const ProfileCard = styled(Card)`
+  padding: ${({ theme }) => theme.spacing.xl};
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
 `;
 
 const ProfileHeader = styled.div`
   display: flex;
-  gap: 1rem;
+  gap: ${({ theme }) => theme.spacing.lg};
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: ${({ theme }) => theme.spacing.lg};
 `;
 
 const Avatar = styled.div`
   flex-shrink: 0;
   width: 5rem;
   height: 5rem;
-  border-radius: 9999px;
+  border-radius: ${({ theme }) => theme.radii.full};
   background: linear-gradient(135deg, ${({ theme }) => theme.colors.primary} 0%, rgba(104, 124, 244, 0.6) 100%);
   display: flex;
   align-items: center;
@@ -375,40 +374,27 @@ const ProfileInfo = styled.div`
   flex: 1;
 `;
 
-const ProfileName = styled.h2`
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.foreground};
-  margin-bottom: 0.25rem;
+const ProfileName = styled(H2)`
+  margin-bottom: ${({ theme }) => theme.spacing.xs};
 `;
 
-const ProfileRole = styled.p`
-  margin: 0;
-  color: ${({ theme }) => theme.colors.muted};
-  font-size: 0.95rem;
-  margin-bottom: 0.5rem;
+const ProfileRole = styled(PMuted)`
+  margin-bottom: ${({ theme }) => theme.spacing.sm};
 `;
 
 const ProfileBadges = styled.div`
   display: flex;
-  gap: 0.5rem;
+  gap: ${({ theme }) => theme.spacing.sm};
   flex-wrap: wrap;
 `;
 
-const SmallBadge = styled.span`
-  font-size: 0.75rem;
-  padding: 0.125rem 0.5rem;
-  border-radius: ${({ theme }) => theme.radii.sm};
-  background: ${({ theme }) => theme.colors.secondary};
-  color: ${({ theme }) => theme.colors.foreground};
-`;
+const SmallBadge = styled(PrimaryBadge)``;
 
 const StatsContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  padding-top: 1rem;
+  gap: ${({ theme }) => theme.spacing.lg};
+  padding-top: ${({ theme }) => theme.spacing.lg};
   border-top: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
@@ -416,33 +402,25 @@ const StatItem = styled.div`
   text-align: center;
 `;
 
-const StatLabel = styled.p`
-  margin: 0;
-  color: ${({ theme }) => theme.colors.muted};
-  font-size: 0.875rem;
-  margin-bottom: 0.25rem;
+const StatLabel = styled(PMuted)`
+  margin-bottom: ${({ theme }) => theme.spacing.xs};
 `;
 
-const StatValue = styled.p`
-  margin: 0;
-  font-weight: 700;
+const StatValue = styled(H3)`
   color: ${({ theme }) => theme.colors.primary};
-  font-size: 1rem;
 `;
 
-const MenuCard = styled.div`
-  background: ${({ theme }) => theme.colors.card};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  margin-bottom: 1.5rem;
+const MenuCard = styled(Card)`
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
   overflow: hidden;
+  padding: 0;
 `;
 
 const MenuItem = styled.button<{ $isLast: boolean }>`
   width: 100%;
-  padding: 1rem;
+  padding: ${({ theme }) => theme.spacing.lg};
   display: flex;
-  gap: 1rem;
+  gap: ${({ theme }) => theme.spacing.lg};
   align-items: center;
   background: transparent;
   border: none;
@@ -459,7 +437,7 @@ const MenuIcon = styled.div`
   flex-shrink: 0;
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: 9999px;
+  border-radius: ${({ theme }) => theme.radii.full};
   background: ${({ theme }) => theme.colors.secondary};
   display: flex;
   align-items: center;
@@ -474,31 +452,16 @@ const MenuContent = styled.div`
 
 const MenuHeader = styled.div`
   display: flex;
-  gap: 0.5rem;
+  gap: ${({ theme }) => theme.spacing.sm};
   align-items: center;
-  margin-bottom: 0.25rem;
+  margin-bottom: ${({ theme }) => theme.spacing.xs};
 `;
 
-const MenuLabel = styled.h3`
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.foreground};
-`;
+const MenuLabel = styled(H3)``;
 
-const CountBadge = styled.span`
-  background: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.primaryForeground};
-  font-size: 0.75rem;
-  padding: 0.125rem 0.5rem;
-  border-radius: ${({ theme }) => theme.radii.sm};
-`;
+const CountBadge = styled(PrimaryBadge)``;
 
-const MenuDescription = styled.p`
-  margin: 0;
-  color: ${({ theme }) => theme.colors.muted};
-  font-size: 0.875rem;
-`;
+const MenuDescription = styled(PMuted)``;
 
 const MenuChevron = styled.div`
   flex-shrink: 0;
@@ -507,7 +470,7 @@ const MenuChevron = styled.div`
 
 const LogoutButton = styled.button`
   width: 100%;
-  padding: 0.875rem 1rem;
+  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
   background: transparent;
   border: 1px solid #ff5a5f;
   color: #ff5a5f;
@@ -515,12 +478,11 @@ const LogoutButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: ${({ theme }) => theme.spacing.sm};
   cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 500;
+  font: ${({ theme }) => theme.fonts.body};
   transition: background-color 0.2s, color 0.2s;
-  margin-bottom: 1.5rem;
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
   &:hover {
     background: #ff5a5f;
     color: #ffffff;
@@ -528,23 +490,21 @@ const LogoutButton = styled.button`
 `;
 
 const AppInfo = styled.div`
-  margin-top: 1.5rem;
+  margin-top: ${({ theme }) => theme.spacing.xl};
   text-align: center;
   color: ${({ theme }) => theme.colors.muted};
 `;
 
-const AppVersion = styled.p`
-  margin: 0;
-  margin-bottom: 0.25rem;
-  font-size: 0.875rem;
+const AppVersion = styled(PMuted)`
+  margin-bottom: ${({ theme }) => theme.spacing.xs};
 `;
 
 const AppLinks = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1rem;
-  font-size: 0.875rem;
+  gap: ${({ theme }) => theme.spacing.lg};
+  font: ${({ theme }) => theme.fonts.caption};
 `;
 
 const AppLink = styled.a`
