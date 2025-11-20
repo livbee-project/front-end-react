@@ -1,7 +1,9 @@
 import React from 'react';
+import styled from 'styled-components';
 import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
 import Button from '@/presentation/components/ui/Button';
-import { GAP, FONT_SIZE, FONT_WEIGHT, TEXT_COLOR, BACKGROUND_COLOR, ELLIPSIS_TEXT, BORDER_RADIUS, SPACING } from '@/presentation/styles/constants';
+import { H3, PMuted, Caption } from '@/presentation/components/styled/Typography';
+import { EllipsisText } from '@/presentation/components/styled/CommonStyles';
 
 /**
  * MyClipCard 컴포넌트가 받을 props 타입을 정의합니다.
@@ -21,6 +23,83 @@ interface MyClipCardProps {
   onDelete?: () => void;
 }
 
+const CardContainer = styled.div`
+  width: 100%;
+  box-sizing: border-box;
+`;
+
+const Thumbnail = styled.div<{ $hasImage: boolean; $imageUrl?: string }>`
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: ${({ theme }) => theme.colors.secondary};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  border: ${({ $hasImage, theme }) => ($hasImage ? 'none' : `1px solid ${theme.colors.border}`)};
+  background-image: ${({ $hasImage, $imageUrl }) => ($hasImage && $imageUrl ? `url(${$imageUrl})` : 'none')};
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  margin-bottom: ${({ theme }) => theme.spacing.md};
+`;
+
+const InfoArea = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: ${({ theme }) => theme.spacing.md};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
+`;
+
+const ProfileImageContainer = styled.div<{ $hasImage: boolean }>`
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: ${({ theme }) => theme.radii.full};
+  background-color: ${({ theme }) => theme.colors.secondary};
+  border: ${({ $hasImage, theme }) => ($hasImage ? 'none' : `1px solid ${theme.colors.border}`)};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+`;
+
+const ProfileImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+const ProfilePlaceholder = styled(Caption)`
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
+const TextArea = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.xs};
+  min-width: 0;
+`;
+
+const Title = styled(H3)`
+  color: ${({ theme }) => theme.colors.foreground};
+`;
+
+const Description = styled(PMuted)``;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: ${({ theme }) => theme.spacing.md};
+  width: 100%;
+`;
+
+const StyledButton = styled(Button)`
+  flex: 1;
+`;
+
 /**
  * 내 숏클립 페이지에서 사용되는 비디오 카드 컴포넌트입니다.
  * 썸네일 이미지, 프로필 아이콘, 제목, 설명, 편집/삭제 버튼을 표시합니다.
@@ -33,148 +112,45 @@ const MyClipCard: React.FC<MyClipCardProps> = ({
   onEdit,
   onDelete,
 }) => {
-  /**
-   * 카드 컨테이너 스타일
-   */
-  const cardStyle: React.CSSProperties = {
-    width: '100%',
-    boxSizing: 'border-box',
-  };
-
-  /**
-   * 썸네일 이미지 영역 스타일
-   */
-  const thumbnailStyle: React.CSSProperties = {
-    width: '100%',
-    aspectRatio: '16 / 9', // 일반적인 비디오 비율
-    backgroundColor: BACKGROUND_COLOR.PLACEHOLDER,
-    borderRadius: BORDER_RADIUS.MD,
-    border: imageUrl ? 'none' : `1px solid ${TEXT_COLOR.DARK_GRAY}`,
-    backgroundImage: imageUrl ? `url(${imageUrl})` : 'none',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-    marginBottom: SPACING.MD,
-  };
-
-  /**
-   * 정보 영역 스타일
-   */
-  const infoStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: GAP.MD,
-    marginBottom: SPACING.MD,
-  };
-
-  /**
-   * 프로필 이미지 컨테이너 스타일
-   */
-  const profileImageStyle: React.CSSProperties = {
-    width: '32px',
-    height: '32px',
-    flexShrink: 0,
-    borderRadius: BORDER_RADIUS.CIRCLE,
-    backgroundColor: BACKGROUND_COLOR.PLACEHOLDER,
-    border: profileImageUrl ? 'none' : `1px solid ${TEXT_COLOR.DARK_GRAY}`,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-  };
-
-  /**
-   * 텍스트 영역 스타일
-   */
-  const textAreaStyle: React.CSSProperties = {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: GAP.XS,
-    minWidth: 0,
-  };
-
-  /**
-   * 제목 스타일
-   */
-  const titleStyle: React.CSSProperties = {
-    fontWeight: FONT_WEIGHT.BOLD,
-    fontSize: FONT_SIZE.MD,
-    color: TEXT_COLOR.BLACK,
-    ...ELLIPSIS_TEXT,
-  };
-
-  /**
-   * 설명 스타일
-   */
-  const descriptionStyle: React.CSSProperties = {
-    fontWeight: FONT_WEIGHT.NORMAL,
-    fontSize: FONT_SIZE.XS,
-    color: TEXT_COLOR.DARK_GRAY,
-    ...ELLIPSIS_TEXT,
-  };
-
-  /**
-   * 버튼 컨테이너 스타일
-   */
-  const buttonContainerStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'row',
-    gap: GAP.MD,
-    width: '100%',
-  };
-
   return (
-    <div style={cardStyle}>
+    <CardContainer>
       {/* 썸네일 이미지 */}
-      <div style={thumbnailStyle}>
+      <Thumbnail $hasImage={!!imageUrl} $imageUrl={imageUrl}>
         {!imageUrl && <PlaceholderImage size={48} />}
-      </div>
+      </Thumbnail>
 
       {/* 정보 영역 */}
-      <div style={infoStyle}>
+      <InfoArea>
         {/* 프로필 이미지 */}
-        <div style={profileImageStyle}>
+        <ProfileImageContainer $hasImage={!!profileImageUrl}>
           {profileImageUrl ? (
-            <img
-              src={profileImageUrl}
-              alt="프로필"
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
+            <ProfileImage src={profileImageUrl} alt="프로필" />
           ) : (
-            <span style={{ fontSize: FONT_SIZE.XS, color: TEXT_COLOR.DARK_GRAY }}>P</span>
+            <ProfilePlaceholder>P</ProfilePlaceholder>
           )}
-        </div>
+        </ProfileImageContainer>
 
         {/* 텍스트 영역 */}
-        <div style={textAreaStyle}>
-          <span style={titleStyle}>{title}</span>
-          <span style={descriptionStyle}>{description}</span>
-        </div>
-      </div>
+        <TextArea>
+          <EllipsisText>
+            <Title>{title}</Title>
+          </EllipsisText>
+          <EllipsisText>
+            <Description>{description}</Description>
+          </EllipsisText>
+        </TextArea>
+      </InfoArea>
 
       {/* 버튼 영역 */}
-      <div style={buttonContainerStyle}>
-        <Button
-          variant="outline"
-          onClick={onEdit}
-          style={{ flex: 1 }}
-        >
+      <ButtonContainer>
+        <StyledButton variant="outline" onClick={onEdit}>
           편집
-        </Button>
-        <Button
-          variant="primary"
-          onClick={onDelete}
-          style={{ flex: 1 }}
-        >
+        </StyledButton>
+        <StyledButton variant="primary" onClick={onDelete}>
           삭제
-        </Button>
-      </div>
-    </div>
+        </StyledButton>
+      </ButtonContainer>
+    </CardContainer>
   );
 };
 

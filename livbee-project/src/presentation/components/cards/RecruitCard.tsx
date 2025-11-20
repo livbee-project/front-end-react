@@ -1,4 +1,8 @@
 import React from 'react';
+import styled from 'styled-components';
+import { H2, H3, PMuted, Caption } from '@/presentation/components/styled/Typography';
+import { PrimaryBadge } from '@/presentation/components/styled/CommonStyles';
+import { EllipsisText } from '@/presentation/components/styled/CommonStyles';
 
 /**
  * RecruitCard 컴포넌트가 받을 props 타입을 정의합니다.
@@ -18,6 +22,58 @@ interface RecruitCardProps {
   onPress?: () => void;
 }
 
+const CardContainer = styled.div<{ $hasClick: boolean }>`
+  width: 240px;
+  flex-shrink: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  cursor: ${({ $hasClick }) => ($hasClick ? 'pointer' : 'default')};
+`;
+
+const BottomContent = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: ${({ theme }) => theme.spacing.md};
+  gap: ${({ theme }) => theme.spacing.md};
+`;
+
+const BrandRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const Brand = styled(H3)`
+  color: ${({ theme }) => theme.colors.primary};
+  flex: 1;
+`;
+
+const ChIcon = styled(PrimaryBadge)`
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: ${({ theme }) => theme.radii.full};
+  padding: 0;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  ${Caption} {
+    color: inherit;
+  }
+`;
+
+const Title = styled(H2)`
+  color: ${({ theme }) => theme.colors.foreground};
+`;
+
+const Content = styled(PMuted)``;
+
+const Spacer = styled.div`
+  flex: 1;
+`;
+
 /**
  * '쇼핑라이브' 및 '브랜드 픽' 섹션에서 사용되는
  * 공통 공고 카드 레이아웃 컴포넌트입니다.
@@ -30,117 +86,40 @@ const RecruitCard: React.FC<RecruitCardProps> = ({
   content,
   onPress,
 }) => {
-  // --- 공통 스타일 정의 ---
-  // (Home.tsx에서 사용했던 스타일을 그대로 가져옵니다)
-
-  // 브랜드명 (파란색)
-  const brandNameStyle: React.CSSProperties = {
-    color: 'var(--primary)',
-    fontSize: 'var(--h3)',
-    fontWeight: 700,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    flex: 1, // 아이콘을 밀어내기 위해
-  };
-
-  // CH 원형 아이콘
-  const chIconStyle: React.CSSProperties = {
-    display: 'inline-flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 40,
-    height: 40,
-    background: 'var(--primary)',
-    color: 'var(--white)',
-    fontSize: 'var(--p2)',
-    fontWeight: 400,
-    borderRadius: '50%',
-    flexShrink: 0,
-  };
-
-  // 제목 (검정 굵게)
-  const titleStyle: React.CSSProperties = {
-    fontWeight: 700,
-    fontSize: 'var(--h2)',
-    color: 'var(--black)',
-    width: '100%',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  };
-
-  // 내용 (회색)
-  const contentStyle: React.CSSProperties = {
-    fontWeight: 400,
-    fontSize: '12px',
-    color: 'var(--dark-gray)',
-    width: '100%',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  };
-
-  // --- 컴포넌트 렌더링 ---
   return (
-    <div
-      onClick={onPress}
-      style={{
-        width: 240, // 카드 고정 너비
-        flexShrink: 0, // 가로 스크롤 시 찌그러짐 방지
-        height: '100%', // 부모 컨테이너(가로 스크롤 div)의 높이를 채움
-        display: 'flex',
-        flexDirection: 'column',
-        cursor: onPress ? 'pointer' : 'default', // 클릭 가능 여부 표시
-      }}
-    >
-      {/*
-        1. 상단 컨텐츠 (변화하는 부분)
-        '쇼핑라이브'의 (400px 이미지 + 뱃지) 또는
-        '브랜드 픽'의 (150px 이미지 + 뱃지)가 이 자리에 들어옵니다.
-      */}
+    <CardContainer $hasClick={!!onPress} onClick={onPress}>
+      {/* 1. 상단 컨텐츠 (변화하는 부분) */}
       {topContent}
 
-      {/*
-        2. 하단 공통 컨텐츠 영역
-        (브랜드명, 제목, 내용, 하단 컨텐츠)
-      */}
-      <div
-        style={{
-          flex: 1, // topContent를 제외한 나머지 세로 공간을 모두 차지
-          display: 'flex',
-          flexDirection: 'column',
-          paddingTop: 12, // 상단 컨텐츠(이미지)와의 간격
-          gap: 12, // 내부 아이템(브랜드, 제목, 내용) 간의 간격
-        }}
-      >
+      {/* 2. 하단 공통 컨텐츠 영역 */}
+      <BottomContent>
         {/* 2a. 브랜드명 + CH 아이콘 (공통) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={brandNameStyle}>{brandName}</span>
-          <span style={chIconStyle}>CH</span>
-        </div>
+        <BrandRow>
+          <EllipsisText>
+            <Brand>{brandName}</Brand>
+          </EllipsisText>
+          <ChIcon>
+            <Caption>CH</Caption>
+          </ChIcon>
+        </BrandRow>
 
         {/* 2b. 제목 (공통) */}
-        <span style={titleStyle}>{title}</span>
+        <EllipsisText>
+          <Title>{title}</Title>
+        </EllipsisText>
 
         {/* 2c. 내용 (공통) */}
-        <span style={contentStyle}>{content}</span>
+        <EllipsisText>
+          <Content>{content}</Content>
+        </EllipsisText>
 
         {/* 2d. Spacer (공통) */}
-        {/*
-          이 빈 div가 flex: 1을 가짐으로써
-          하단 컨텐츠(bottomContent)를 항상 카드 맨 아래로 밀어냅니다.
-        */}
-        <div style={{ flex: 1 }} />
+        <Spacer />
 
-        {/*
-          2e. 하단 컨텐츠 (변화하는 부분)
-          '쇼핑라이브'의 (상품 정보) 또는
-          '브랜드 픽'의 (버튼)이 이 자리에 들어옵니다.
-        */}
+        {/* 2e. 하단 컨텐츠 (변화하는 부분) */}
         {bottomContent}
-      </div>
-    </div>
+      </BottomContent>
+    </CardContainer>
   );
 };
 
