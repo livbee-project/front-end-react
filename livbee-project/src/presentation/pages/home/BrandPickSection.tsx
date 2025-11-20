@@ -9,16 +9,18 @@ import type { Campaign } from '@/domain/entities/Campaign';
 import { htmlToText } from '@/shared/utils/htmlUtils';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
+import { H2, H3, Caption, PMuted } from '@/presentation/components/styled/Typography';
+import { PrimaryBadge } from '@/presentation/components/styled/CommonStyles';
 
 const Card = styled.article`
   flex: 0 0 240px;
   background-color: ${({ theme }) => theme.colors.card};
   border-radius: ${({ theme }) => theme.radii.lg};
   border: 1px solid ${({ theme }) => theme.colors.border};
-  padding: 0.75rem;
+  padding: ${({ theme }) => theme.spacing.md};
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: ${({ theme }) => theme.spacing.sm};
 `;
 
 const ImageWrapper = styled.div`
@@ -36,33 +38,24 @@ const CoverImage = styled.img`
   object-fit: cover;
 `;
 
-const CornerBadge = styled.span`
+const CornerBadge = styled(PrimaryBadge)`
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.primaryForeground};
+  top: ${({ theme }) => theme.spacing.md};
+  right: ${({ theme }) => theme.spacing.md};
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: ${({ theme }) => theme.radii.full};
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 14px;
+  padding: 0;
 `;
 
-const Brand = styled.p`
-  margin: 0;
-  font-size: 12px;
+const Brand = styled(Caption)`
   color: ${({ theme }) => theme.colors.muted};
 `;
 
-const Title = styled.h3`
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.foreground};
+const Title = styled(H3)`
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -70,10 +63,7 @@ const Title = styled.h3`
   min-height: 2.5rem;
 `;
 
-const Description = styled.p`
-  margin: 0;
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.muted};
+const Description = styled(PMuted)`
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;

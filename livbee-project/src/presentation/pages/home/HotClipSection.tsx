@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import HomeSection from './components/HomeSection';
+import { H3, PMuted, Caption } from '@/presentation/components/styled/Typography';
 
 const clips = [
   {
@@ -36,7 +37,7 @@ const clips = [
 
 const ScrollArea = styled.div`
   display: flex;
-  gap: 10px;
+  gap: ${({ theme }) => theme.spacing.sm};
   overflow-x: auto;
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -74,37 +75,32 @@ const ClipImage = styled.img`
 
 const Duration = styled.span`
   position: absolute;
-  bottom: 0.5rem;
-  right: 0.5rem;
+  bottom: ${({ theme }) => theme.spacing.sm};
+  right: ${({ theme }) => theme.spacing.sm};
   background-color: rgba(0, 0, 0, 0.7);
   color: #fff;
-  padding: 0.1rem 0.4rem;
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.xs};
   border-radius: ${({ theme }) => theme.radii.sm};
-  font-size: 12px;
+  ${Caption} {
+    color: inherit;
+  }
 `;
 
 const ClipBody = styled.div`
-  padding: 0.75rem;
+  padding: ${({ theme }) => theme.spacing.md};
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: ${({ theme }) => theme.spacing.xs};
 `;
 
-const ClipTitle = styled.h3`
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.foreground};
+const ClipTitle = styled(H3)`
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 `;
 
-const ClipDescription = styled.p`
-  margin: 0;
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.muted};
+const ClipDescription = styled(PMuted)`
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -121,7 +117,7 @@ const HotClipSection: React.FC = () => {
           <Card key={clip.id}>
             <Thumbnail>
               <ClipImage src={clip.thumbnail} alt={clip.title} />
-              <Duration>{clip.duration}</Duration>
+              <Duration><Caption>{clip.duration}</Caption></Duration>
             </Thumbnail>
             <ClipBody>
               <ClipTitle>{clip.title}</ClipTitle>

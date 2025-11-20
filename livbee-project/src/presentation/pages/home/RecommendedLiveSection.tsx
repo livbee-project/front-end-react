@@ -9,10 +9,12 @@ import type { Campaign } from '@/domain/entities/Campaign';
 import { htmlToText } from '@/shared/utils/htmlUtils';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
+import { H2, H3, Caption, PMuted, CaptionMedium } from '@/presentation/components/styled/Typography';
+import { PrimaryBadge } from '@/presentation/components/styled/CommonStyles';
 
 const ScrollArea = styled.div`
   display: flex;
-  gap: 10px;
+  gap: ${({ theme }) => theme.spacing.sm};
   overflow-x: auto;
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -31,10 +33,10 @@ const Card = styled.article`
   );
   border-radius: ${({ theme }) => theme.radii.lg};
   border: 1px solid ${({ theme }) => theme.primaryOpacity['30']};
-  padding: 0.75rem;
+  padding: ${({ theme }) => theme.spacing.md};
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: ${({ theme }) => theme.spacing.sm};
 `;
 
 const ImageWrapper = styled.div`
@@ -54,38 +56,29 @@ const CoverImage = styled.img`
 
 const FeeBadge = styled.span`
   position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
+  top: ${({ theme }) => theme.spacing.md};
+  left: ${({ theme }) => theme.spacing.md};
   background-color: rgba(0, 0, 0, 0.6);
   color: #fff;
-  padding: 0.2rem 0.5rem;
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
   border-radius: ${({ theme }) => theme.radii.sm};
-  font-size: 12px;
+  ${Caption} {
+    color: inherit;
+  }
 `;
 
-const DdayBadge = styled.span`
+const DdayBadge = styled(PrimaryBadge)`
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  background-color: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.primaryForeground};
-  padding: 0.2rem 0.6rem;
-  border-radius: ${({ theme }) => theme.radii.lg};
-  font-size: 12px;
-  font-weight: 500;
+  top: ${({ theme }) => theme.spacing.md};
+  right: ${({ theme }) => theme.spacing.md};
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
 `;
 
-const Brand = styled.p`
-  margin: 0;
-  font-size: 12px;
+const Brand = styled(Caption)`
   color: ${({ theme }) => theme.colors.muted};
 `;
 
-const Title = styled.h3`
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.foreground};
+const Title = styled(H3)`
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -93,10 +86,7 @@ const Title = styled.h3`
   min-height: 2.5rem;
 `;
 
-const Description = styled.p`
-  margin: 0;
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.muted};
+const Description = styled(PMuted)`
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -158,8 +148,8 @@ const RecommendedLiveSection: React.FC = () => {
             <Card key={campaign.id}>
               <ImageWrapper>
                 {imageUrl && <CoverImage src={imageUrl} alt={campaign.title} />}
-                <FeeBadge>{fee}</FeeBadge>
-                {dday && <DdayBadge>{dday}</DdayBadge>}
+                <FeeBadge><Caption>{fee}</Caption></FeeBadge>
+                {dday && <DdayBadge><CaptionMedium>{dday}</CaptionMedium></DdayBadge>}
               </ImageWrapper>
               <Brand>{campaign.brandName}</Brand>
               <Title>{campaign.title}</Title>

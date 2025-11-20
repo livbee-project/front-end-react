@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Calendar } from 'lucide-react';
 import HomeSection from './components/HomeSection';
+import { H3, PMuted, Caption } from '@/presentation/components/styled/Typography';
 
 const newsItems = [
   {
@@ -21,13 +22,13 @@ const newsItems = [
 const List = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: ${({ theme }) => theme.spacing.lg};
 `;
 
 const Card = styled.article`
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.radii.lg};
-  padding: 1rem;
+  padding: ${({ theme }) => theme.spacing.lg};
   background-color: ${({ theme }) => theme.colors.card};
   transition: transform 0.2s ease;
 
@@ -36,21 +37,16 @@ const Card = styled.article`
   }
 `;
 
-const Title = styled.h3`
-  margin: 0 0 0.5rem;
-  font-size: 14px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.foreground};
+const Title = styled(H3)`
+  margin-bottom: ${({ theme }) => theme.spacing.sm};
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 `;
 
-const Description = styled.p`
-  margin: 0 0 0.75rem;
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.muted};
+const Description = styled(PMuted)`
+  margin-bottom: ${({ theme }) => theme.spacing.md};
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -60,9 +56,10 @@ const Description = styled.p`
 const Meta = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.muted};
+  gap: ${({ theme }) => theme.spacing.xs};
+  ${Caption} {
+    color: ${({ theme }) => theme.colors.muted};
+  }
 `;
 
 const LivbeeNewsSection: React.FC = () => (
@@ -74,7 +71,7 @@ const LivbeeNewsSection: React.FC = () => (
           <Description>{news.content}</Description>
           <Meta>
             <Calendar size={14} />
-            <span>{news.time}</span>
+            <Caption>{news.time}</Caption>
           </Meta>
         </Card>
       ))}

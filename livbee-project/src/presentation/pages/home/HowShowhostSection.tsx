@@ -9,27 +9,28 @@ import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { Portfolio } from '@/domain/entities/Portfolio';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
+import { H3, PMuted } from '@/presentation/components/styled/Typography';
 
 const List = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: ${({ theme }) => theme.spacing.lg};
 `;
 
 const Card = styled.article`
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
+  gap: ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => theme.spacing.lg};
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.radii.lg};
   background-color: ${({ theme }) => theme.colors.card};
 `;
 
 const Avatar = styled.div`
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
+  width: 4rem;
+  height: 4rem;
+  border-radius: ${({ theme }) => theme.radii.full};
   overflow: hidden;
   background-color: ${({ theme }) => theme.colors.secondary};
   flex-shrink: 0;
@@ -40,17 +41,10 @@ const Info = styled.div`
   min-width: 0;
 `;
 
-const Name = styled.h3`
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.foreground};
-`;
+const Name = styled(H3)``;
 
-const Intro = styled.p`
-  margin: 0.25rem 0 0;
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.muted};
+const Intro = styled(PMuted)`
+  margin-top: ${({ theme }) => theme.spacing.xs};
 `;
 
 const HowShowhostSection: React.FC = () => {

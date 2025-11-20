@@ -8,6 +8,8 @@ import type { Campaign } from '@/domain/entities/Campaign';
 import { htmlToText } from '@/shared/utils/htmlUtils';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
+import { H2, H3, Caption, PMuted, CaptionMedium } from '@/presentation/components/styled/Typography';
+import { PrimaryBadge } from '@/presentation/components/styled/CommonStyles';
 
 const Card = styled.article`
   flex: 0 0 65vw;
@@ -47,45 +49,31 @@ const CoverImage = styled.img`
   }
 `;
 
-const Badge = styled.span`
+const Badge = styled(PrimaryBadge)`
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  background-color: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.primaryForeground};
-  padding: 0.25rem 0.85rem;
-  border-radius: ${({ theme }) => theme.radii.lg};
-  font-size: 12px;
-  font-weight: 500;
+  top: ${({ theme }) => theme.spacing.md};
+  right: ${({ theme }) => theme.spacing.md};
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
 `;
 
 const CardBody = styled.div`
-  padding: 0.75rem;
+  padding: ${({ theme }) => theme.spacing.md};
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: ${({ theme }) => theme.spacing.sm};
 `;
 
-const Brand = styled.p`
-  margin: 0;
-  font-size: 12px;
+const Brand = styled(Caption)`
   color: ${({ theme }) => theme.colors.muted};
 `;
 
-const Title = styled.h3`
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.foreground};
+const Title = styled(H3)`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 `;
 
-const Description = styled.p`
-  margin: 0;
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.muted};
+const Description = styled(PMuted)`
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -96,8 +84,8 @@ const Description = styled.p`
 const ProductInfo = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding-top: 0.75rem;
+  gap: ${({ theme }) => theme.spacing.md};
+  padding-top: ${({ theme }) => theme.spacing.md};
   border-top: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
@@ -115,18 +103,11 @@ const ProductText = styled.div`
   min-width: 0;
 `;
 
-const PriceLabel = styled.p`
-  margin: 0;
-  font-size: 12px;
-  font-weight: 500;
+const PriceLabel = styled(CaptionMedium)`
   color: ${({ theme }) => theme.colors.primary};
 `;
 
-const PriceValue = styled.p`
-  margin: 0;
-  font-size: 14px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.foreground};
+const PriceValue = styled(H2)`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -8,6 +8,7 @@ import { ModelRepository } from '@/data/repositories/ModelRepository';
 import type { Model } from '@/domain/entities/Model';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
+import { H3, PMuted } from '@/presentation/components/styled/Typography';
 
 const Card = styled.article`
   flex: 0 0 65vw;
@@ -47,23 +48,15 @@ const Portrait = styled.img`
 `;
 
 const CardBody = styled.div`
-  padding: 0.75rem;
+  padding: ${({ theme }) => theme.spacing.md};
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: ${({ theme }) => theme.spacing.xs};
 `;
 
-const Name = styled.h3`
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-`;
+const Name = styled(H3)``;
 
-const Intro = styled.p`
-  margin: 0;
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.muted};
-`;
+const Intro = styled(PMuted)``;
 
 const ConceptModelSection: React.FC = () => {
   const navigate = useNavigate();
