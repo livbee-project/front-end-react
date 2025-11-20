@@ -8,17 +8,14 @@ import { ModelRepository } from '@/data/repositories/ModelRepository';
 import type { Model } from '@/domain/entities/Model';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
-import { H3, PMuted } from '@/presentation/components/styled/Typography';
+import { HomeCard } from '@/presentation/components/cards/HomeCard';
+import { HomeCardImage } from '@/presentation/components/cards/HomeCardImage';
+import { HomeCardBody, HomeCardTitle, HomeCardDescription } from '@/presentation/components/cards/HomeCardBody';
 
-const Card = styled.article`
+const StyledCard = styled(HomeCard)`
   flex: 0 0 65vw;
   min-width: 200px;
   max-width: 220px;
-  background-color: ${({ theme }) => theme.colors.card};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  overflow: hidden;
-  cursor: pointer;
 
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     flex: 0 0 200px;
@@ -28,35 +25,6 @@ const Card = styled.article`
     flex: 0 0 220px;
   }
 `;
-
-const ImageWrapper = styled.div`
-  width: 100%;
-  aspect-ratio: 3 / 4;
-  overflow: hidden;
-  background-color: ${({ theme }) => theme.colors.secondary};
-`;
-
-const Portrait = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-
-  ${Card}:hover & {
-    transform: scale(1.05);
-  }
-`;
-
-const CardBody = styled.div`
-  padding: ${({ theme }) => theme.spacing.md};
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.xs};
-`;
-
-const Name = styled(H3)``;
-
-const Intro = styled(PMuted)``;
 
 const ConceptModelSection: React.FC = () => {
   const navigate = useNavigate();
@@ -95,17 +63,13 @@ const ConceptModelSection: React.FC = () => {
     >
       <HorizontalScroll>
         {models.map((model) => (
-          <Card key={model.id} onClick={() => navigate(`/models/${model.id}`)}>
-            <ImageWrapper>
-              {model.mainThumbnailUrl && (
-                <Portrait src={model.mainThumbnailUrl} alt={model.nickname || '모델'} />
-              )}
-            </ImageWrapper>
-            <CardBody>
-              <Name>{model.nickname || '이름 없음'}</Name>
-              <Intro>{model.oneLineIntro || '소개 없음'}</Intro>
-            </CardBody>
-          </Card>
+          <StyledCard key={model.id} onClick={() => navigate(`/models/${model.id}`)}>
+            <HomeCardImage src={model.mainThumbnailUrl || undefined} alt={model.nickname || '모델'} ratio="3 / 4" />
+            <HomeCardBody>
+              <HomeCardTitle>{model.nickname || '이름 없음'}</HomeCardTitle>
+              <HomeCardDescription>{model.oneLineIntro || '소개 없음'}</HomeCardDescription>
+            </HomeCardBody>
+          </StyledCard>
         ))}
       </HorizontalScroll>
     </HomeSection>

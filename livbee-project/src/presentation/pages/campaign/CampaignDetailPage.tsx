@@ -14,6 +14,7 @@ import { theme } from '@/presentation/styles/theme';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { CampaignDetail } from '@/domain/entities/Campaign';
 import { htmlToText } from '@/shared/utils/htmlUtils';
+import { calculateDDay, formatDate } from '@/shared/utils/dateUtils';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useDetailData } from '@/presentation/hooks/useDetailData';
 import { P } from '@/presentation/components/styled/Typography';
@@ -48,40 +49,6 @@ const CampaignDetailPage: React.FC = () => {
     id,
     '공고를 불러오는데 실패했습니다.'
   );
-
-  /**
-   * D-DAY 계산 함수
-   */
-  const calculateDDay = (closeAt: string): string => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const deadline = new Date(closeAt);
-    deadline.setHours(23, 59, 59, 999);
-
-    const diffTime = deadline.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 0) {
-      return '마감';
-    } else if (diffDays === 0) {
-      return 'D-DAY';
-    } else {
-      return `D-${diffDays}`;
-    }
-  };
-
-  /**
-   * 날짜 포맷팅 함수 (YYYY-MM-DD)
-   */
-  const formatDate = (dateString: string | null | undefined): string => {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return '-';
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
 
   /**
    * 이미지 클릭 핸들러

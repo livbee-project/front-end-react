@@ -1,9 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { useRepository } from '@/presentation/hooks/useRepository';
+import { useFormState } from '@/presentation/hooks/useFormState';
+import { useFormUpload } from '@/presentation/hooks/useFormUpload';
 import type { CreatePortfolioRequest } from '@/domain/entities/Portfolio';
 import type { PortfolioFormData, PortfolioToggleState } from './types';
 
@@ -32,16 +34,26 @@ export const usePortfolioRegisterForm = () => {
   const { showToast } = useToast();
   const portfolioRepository = useRepository(PortfolioRepository);
 
-  const [formData, setFormData] = useState<PortfolioFormData>(INITIAL_FORM_DATA);
-  const [toggles, setToggles] = useState<PortfolioToggleState>(INITIAL_TOGGLE_STATE);
+  const { formData, updateField, updateArrayField } = useFormState<PortfolioFormData>(INITIAL_FORM_DATA);
+  const {
+    formData: toggles,
+    updateField: updateToggleField,
+    updateArrayField: updateToggleArrayField,
+  } = useFormState<PortfolioToggleState>(INITIAL_TOGGLE_STATE);
 
-  const [mainThumbnailUrl, setMainThumbnailUrl] = useState('');
-  const [galleryImageUrls, setGalleryImageUrls] = useState<string[]>([]);
+  const {
+    profileFile: mainThumbnailFile,
+    profileUrl: mainThumbnailUrl,
+    galleryFiles: galleryImageFiles,
+    galleryUrls: galleryImageUrls,
+    selectProfileImage,
+    selectGalleryImage,
+    removeGalleryImage,
+  } = useFormUpload({ maxGalleryImages: 9 });
+
   const [resumeFileUrl, setResumeFileUrl] = useState('');
   const [portfolioFileUrl, setPortfolioFileUrl] = useState('');
 
-  const [mainThumbnailFile, setMainThumbnailFile] = useState<File | null>(null);
-  const [galleryImageFiles, setGalleryImageFiles] = useState<File[]>([]);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,60 +61,44 @@ export const usePortfolioRegisterForm = () => {
   const handleInputChange = useCallback(
     (field: keyof PortfolioFormData, value: string, index?: number) => {
       if (index !== undefined && (field === 'websites' || field === 'tags')) {
-        const currentArray = [...(formData[field] as string[])];
-        currentArray[index] = value;
-        setFormData((prev) => ({ ...prev, [field]: currentArray }));
+        updateArrayField(field, index, value);
         return;
       }
 
-      setFormData((prev) => ({ ...prev, [field]: value }));
+      updateField(field, value);
     },
-    [formData]
+    [updateArrayField, updateField]
   );
 
   const handleToggleChange = useCallback(
     (field: keyof PortfolioToggleState, index?: number) => {
       if (index !== undefined && Array.isArray(toggles[field])) {
-        const currentArray = [...(toggles[field] as boolean[])];
-        currentArray[index] = !currentArray[index];
-        setToggles((prev) => ({ ...prev, [field]: currentArray }));
+        const currentValue = (toggles[field] as boolean[])[index];
+        updateToggleArrayField(field, index, !currentValue);
         return;
+      const currentValue = toggles[field];
+      if (typeof currentValue === 'boolean') {
+        updateToggleField(field, (!currentValue) as PortfolioToggleState[typeof field]);
       }
-
-      setToggles((prev) => ({ ...prev, [field]: !prev[field] }));
     },
-    [toggles]
+    [toggles, updateToggleArrayField, updateToggleField]
   );
-
-  const handleProfileImageSelect = useCallback((file: File) => {
-    setMainThumbnailFile(file);
-    const blobUrl = URL.createObjectURL(file);
-    setMainThumbnailUrl(blobUrl);
-  }, []);
 
   const handleGalleryImageSelect = useCallback(
     (file: File) => {
-      if (galleryImageFiles.length >= 9) {
+      const added = selectGalleryImage(file);
+      if (!added) {
         showToast('갤러리 이미지는 최대 9개까지 업로드 가능합니다.', undefined, 'error');
-        return;
       }
-      setGalleryImageFiles((prev) => [...prev, file]);
-      const blobUrl = URL.createObjectURL(file);
-      setGalleryImageUrls((prev) => [...prev, blobUrl]);
     },
-    [galleryImageFiles.length, showToast]
+    [selectGalleryImage, showToast]
   );
 
   const handleGalleryImageRemove = useCallback(
     (index: number) => {
-      const urlToRemove = galleryImageUrls[index];
-      if (urlToRemove && urlToRemove.startsWith('blob:')) {
-        URL.revokeObjectURL(urlToRemove);
-      }
-      setGalleryImageFiles((prev) => prev.filter((_, i) => i !== index));
-      setGalleryImageUrls((prev) => prev.filter((_, i) => i !== index));
+      removeGalleryImage(index);
     },
-    [galleryImageUrls]
+    [removeGalleryImage]
   );
 
   const handlePortfolioFileAdd = useCallback((file: File) => {
@@ -248,7 +244,7 @@ export const usePortfolioRegisterForm = () => {
     isImageUploading,
     handleInputChange,
     handleToggleChange,
-    handleProfileImageSelect,
+    handleProfileImageSelect: selectProfileImage,
     handleGalleryImageSelect,
     handleGalleryImageRemove,
     handlePortfolioFileAdd,

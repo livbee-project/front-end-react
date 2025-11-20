@@ -8,77 +8,19 @@ import type { Campaign } from '@/domain/entities/Campaign';
 import { htmlToText } from '@/shared/utils/htmlUtils';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
-import { H2, H3, Caption, PMuted, CaptionMedium } from '@/presentation/components/styled/Typography';
+import { H2, CaptionMedium } from '@/presentation/components/styled/Typography';
 import { Badge } from '@/presentation/components/styled/CommonStyles';
-
-const Card = styled.article`
-  flex: 0 0 65vw;
-  min-width: 240px;
-  max-width: 300px;
-  background-color: ${({ theme }) => theme.colors.card};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  overflow: hidden;
-  cursor: pointer;
-
-  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    flex: 0 0 280px;
-  }
-
-  @media (min-width: ${({ theme }) => theme.breakpoints.desktop}) {
-    flex: 0 0 300px;
-  }
-
-`;
-
-const ImageWrapper = styled.div`
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  position: relative;
-  overflow: hidden;
-`;
-
-const CoverImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-
-  ${Card}:hover & {
-    transform: scale(1.05);
-  }
-`;
+import { HomeCard } from '@/presentation/components/cards/HomeCard';
+import { HomeCardImage } from '@/presentation/components/cards/HomeCardImage';
+import { HomeCardBody, HomeCardBrand, HomeCardTitle, HomeCardDescription } from '@/presentation/components/cards/HomeCardBody';
+import { calculateDDay } from '@/shared/utils/dateUtils';
+import { formatCurrency } from '@/shared/utils/formatUtils';
 
 const StyledBadge = styled(Badge)`
   position: absolute;
   top: ${({ theme }) => theme.spacing.md};
   right: ${({ theme }) => theme.spacing.md};
   padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
-`;
-
-const CardBody = styled.div`
-  padding: ${({ theme }) => theme.spacing.md};
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.sm};
-`;
-
-const Brand = styled(Caption)`
-  color: ${({ theme }) => theme.colors.muted};
-`;
-
-const Title = styled(H3)`
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const Description = styled(PMuted)`
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  min-height: 2.5rem;
 `;
 
 const ProductInfo = styled.div`
@@ -127,18 +69,6 @@ const ShoppingLiveSection: React.FC = () => {
     '쇼핑 라이브 목록을 불러오는 중 오류가 발생했습니다.'
   );
 
-  const calculateDDay = (closeAt?: string | null) => {
-    if (!closeAt) return null;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const deadline = new Date(closeAt);
-    deadline.setHours(23, 59, 59, 999);
-    const diffDays = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    if (diffDays < 0) return '마감';
-    if (diffDays === 0) return 'D-DAY';
-    return `D-${diffDays}`;
-  };
-
   if (loading) {
     return (
       <HomeSection title={<><span>지금 뜨는 </span><Highlight>쇼핑라이브</Highlight></>}>
@@ -160,18 +90,18 @@ const ShoppingLiveSection: React.FC = () => {
         {campaigns.map((campaign) => {
           const imageUrl = campaign.imageUrl || campaign.thumbnailUrl || undefined;
           const summary = htmlToText(campaign.content).slice(0, 60);
-          const dday = calculateDDay(campaign.closeAt);
+          const dday = campaign.closeAt ? calculateDDay(campaign.closeAt) : '';
+          const price = campaign.minPrice != null ? formatCurrency(campaign.minPrice) : '가격 미정';
 
           return (
-            <Card key={campaign.id} onClick={() => navigate(`/campaigns/${campaign.id}`)}>
-              <ImageWrapper>
-                {imageUrl ? <CoverImage src={imageUrl} alt={campaign.title} /> : <div />}
+            <HomeCard key={campaign.id} onClick={() => navigate(`/campaigns/${campaign.id}`)}>
+              <HomeCardImage src={imageUrl} alt={campaign.title}>
                 {dday && <StyledBadge>{dday}</StyledBadge>}
-              </ImageWrapper>
-              <CardBody>
-                <Brand>{campaign.brandName}</Brand>
-                <Title>{campaign.title}</Title>
-                <Description>{summary}</Description>
+              </HomeCardImage>
+              <HomeCardBody>
+                <HomeCardBrand>{campaign.brandName}</HomeCardBrand>
+                <HomeCardTitle>{campaign.title}</HomeCardTitle>
+                <HomeCardDescription>{summary}</HomeCardDescription>
                 <ProductInfo>
                   <ProductThumb>
                     {campaign.thumbnailUrl && (
@@ -184,11 +114,11 @@ const ShoppingLiveSection: React.FC = () => {
                   </ProductThumb>
                   <ProductText>
                     <PriceLabel>특딜가</PriceLabel>
-                    <PriceValue>{campaign.title}</PriceValue>
+                    <PriceValue>{price}</PriceValue>
                   </ProductText>
                 </ProductInfo>
-              </CardBody>
-            </Card>
+              </HomeCardBody>
+            </HomeCard>
           );
         })}
       </HorizontalScroll>

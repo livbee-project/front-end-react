@@ -10,6 +10,8 @@ import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { Portfolio } from '@/domain/entities/Portfolio';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
+import { useListFilters } from '@/presentation/hooks/useListFilters';
+import { useListSearch } from '@/presentation/hooks/useListSearch';
 import { H1, H3, PMuted, Caption, Highlight } from '@/presentation/components/styled/Typography';
 import { Input, Badge } from '@/presentation/components/styled/CommonStyles';
 import { Card } from '@/presentation/components/styled/SectionStyles';
@@ -26,9 +28,8 @@ const filters: Array<{ label: string; value: string }> = [
 const PortfolioPage: React.FC = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = React.useState<number>(1);
-  const [searchQuery, setSearchQuery] = React.useState<string>('');
-  const [searchInputValue, setSearchInputValue] = React.useState<string>('');
-  const [activeFilter, setActiveFilter] = React.useState<string>('전체');
+  const { searchInputValue, setSearchInputValue, searchQuery, handleSearchSubmit, clearSearch } = useListSearch();
+  const { activeFilter, setActiveFilter } = useListFilters<string>('전체');
   const [scrapMap, setScrapMap] = React.useState<Record<string, boolean>>({});
 
   const portfolioRepository = useRepository(PortfolioRepository);
@@ -58,18 +59,14 @@ const PortfolioPage: React.FC = () => {
     return portfolios;
   }, [portfolios, activeFilter]);
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    handleSearchSubmit(event);
     setCurrentPage(1);
-  };
-
-  const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    handleSearch(searchInputValue.trim());
   };
 
   const handleFilterChange = (value: string) => {
     setActiveFilter(value);
+    setCurrentPage(1);
   };
 
   const handleScrapToggle = (portfolioId: string) => {
@@ -109,7 +106,7 @@ const PortfolioPage: React.FC = () => {
             message={error}
             onRetry={() => {
               setCurrentPage(1);
-              setSearchQuery('');
+              clearSearch();
             }}
           />
         </StateWrapper>
@@ -196,7 +193,7 @@ const PortfolioPage: React.FC = () => {
           <PageDescription>브랜드에 맞는 쇼호스트를 찾아보세요</PageDescription>
         </HeaderSection>
 
-        <SearchSection onSubmit={handleSearchSubmit}>
+        <SearchSection onSubmit={handleFormSubmit}>
           <SearchIconWrapper size={18} aria-hidden="true" />
           <StyledInput
             type="text"

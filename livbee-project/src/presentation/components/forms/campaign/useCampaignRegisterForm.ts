@@ -4,6 +4,8 @@ import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
 import { useToast } from '@/presentation/contexts/ToastContext';
+import { useFormState } from '@/presentation/hooks/useFormState';
+import { validateRequiredFields, validateTimeRange } from '@/shared/utils/formValidation';
 import type { CreateCampaignRequest } from '@/domain/entities/Campaign';
 import type { CampaignFormData } from './types';
 
@@ -57,7 +59,7 @@ export const useCampaignRegisterForm = () => {
   const { showToast } = useToast();
   const campaignRepository = useRepository(CampaignRepository);
 
-  const [formData, setFormData] = useState<CampaignFormData>(INITIAL_FORM_DATA);
+  const { formData, updateField } = useFormState<CampaignFormData>(INITIAL_FORM_DATA);
   const [coverImageUrl, setCoverImageUrl] = useState('');
   const [productImageUrl, setProductImageUrl] = useState('');
   const [liveCoverImageUrl, setLiveCoverImageUrl] = useState('');
@@ -67,8 +69,8 @@ export const useCampaignRegisterForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = useCallback((field: keyof CampaignFormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  }, []);
+    updateField(field, value);
+  }, [updateField]);
 
   const handleImageSelect = useCallback((file: File, type: 'cover' | 'product' | 'liveCover') => {
     const blobUrl = URL.createObjectURL(file);
@@ -85,37 +87,27 @@ export const useCampaignRegisterForm = () => {
   }, []);
 
   const validateRequired = useCallback(() => {
-    if (!formData.brandName.trim()) {
-      showToast('브랜드명을 입력해주세요.', undefined, 'error');
+    const requiredFields = [
+      { value: formData.brandName, message: '브랜드명을 입력해주세요.' },
+      { value: formData.title, message: '제목을 입력해주세요.' },
+      { value: formData.filmingDate, message: '촬영일을 선택해주세요.' },
+      { value: formData.deadline, message: '공고 마감일을 선택해주세요.' },
+      { value: formData.startTime, message: '시작시간을 선택해주세요.' },
+      { value: formData.endTime, message: '종료시간을 선택해주세요.' },
+    ];
+
+    const requiredSatisfied = validateRequiredFields(requiredFields, (message) =>
+      showToast(message, undefined, 'error')
+    );
+
+    if (!requiredSatisfied) {
       return false;
     }
-    if (!formData.title.trim()) {
-      showToast('제목을 입력해주세요.', undefined, 'error');
-      return false;
-    }
-    if (!formData.filmingDate) {
-      showToast('촬영일을 선택해주세요.', undefined, 'error');
-      return false;
-    }
-    if (!formData.deadline) {
-      showToast('공고 마감일을 선택해주세요.', undefined, 'error');
-      return false;
-    }
-    if (!formData.startTime) {
-      showToast('시작시간을 선택해주세요.', undefined, 'error');
-      return false;
-    }
-    if (!formData.endTime) {
-      showToast('종료시간을 선택해주세요.', undefined, 'error');
-      return false;
-    }
-    const durationHours = calculateDurationHours(formData.startTime, formData.endTime);
-    if (durationHours <= 0) {
-      showToast('종료시간은 시작시간보다 늦어야 합니다.', undefined, 'error');
-      return false;
-    }
-    return true;
-  }, [formData, showToast]);
+
+    return validateTimeRange(formData.startTime, formData.endTime, (message) =>
+      showToast(message, undefined, 'error')
+    );
+  }, [formData.deadline, formData.endTime, formData.filmingDate, formData.startTime, formData.title, formData.brandName, showToast]);
 
   const handleSubmit = useCallback(async () => {
     if (!validateRequired()) {

@@ -4,6 +4,8 @@ import { ModelRepository } from '@/data/repositories/ModelRepository';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
 import { useToast } from '@/presentation/contexts/ToastContext';
+import { useFormState } from '@/presentation/hooks/useFormState';
+import { useFormUpload } from '@/presentation/hooks/useFormUpload';
 import type { CreateModelRequest } from '@/domain/entities/Model';
 import type { ModelFormData, ModelToggleState } from './types';
 
@@ -43,15 +45,26 @@ export const useModelRegisterForm = () => {
   const { showToast } = useToast();
   const modelRepository = useRepository(ModelRepository);
 
-  const [formData, setFormData] = useState<ModelFormData>(INITIAL_FORM_DATA);
-  const [toggles, setToggles] = useState<ModelToggleState>(INITIAL_TOGGLE_STATE);
+  const { formData, updateField, updateArrayField } = useFormState<ModelFormData>(INITIAL_FORM_DATA);
+  const {
+    formData: toggles,
+    updateField: updateToggleField,
+    updateArrayField: updateToggleArrayField,
+  } = useFormState<ModelToggleState>(INITIAL_TOGGLE_STATE);
 
-  const [mainThumbnailUrl, setMainThumbnailUrl] = useState('');
-  const [galleryImageUrls, setGalleryImageUrls] = useState<string[]>([]);
+  const {
+    profileFile: mainThumbnailFile,
+    profileUrl: mainThumbnailUrl,
+    galleryFiles: galleryImageFiles,
+    galleryUrls: galleryImageUrls,
+    selectProfileImage,
+    removeProfileImage,
+    selectGalleryImage,
+    removeGalleryImage,
+  } = useFormUpload({ maxGalleryImages: MAX_GALLERY_IMAGES });
+
   const [portfolioFileUrl, setPortfolioFileUrl] = useState('');
 
-  const [mainThumbnailFile, setMainThumbnailFile] = useState<File | null>(null);
-  const [galleryImageFiles, setGalleryImageFiles] = useState<File[]>([]);
   const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,76 +73,50 @@ export const useModelRegisterForm = () => {
     (field: keyof ModelFormData, value: string, index?: number, subField?: keyof (ModelFormData['websites'][number]) ) => {
       if (index !== undefined) {
         if (field === 'websites') {
-          const newWebsites = [...formData.websites];
-          if (subField) {
-            newWebsites[index] = { ...newWebsites[index], [subField]: value };
-          }
-          setFormData((prev) => ({ ...prev, websites: newWebsites }));
+          updateArrayField(field, index, value, subField);
           return;
         }
         if (field === 'tags') {
-          const newTags = [...formData.tags];
-          newTags[index] = { ...newTags[index], value };
-          setFormData((prev) => ({ ...prev, tags: newTags }));
+          updateArrayField(field, index, value);
           return;
         }
       }
 
-      setFormData((prev) => ({ ...prev, [field]: value }));
+      updateField(field, value);
     },
-    [formData.tags, formData.websites]
+    [updateArrayField, updateField]
   );
 
   const handleToggleChange = useCallback(
     (field: keyof ModelToggleState, index?: number) => {
       if (index !== undefined && Array.isArray(toggles[field])) {
-        const array = [...(toggles[field] as boolean[])];
-        array[index] = !array[index];
-        setToggles((prev) => ({ ...prev, [field]: array }));
+        const currentArray = toggles[field] as boolean[];
+        updateToggleArrayField(field, index, !currentArray[index]);
         return;
       }
-      setToggles((prev) => ({ ...prev, [field]: !prev[field] }));
+      const currentValue = toggles[field];
+      if (typeof currentValue === 'boolean') {
+        updateToggleField(field, (!currentValue) as ModelToggleState[typeof field]);
+      }
     },
-    [toggles]
+    [toggles, updateToggleArrayField, updateToggleField]
   );
-
-  const handleProfileImageSelect = useCallback((file: File) => {
-    setMainThumbnailFile(file);
-    const url = URL.createObjectURL(file);
-    setMainThumbnailUrl(url);
-  }, []);
-
-  const handleProfileImageRemove = useCallback(() => {
-    if (mainThumbnailUrl?.startsWith('blob:')) {
-      URL.revokeObjectURL(mainThumbnailUrl);
-    }
-    setMainThumbnailFile(null);
-    setMainThumbnailUrl('');
-  }, [mainThumbnailUrl]);
 
   const handleGalleryImageSelect = useCallback(
     (file: File) => {
-      if (galleryImageFiles.length >= MAX_GALLERY_IMAGES) {
+      const added = selectGalleryImage(file);
+      if (!added) {
         showToast(`갤러리 이미지는 최대 ${MAX_GALLERY_IMAGES}개까지 업로드 가능합니다.`, undefined, 'error');
-        return;
       }
-      setGalleryImageFiles((prev) => [...prev, file]);
-      const url = URL.createObjectURL(file);
-      setGalleryImageUrls((prev) => [...prev, url]);
     },
-    [galleryImageFiles.length, showToast]
+    [selectGalleryImage, showToast]
   );
 
   const handleGalleryImageRemove = useCallback(
     (index: number) => {
-      const url = galleryImageUrls[index];
-      if (url?.startsWith('blob:')) {
-        URL.revokeObjectURL(url);
-      }
-      setGalleryImageFiles((prev) => prev.filter((_, i) => i !== index));
-      setGalleryImageUrls((prev) => prev.filter((_, i) => i !== index));
+      removeGalleryImage(index);
     },
-    [galleryImageUrls]
+    [removeGalleryImage]
   );
 
   const handlePortfolioFileSelect = useCallback((file: File) => {
@@ -250,8 +237,8 @@ export const useModelRegisterForm = () => {
     isImageUploading,
     handleInputChange,
     handleToggleChange,
-    handleProfileImageSelect,
-    handleProfileImageRemove,
+    handleProfileImageSelect: selectProfileImage,
+    handleProfileImageRemove: removeProfileImage,
     handleGalleryImageSelect,
     handleGalleryImageRemove,
     handlePortfolioFileSelect,

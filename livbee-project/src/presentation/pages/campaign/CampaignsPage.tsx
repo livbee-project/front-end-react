@@ -10,9 +10,13 @@ import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { Campaign } from '@/domain/entities/Campaign';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
+import { useListFilters } from '@/presentation/hooks/useListFilters';
+import { useListSearch } from '@/presentation/hooks/useListSearch';
 import { H1, H2, H3, PMuted, CaptionMedium, Highlight } from '@/presentation/components/styled/Typography';
 import { Input, Badge } from '@/presentation/components/styled/CommonStyles';
 import { Card, CardHeader, CardFooter } from '@/presentation/components/styled/SectionStyles';
+import { calculateDDay, formatDate as formatDateLabel } from '@/shared/utils/dateUtils';
+import { formatCurrency } from '@/shared/utils/formatUtils';
 
 const filters: Array<{ label: string; value: '전체' | Campaign['category'] }> = [
   { label: '전체', value: '전체' },
@@ -26,9 +30,8 @@ const filters: Array<{ label: string; value: '전체' | Campaign['category'] }> 
 const CampaignsPage: React.FC = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = React.useState<number>(1);
-  const [searchQuery, setSearchQuery] = React.useState<string>('');
-  const [searchInputValue, setSearchInputValue] = React.useState<string>('');
-  const [activeFilter, setActiveFilter] = React.useState<(typeof filters)[number]['value']>('전체');
+  const { searchInputValue, setSearchInputValue, searchQuery, handleSearchSubmit, clearSearch } = useListSearch();
+  const { activeFilter, setActiveFilter } = useListFilters<(typeof filters)[number]['value']>('전체');
   const [scrapMap, setScrapMap] = React.useState<Record<string, boolean>>({});
 
   const campaignRepository = useRepository(CampaignRepository);
@@ -61,18 +64,14 @@ const CampaignsPage: React.FC = () => {
     return campaigns.filter((campaign) => campaign.category === activeFilter);
   }, [campaigns, activeFilter]);
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    handleSearchSubmit(event);
     setCurrentPage(1);
-  };
-
-  const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    handleSearch(searchInputValue.trim());
   };
 
   const handleFilterChange = (value: (typeof filters)[number]['value']) => {
     setActiveFilter(value);
+    setCurrentPage(1);
   };
 
   const handleScrapToggle = (campaignId: string) => {
@@ -98,7 +97,7 @@ const CampaignsPage: React.FC = () => {
             message={error}
             onRetry={() => {
               setCurrentPage(1);
-              setSearchQuery('');
+              clearSearch();
             }}
           />
         </StateWrapper>
@@ -150,7 +149,7 @@ const CampaignsPage: React.FC = () => {
 
               <StyledCardFooter>
                 <FeeText>{formatFee(campaign.fee)}</FeeText>
-                <DeadlineText>{formatDeadline(campaign.closeAt)}</DeadlineText>
+                <DeadlineText>{getDeadlineLabel(campaign.closeAt)}</DeadlineText>
               </StyledCardFooter>
             </CampaignCard>
           ))}
@@ -175,7 +174,7 @@ const CampaignsPage: React.FC = () => {
           <PageDescription>브랜드가 찾고 있는 쇼호스트에 지원해보세요</PageDescription>
         </HeaderSection>
 
-        <SearchSection onSubmit={handleSearchSubmit}>
+        <SearchSection onSubmit={handleFormSubmit}>
           <SearchIconWrapper size={18} aria-hidden="true" />
           <StyledInput
             type="text"
@@ -220,16 +219,9 @@ const buildBadgeItems = (campaign: Campaign): string[] => {
     badges.push(campaign.category);
   }
   if (campaign.shootDate) {
-    badges.push(`촬영 ${formatDate(campaign.shootDate)}`);
+    badges.push(`촬영 ${formatDateLabel(campaign.shootDate)}`);
   }
   return badges;
-};
-
-const formatDate = (dateString?: string) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return dateString;
-  return `${date.getMonth() + 1}월 ${date.getDate()}일`;
 };
 
 const formatFee = (fee?: number) => {
@@ -242,20 +234,13 @@ const formatFee = (fee?: number) => {
     return `${millionWon.toLocaleString('ko-KR')}만원`;
   }
 
-  return `${fee.toLocaleString('ko-KR')}원`;
+  return formatCurrency(fee);
 };
 
-const formatDeadline = (deadline?: string) => {
+const getDeadlineLabel = (deadline?: string) => {
   if (!deadline) return '상시';
-  const now = new Date();
-  const target = new Date(deadline);
-  if (Number.isNaN(target.getTime())) {
-    return '상시';
-  }
-  const diff = Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-  if (diff < 0) return '마감';
-  if (diff === 0) return 'D-day';
-  return `D-${diff}`;
+  const label = calculateDDay(deadline);
+  return label || '상시';
 };
 
 const PageWrapper = styled.div`
