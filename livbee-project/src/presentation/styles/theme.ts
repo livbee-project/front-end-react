@@ -97,6 +97,72 @@ export const theme = {
     tablet: '640px',
     desktop: '1024px',
   },
+  /**
+   * 레거시 호환성을 위한 상수들
+   * 기존 constants.ts에서 사용되던 값들을 theme으로 통합
+   */
+  legacy: {
+    /**
+     * @deprecated theme.spacing을 사용하세요
+     */
+    spacing: {
+      XS: '4px',
+      SM: '8px',
+      MD: '12px',
+      LG: '16px',
+      XL: '20px',
+      XXL: '24px',
+      XXXL: '32px',
+    },
+    /**
+     * @deprecated theme.spacing을 사용하세요
+     */
+    gap: {
+      XS: '4px',
+      SM: '5px',
+      MD: '8px',
+      LG: '10px',
+      XL: '12px',
+      XXL: '16px',
+    },
+    /**
+     * @deprecated theme.radii를 사용하세요
+     */
+    borderRadius: {
+      SM: '8px',
+      MD: '10px',
+      LG: '12px',
+      XL: '16px',
+      CIRCLE: '50%',
+    },
+    /**
+     * @deprecated theme.fonts를 사용하세요
+     */
+    fontSize: {
+      XS: '12px',
+      SM: '14px',
+      MD: '16px',
+      LG: '18px',
+      XL: '20px',
+    },
+    /**
+     * @deprecated theme.fonts를 사용하세요
+     */
+    fontWeight: {
+      NORMAL: 400,
+      MEDIUM: 500,
+      BOLD: 700,
+    },
+    /**
+     * @deprecated theme.colors를 사용하세요
+     */
+    textColor: {
+      BLACK: '#030213',
+      DARK_GRAY: '#717182',
+      PRIMARY: '#687CF4',
+      WHITE: '#ffffff',
+    },
+  },
 };
 
 export type AppTheme = typeof theme;

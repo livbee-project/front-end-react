@@ -12,7 +12,7 @@ import DetailSection from '@/presentation/layouts/DetailSection';
 import DetailContent from '@/presentation/layouts/DetailContent';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { ErrorState } from '@/presentation/components/states/ErrorState';
-import { SPACING } from '@/presentation/styles/constants';
+import { theme } from '@/presentation/styles/theme';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { PortfolioDetail } from '@/domain/entities/Portfolio';
 import { useRepository } from '@/presentation/hooks/useRepository';
@@ -117,7 +117,7 @@ const PortfolioDetailPage: React.FC = () => {
       {/* 2. 상세소개 섹션 */}
       {portfolio.detailedIntro && (
         <DetailSection showDivider>
-          <div style={{ paddingBottom: SPACING.LG }}>
+          <div style={{ paddingBottom: theme.spacing.lg }}>
             <SectionHeader title="상세소개" />
           </div>
           <DetailContent>
@@ -186,7 +186,7 @@ const PortfolioDetailPage: React.FC = () => {
       </div>
 
       {/* 5. 하단 버튼 */}
-      <div style={{ padding: SPACING.LG }}>
+      <div style={{ padding: theme.spacing.lg }}>
         <Button
           variant="primary"
           size="large"

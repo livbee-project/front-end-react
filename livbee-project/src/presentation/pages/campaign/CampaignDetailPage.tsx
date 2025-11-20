@@ -10,7 +10,7 @@ import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { ErrorState } from '@/presentation/components/states/ErrorState';
-import { SPACING } from '@/presentation/styles/constants';
+import { theme } from '@/presentation/styles/theme';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { CampaignDetail } from '@/domain/entities/Campaign';
 import { htmlToText } from '@/shared/utils/htmlUtils';
@@ -242,7 +242,7 @@ const CampaignDetailPage: React.FC = () => {
       )}
 
       {/* 8. 하단 액션 버튼 */}
-      <div style={{ padding: SPACING.LG }}>
+      <div style={{ padding: theme.spacing.lg }}>
         <Button
           variant="primary"
           size="large"
