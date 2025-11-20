@@ -16,7 +16,7 @@ import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import type { CreateModelRequest } from '@/domain/entities/Model';
-import { Caption } from '@/presentation/components/styled/Typography';
+import { Caption, Small } from '@/presentation/components/styled/Typography';
 
 const HelperText = styled(Caption)`
   color: ${({ theme }) => theme.colors.muted};
@@ -24,6 +24,24 @@ const HelperText = styled(Caption)`
 
 const SuccessText = styled(Caption)`
   color: ${({ theme }) => theme.colors.primary};
+`;
+
+const PortfolioUploadButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: ${({ theme }) => theme.spacing.lg};
+  padding: 20px;
+  border: 2px dashed ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  background: ${({ theme }) => theme.colors.secondary};
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary};
+    background: ${({ theme }) => theme.primaryOpacity['10']};
+  }
 `;
 
 /**
@@ -314,7 +332,6 @@ const ModelRegisterPage: React.FC = () => {
                   color: 'white',
                   border: 'none',
                   cursor: 'pointer',
-                  fontSize: '12px',
                 }}
               >
                 ×
@@ -412,34 +429,12 @@ const ModelRegisterPage: React.FC = () => {
             }}
           />
           {!portfolioFileUrl ? (
-            <button
+            <PortfolioUploadButton
               type="button"
               onClick={() => portfolioInputRef.current?.click()}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '12px',
-                padding: '20px',
-                border: '2px dashed #e5e7eb',
-                borderRadius: '8px',
-                background: '#fafafa',
-                fontSize: '14px',
-                color: '#717182',
-                cursor: 'pointer',
-                transition: 'border-color 0.2s, background 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#687CF4';
-                e.currentTarget.style.background = '#f5f6ff';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = '#e5e7eb';
-                e.currentTarget.style.background = '#fafafa';
-              }}
             >
-              <span>추가된 파일이 없습니다</span>
-            </button>
+              <Small>추가된 파일이 없습니다</Small>
+            </PortfolioUploadButton>
           ) : (
             <SuccessText>✓ 포트폴리오 파일이 업로드되었습니다.</SuccessText>
           )}

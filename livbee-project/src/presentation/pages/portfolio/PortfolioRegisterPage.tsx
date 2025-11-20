@@ -272,13 +272,14 @@ const EmptyState = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: ${({ theme }) => theme.spacing.lg};
   padding: 20px;
-  border: 2px dashed #e5e7eb;
-  border-radius: 8px;
-  background: #fafafa;
-  font-size: 14px;
-  color: ${({ theme }) => theme.colors.muted};
+  border: 2px dashed ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  background: ${({ theme }) => theme.colors.secondary};
+  ${Small} {
+    color: ${({ theme }) => theme.colors.muted};
+  }
 `;
 
 const PortfolioItem = styled.div`
@@ -357,9 +358,8 @@ const TagItem = styled.div`
   }
 `;
 
-const TagLabel = styled.span`
+const TagLabel = styled(P)`
   min-width: 80px;
-  font-size: 15px;
   font-weight: 500;
 `;
 
@@ -372,7 +372,7 @@ const TagInputWrapper = styled.div`
 
 const TagInput = styled.input`
   ${underlineField};
-  font-size: 15px;
+  font: ${({ theme }) => theme.fonts.body};
   padding: 8px 0;
 `;
 
@@ -442,22 +442,23 @@ const DeleteButton = styled.button`
 const AddImageButton = styled.button`
   width: 100%;
   aspect-ratio: 1 / 1;
-  border: 2px dashed #d1d5db;
-  border-radius: 8px;
-  background: #fafafa;
+  border: 2px dashed ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  background: ${({ theme }) => theme.colors.secondary};
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  color: #9ca3af;
-  font-size: 13px;
-  font-weight: 500;
+  color: ${({ theme }) => theme.colors.muted};
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s;
+  ${Small} {
+    font-weight: 500;
+  }
   &:hover {
     border-color: ${({ theme }) => theme.colors.primary};
-    background: ${({ theme }) => `${theme.colors.primary}0d`};
+    background: ${({ theme }) => theme.primaryOpacity['10']};
   }
 `;
 
@@ -960,7 +961,7 @@ const PortfolioRegisterPage: React.FC = () => {
                   style={{ cursor: 'pointer' }}
                 >
                   <Upload size={24} />
-                  <div>추가된 파일이 없습니다</div>
+                  <Small>추가된 파일이 없습니다</Small>
                 </EmptyState>
               )}
 
@@ -1010,7 +1011,7 @@ const PortfolioRegisterPage: React.FC = () => {
               {galleryImageUrls.length < 9 && (
                 <AddImageButton type="button" onClick={() => galleryInputRef.current?.click()}>
                   <Plus size={28} />
-                  <span>추가</span>
+                  <Small>추가</Small>
                   <HiddenInput
                     ref={galleryInputRef}
                     type="file"
