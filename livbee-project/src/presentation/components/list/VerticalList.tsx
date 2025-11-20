@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 
 /**
  * VerticalList가 받을 props 타입을 정의합니다.
@@ -21,7 +22,7 @@ const VerticalList: React.FC<VerticalListProps> = ({
   const items = React.Children.toArray(children);
 
   return (
-    <div>
+    <Container>
       {items.map((child, index) => (
         <React.Fragment key={index}>
           {child}
@@ -29,20 +30,22 @@ const VerticalList: React.FC<VerticalListProps> = ({
             (수정) showDividers가 true이고, 마지막 아이템이 아닐 때만
             구분선을 렌더링합니다.
           */}
-          {showDividers && index < items.length - 1 && (
-            <hr
-              style={{
-                border: 'none',
-                height: '0.3px',
-                backgroundColor: '#CAC4D0',
-                margin: 0,
-              }}
-            />
-          )}
+          {showDividers && index < items.length - 1 && <Divider />}
         </React.Fragment>
       ))}
-    </div>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  width: 100%;
+`;
+
+const Divider = styled.hr`
+  border: none;
+  height: 0.3px;
+  background-color: ${({ theme }) => theme.colors.border};
+  margin: 0;
+`;
 
 export default VerticalList;

@@ -1,4 +1,7 @@
 import React from 'react';
+import styled from 'styled-components';
+import { P } from '@/presentation/components/styled/Typography';
+import { PrimaryButton } from '@/presentation/components/styled/CommonStyles';
 
 interface ErrorStateProps {
   message: string;
@@ -17,25 +20,27 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
   retryLabel = '다시 시도',
 }) => {
   return (
-    <div style={{ padding, textAlign: 'center' }}>
-      <p style={{ color: 'var(--error, #FF0000)' }}>{message}</p>
+    <Container $padding={padding}>
+      <ErrorMessage as={P}>{message}</ErrorMessage>
       {onRetry && (
-        <button
-          onClick={onRetry}
-          style={{
-            marginTop: '10px',
-            padding: '8px 16px',
-            cursor: 'pointer',
-            backgroundColor: 'var(--primary)',
-            color: 'var(--white)',
-            border: 'none',
-            borderRadius: '8px',
-          }}
-        >
+        <RetryButton onClick={onRetry}>
           {retryLabel}
-        </button>
+        </RetryButton>
       )}
-    </div>
+    </Container>
   );
 };
+
+const Container = styled.div<{ $padding: string }>`
+  padding: ${({ $padding }) => $padding};
+  text-align: center;
+`;
+
+const ErrorMessage = styled(P)`
+  color: ${({ theme }) => theme.colors.error};
+`;
+
+const RetryButton = styled(PrimaryButton)`
+  margin-top: ${({ theme }) => theme.spacing.sm};
+`;
 

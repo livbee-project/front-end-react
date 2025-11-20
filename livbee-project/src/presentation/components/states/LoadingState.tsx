@@ -1,4 +1,6 @@
 import React from 'react';
+import styled from 'styled-components';
+import { P } from '@/presentation/components/styled/Typography';
 
 interface LoadingStateProps {
   message?: string;
@@ -13,9 +15,18 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   padding = '20px',
 }) => {
   return (
-    <div style={{ padding, textAlign: 'center' }}>
-      <p>{message}</p>
-    </div>
+    <Container $padding={padding}>
+      <Message as={P}>{message}</Message>
+    </Container>
   );
 };
+
+const Container = styled.div<{ $padding: string }>`
+  padding: ${({ $padding }) => $padding};
+  text-align: center;
+`;
+
+const Message = styled(P)`
+  color: ${({ theme }) => theme.colors.foreground};
+`;
 

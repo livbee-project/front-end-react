@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { SPACING } from '@/presentation/styles/constants';
+import styled from 'styled-components';
+import { P } from '@/presentation/components/styled/Typography';
+import { theme } from '@/presentation/styles/theme';
 
 /**
  * 전역 타입 확장
@@ -519,60 +521,23 @@ const ImageCropPage: React.FC = () => {
 
   if (!imageSrc) {
     return (
-      <div style={{ padding: SPACING.LG, textAlign: 'center' }}>
-        이미지를 불러오는 중...
-      </div>
+      <LoadingContainer>
+        <P>이미지를 불러오는 중...</P>
+      </LoadingContainer>
     );
   }
 
   return (
-    <div
-      style={{
-        width: '100%',
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: '#000',
-      }}
-    >
+    <PageContainer>
       {/* 상단 바 */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: `${SPACING.MD} ${SPACING.LG}`,
-          backgroundColor: '#1a1a1a',
-          color: '#fff',
-        }}
-      >
-        <button
-          onClick={handleBack}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#fff',
-            fontSize: 'var(--h3)',
-            cursor: 'pointer',
-            padding: SPACING.SM,
-          }}
-        >
+      <TopBar>
+        <HeaderButton onClick={handleBack}>
           {'<< 뒤로가기'}
-        </button>
-        <button
-          onClick={handleSave}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#fff',
-            fontSize: 'var(--h3)',
-            cursor: 'pointer',
-            padding: SPACING.SM,
-          }}
-        >
+        </HeaderButton>
+        <HeaderButton onClick={handleSave}>
           저장
-        </button>
-      </div>
+        </HeaderButton>
+      </TopBar>
 
       {/* 이미지 크롭 영역 */}
       <div
@@ -691,43 +656,80 @@ const ImageCropPage: React.FC = () => {
       </div>
 
       {/* 하단 바 - 크롭 비율 선택 */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: SPACING.MD,
-          padding: `${SPACING.MD} ${SPACING.LG}`,
-          backgroundColor: '#1a1a1a',
-          overflowX: 'auto',
-        }}
-      >
+      <BottomBar>
         {CROP_RATIOS.map((ratio) => (
-          <button
+          <RatioButton
             key={ratio.value}
             onClick={() => setSelectedRatio(ratio.value)}
-            style={{
-              padding: `${SPACING.SM} ${SPACING.MD}`,
-              borderRadius: '20px',
-              border: 'none',
-              backgroundColor: selectedRatio === ratio.value ? '#fff' : 'transparent',
-              color: selectedRatio === ratio.value ? '#000' : '#fff',
-              fontSize: 'var(--p2)',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              transition: 'all 0.2s',
-            }}
+            $isActive={selectedRatio === ratio.value}
           >
             {ratio.label}
-          </button>
+          </RatioButton>
         ))}
-      </div>
+      </BottomBar>
 
       {/* 숨겨진 캔버스 (크롭 처리용) */}
-      <canvas ref={canvasRef} style={{ display: 'none' }} />
-    </div>
+      <HiddenCanvas ref={canvasRef} />
+    </PageContainer>
   );
 };
+
+const LoadingContainer = styled.div`
+  padding: ${({ theme }) => theme.spacing.lg};
+  text-align: center;
+`;
+
+const PageContainer = styled.div`
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #000;
+`;
+
+const TopBar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
+  background-color: #1a1a1a;
+  color: ${theme.colors.primaryForeground};
+`;
+
+const HeaderButton = styled.button`
+  background: none;
+  border: none;
+  color: ${theme.colors.primaryForeground};
+  font: ${({ theme }) => theme.fonts.h2};
+  cursor: pointer;
+  padding: ${({ theme }) => theme.spacing.sm};
+`;
+
+const BottomBar = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.md};
+  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
+  background-color: #1a1a1a;
+  overflow-x: auto;
+`;
+
+const RatioButton = styled.button<{ $isActive: boolean }>`
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+  border-radius: ${({ theme }) => theme.radii.full};
+  border: none;
+  background-color: ${({ $isActive }) => ($isActive ? theme.colors.primaryForeground : 'transparent')};
+  color: ${({ $isActive }) => ($isActive ? '#000' : theme.colors.primaryForeground)};
+  font: ${({ theme }) => theme.fonts.body};
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+`;
+
+const HiddenCanvas = styled.canvas`
+  display: none;
+`;
 
 export default ImageCropPage;
 

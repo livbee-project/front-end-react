@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { RiImageLine } from 'react-icons/ri';
 
@@ -91,33 +92,46 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   };
 
   const { width, height } = getDimensions();
-
-  const containerStyle: React.CSSProperties = {
-    width,
-    height,
-    borderRadius: size === 100 && !aspectRatio ? '50%' : '12px',
-    border: '1px solid var(--paint-gray, #E5E7ED)',
-    backgroundColor: '#F5F5F5',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    flexShrink: 0,
-  };
+  const isCircle = size === 100 && !aspectRatio;
 
   return (
-    <div style={containerStyle} onClick={handleClick}>
-      <RiImageLine size={size * 0.4} color="var(--dark-gray)" />
-      <input
+    <Container
+      $width={width}
+      $height={height}
+      $isCircle={isCircle}
+      onClick={handleClick}
+    >
+      <ImageIcon size={size * 0.4} />
+      <HiddenInput
         ref={fileInputRef}
         type="file"
         accept="image/*"
-        style={{ display: 'none' }}
         onChange={handleFileChange}
       />
-    </div>
+    </Container>
   );
 };
+
+const Container = styled.div<{ $width: number; $height: number; $isCircle: boolean }>`
+  width: ${({ $width }) => $width}px;
+  height: ${({ $height }) => $height}px;
+  border-radius: ${({ $isCircle, theme }) => ($isCircle ? theme.radii.full : theme.radii.lg)};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  background-color: ${({ theme }) => theme.colors.secondary};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+`;
+
+const ImageIcon = styled(RiImageLine)`
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
+const HiddenInput = styled.input`
+  display: none;
+`;
 
 export default ImageUpload;
 
