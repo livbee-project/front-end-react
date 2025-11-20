@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import styled, { keyframes } from 'styled-components';
 import Button from '@/presentation/components/ui/Button';
 import InputWrapper from '@/presentation/components/forms/inputs/InputWrapper';
-import { SPACING, BORDER_RADIUS, FONT_SIZE, FONT_WEIGHT, TEXT_COLOR, INPUT_BASE_STYLE } from '@/presentation/styles/constants';
+import { Input } from '@/presentation/components/styled/CommonStyles';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import liveelogo from '@/presentation/assets/images/liveelogo.png';
@@ -126,276 +127,222 @@ const LoginPage: React.FC = () => {
     };
   }, [userType]); // userType이 변경되면 버튼 스타일이 바뀔 수 있으므로 재계산
 
-  /**
-   * 페이지 컨테이너 스타일
-   */
-  const pageStyle: React.CSSProperties = {
-    minHeight: '100vh',
-    backgroundColor: TEXT_COLOR.WHITE,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: `${SPACING.XXXL} ${SPACING.LG}`,
-    boxSizing: 'border-box',
-  };
-
-  /**
-   * 로고 컨테이너 스타일
-   */
-  const logoContainerStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginBottom: `${parseInt(SPACING.XXL) * 2.5}px`, // 2.5배 여백 (60px)
-    position: 'relative',
-    width: '100%',
-  };
-
-  /**
-   * 로고 이미지 스타일
-   */
-  const logoImageStyle: React.CSSProperties = {
-    width: 'auto',
-    height: 'auto',
-    maxWidth: '300px', // 200px * 1.5 = 300px
-    objectFit: 'contain',
-  };
-
-  /**
-   * 모델도 여기 말풍선 컨테이너 스타일 (애니메이션용)
-   * 쇼호스트 버튼 너비의 정확한 절반 지점(중앙)에 뾰족점이 오도록 설정
-   * useRef와 useEffect를 사용하여 실제 DOM 요소의 위치를 측정
-   */
-  const modelBubbleContainerStyle: React.CSSProperties = {
-    position: 'absolute',
-    left: bubbleLeft, // 쇼호스트 버튼의 실제 중앙 위치 (동적으로 계산)
-    transform: 'translateX(-50%)', // 말풍선의 중심(뾰족점)을 버튼 중앙에 맞춤
-    bottom: `calc(100% + ${SPACING.LG} + 10px)`, // 탭 섹션보다 10px 위
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    animation: 'bounceVertical 2s ease-in-out infinite',
-    width: 'fit-content', // 말풍선의 실제 너비에 맞춤
-  };
-
-  /**
-   * 모델도 여기 말풍선 스타일
-   */
-  const modelBubbleStyle: React.CSSProperties = {
-    backgroundColor: 'var(--primary)', // 프라이머리 색상
-    color: TEXT_COLOR.WHITE,
-    padding: `${SPACING.XS} ${SPACING.MD}`,
-    borderRadius: BORDER_RADIUS.MD,
-    fontSize: FONT_SIZE.XS,
-    fontWeight: FONT_WEIGHT.MEDIUM,
-    position: 'relative',
-    whiteSpace: 'nowrap', // 텍스트가 한 줄로 유지되도록
-  };
-
-  /**
-   * 말풍선 뾰족점 스타일 (가운데 정렬)
-   */
-  const bubblePointerStyle: React.CSSProperties = {
-    position: 'absolute',
-    bottom: '-8px',
-    left: '50%',
-    transform: 'translateX(-50%)', // 가운데 정렬
-    width: 0,
-    height: 0,
-    borderLeft: '8px solid transparent',
-    borderRight: '8px solid transparent',
-    borderTop: `8px solid var(--primary)`, // 프라이머리 색상
-  };
-
-  /**
-   * 탭 컨테이너 스타일 (말풍선 위치 기준점)
-   */
-  const tabContainerStyle: React.CSSProperties = {
-    display: 'flex',
-    width: '100%',
-    maxWidth: '400px',
-    backgroundColor: '#F5F5F5',
-    borderRadius: BORDER_RADIUS.LG,
-    padding: SPACING.XS,
-    marginBottom: SPACING.XXL,
-    gap: SPACING.XS,
-    position: 'relative',
-  };
-
-  /**
-   * 탭 버튼 스타일
-   */
-  const getTabStyle = (isActive: boolean): React.CSSProperties => ({
-    flex: 1,
-    padding: `${SPACING.MD} ${SPACING.LG}`,
-    borderRadius: BORDER_RADIUS.MD,
-    border: 'none',
-    backgroundColor: isActive ? TEXT_COLOR.WHITE : 'transparent',
-    color: TEXT_COLOR.BLACK,
-    fontSize: FONT_SIZE.MD,
-    fontWeight: isActive ? FONT_WEIGHT.MEDIUM : FONT_WEIGHT.NORMAL,
-    cursor: 'pointer',
-    boxShadow: isActive ? '0 2px 8px rgba(0, 0, 0, 0.1)' : 'none',
-    transition: 'all 0.2s',
-  });
-
-  /**
-   * 폼 컨테이너 스타일
-   */
-  const formContainerStyle: React.CSSProperties = {
-    width: '100%',
-    maxWidth: '400px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: SPACING.LG,
-  };
-
-  /**
-   * 입력 필드 스타일
-   */
-  const inputStyle: React.CSSProperties = {
-    ...INPUT_BASE_STYLE,
-    paddingRight: SPACING.LG,
-  };
-
-  /**
-   * 회원가입 링크 컨테이너 스타일
-   */
-  const signUpContainerStyle: React.CSSProperties = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: SPACING.XS,
-    marginTop: SPACING.MD,
-    fontSize: FONT_SIZE.SM,
-    color: TEXT_COLOR.DARK_GRAY,
-  };
-
-  /**
-   * 회원가입 링크 스타일
-   */
-  const signUpLinkStyle: React.CSSProperties = {
-    color: '#4A90E2',
-    cursor: 'pointer',
-    textDecoration: 'none',
-    fontWeight: FONT_WEIGHT.MEDIUM,
-  };
-
   return (
-    <>
-      {/* 애니메이션 스타일 정의 */}
-      <style>
-        {`
-          @keyframes bounceVertical {
-            0%, 100% {
-              transform: translateY(0);
-            }
-            50% {
-              transform: translateY(-10px);
-            }
-          }
-        `}
-      </style>
-      <div style={pageStyle}>
+    <PageWrapper>
         {/* 로고 영역 */}
-        <div style={logoContainerStyle}>
-          <img src={liveelogo} alt="라이비 로고" style={logoImageStyle} />
-        </div>
+        <LogoWrapper>
+          <LogoImage src={liveelogo} alt="라이비 로고" />
+        </LogoWrapper>
 
         {/* 사용자 타입 탭 */}
-        <div ref={tabContainerRef} style={tabContainerStyle}>
-          {/* 모델도 여기 말풍선 (탭 섹션 위에 배치) */}
-          <div style={modelBubbleContainerStyle}>
-            <div style={modelBubbleStyle}>
+        <TabsWrapper ref={tabContainerRef}>
+          <BubbleContainer $left={bubbleLeft}>
+            <Bubble>
               모델도 여기!
-              <div style={bubblePointerStyle} />
-            </div>
-          </div>
-        <button
-          style={getTabStyle(userType === 'brand')}
-          onClick={() => setUserType('brand')}
-        >
-          브랜드
-        </button>
-        <button
-          ref={showhostButtonRef}
-          style={getTabStyle(userType === 'showhost')}
-          onClick={() => setUserType('showhost')}
-        >
-          쇼호스트
-        </button>
-      </div>
+              <BubblePointer />
+            </Bubble>
+          </BubbleContainer>
+          <TypeTabButton
+            type="button"
+            $active={userType === 'brand'}
+            onClick={() => setUserType('brand')}
+          >
+            브랜드
+          </TypeTabButton>
+          <TypeTabButton
+            type="button"
+            ref={showhostButtonRef}
+            $active={userType === 'showhost'}
+            onClick={() => setUserType('showhost')}
+          >
+            쇼호스트
+          </TypeTabButton>
+        </TabsWrapper>
 
       {/* 로그인 폼 */}
-      <div style={formContainerStyle}>
+      <FormContainer>
         <InputWrapper>
-          <input
+          <StyledInput
             type="email"
             placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onKeyPress={handleKeyPress}
-            style={inputStyle}
             disabled={isLoading}
           />
         </InputWrapper>
 
         <InputWrapper>
-          <input
+          <StyledInput
             type="password"
             placeholder="비밀번호"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onKeyPress={handleKeyPress}
-            style={inputStyle}
             disabled={isLoading}
           />
         </InputWrapper>
 
         {/* 에러 메시지 표시 */}
-        {error && (
-          <div
-            style={{
-              color: '#E53E3E',
-              fontSize: FONT_SIZE.SM,
-              marginTop: SPACING.SM,
-              textAlign: 'center',
-            }}
-          >
-            {error}
-          </div>
-        )}
+        {error && <ErrorText>{error}</ErrorText>}
 
-        <Button
-          variant="primary"
-          fullWidth
-          onClick={handleLogin}
-          disabled={isLoading}
-          style={{ marginTop: SPACING.MD }}
-        >
-          {isLoading ? '로그인 중...' : '로그인'}
-        </Button>
+        <ButtonSpacer>
+          <Button variant="primary" fullWidth onClick={handleLogin} disabled={isLoading}>
+            {isLoading ? '로그인 중...' : '로그인'}
+          </Button>
+        </ButtonSpacer>
 
         {/* 회원가입 링크 */}
-        <div style={signUpContainerStyle}>
+        <SignUpRow>
           <span>아직 계정이 없으신가요?</span>
-          <a
+          <SignUpLink
             href="#"
             onClick={(e) => {
               e.preventDefault();
               handleSignUp();
             }}
-            style={signUpLinkStyle}
           >
             회원가입
-          </a>
-        </div>
-      </div>
-      </div>
-    </>
+          </SignUpLink>
+        </SignUpRow>
+      </FormContainer>
+      </PageWrapper>
   );
 };
 
 export default LoginPage;
+
+const PageWrapper = styled.div`
+  min-height: 100vh;
+  background: ${({ theme }) => theme.colors.background};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: ${({ theme }) => `${theme.spacing['5xl']} ${theme.spacing.lg}`};
+  box-sizing: border-box;
+  gap: ${({ theme }) => theme.spacing['3xl']};
+`;
+
+const LogoWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-bottom: ${({ theme }) => theme.spacing['4xl']};
+`;
+
+const LogoImage = styled.img`
+  max-width: 300px;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+`;
+
+const bounceVertical = keyframes`
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+`;
+
+const TabsWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  max-width: 400px;
+  background: ${({ theme }) => theme.colors.secondary};
+  border-radius: ${({ theme }) => theme.radii.xl};
+  padding: ${({ theme }) => theme.spacing.xs};
+  gap: ${({ theme }) => theme.spacing.xs};
+  position: relative;
+`;
+
+const BubbleContainer = styled.div<{ $left: string }>`
+  position: absolute;
+  left: ${({ $left }) => $left};
+  transform: translateX(-50%);
+  bottom: calc(100% + ${({ theme }) => theme.spacing.xl} + 10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: ${bounceVertical} 2s ease-in-out infinite;
+`;
+
+const Bubble = styled.div`
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primaryForeground};
+  padding: ${({ theme }) => `${theme.spacing.xs} ${theme.spacing.md}`};
+  border-radius: ${({ theme }) => theme.radii.md};
+  font: ${({ theme }) => theme.fonts.caption};
+  font-weight: 500;
+  position: relative;
+  white-space: nowrap;
+`;
+
+const BubblePointer = styled.span`
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid ${({ theme }) => theme.colors.primary};
+`;
+
+const TypeTabButton = styled.button<{ $active: boolean }>`
+  flex: 1;
+  padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.lg}`};
+  border-radius: ${({ theme }) => theme.radii.md};
+  border: none;
+  background: ${({ theme, $active }) => ($active ? theme.colors.card : 'transparent')};
+  color: ${({ theme }) => theme.colors.foreground};
+  font: ${({ theme }) => theme.fonts.body};
+  font-weight: ${({ $active }) => ($active ? 600 : 400)};
+  cursor: pointer;
+  box-shadow: ${({ $active }) => ($active ? '0 2px 8px rgba(0, 0, 0, 0.1)' : 'none')};
+  transition: background 0.2s, box-shadow 0.2s;
+`;
+
+const FormContainer = styled.div`
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.lg};
+`;
+
+const StyledInput = styled(Input)`
+  padding-right: ${({ theme }) => theme.spacing.lg};
+`;
+
+const ErrorText = styled.p`
+  color: ${({ theme }) => theme.colors.error};
+  font: ${({ theme }) => theme.fonts.caption};
+  margin: 0;
+  text-align: center;
+`;
+
+const ButtonSpacer = styled.div`
+  margin-top: ${({ theme }) => theme.spacing.md};
+`;
+
+const SignUpRow = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.xs};
+  font: ${({ theme }) => theme.fonts.caption};
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
+const SignUpLink = styled.a`
+  color: ${({ theme }) => theme.colors.primary};
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+`;
 

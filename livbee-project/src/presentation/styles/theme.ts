@@ -49,12 +49,15 @@ export const theme = {
     xl: '24px',
     '2xl': '32px',
     '3xl': '36px',
+    '4xl': '48px',
+    '5xl': '60px',
   },
   radii: {
     sm: '6px',
     md: '8px',
     lg: '10px',
     xl: '16px',
+    '2xl': '24px',
     full: '9999px',
   },
   fonts: {
