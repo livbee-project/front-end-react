@@ -1,61 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled, { css } from 'styled-components';
-import {
-  User,
-  Bell,
-  MessageSquare,
-  LogOut,
-  Briefcase,
-  Users,
-  Send,
-  CreditCard,
-  FileText,
-  Video,
-  Mail,
-  ChevronRight,
-} from 'lucide-react';
+import styled from 'styled-components';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';
-import { H2, H3, PMuted } from '@/presentation/components/styled/Typography';
-import { PrimaryBadge } from '@/presentation/components/styled/CommonStyles';
-import { Card } from '@/presentation/components/styled/SectionStyles';
-import { formatNumberCompact, maskPhoneNumber } from '@/shared/utils/formatUtils';
-
-type UserType = 'brand' | 'showhost' | 'model';
-
-interface MenuItemData {
-  icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
-  label: string;
-  description: string;
-  count?: number;
-  onClick: () => void;
-}
-
-interface ProfileStat {
-  label: string;
-  value: number;
-  unit?: string;
-  format?: 'count' | 'rating' | 'compact';
-}
-
-interface ProfileData {
-  name: string;
-  role: string;
-  badges: string[];
-  contact?: string;
-  stats: ProfileStat[];
-}
+import { useMyPageData } from '@/presentation/hooks/useMyPageData';
+import { TypeSwitcher } from '@/presentation/components/mypage/TypeSwitcher';
+import { ProfileSection } from '@/presentation/components/mypage/ProfileSection';
+import { MenuSection } from '@/presentation/components/mypage/MenuSection';
+import { LogoutButton } from '@/presentation/components/mypage/LogoutButton';
+import { AppInfo } from '@/presentation/components/mypage/AppInfo';
+import type { UserType } from '@/types/mypage';
 
 const MyPage: React.FC = () => {
   const navigate = useNavigate();
   const { logout, isLoggedIn, user, isLoading } = useAuth();
   const { showToast } = useToast();
   
-  const [userType, setUserType] = React.useState<UserType>('brand');
+  const [userType, setUserType] = useState<UserType>('brand');
 
   // 사용자 역할에 따라 userType 업데이트
-  React.useEffect(() => {
+  useEffect(() => {
     if (user?.role === 'brand') {
       setUserType('brand');
     } else if (user?.role === 'showhost') {
@@ -64,7 +28,7 @@ const MyPage: React.FC = () => {
   }, [user?.role]);
 
   // 로그인 안되어있으면 로그인 페이지로 리다이렉트
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isLoading && !isLoggedIn) {
       navigate('/login', { replace: true });
     }
@@ -75,155 +39,7 @@ const MyPage: React.FC = () => {
     showToast('로그아웃되었습니다.');
   };
 
-  // 유저 타입별 프로필 데이터 (임시)
-  const profileData = React.useMemo<ProfileData>(() => {
-    switch (userType) {
-      case 'brand':
-        return {
-          name: '스타일코리아',
-          role: '패션 브랜드',
-          badges: ['패션', '브랜드'],
-          contact: '021234567',
-          stats: [
-            { label: '진행 캠페인', value: 5, unit: '개', format: 'count' },
-            { label: '계약 호스트', value: 12, unit: '명', format: 'count' },
-            { label: '평점', value: 4.9, format: 'rating' },
-          ],
-        };
-      case 'showhost':
-        return {
-          name: '김지현',
-          role: '패션 전문 쇼호스트',
-          badges: ['패션', '뷰티'],
-          contact: '01012345678',
-          stats: [
-            { label: '라이브', value: 24, unit: '회', format: 'count' },
-            { label: '팔로워', value: 1200, unit: '명', format: 'compact' },
-            { label: '평점', value: 4.8, format: 'rating' },
-          ],
-        };
-      case 'model':
-        return {
-          name: '한지우',
-          role: '프리랜스 모델',
-          badges: ['패션', '뷰티'],
-          contact: '01087654321',
-          stats: [
-            { label: '촬영', value: 32, unit: '회', format: 'count' },
-            { label: '팔로워', value: 2500, unit: '명', format: 'compact' },
-            { label: '평점', value: 4.9, format: 'rating' },
-          ],
-        };
-    }
-  }, [userType]);
-
-  const formatStatValue = React.useCallback((stat: ProfileStat) => {
-    switch (stat.format) {
-      case 'rating':
-        return `${stat.value.toFixed(1)}★`;
-      case 'compact':
-        return `${formatNumberCompact(stat.value)}${stat.unit ?? ''}`;
-      case 'count':
-        return `${stat.value.toLocaleString()}${stat.unit ?? ''}`;
-      default:
-        return stat.unit ? `${stat.value.toLocaleString()}${stat.unit}` : stat.value.toLocaleString();
-    }
-  }, []);
-
-  // 유저 타입별 메뉴 데이터
-  const menuItems = React.useMemo<MenuItemData[][]>(() => {
-    const commonMenu: MenuItemData[] = [
-      {
-        icon: User,
-        label: '개인정보 관리',
-        description: '비밀번호 변경 및 인증',
-        onClick: () => console.log('개인정보 관리 클릭'),
-      },
-      {
-        icon: Bell,
-        label: '알림 설정',
-        description: '알림 수신 설정 관리',
-        onClick: () => console.log('알림 설정 클릭'),
-      },
-      {
-        icon: MessageSquare,
-        label: '메시지',
-        description: '받은 메시지 확인',
-        onClick: () => console.log('메시지 클릭'),
-      },
-    ];
-
-    switch (userType) {
-      case 'brand':
-        return [
-          [
-            {
-              icon: Briefcase,
-              label: '캠페인 목록',
-              description: '등록한 캠페인 관리',
-              onClick: () => console.log('캠페인 목록 클릭'),
-            },
-            {
-              icon: Users,
-              label: '지원자 현황',
-              description: '지원자 확인 및 관리',
-              onClick: () => console.log('지원자 현황 클릭'),
-            },
-            {
-              icon: Send,
-              label: '보낸 제안',
-              description: '보낸 제안 내역',
-              onClick: () => console.log('보낸 제안 클릭'),
-            },
-            {
-              icon: CreditCard,
-              label: '계약 및 정산',
-              description: '계약서 및 정산 내역',
-              onClick: () => console.log('계약 및 정산 클릭'),
-            },
-          ],
-          commonMenu,
-        ];
-      case 'showhost':
-      case 'model':
-        return [
-          [
-            {
-              icon: Briefcase,
-              label: '내가 지원한 캠페인',
-              description: '지원한 캠페인 확인',
-              onClick: () => console.log('내가 지원한 캠페인 클릭'),
-            },
-            {
-              icon: FileText,
-              label: '포트폴리오 관리',
-              description: '포트폴리오 수정 및 관리',
-              onClick: () =>
-                navigate('/mypage/portfolios', { state: { role: userType } }),
-            },
-            {
-              icon: Video,
-              label: '숏클립 관리',
-              description: '숏클립 업로드 및 관리',
-              onClick: () => navigate('/mypage/clips'),
-            },
-            {
-              icon: Mail,
-              label: '받은 제안',
-              description: '받은 제안 확인',
-              onClick: () => console.log('받은 제안 클릭'),
-            },
-            {
-              icon: CreditCard,
-              label: '계약 정산',
-              description: '계약서 및 정산 내역',
-              onClick: () => console.log('계약 정산 클릭'),
-            },
-          ],
-          commonMenu,
-        ];
-    }
-  }, [userType, navigate]);
+  const { profileData, menuItems } = useMyPageData(userType);
 
   // 로딩 중이거나 로그인 안되어있으면 아무것도 렌더링하지 않음
   if (isLoading || !isLoggedIn || !user) {
@@ -238,100 +54,15 @@ const MyPage: React.FC = () => {
   return (
     <PageWrapper>
       <PageInner>
-        {availableTypes.length > 1 && (
-          <TypeSwitcher>
-            {availableTypes.includes('brand') && (
-              <TypeBadge $isActive={userType === 'brand'} onClick={() => setUserType('brand')}>
-                브랜드
-              </TypeBadge>
-            )}
-            {availableTypes.includes('showhost') && (
-              <TypeBadge $isActive={userType === 'showhost'} onClick={() => setUserType('showhost')}>
-                쇼호스트
-              </TypeBadge>
-            )}
-            {availableTypes.includes('model') && (
-              <TypeBadge $isActive={userType === 'model'} onClick={() => setUserType('model')}>
-                모델
-              </TypeBadge>
-            )}
-          </TypeSwitcher>
-        )}
-
-        <ProfileCard>
-          <ProfileHeader>
-            <Avatar>
-              <User size={40} strokeWidth={2} />
-            </Avatar>
-            <ProfileInfo>
-              <ProfileName as={H2}>{profileData.name}</ProfileName>
-              <ProfileRole as={PMuted}>{profileData.role}</ProfileRole>
-              <ProfileBadges>
-                {profileData.badges.map((badge) => (
-                  <SmallBadge key={badge} as={PrimaryBadge}>{badge}</SmallBadge>
-                ))}
-              </ProfileBadges>
-              {profileData.contact && (
-                <ProfileContact>
-                  연락처 {maskPhoneNumber(profileData.contact)}
-                </ProfileContact>
-              )}
-            </ProfileInfo>
-          </ProfileHeader>
-
-          <StatsContainer>
-                {profileData.stats.map((stat) => (
-                  <StatItem key={stat.label}>
-                    <StatLabel as={PMuted}>{stat.label}</StatLabel>
-                    <StatValue as={H3}>{formatStatValue(stat)}</StatValue>
-                  </StatItem>
-                ))}
-          </StatsContainer>
-        </ProfileCard>
-
-        {menuItems.map((menuGroup, groupIndex) => (
-          <MenuCard key={groupIndex}>
-            {menuGroup.map((item, itemIndex) => (
-              <MenuItem
-                key={item.label}
-                $isLast={itemIndex === menuGroup.length - 1}
-                onClick={item.onClick}
-              >
-                <MenuIcon>
-                  <item.icon size={20} strokeWidth={2} />
-                </MenuIcon>
-                <MenuContent>
-                  <MenuHeader>
-                    <MenuLabel as={H3}>{item.label}</MenuLabel>
-                    {item.count != null && <CountBadge>{item.count}</CountBadge>}
-                  </MenuHeader>
-                  <MenuDescription as={PMuted}>{item.description}</MenuDescription>
-                </MenuContent>
-                <MenuChevron>
-                  <ChevronRight size={20} />
-                </MenuChevron>
-              </MenuItem>
-            ))}
-          </MenuCard>
-        ))}
-
-        <LogoutButton onClick={handleLogout}>
-          <LogOut size={16} strokeWidth={2} />
-          로그아웃
-        </LogoutButton>
-
-        <AppInfo>
-          <AppVersion as={PMuted}>버전 1.0.0</AppVersion>
-          <AppLinks>
-            <AppLink href="#" onClick={(e) => e.preventDefault()}>
-              이용약관
-            </AppLink>
-            <span>·</span>
-            <AppLink href="#" onClick={(e) => e.preventDefault()}>
-              개인정보처리방침
-            </AppLink>
-          </AppLinks>
-        </AppInfo>
+        <TypeSwitcher
+          availableTypes={availableTypes}
+          selectedType={userType}
+          onTypeChange={setUserType}
+        />
+        <ProfileSection profileData={profileData} />
+        <MenuSection menuItems={menuItems} />
+        <LogoutButton onClick={handleLogout} />
+        <AppInfo />
       </PageInner>
     </PageWrapper>
   );
@@ -354,209 +85,6 @@ const PageInner = styled.div`
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-`;
-
-const TypeSwitcher = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.sm};
-  margin-bottom: ${({ theme }) => theme.spacing.xl};
-`;
-
-const TypeBadge = styled.button<{ $isActive: boolean }>`
-  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.lg};
-  border: none;
-  border-radius: ${({ theme }) => theme.radii.md};
-  cursor: pointer;
-  transition: all 0.2s;
-  font: ${({ theme }) => theme.fonts.caption};
-  ${({ $isActive }) =>
-    $isActive
-      ? css`
-          background: ${({ theme }) => theme.colors.primary};
-          color: ${({ theme }) => theme.colors.primaryForeground};
-        `
-      : css`
-          background: ${({ theme }) => theme.colors.secondary};
-          color: ${({ theme }) => theme.colors.foreground};
-        `}
-  &:hover {
-    background: ${({ theme }) => theme.primaryOpacity['10']};
-    color: ${({ theme }) => theme.colors.primary};
-  }
-`;
-
-const ProfileCard = styled(Card)`
-  padding: ${({ theme }) => theme.spacing.xl};
-  margin-bottom: ${({ theme }) => theme.spacing.xl};
-`;
-
-const ProfileHeader = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.lg};
-  align-items: center;
-  margin-bottom: ${({ theme }) => theme.spacing.lg};
-`;
-
-const Avatar = styled.div`
-  flex-shrink: 0;
-  width: 5rem;
-  height: 5rem;
-  border-radius: ${({ theme }) => theme.radii.full};
-  background: linear-gradient(135deg, ${({ theme }) => theme.colors.primary} 0%, ${({ theme }) => theme.primaryOpacity['60']} 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${({ theme }) => theme.colors.primaryForeground};
-`;
-
-const ProfileInfo = styled.div`
-  flex: 1;
-`;
-
-const ProfileName = styled(H2)`
-  margin-bottom: ${({ theme }) => theme.spacing.xs};
-`;
-
-const ProfileRole = styled(PMuted)`
-  margin-bottom: ${({ theme }) => theme.spacing.sm};
-`;
-
-const ProfileContact = styled(PMuted)`
-  color: ${({ theme }) => theme.colors.muted};
-`;
-
-const ProfileBadges = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.sm};
-  flex-wrap: wrap;
-`;
-
-const SmallBadge = styled(PrimaryBadge)``;
-
-const StatsContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: ${({ theme }) => theme.spacing.lg};
-  padding-top: ${({ theme }) => theme.spacing.lg};
-  border-top: 1px solid ${({ theme }) => theme.colors.border};
-`;
-
-const StatItem = styled.div`
-  text-align: center;
-`;
-
-const StatLabel = styled(PMuted)`
-  margin-bottom: ${({ theme }) => theme.spacing.xs};
-`;
-
-const StatValue = styled(H3)`
-  color: ${({ theme }) => theme.colors.primary};
-`;
-
-const MenuCard = styled(Card)`
-  margin-bottom: ${({ theme }) => theme.spacing.xl};
-  overflow: hidden;
-  padding: 0;
-`;
-
-const MenuItem = styled.button<{ $isLast: boolean }>`
-  width: 100%;
-  padding: ${({ theme }) => theme.spacing.lg};
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.lg};
-  align-items: center;
-  background: transparent;
-  border: none;
-  border-bottom: ${({ $isLast, theme }) => ($isLast ? 'none' : `1px solid ${theme.colors.border}`)};
-  text-align: left;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  &:hover {
-    background: ${({ theme }) => theme.primaryOpacity['10']};
-  }
-`;
-
-const MenuIcon = styled.div`
-  flex-shrink: 0;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: ${({ theme }) => theme.radii.full};
-  background: ${({ theme }) => theme.colors.secondary};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${({ theme }) => theme.colors.primary};
-`;
-
-const MenuContent = styled.div`
-  flex: 1;
-  min-width: 0;
-`;
-
-const MenuHeader = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.sm};
-  align-items: center;
-  margin-bottom: ${({ theme }) => theme.spacing.xs};
-`;
-
-const MenuLabel = styled(H3)``;
-
-const CountBadge = styled(PrimaryBadge)``;
-
-const MenuDescription = styled(PMuted)``;
-
-const MenuChevron = styled.div`
-  flex-shrink: 0;
-  color: ${({ theme }) => theme.colors.muted};
-`;
-
-const LogoutButton = styled.button`
-  width: 100%;
-  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
-  background: transparent;
-  border: 1px solid ${({ theme }) => theme.colors.error};
-  color: ${({ theme }) => theme.colors.error};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: ${({ theme }) => theme.spacing.sm};
-  cursor: pointer;
-  font: ${({ theme }) => theme.fonts.body};
-  transition: background-color 0.2s, color 0.2s;
-  margin-bottom: ${({ theme }) => theme.spacing.xl};
-  &:hover {
-    background: ${({ theme }) => theme.colors.error};
-    color: ${({ theme }) => theme.colors.errorForeground};
-  }
-`;
-
-const AppInfo = styled.div`
-  margin-top: ${({ theme }) => theme.spacing.xl};
-  text-align: center;
-  color: ${({ theme }) => theme.colors.muted};
-`;
-
-const AppVersion = styled(PMuted)`
-  margin-bottom: ${({ theme }) => theme.spacing.xs};
-`;
-
-const AppLinks = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing.lg};
-  font: ${({ theme }) => theme.fonts.caption};
-`;
-
-const AppLink = styled.a`
-  color: inherit;
-  text-decoration: none;
-  transition: color 0.2s;
-  &:hover {
-    color: ${({ theme }) => theme.colors.primary};
-  }
 `;
 
 export default MyPage;
