@@ -72,7 +72,7 @@ const CampaignApplyModal: React.FC<CampaignApplyModalProps> = ({ isOpen, campaig
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="420px" width="94%">
-      <ModalContainer>
+      <ModalContainer className="hide-scrollbar">
         <ModalHeader>
           <ModalTitle>지원하기</ModalTitle>
           <CloseButton onClick={onClose} type="button" aria-label="모달 닫기">
@@ -166,6 +166,9 @@ const CampaignApplyModal: React.FC<CampaignApplyModalProps> = ({ isOpen, campaig
 };
 
 const ModalContainer = styled.div`
+  border-radius: ${({ theme }) => theme.radii['2xl']};
+  max-height: 80vh;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.lg};
