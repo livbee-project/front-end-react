@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
 import Modal from '@/presentation/components/ui/Modal';
+import { theme } from '@/presentation/styles/theme';
 import '@/presentation/styles/global.css';
 import 'react-day-picker/dist/style.css';
 
@@ -140,7 +141,7 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
     }
 
     .rdp-day_today {
-      background-color: ${({ theme }) => theme.primaryOpacity['10']};
+      background-color: ${theme.primaryOpacity['10']};
       color: var(--black);
       font-weight: 400;
     }
