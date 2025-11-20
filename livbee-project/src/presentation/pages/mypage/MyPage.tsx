@@ -198,7 +198,8 @@ const MyPage: React.FC = () => {
               icon: FileText,
               label: '포트폴리오 관리',
               description: '포트폴리오 수정 및 관리',
-              onClick: () => navigate('/mypage/portfolios'),
+              onClick: () =>
+                navigate('/mypage/portfolios', { state: { role: userType } }),
             },
             {
               icon: Video,

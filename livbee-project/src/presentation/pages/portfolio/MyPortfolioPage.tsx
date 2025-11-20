@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { Star, Pencil, Trash2 } from 'lucide-react';
 import Pagination from '@/presentation/components/list/Pagination';
@@ -76,11 +76,6 @@ const MOCK_PORTFOLIOS: MyPortfolioItem[] = [
 
 const ITEMS_PER_PAGE = 3;
 
-const tabs: Array<{ label: string; value: PortfolioRole }> = [
-  { label: '쇼호스트 포트폴리오', value: 'showhost' },
-  { label: '모델 포트폴리오', value: 'model' },
-];
-
 const formatDateLabel = (value: string) => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
@@ -89,8 +84,10 @@ const formatDateLabel = (value: string) => {
 
 const MyPortfolioPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const activeRole: PortfolioRole =
+    (location.state as { role?: PortfolioRole } | null)?.role ?? 'showhost';
   const { showToast } = useToast();
-  const [activeRole, setActiveRole] = useState<PortfolioRole>('showhost');
   const [portfolios, setPortfolios] = useState<MyPortfolioItem[]>(MOCK_PORTFOLIOS);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -108,11 +105,6 @@ const MyPortfolioPage: React.FC = () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleRoleChange = (role: PortfolioRole) => {
-    setActiveRole(role);
-    setCurrentPage(1);
   };
 
   const handleTogglePinned = (id: number) => {
@@ -158,26 +150,13 @@ const MyPortfolioPage: React.FC = () => {
     <PageWrapper>
       <HeaderRow>
         <div>
-          <PageTitle>포트폴리오 관리</PageTitle>
+          <PageTitle>{activeRole === 'showhost' ? '쇼호스트 포트폴리오' : '모델 포트폴리오'}</PageTitle>
           <PageDescription>나의 포트폴리오를 관리하고 기본 포트폴리오를 설정하세요.</PageDescription>
         </div>
         <HeaderButton type="button" onClick={handleRegisterClick}>
           관리
         </HeaderButton>
       </HeaderRow>
-
-      <TabList>
-        {tabs.map((tab) => (
-          <TabButton
-            key={tab.value}
-            type="button"
-            $active={activeRole === tab.value}
-            onClick={() => handleRoleChange(tab.value)}
-          >
-            {tab.label}
-          </TabButton>
-        ))}
-      </TabList>
 
       {pageItems.length === 0 ? (
         <EmptyState message="등록된 포트폴리오가 없습니다." />
@@ -289,31 +268,6 @@ const HeaderButton = styled.button`
   font: ${({ theme }) => theme.fonts.button};
   cursor: pointer;
   padding: ${({ theme }) => theme.spacing.xs};
-`;
-
-const TabList = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.sm};
-`;
-
-const TabButton = styled.button<{ $active: boolean }>`
-  flex: 1;
-  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  border: none;
-  font: ${({ theme }) => theme.fonts.body};
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  ${({ $active, theme }) =>
-    $active
-      ? css`
-          background: ${theme.colors.primary};
-          color: ${theme.colors.primaryForeground};
-        `
-      : css`
-          background: ${theme.colors.secondary};
-          color: ${theme.colors.foreground};
-        `}
 `;
 
 const CardList = styled.div`
