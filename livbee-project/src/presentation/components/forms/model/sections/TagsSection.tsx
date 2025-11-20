@@ -1,9 +1,9 @@
 import React from 'react';
 import VerticalList from '@/presentation/components/list/VerticalList';
 import ListItem from '@/presentation/components/list/ListItem';
-import FormSection from '@/presentation/components/forms/FormSection';
-import FormRow from '@/presentation/components/forms/FormRow';
-import TextInput from '@/presentation/components/forms/TextInput';
+import FormSection from '@/presentation/components/forms/sections/FormSection';
+import FormRow from '@/presentation/components/forms/sections/FormRow';
+import TextInput from '@/presentation/components/forms/inputs/TextInput';
 import ToggleSwitch from '@/presentation/components/ui/ToggleSwitch';
 import { Caption } from '@/presentation/components/styled/Typography';
 import type { ModelTagEntry } from '../types';

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/presentation/components/ui/Button';
-import InputWrapper from '@/presentation/components/forms/InputWrapper';
+import InputWrapper from '@/presentation/components/forms/inputs/InputWrapper';
 import { SPACING, BORDER_RADIUS, FONT_SIZE, FONT_WEIGHT, TEXT_COLOR, INPUT_BASE_STYLE } from '@/presentation/styles/constants';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';

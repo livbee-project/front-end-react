@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import FormSection from '@/presentation/components/forms/FormSection';
+import FormSection from '@/presentation/components/forms/sections/FormSection';
 import SectionTitle from '@/presentation/components/ui/SectionTitle';
-import TextInput from '@/presentation/components/forms/TextInput';
+import TextInput from '@/presentation/components/forms/inputs/TextInput';
 import ImageUpload from '@/presentation/components/upload/ImageUpload';
 
 interface NameSectionProps {

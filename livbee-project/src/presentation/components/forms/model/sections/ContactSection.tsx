@@ -1,7 +1,7 @@
 import React from 'react';
-import FormSection from '@/presentation/components/forms/FormSection';
-import FormRow from '@/presentation/components/forms/FormRow';
-import TextInput from '@/presentation/components/forms/TextInput';
+import FormSection from '@/presentation/components/forms/sections/FormSection';
+import FormRow from '@/presentation/components/forms/sections/FormRow';
+import TextInput from '@/presentation/components/forms/inputs/TextInput';
 import ToggleSwitch from '@/presentation/components/ui/ToggleSwitch';
 
 interface ContactSectionProps {

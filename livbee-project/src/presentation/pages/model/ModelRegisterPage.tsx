@@ -1,7 +1,7 @@
 import React from 'react';
 import RegisterPageLayout from '@/presentation/layouts/RegisterPageLayout';
-import FormSection from '@/presentation/components/forms/FormSection';
-import TextInput from '@/presentation/components/forms/TextInput';
+import FormSection from '@/presentation/components/forms/sections/FormSection';
+import TextInput from '@/presentation/components/forms/inputs/TextInput';
 import SectionTitle from '@/presentation/components/ui/SectionTitle';
 import {
   NameSection,

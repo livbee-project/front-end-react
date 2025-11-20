@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
-import FormSection from '@/presentation/components/forms/FormSection';
+import FormSection from '@/presentation/components/forms/sections/FormSection';
 import { Caption } from '@/presentation/components/styled/Typography';
 
 interface PortfolioUploadSectionProps {

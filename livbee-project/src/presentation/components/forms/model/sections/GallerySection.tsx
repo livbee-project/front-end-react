@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import FormSection from '@/presentation/components/forms/FormSection';
+import FormSection from '@/presentation/components/forms/sections/FormSection';
 import ImageUpload from '@/presentation/components/upload/ImageUpload';
 import { MAX_GALLERY_IMAGES } from '../useModelRegisterForm';
 

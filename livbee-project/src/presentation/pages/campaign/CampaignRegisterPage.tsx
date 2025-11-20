@@ -1,13 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import TextInput from '@/presentation/components/forms/TextInput';
-import SelectInput from '@/presentation/components/forms/SelectInput';
-import DateInput from '@/presentation/components/forms/DateInput';
-import TimeInput from '@/presentation/components/forms/TimeInput';
+import TextInput from '@/presentation/components/forms/inputs/TextInput';
+import SelectInput from '@/presentation/components/forms/inputs/SelectInput';
+import DateInput from '@/presentation/components/forms/inputs/DateInput';
+import TimeInput from '@/presentation/components/forms/inputs/TimeInput';
 import ImageUpload from '@/presentation/components/upload/ImageUpload';
 import Button from '@/presentation/components/ui/Button';
 import RegisterPageLayout from '@/presentation/layouts/RegisterPageLayout';
-import FormSection from '@/presentation/components/forms/FormSection';
+import FormSection from '@/presentation/components/forms/sections/FormSection';
 import { Caption } from '@/presentation/components/styled/Typography';
 import { useCampaignRegisterForm } from '@/presentation/components/forms/campaign/useCampaignRegisterForm';
 

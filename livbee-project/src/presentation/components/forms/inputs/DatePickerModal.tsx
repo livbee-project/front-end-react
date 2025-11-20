@@ -6,13 +6,6 @@ import { theme } from '@/presentation/styles/theme';
 import '@/presentation/styles/global.css';
 import 'react-day-picker/dist/style.css';
 
-/**
- * DatePickerModal 컴포넌트가 받을 props 타입을 정의합니다.
- * @param isOpen - 모달 열림/닫힘 상태
- * @param onClose - 모달 닫기 함수
- * @param selectedDate - 선택된 날짜
- * @param onDateSelect - 날짜 선택 시 실행될 함수
- */
 interface DatePickerModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -20,22 +13,10 @@ interface DatePickerModalProps {
   onDateSelect: (date: Date | undefined) => void;
 }
 
-/**
- * 날짜 선택 모달 컴포넌트입니다.
- * 이미지 디자인에 맞춘 3단계 네비게이션(날짜/월/연도)을 지원합니다.
- */
-const DatePickerModal: React.FC<DatePickerModalProps> = ({
-  isOpen,
-  onClose,
-  selectedDate,
-  onDateSelect,
-}) => {
+const DatePickerModal: React.FC<DatePickerModalProps> = ({ isOpen, onClose, selectedDate, onDateSelect }) => {
   const [view, setView] = useState<'date' | 'month' | 'year'>('date');
   const [currentMonth, setCurrentMonth] = useState(selectedDate || new Date());
 
-  /**
-   * 날짜 선택 핸들러
-   */
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
       onDateSelect(date);
@@ -43,18 +24,12 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
     }
   };
 
-  /**
-   * Today 버튼 클릭 핸들러
-   */
   const handleTodayClick = () => {
     const today = new Date();
     onDateSelect(today);
     onClose();
   };
 
-  /**
-   * react-day-picker 커스텀 스타일
-   */
   const customStyles = `
     .rdp {
       --rdp-cell-size: 40px;
@@ -157,17 +132,8 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
     }
   `;
 
-  /**
-   * 월 이름 배열
-   */
-  const monthNames = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-  ];
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-  /**
-   * 월 선택 뷰 렌더링
-   */
   const renderMonthView = () => {
     const currentYear = currentMonth.getFullYear();
     const months = Array.from({ length: 12 }, (_, i) => i);
@@ -175,43 +141,22 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
 
     return (
       <div>
-        {/* 헤더 */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
           <button
             onClick={() => setCurrentMonth(new Date(currentYear - 1, 0))}
-            style={{
-              border: 'none',
-              background: 'transparent',
-              cursor: 'pointer',
-              padding: '8px',
-            }}
+            style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: '8px' }}
           >
             <RiArrowLeftSLine size={20} />
           </button>
-          <span style={{ fontSize: 'var(--h2)', fontWeight: 700, color: 'var(--black)' }}>
-            {currentYear}
-          </span>
+          <span style={{ fontSize: 'var(--h2)', fontWeight: 700, color: 'var(--black)' }}>{currentYear}</span>
           <button
             onClick={() => setCurrentMonth(new Date(currentYear + 1, 0))}
-            style={{
-              border: 'none',
-              background: 'transparent',
-              cursor: 'pointer',
-              padding: '8px',
-            }}
+            style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: '8px' }}
           >
             <RiArrowRightSLine size={20} />
           </button>
         </div>
-
-        {/* 월 그리드 */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '8px',
-          }}
-        >
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
           {months.map((month) => {
             const isSelected = month === selectedMonth && currentYear === selectedDate?.getFullYear();
             return (
@@ -242,9 +187,6 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
     );
   };
 
-  /**
-   * 연도 선택 뷰 렌더링
-   */
   const renderYearView = () => {
     const currentYear = currentMonth.getFullYear();
     const decadeStart = Math.floor(currentYear / 10) * 10;
@@ -253,16 +195,10 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
 
     return (
       <div>
-        {/* 헤더 */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
           <button
             onClick={() => setCurrentMonth(new Date(decadeStart - 10, 0))}
-            style={{
-              border: 'none',
-              background: 'transparent',
-              cursor: 'pointer',
-              padding: '8px',
-            }}
+            style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: '8px' }}
           >
             <RiArrowLeftSLine size={20} />
           </button>
@@ -271,25 +207,12 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
           </span>
           <button
             onClick={() => setCurrentMonth(new Date(decadeStart + 10, 0))}
-            style={{
-              border: 'none',
-              background: 'transparent',
-              cursor: 'pointer',
-              padding: '8px',
-            }}
+            style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: '8px' }}
           >
             <RiArrowRightSLine size={20} />
           </button>
         </div>
-
-        {/* 연도 그리드 */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '8px',
-          }}
-        >
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
           {years.map((year) => {
             const isSelected = year === selectedYear;
             const isOutsideRange = year < decadeStart || year > decadeStart + 9;
@@ -325,125 +248,89 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
   return (
     <>
       <style>{customStyles}</style>
-      <Modal
-        isOpen={isOpen}
-        onClose={onClose}
-        maxWidth="400px"
-        width="90%"
-        padding="24px"
-      >
+      <Modal isOpen={isOpen} onClose={onClose} maxWidth="400px" width="90%" padding="24px">
         {view === 'date' && (
-            <>
-              {/* 커스텀 헤더 */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                  <div style={{ display: 'flex', gap: '4px' }}>
-                    <button
-                      onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear() - 1, currentMonth.getMonth()))}
-                      style={{
-                        border: 'none',
-                        background: 'transparent',
-                        cursor: 'pointer',
-                        padding: '4px',
-                        display: 'flex',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <RiArrowLeftSLine size={16} />
-                    </button>
-                    <button
-                      onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-                      style={{
-                        border: 'none',
-                        background: 'transparent',
-                        cursor: 'pointer',
-                        padding: '4px',
-                        display: 'flex',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <RiArrowLeftSLine size={16} />
-                    </button>
-                  </div>
-                  <button
-                    onClick={() => setView('month')}
-                    style={{
-                      border: 'none',
-                      background: 'transparent',
-                      cursor: 'pointer',
-                      fontSize: 'var(--h2)',
-                      fontWeight: 700,
-                      color: 'var(--black)',
-                      padding: '4px 8px',
-                    }}
-                  >
-                    {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                  </button>
-                  <div style={{ display: 'flex', gap: '4px' }}>
-                    <button
-                      onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-                      style={{
-                        border: 'none',
-                        background: 'transparent',
-                        cursor: 'pointer',
-                        padding: '4px',
-                        display: 'flex',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <RiArrowRightSLine size={16} />
-                    </button>
-                    <button
-                      onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear() + 1, currentMonth.getMonth()))}
-                      style={{
-                        border: 'none',
-                        background: 'transparent',
-                        cursor: 'pointer',
-                        padding: '4px',
-                        display: 'flex',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <RiArrowRightSLine size={16} />
-                    </button>
-                  </div>
-                </div>
-                <DayPicker
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={handleDateSelect}
-                  month={currentMonth}
-                  onMonthChange={setCurrentMonth}
-                  modifiersClassNames={{
-                    selected: 'rdp-day_selected',
-                    today: 'rdp-day_today',
-                  }}
-                  classNames={{
-                    months: 'rdp-months',
-                    month: 'rdp-month',
-                    caption: 'rdp-caption-hidden',
-                    nav: 'rdp-nav',
-                    nav_button: 'rdp-nav_button',
-                  }}
-                />
-              {/* Today 버튼 */}
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', gap: '4px' }}>
                 <button
-                  onClick={handleTodayClick}
-                  style={{
-                    border: 'none',
-                    background: 'transparent',
-                    cursor: 'pointer',
-                    fontSize: 'var(--p2)',
-                    fontWeight: 400,
-                    color: 'var(--black)',
-                    padding: '8px 16px',
-                  }}
+                  onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear() - 1, currentMonth.getMonth()))}
+                  style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}
                 >
-                  Today
+                  <RiArrowLeftSLine size={16} />
+                </button>
+                <button
+                  onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
+                  style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}
+                >
+                  <RiArrowLeftSLine size={16} />
                 </button>
               </div>
-            </>
-          )}
+              <button
+                onClick={() => setView('month')}
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  fontSize: 'var(--h2)',
+                  fontWeight: 700,
+                  color: 'var(--black)',
+                  padding: '4px 8px',
+                }}
+              >
+                {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              </button>
+              <div style={{ display: 'flex', gap: '4px' }}>
+                <button
+                  onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
+                  style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}
+                >
+                  <RiArrowRightSLine size={16} />
+                </button>
+                <button
+                  onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear() + 1, currentMonth.getMonth()))}
+                  style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}
+                >
+                  <RiArrowRightSLine size={16} />
+                </button>
+              </div>
+            </div>
+            <DayPicker
+              mode="single"
+              selected={selectedDate}
+              onSelect={handleDateSelect}
+              month={currentMonth}
+              onMonthChange={setCurrentMonth}
+              modifiersClassNames={{
+                selected: 'rdp-day_selected',
+                today: 'rdp-day_today',
+              }}
+              classNames={{
+                months: 'rdp-months',
+                month: 'rdp-month',
+                caption: 'rdp-caption-hidden',
+                nav: 'rdp-nav',
+                nav_button: 'rdp-nav_button',
+              }}
+            />
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+              <button
+                onClick={handleTodayClick}
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  fontSize: 'var(--p2)',
+                  fontWeight: 400,
+                  color: 'var(--black)',
+                  padding: '8px 16px',
+                }}
+              >
+                Today
+              </button>
+            </div>
+          </>
+        )}
         {view === 'month' && (
           <>
             {renderMonthView()}
