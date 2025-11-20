@@ -9,7 +9,7 @@ import type { Campaign } from '@/domain/entities/Campaign';
 import { htmlToText } from '@/shared/utils/htmlUtils';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
-import { H2, H3, Caption, PMuted, CaptionMedium } from '@/presentation/components/styled/Typography';
+import { H3, Caption, PMuted, CaptionMedium } from '@/presentation/components/styled/Typography';
 import { PrimaryBadge } from '@/presentation/components/styled/CommonStyles';
 
 const ScrollArea = styled.div`
