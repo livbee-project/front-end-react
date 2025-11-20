@@ -22,6 +22,11 @@ export const HomeCardTitle = styled(H3)`
 export const HomeCardDescription = styled(PMuted)`
   color: ${({ theme }) => theme.colors.muted};
   margin: 0;
+  min-height: 40px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 `;
 
 export const HomeCardMetaRow = styled.div`
@@ -29,5 +34,23 @@ export const HomeCardMetaRow = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: ${({ theme }) => theme.spacing.sm};
+  flex-wrap: wrap;
+`;
+
+export const CTAButton = styled.button`
+  width: 100%;
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.lg};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  border: none;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primaryForeground};
+  font: ${({ theme }) => theme.fonts.button};
+  cursor: pointer;
+  margin-top: ${({ theme }) => theme.spacing.md};
+  transition: background 0.2s;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.primaryHover};
+  }
 `;
 

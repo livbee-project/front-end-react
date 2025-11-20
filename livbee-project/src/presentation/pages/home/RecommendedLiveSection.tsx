@@ -12,8 +12,16 @@ import { CaptionMedium } from '@/presentation/components/styled/Typography';
 import { Badge } from '@/presentation/components/styled/CommonStyles';
 import { HomeCard } from '@/presentation/components/cards/HomeCard';
 import { HomeCardImage } from '@/presentation/components/cards/HomeCardImage';
-import { HomeCardBody, HomeCardBrand, HomeCardTitle, HomeCardDescription } from '@/presentation/components/cards/HomeCardBody';
+import {
+  HomeCardBody,
+  HomeCardBrand,
+  HomeCardTitle,
+  HomeCardDescription,
+  HomeCardMetaRow,
+  CTAButton,
+} from '@/presentation/components/cards/HomeCardBody';
 import { calculateDDay } from '@/shared/utils/dateUtils';
+import CampaignApplyModal from '@/presentation/components/detail/CampaignApplyModal';
 
 const StyledBadge = styled(Badge)`
   position: absolute;
@@ -24,6 +32,7 @@ const StyledBadge = styled(Badge)`
 
 const RecommendedLiveSection: React.FC = () => {
   const navigate = useNavigate();
+  const [selectedCampaign, setSelectedCampaign] = React.useState<Campaign | null>(null);
   const campaignRepository = useRepository(CampaignRepository);
   const { data: campaigns, loading } = useListData<
     Campaign,
@@ -72,11 +81,34 @@ const RecommendedLiveSection: React.FC = () => {
                 <HomeCardBrand>{campaign.brandName}</HomeCardBrand>
                 <HomeCardTitle>{campaign.title}</HomeCardTitle>
                 <HomeCardDescription>{summary}</HomeCardDescription>
+                <HomeCardMetaRow>
+                  <HomeCardBrand as="span">
+                    {campaign.brandName} · {campaign.fee ? `${campaign.fee.toLocaleString()}원` : '협의'}
+                  </HomeCardBrand>
+                  <HomeCardBrand as="span">{campaign.category}</HomeCardBrand>
+                </HomeCardMetaRow>
+                <CTAButton
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setSelectedCampaign(campaign);
+                  }}
+                >
+                  지원하기
+                </CTAButton>
               </HomeCardBody>
             </HomeCard>
           );
         })}
       </HorizontalScroll>
+
+      {selectedCampaign && (
+        <CampaignApplyModal
+          isOpen={Boolean(selectedCampaign)}
+          campaignTitle={selectedCampaign.title}
+          onClose={() => setSelectedCampaign(null)}
+        />
+      )}
     </HomeSection>
   );
 };
