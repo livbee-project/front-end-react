@@ -1,4 +1,6 @@
 import React from 'react';
+import styled from 'styled-components';
+import { Caption } from '@/presentation/components/styled/Typography';
 
 /**
  * ListPageHint 컴포넌트가 받을 props 타입을 정의합니다.
@@ -15,19 +17,15 @@ interface ListPageHintProps {
 const ListPageHint: React.FC<ListPageHintProps> = ({
   text = '카드를 누르면 상세 정보를 보실 수 있습니다.',
 }) => {
-  /**
-   * 안내 문구 스타일
-   */
-  const hintStyle: React.CSSProperties = {
-    marginBlockStart: '40px',
-    marginBlockEnd: 0,
-    fontSize: '12px',
-    color: 'var(--dark-gray)',
-    marginBottom: '20px',
-  };
-
-  return <p style={hintStyle}>{text}</p>;
+  return <HintText>{text}</HintText>;
 };
+
+const HintText = styled(Caption)`
+  margin-block-start: ${({ theme }) => theme.spacing['4xl']};
+  margin-block-end: 0;
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
+  color: ${({ theme }) => theme.colors.muted};
+`;
 
 export default ListPageHint;
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { RiInformationLine, RiErrorWarningLine } from 'react-icons/ri';
-import { FONT_SIZE, FONT_WEIGHT, TEXT_COLOR, BORDER_RADIUS, SPACING, GAP } from '@/presentation/styles/constants';
+import { P } from '@/presentation/components/styled/Typography';
 
 /**
  * Toast 타입 (variant)
@@ -62,84 +63,55 @@ const Toast: React.FC<ToastProps> = ({ message, duration = 2000, variant = 'info
     };
   }, [duration, onClose]);
 
-  /**
-   * 토스트 컨테이너 스타일
-   * 그림자 효과를 포함합니다.
-   * 위치는 ToastContext에서 제어됩니다.
-   * 애니메이션 상태에 따라 transform과 opacity가 변경됩니다.
-   * variant에 따라 배경색이 변경됩니다.
-   */
-  const getToastStyle = (): React.CSSProperties => {
-    const backgroundColor = variant === 'error' ? '#E53E3E' : '#FF6B35'; // error: 빨간색, info: 오렌지색
-    
-    const baseStyle: React.CSSProperties = {
-      backgroundColor,
-      borderRadius: BORDER_RADIUS.XL,
-      padding: `${SPACING.MD} ${SPACING.XXL}`,
-      display: 'flex',
-      alignItems: 'center',
-      gap: GAP.MD,
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-      minWidth: '200px',
-      maxWidth: 'calc(100vw - 32px)', // 화면 양쪽에 16px씩 여백
-      width: 'fit-content',
-      transition: 'transform 0.3s ease-out, opacity 0.3s ease-out',
-    };
-
-    switch (animationState) {
-      case 'entering':
-        return {
-          ...baseStyle,
-          transform: 'translateY(100%)',
-          opacity: 0,
-        };
-      case 'visible':
-        return {
-          ...baseStyle,
-          transform: 'translateY(0)',
-          opacity: 1,
-        };
-      case 'exiting':
-        return {
-          ...baseStyle,
-          transform: 'translateY(100%)',
-          opacity: 0,
-        };
-      default:
-        return baseStyle;
-    }
-  };
-
-  /**
-   * 정보 아이콘 스타일
-   */
-  const iconStyle: React.CSSProperties = {
-    flexShrink: 0,
-    color: TEXT_COLOR.WHITE,
-  };
-
-  /**
-   * 메시지 텍스트 스타일
-   */
-  const messageStyle: React.CSSProperties = {
-    fontSize: FONT_SIZE.MD,
-    fontWeight: FONT_WEIGHT.NORMAL,
-    color: TEXT_COLOR.WHITE,
-    lineHeight: 1.5,
-    whiteSpace: 'pre-line', // \n을 줄바꿈으로 처리
-  };
-
   return (
-    <div style={getToastStyle()}>
+    <ToastContainer $variant={variant} $animationState={animationState}>
       {variant === 'error' ? (
-        <RiErrorWarningLine size={20} style={iconStyle} />
+        <IconWrapper>
+          <RiErrorWarningLine size={20} />
+        </IconWrapper>
       ) : (
-        <RiInformationLine size={20} style={iconStyle} />
+        <IconWrapper>
+          <RiInformationLine size={20} />
+        </IconWrapper>
       )}
-      <span style={messageStyle}>{message}</span>
-    </div>
+      <MessageText>{message}</MessageText>
+    </ToastContainer>
   );
 };
+
+const ToastContainer = styled.div<{
+  $variant: ToastVariant;
+  $animationState: ToastAnimationState;
+}>`
+  background-color: ${({ $variant }) => ($variant === 'error' ? '#E53E3E' : '#FF6B35')};
+  border-radius: ${({ theme }) => theme.radii.xl};
+  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.xl};
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  max-width: calc(100vw - 32px);
+  width: fit-content;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  transform: ${({ $animationState }) =>
+    $animationState === 'visible' ? 'translateY(0)' : 'translateY(100%)'};
+  opacity: ${({ $animationState }) => ($animationState === 'visible' ? 1 : 0)};
+`;
+
+const IconWrapper = styled.div`
+  flex-shrink: 0;
+  color: ${({ theme }) => theme.colors.primaryForeground};
+  display: flex;
+  align-items: center;
+`;
+
+const MessageText = styled(P)`
+  color: ${({ theme }) => theme.colors.primaryForeground};
+  line-height: 1.5;
+  white-space: pre-line;
+  margin: 0;
+`;
 
 export default Toast;
 

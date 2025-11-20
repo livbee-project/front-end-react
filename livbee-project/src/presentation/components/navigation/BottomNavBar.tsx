@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import { useLocation, useNavigate } from 'react-router-dom';
 import BottomNavItem from './BottomNavItem';
 import { useToast } from '@/presentation/contexts/ToastContext';
@@ -11,8 +12,6 @@ import {
   RiUser3Line,
   RiUserSettingsLine,
 } from 'react-icons/ri';
-// CSS 변수를 사용하기 위해 global.css 임포트
-import '@/presentation/styles/global.css';
 
 /**
  * (수정) 탭 메뉴의 데이터
@@ -68,31 +67,9 @@ const BottomNavBar: React.FC = () => {
     }
   };
 
-  // --- 4. 스타일 정의 ---
-
-  /** 최상위 <nav> 태그 스타일 */
-  const navStyle: React.CSSProperties = {
-    backgroundColor: 'var(--white)',
-    width: '100%',
-    // Flutter의 border/boxShadow
-    borderTop: '1px solid #ECEFF1',
-    boxShadow: '0 -8px 22px rgba(0, 0, 0, 0.06)',
-    // iOS의 'safe area'를 고려한 하단 패딩
-    paddingBottom: 'env(safe-area-inset-bottom, 0)',
-    boxSizing: 'border-box',
-  };
-
-  /** 탭 버튼들을 감싸는 래퍼 스타일 (Flutter의 Row) */
-  const wrapperStyle: React.CSSProperties = {
-    display: 'flex',
-    justifyContent: 'space-around', // Flutter의 spaceAround
-    alignItems: 'stretch',
-    height: '100%',
-  };
-
   return (
-    <nav style={navStyle}>
-      <div style={wrapperStyle}>
+    <Nav>
+      <Wrapper>
         {/*
           --- (수정) TABS.map() 내부 ---
           복잡한 <button> JSX 대신 BottomNavItem 컴포넌트를 렌더링
@@ -110,9 +87,25 @@ const BottomNavBar: React.FC = () => {
             />
           );
         })}
-      </div>
-    </nav>
+      </Wrapper>
+    </Nav>
   );
 };
+
+const Nav = styled.nav`
+  background-color: ${({ theme }) => theme.colors.background};
+  width: 100%;
+  border-top: 1px solid ${({ theme }) => theme.colors.border};
+  box-shadow: 0 -8px 22px rgba(0, 0, 0, 0.06);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  box-sizing: border-box;
+`;
+
+const Wrapper = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: stretch;
+  height: 100%;
+`;
 
 export default BottomNavBar;

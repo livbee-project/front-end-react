@@ -40,6 +40,12 @@ const ProductThumb = styled.div`
   flex-shrink: 0;
 `;
 
+const ProductImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
 const ProductText = styled.div`
   flex: 1;
   min-width: 0;
@@ -105,10 +111,9 @@ const ShoppingLiveSection: React.FC = () => {
                 <ProductInfo>
                   <ProductThumb>
                     {campaign.thumbnailUrl && (
-                      <img
+                      <ProductImage
                         src={campaign.thumbnailUrl}
                         alt={campaign.title}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
                     )}
                   </ProductThumb>

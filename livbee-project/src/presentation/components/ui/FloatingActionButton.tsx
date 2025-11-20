@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import { RiAddLine } from 'react-icons/ri';
 
 /**
@@ -16,27 +17,6 @@ interface FloatingActionButtonProps {
 const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   onClick,
 }) => {
-  const buttonStyle: React.CSSProperties = {
-    position: 'fixed',
-    bottom: '80px', // 하단 네비게이션 바 위에 위치
-    // 화면 최대 너비 1200px 기준으로 위치 계산
-    // 1200px 이하: 화면 오른쪽 끝에서 16px
-    // 1200px 초과: 1200px 컨텐츠 영역의 오른쪽 끝에서 16px
-    right: 'max(16px, calc((100vw - 1200px) / 2 + 16px))',
-    width: '56px',
-    height: '56px',
-    borderRadius: '50%',
-    backgroundColor: 'var(--primary)',
-    color: 'var(--white)',
-    border: 'none',
-    cursor: onClick ? 'pointer' : 'default',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-    zIndex: 1000,
-    transition: 'transform 0.2s, box-shadow 0.2s',
-  };
 
   const handleClick = () => {
     if (onClick) {
@@ -62,19 +42,38 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   };
 
   return (
-    <button
+    <Button
       id="fab-button"
-      style={buttonStyle}
       onClick={handleClick}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       aria-label="추가"
+      $hasClick={!!onClick}
     >
       <RiAddLine size={24} />
-    </button>
+    </Button>
   );
 };
+
+const Button = styled.button<{ $hasClick: boolean }>`
+  position: fixed;
+  bottom: 80px;
+  right: max(16px, calc((100vw - 1200px) / 2 + 16px));
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primaryForeground};
+  border: none;
+  cursor: ${({ $hasClick }) => ($hasClick ? 'pointer' : 'default')};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  transition: transform 0.2s, box-shadow 0.2s;
+`;
 
 export default FloatingActionButton;
 

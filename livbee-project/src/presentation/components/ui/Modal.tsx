@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import styled from 'styled-components';
 
 /**
  * Modal 컴포넌트가 받을 props 타입을 정의합니다.
@@ -60,37 +61,6 @@ const Modal: React.FC<ModalProps> = ({
   if (!isOpen) return null;
 
   /**
-   * 오버레이 스타일 (배경)
-   */
-  const overlayStyle: React.CSSProperties = {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000,
-  };
-
-  /**
-   * 모달 컨테이너 스타일
-   */
-  const modalStyle: React.CSSProperties = {
-    backgroundColor: 'var(--white)',
-    borderRadius: '16px',
-    padding,
-    maxWidth,
-    width,
-    maxHeight: '90vh',
-    overflow: 'auto',
-    position: 'relative',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
-  };
-
-  /**
    * 오버레이 클릭 핸들러
    */
   const handleOverlayClick = () => {
@@ -107,13 +77,47 @@ const Modal: React.FC<ModalProps> = ({
   };
 
   return (
-    <div style={overlayStyle} onClick={handleOverlayClick}>
-      <div style={modalStyle} onClick={handleModalClick}>
+    <Overlay onClick={handleOverlayClick}>
+      <ModalContainer
+        $maxWidth={maxWidth}
+        $width={width}
+        $padding={padding}
+        onClick={handleModalClick}
+      >
         {children}
-      </div>
-    </div>
+      </ModalContainer>
+    </Overlay>
   );
 };
+
+const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const ModalContainer = styled.div<{
+  $maxWidth: string;
+  $width: string;
+  $padding: string;
+}>`
+  background-color: ${({ theme }) => theme.colors.background};
+  border-radius: ${({ theme }) => theme.radii.xl};
+  padding: ${({ $padding }) => $padding};
+  max-width: ${({ $maxWidth }) => $maxWidth};
+  width: ${({ $width }) => $width};
+  max-height: 90vh;
+  overflow: auto;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+`;
 
 export default Modal;
 

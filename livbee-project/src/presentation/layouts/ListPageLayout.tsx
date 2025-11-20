@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import SearchInput from '@/presentation/components/search/SearchInput';
 import ListPageHint from '@/presentation/components/list/ListPageHint';
@@ -48,19 +49,10 @@ const ListPageLayout: React.FC<ListPageLayoutProps> = ({
     // TODO: 추후 ViewModel(데이터 관리 로직)과 연결
   };
 
-  /**
-   * 페이지 컨테이너 스타일
-   */
-  const defaultPageStyle: React.CSSProperties = {
-    padding: '10px',
-  };
-
-  const pageStyle: React.CSSProperties = customPageStyle || defaultPageStyle;
-
   return (
-    <div style={pageStyle}>
+    <PageContainer $customStyle={customPageStyle}>
       {/* 검색 입력 및 안내 문구 */}
-      <div style={{ padding: '0' }}>
+      <SearchWrapper>
         <SearchInput
           placeholder={searchPlaceholder}
           value={searchQuery}
@@ -68,16 +60,25 @@ const ListPageLayout: React.FC<ListPageLayoutProps> = ({
           onSearchSubmit={handleSearchSubmit}
         />
         <ListPageHint text={hintText} />
-      </div>
+      </SearchWrapper>
 
       {/* 리스트 컨텐츠 */}
       {children}
 
       {/* 플로팅 액션 버튼 */}
       <FloatingActionButton onClick={() => navigate(floatingActionButtonPath)} />
-    </div>
+    </PageContainer>
   );
 };
+
+const PageContainer = styled.div<{ $customStyle?: React.CSSProperties }>`
+  padding: ${({ $customStyle, theme }) =>
+    $customStyle?.padding || theme.spacing.sm};
+`;
+
+const SearchWrapper = styled.div`
+  padding: 0;
+`;
 
 export default ListPageLayout;
 
