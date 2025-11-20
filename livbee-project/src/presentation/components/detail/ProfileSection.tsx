@@ -116,16 +116,18 @@ const DetailedIntro = styled.div`
 const TagsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: ${({ theme }) => theme.spacing.xs};
-  margin-top: ${({ theme }) => theme.spacing.sm};
+  gap: ${({ theme }) => theme.spacing.sm};
+  margin-top: ${({ theme }) => theme.spacing.lg};
 `;
 
 const Tag = styled(Caption)`
-  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
   background-color: ${({ theme }) => theme.colors.secondary};
   color: ${({ theme }) => theme.colors.foreground};
-  border-radius: ${({ theme }) => theme.radii.sm};
+  border-radius: ${({ theme }) => theme.radii.md};
   white-space: nowrap;
+  font-size: 14px;
+  font-weight: 400;
 `;
 
 const WebsiteLink = styled.a`
@@ -135,8 +137,9 @@ const WebsiteLink = styled.a`
   color: ${({ theme }) => theme.colors.primary};
   text-decoration: none;
   font: ${({ theme }) => theme.fonts.body};
-  margin-top: ${({ theme }) => theme.spacing.sm};
+  margin-top: ${({ theme }) => theme.spacing.md};
   transition: opacity 0.2s;
+  word-break: break-all;
 
   &:hover {
     opacity: 0.8;
@@ -195,7 +198,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       {websiteUrl && (
         <WebsiteLink href={websiteUrl} target="_blank" rel="noopener noreferrer">
           <ExternalLink size={16} />
-          <span>웹사이트</span>
+          <span>{websiteUrl}</span>
         </WebsiteLink>
       )}
     </Section>

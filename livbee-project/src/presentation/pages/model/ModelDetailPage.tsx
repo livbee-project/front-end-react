@@ -73,6 +73,25 @@ const ModelDetailPage: React.FC = () => {
     );
   }
 
+  // 카테고리 배열 생성 (description에서 추출)
+  const categories: string[] = [];
+  const description = model.oneLineIntro || '';
+  if (description.includes('패션')) {
+    categories.push('패션');
+  }
+  if (description.includes('뷰티')) {
+    categories.push('뷰티');
+  }
+  if (description.includes('식품')) {
+    categories.push('식품');
+  }
+  if (description.includes('가전')) {
+    categories.push('가전');
+  }
+  if (description.includes('생활') || description.includes('리빙')) {
+    categories.push('생활/리빙');
+  }
+
   // 태그 배열 생성
   const tags: string[] = [];
   if (model.isSizingPublic && model.height != null) {
@@ -98,7 +117,7 @@ const ModelDetailPage: React.FC = () => {
         detailedIntro={model.detailedIntro}
         profileImageUrl={model.mainThumbnailUrl || undefined}
         type="model"
-        categories={[]}
+        categories={categories}
         tags={tags}
         websiteUrl={model.websiteUrl}
         onImageClick={handleProfileImageClick}

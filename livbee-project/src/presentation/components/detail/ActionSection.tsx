@@ -32,6 +32,8 @@ const ScrapButton = styled(ButtonBase)<{ $isScraped: boolean }>`
   align-items: center;
   justify-content: center;
   gap: ${({ theme }) => theme.spacing.xs};
+  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.xl};
+  border-radius: ${({ theme }) => theme.radii.md};
   background-color: ${({ $isScraped, theme }) =>
     $isScraped ? theme.colors.primary : 'transparent'};
   color: ${({ $isScraped, theme }) =>
@@ -47,6 +49,8 @@ const ScrapButton = styled(ButtonBase)<{ $isScraped: boolean }>`
 
 const OfferButton = styled(ButtonBase)`
   flex: 1;
+  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.xl};
+  border-radius: ${({ theme }) => theme.radii.md};
   background-color: ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.primaryForeground};
   border: none;
@@ -91,7 +95,7 @@ const ActionSection: React.FC<ActionSectionProps> = ({
   return (
     <Section>
       <ScrapButton $isScraped={isScraped} onClick={handleScrap}>
-        <Heart size={16} fill={isScraped ? 'currentColor' : 'none'} />
+        <Heart size={20} fill={isScraped ? 'currentColor' : 'none'} />
         <Caption>{isScraped ? '찜 완료' : '찜하기'}</Caption>
       </ScrapButton>
       <OfferButton
