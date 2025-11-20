@@ -10,14 +10,19 @@ import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { ErrorState } from '@/presentation/components/states/ErrorState';
-import { theme } from '@/presentation/styles/theme';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { PortfolioDetail } from '@/domain/entities/Portfolio';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useDetailData } from '@/presentation/hooks/useDetailData';
+import { useImageGallery } from '@/presentation/hooks/useImageGallery';
+import GalleryLightbox from '@/presentation/components/detail/GalleryLightbox';
 
 const GallerySection = styled(DetailSection)`
   padding: ${({ theme }) => theme.spacing.xl} ${({ theme }) => theme.spacing.lg};
+`;
+
+const GalleryWrapper = styled.div`
+  margin-top: ${({ theme }) => theme.spacing.lg};
 `;
 
 const PortfolioDetailPage: React.FC = () => {
@@ -32,12 +37,14 @@ const PortfolioDetailPage: React.FC = () => {
     '포트폴리오를 불러오는데 실패했습니다.'
   );
 
+  const gallery = useImageGallery(portfolio?.subThumbnailUrls ?? []);
+
   const handleProfileImageClick = () => {
     // TODO: 이미지 확대 또는 갤러리 열기 기능 구현
   };
 
-  const handleGalleryImageClick = (_index: number) => {
-    // TODO: 이미지 확대 또는 갤러리 뷰어 열기 기능 구현
+  const handleGalleryImageClick = (index: number) => {
+    gallery.open(index);
   };
 
   const handleScrap = () => {
@@ -126,13 +133,13 @@ const PortfolioDetailPage: React.FC = () => {
       {portfolio.subThumbnailUrls && portfolio.subThumbnailUrls.length > 0 && (
         <GallerySection>
           <HomeSectionHeader title="갤러리" />
-          <div style={{ marginTop: theme.spacing.lg }}>
+          <GalleryWrapper>
             <GalleryGrid
               images={portfolio.subThumbnailUrls}
               columns={3}
               onImageClick={handleGalleryImageClick}
             />
-          </div>
+          </GalleryWrapper>
         </GallerySection>
       )}
 
@@ -141,6 +148,14 @@ const PortfolioDetailPage: React.FC = () => {
         isReceivingOffers={portfolio.isReceivingOffers}
         onScrap={handleScrap}
         onOffer={handleOffer}
+      />
+      <GalleryLightbox
+        image={gallery.currentImage}
+        isOpen={gallery.isOpen}
+        onClose={gallery.close}
+        onPrev={gallery.showPrev}
+        onNext={gallery.showNext}
+        showControls={gallery.images.length > 1}
       />
     </DetailPageLayout>
   );

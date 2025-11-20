@@ -20,6 +20,7 @@ import { useToast } from '@/presentation/contexts/ToastContext';
 import { H2, H3, PMuted } from '@/presentation/components/styled/Typography';
 import { PrimaryBadge } from '@/presentation/components/styled/CommonStyles';
 import { Card } from '@/presentation/components/styled/SectionStyles';
+import { formatNumberCompact, maskPhoneNumber } from '@/shared/utils/formatUtils';
 
 type UserType = 'brand' | 'showhost' | 'model';
 
@@ -29,6 +30,21 @@ interface MenuItemData {
   description: string;
   count?: number;
   onClick: () => void;
+}
+
+interface ProfileStat {
+  label: string;
+  value: number;
+  unit?: string;
+  format?: 'count' | 'rating' | 'compact';
+}
+
+interface ProfileData {
+  name: string;
+  role: string;
+  badges: string[];
+  contact?: string;
+  stats: ProfileStat[];
 }
 
 const MyPage: React.FC = () => {
@@ -60,17 +76,18 @@ const MyPage: React.FC = () => {
   };
 
   // 유저 타입별 프로필 데이터 (임시)
-  const profileData = React.useMemo(() => {
+  const profileData = React.useMemo<ProfileData>(() => {
     switch (userType) {
       case 'brand':
         return {
           name: '스타일코리아',
           role: '패션 브랜드',
           badges: ['패션', '브랜드'],
+          contact: '021234567',
           stats: [
-            { label: '진행 캠페인', value: '5개' },
-            { label: '계약 호스트', value: '12명' },
-            { label: '평점', value: '4.9★' },
+            { label: '진행 캠페인', value: 5, unit: '개', format: 'count' },
+            { label: '계약 호스트', value: 12, unit: '명', format: 'count' },
+            { label: '평점', value: 4.9, format: 'rating' },
           ],
         };
       case 'showhost':
@@ -78,10 +95,11 @@ const MyPage: React.FC = () => {
           name: '김지현',
           role: '패션 전문 쇼호스트',
           badges: ['패션', '뷰티'],
+          contact: '01012345678',
           stats: [
-            { label: '라이브', value: '24회' },
-            { label: '팔로워', value: '1.2K' },
-            { label: '평점', value: '4.8★' },
+            { label: '라이브', value: 24, unit: '회', format: 'count' },
+            { label: '팔로워', value: 1200, unit: '명', format: 'compact' },
+            { label: '평점', value: 4.8, format: 'rating' },
           ],
         };
       case 'model':
@@ -89,14 +107,28 @@ const MyPage: React.FC = () => {
           name: '한지우',
           role: '프리랜스 모델',
           badges: ['패션', '뷰티'],
+          contact: '01087654321',
           stats: [
-            { label: '촬영', value: '32회' },
-            { label: '팔로워', value: '2.5K' },
-            { label: '평점', value: '4.9★' },
+            { label: '촬영', value: 32, unit: '회', format: 'count' },
+            { label: '팔로워', value: 2500, unit: '명', format: 'compact' },
+            { label: '평점', value: 4.9, format: 'rating' },
           ],
         };
     }
   }, [userType]);
+
+  const formatStatValue = React.useCallback((stat: ProfileStat) => {
+    switch (stat.format) {
+      case 'rating':
+        return `${stat.value.toFixed(1)}★`;
+      case 'compact':
+        return `${formatNumberCompact(stat.value)}${stat.unit ?? ''}`;
+      case 'count':
+        return `${stat.value.toLocaleString()}${stat.unit ?? ''}`;
+      default:
+        return stat.unit ? `${stat.value.toLocaleString()}${stat.unit}` : stat.value.toLocaleString();
+    }
+  }, []);
 
   // 유저 타입별 메뉴 데이터
   const menuItems = React.useMemo<MenuItemData[][]>(() => {
@@ -238,16 +270,21 @@ const MyPage: React.FC = () => {
                   <SmallBadge key={badge} as={PrimaryBadge}>{badge}</SmallBadge>
                 ))}
               </ProfileBadges>
+              {profileData.contact && (
+                <ProfileContact>
+                  연락처 {maskPhoneNumber(profileData.contact)}
+                </ProfileContact>
+              )}
             </ProfileInfo>
           </ProfileHeader>
 
           <StatsContainer>
-            {profileData.stats.map((stat) => (
-              <StatItem key={stat.label}>
-                <StatLabel as={PMuted}>{stat.label}</StatLabel>
-                <StatValue as={H3}>{stat.value}</StatValue>
-              </StatItem>
-            ))}
+                {profileData.stats.map((stat) => (
+                  <StatItem key={stat.label}>
+                    <StatLabel as={PMuted}>{stat.label}</StatLabel>
+                    <StatValue as={H3}>{formatStatValue(stat)}</StatValue>
+                  </StatItem>
+                ))}
           </StatsContainer>
         </ProfileCard>
 
@@ -381,6 +418,10 @@ const ProfileName = styled(H2)`
 
 const ProfileRole = styled(PMuted)`
   margin-bottom: ${({ theme }) => theme.spacing.sm};
+`;
+
+const ProfileContact = styled(PMuted)`
+  color: ${({ theme }) => theme.colors.muted};
 `;
 
 const ProfileBadges = styled.div`

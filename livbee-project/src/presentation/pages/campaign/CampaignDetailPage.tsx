@@ -13,7 +13,7 @@ import { ErrorState } from '@/presentation/components/states/ErrorState';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { CampaignDetail } from '@/domain/entities/Campaign';
 import { htmlToText } from '@/shared/utils/htmlUtils';
-import { calculateDDay, formatDate } from '@/shared/utils/dateUtils';
+import { calculateDDay, formatDate, formatDateTime } from '@/shared/utils/dateUtils';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useDetailData } from '@/presentation/hooks/useDetailData';
 import { P } from '@/presentation/components/styled/Typography';
@@ -178,7 +178,7 @@ const CampaignDetailPage: React.FC = () => {
         />
         <InfoItem
           title="공고마감일"
-          content={formatDate(campaign.closeAt)}
+          content={formatDateTime(campaign.closeAt)}
         />
         <InfoItem
           title="시작시간"

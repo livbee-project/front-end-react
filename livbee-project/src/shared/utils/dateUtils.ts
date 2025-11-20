@@ -29,3 +29,37 @@ export const formatDate = (dateString?: string | null): string => {
   return `${year}-${month}-${day}`;
 };
 
+export const formatDateTime = (
+  dateString?: string | null,
+  options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }
+): string => {
+  if (!dateString) return '-';
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return '-';
+  return new Intl.DateTimeFormat('ko-KR', options).format(date);
+};
+
+export const formatRelativeTime = (dateInput?: string | Date | null): string => {
+  if (!dateInput) return '-';
+  const targetDate = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+  if (Number.isNaN(targetDate.getTime())) return '-';
+
+  const now = new Date();
+  const diffMs = targetDate.getTime() - now.getTime();
+  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) {
+    return '오늘';
+  }
+  if (diffDays > 0) {
+    return `${diffDays}일 후`;
+  }
+  return `${Math.abs(diffDays)}일 전`;
+};
+

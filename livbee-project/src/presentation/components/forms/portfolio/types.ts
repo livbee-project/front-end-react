@@ -1,19 +1,11 @@
-export interface PortfolioFormData {
-  registrationType: string;
+import type { ContactInfoFields, RegistrationInfoFields, ToggleGroupState } from '@/types/forms';
+
+export interface PortfolioFormData extends RegistrationInfoFields, ContactInfoFields {
   name: string;
-  oneLineIntro: string;
-  detailedIntro: string;
   websites: string[];
   recentLiveLink: string;
-  contact: string;
-  openChat: string;
   tags: string[];
 }
 
-export interface PortfolioToggleState {
-  websites: boolean[];
-  contact: boolean;
-  openChat: boolean;
-  tags: boolean[];
-}
+export type PortfolioToggleState = ToggleGroupState;
 

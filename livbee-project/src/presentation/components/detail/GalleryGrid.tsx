@@ -1,17 +1,6 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-
-/**
- * GalleryGrid 컴포넌트가 받을 props 타입을 정의합니다.
- * @param images - 이미지 URL 배열
- * @param columns - 그리드 열 개수 (기본값: 3)
- * @param onImageClick - 이미지 클릭 시 실행될 함수 (선택, 인덱스 전달)
- */
-interface GalleryGridProps {
-  images?: string[];
-  columns?: number;
-  onImageClick?: (index: number) => void;
-}
+import type { GalleryGridProps } from '@/types/components';
 
 const GridContainer = styled.div<{ $columns: number }>`
   display: grid;

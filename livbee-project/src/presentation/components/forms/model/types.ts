@@ -1,28 +1,19 @@
-export interface ModelWebsiteEntry {
-  related: string;
-  content: string;
-}
+import type {
+  ContactInfoFields,
+  RegistrationInfoFields,
+  TagEntry,
+  ToggleGroupState,
+  WebsiteEntry,
+} from '@/types/forms';
 
-export interface ModelTagEntry {
-  label: string;
-  value: string;
-}
+export type ModelWebsiteEntry = WebsiteEntry;
+export type ModelTagEntry = TagEntry;
 
-export interface ModelFormData {
+export interface ModelFormData extends RegistrationInfoFields, ContactInfoFields {
   name: string;
-  registrationType: string;
-  oneLineIntro: string;
-  detailedIntro: string;
   websites: ModelWebsiteEntry[];
-  contact: string;
-  openChat: string;
   tags: ModelTagEntry[];
 }
 
-export interface ModelToggleState {
-  websites: boolean[];
-  contact: boolean;
-  openChat: boolean;
-  tags: boolean[];
-}
+export type ModelToggleState = ToggleGroupState;
 

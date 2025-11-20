@@ -5,7 +5,7 @@ import { useRepository } from '@/presentation/hooks/useRepository';
 import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { useFormState } from '@/presentation/hooks/useFormState';
-import { validateRequiredFields, validateTimeRange } from '@/shared/utils/formValidation';
+import { validateRequiredFields, validateTimeRange } from '@/shared/utils/validation';
 import type { CreateCampaignRequest } from '@/domain/entities/Campaign';
 import type { CampaignFormData } from './types';
 

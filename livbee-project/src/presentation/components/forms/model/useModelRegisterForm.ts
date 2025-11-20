@@ -8,6 +8,7 @@ import { useFormState } from '@/presentation/hooks/useFormState';
 import { useFormUpload } from '@/presentation/hooks/useFormUpload';
 import type { CreateModelRequest } from '@/domain/entities/Model';
 import type { ModelFormData, ModelToggleState } from './types';
+import { isValidPhoneNumber, isValidUrl } from '@/shared/utils/validation';
 
 const INITIAL_FORM_DATA: ModelFormData = {
   name: '',
@@ -137,6 +138,27 @@ export const useModelRegisterForm = () => {
   const handleSubmit = useCallback(async () => {
     setIsSubmitting(true);
 
+    const trimmedContact = formData.contact.trim();
+    if (trimmedContact && !isValidPhoneNumber(trimmedContact)) {
+      showToast('연락처 형식이 올바르지 않습니다.', undefined, 'error');
+      setIsSubmitting(false);
+      return;
+    }
+
+    const hasInvalidWebsite = formData.websites.some((website, index) => {
+      const trimmed = website.content.trim();
+      if (!trimmed || !toggles.websites[index]) {
+        return false;
+      }
+      return !isValidUrl(trimmed);
+    });
+
+    if (hasInvalidWebsite) {
+      showToast('SNS 링크를 올바르게 입력해주세요.', undefined, 'error');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       let uploadedMainThumbnailUrl: string | undefined;
       const uploadedGalleryUrls: string[] = [];
@@ -223,6 +245,7 @@ export const useModelRegisterForm = () => {
     modelRepository,
     navigate,
     portfolioFile,
+    toggles,
     showToast,
     uploadFile,
   ]);

@@ -1,9 +1,6 @@
 import React from 'react';
-
-interface HomeSectionHeaderProps {
-  title: string;
-  onMorePressed?: () => void;
-}
+import styled from 'styled-components';
+import type { SectionHeaderProps } from '@/types/components';
 
 const highlightMap: Record<string, string> = {
   '지금 뜨는 쇼핑라이브': '쇼핑라이브',
@@ -14,7 +11,39 @@ const highlightMap: Record<string, string> = {
   'HOT CLIP': 'CLIP',
 };
 
-const HomeSectionHeader: React.FC<HomeSectionHeaderProps> = ({ title, onMorePressed }) => {
+const HeaderWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: ${({ theme }) => `${theme.spacing['2xl']} ${theme.spacing.md} ${theme.spacing.xl}`};
+`;
+
+const TitleText = styled.span`
+  font: ${({ theme }) => theme.fonts.h1};
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.foreground};
+`;
+
+const HighlightText = styled.span`
+  color: ${({ theme }) => theme.colors.primary};
+`;
+
+const MoreButton = styled.button`
+  border: none;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.muted};
+  font: ${({ theme }) => theme.fonts.h2};
+  font-weight: 700;
+  cursor: pointer;
+  padding: ${({ theme }) => theme.spacing.xs};
+  transition: color 0.2s;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.primary};
+  }
+`;
+
+const HomeSectionHeader: React.FC<SectionHeaderProps> = ({ title, onMorePressed }) => {
   const renderTitleWithHighlight = () => {
     const highlightText = highlightMap[title];
     if (!highlightText) {
@@ -33,47 +62,23 @@ const HomeSectionHeader: React.FC<HomeSectionHeaderProps> = ({ title, onMorePres
     return (
       <>
         {beforeText && <span>{beforeText}</span>}
-        <span style={{ color: 'var(--primary)' }}>{highlightPart}</span>
+        <HighlightText>{highlightPart}</HighlightText>
         {afterText && <span>{afterText}</span>}
       </>
     );
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginTop: 32,
-        marginBottom: 24,
-        marginLeft: 10,
-        marginRight: 10,
-      }}
-    >
-      <span
-        style={{
-          fontWeight: 700,
-          fontSize: 'var(--h1)',
-          color: 'var(--black)',
-        }}
-      >
+    <HeaderWrapper>
+      <TitleText>
         {renderTitleWithHighlight()}
-      </span>
+      </TitleText>
       {onMorePressed && (
-        <span
-          onClick={onMorePressed}
-          style={{
-            fontSize: 'var(--h2)',
-            color: 'var(--dark-gray)',
-            fontWeight: 700,
-            cursor: 'pointer',
-          }}
-        >
+        <MoreButton type="button" onClick={onMorePressed}>
           더보기
-        </span>
+        </MoreButton>
       )}
-    </div>
+    </HeaderWrapper>
   );
 };
 

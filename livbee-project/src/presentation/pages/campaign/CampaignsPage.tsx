@@ -15,7 +15,7 @@ import { useListSearch } from '@/presentation/hooks/useListSearch';
 import { H1, H2, H3, PMuted, CaptionMedium, Highlight } from '@/presentation/components/styled/Typography';
 import { Input, Badge } from '@/presentation/components/styled/CommonStyles';
 import { Card, CardHeader, CardFooter } from '@/presentation/components/styled/SectionStyles';
-import { calculateDDay, formatDate as formatDateLabel } from '@/shared/utils/dateUtils';
+import { calculateDDay, formatDate as formatDateLabel, formatRelativeTime } from '@/shared/utils/dateUtils';
 import { formatCurrency } from '@/shared/utils/formatUtils';
 
 const filters: Array<{ label: string; value: '전체' | Campaign['category'] }> = [
@@ -239,8 +239,12 @@ const formatFee = (fee?: number) => {
 
 const getDeadlineLabel = (deadline?: string) => {
   if (!deadline) return '상시';
-  const label = calculateDDay(deadline);
-  return label || '상시';
+  const dday = calculateDDay(deadline);
+  const relative = formatRelativeTime(deadline);
+  if (!dday) {
+    return relative;
+  }
+  return relative ? `${dday} · ${relative}` : dday;
 };
 
 const PageWrapper = styled.div`

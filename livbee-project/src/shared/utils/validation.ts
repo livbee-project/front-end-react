@@ -1,7 +1,10 @@
+const URL_REGEX = /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/[\w-.~:?#[\]@!$&'()*+,;=%]*)?$/i;
+const TIME_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
 export const isEmpty = (value?: string | null) => !value || value.trim().length === 0;
 
 export const validateRequiredFields = (
-  fields: Array<{ value: string; message: string }>,
+  fields: Array<{ value: string | null | undefined; message: string }>,
   onError?: (message: string) => void
 ) => {
   for (const field of fields) {
@@ -18,7 +21,8 @@ export const validateTimeRange = (
   endTime: string,
   onError?: (message: string) => void
 ) => {
-  if (!startTime || !endTime) {
+  if (!TIME_REGEX.test(startTime) || !TIME_REGEX.test(endTime)) {
+    onError?.('시간 형식이 올바르지 않습니다.');
     return false;
   }
 
@@ -33,5 +37,12 @@ export const validateTimeRange = (
   }
 
   return true;
+};
+
+export const isValidUrl = (value: string) => URL_REGEX.test(value.trim());
+
+export const isValidPhoneNumber = (value: string) => {
+  const digits = value.replace(/\D/g, '');
+  return digits.length >= 9 && digits.length <= 11;
 };
 

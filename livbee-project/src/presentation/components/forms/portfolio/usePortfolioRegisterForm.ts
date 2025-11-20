@@ -7,6 +7,7 @@ import { useRepository } from '@/presentation/hooks/useRepository';
 import { useFormState } from '@/presentation/hooks/useFormState';
 import { useFormUpload } from '@/presentation/hooks/useFormUpload';
 import type { CreatePortfolioRequest } from '@/domain/entities/Portfolio';
+import { isValidPhoneNumber, isValidUrl } from '@/shared/utils/validation';
 import type { PortfolioFormData, PortfolioToggleState } from './types';
 
 const INITIAL_FORM_DATA: PortfolioFormData = {
@@ -125,6 +126,34 @@ export const usePortfolioRegisterForm = () => {
   const handleSubmit = useCallback(async () => {
     setIsSubmitting(true);
 
+    const trimmedContact = formData.contact.trim();
+    if (trimmedContact && !isValidPhoneNumber(trimmedContact)) {
+      showToast('연락처 형식이 올바르지 않습니다.', undefined, 'error');
+      setIsSubmitting(false);
+      return;
+    }
+
+    const trimmedRecentLive = formData.recentLiveLink.trim();
+    if (trimmedRecentLive && !isValidUrl(trimmedRecentLive)) {
+      showToast('최근 라이브 링크가 올바르지 않습니다.', undefined, 'error');
+      setIsSubmitting(false);
+      return;
+    }
+
+    const hasInvalidWebsite = formData.websites.some((url, index) => {
+      const trimmed = url.trim();
+      if (!trimmed || !toggles.websites[index]) {
+        return false;
+      }
+      return !isValidUrl(trimmed);
+    });
+
+    if (hasInvalidWebsite) {
+      showToast('SNS / 사이트 링크를 올바르게 입력해주세요.', undefined, 'error');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       let uploadedMainThumbnailUrl: string | undefined;
       const uploadedGalleryUrls: string[] = [];
@@ -172,10 +201,10 @@ export const usePortfolioRegisterForm = () => {
       const instagramUrl = formData.websites[1]?.trim() || undefined;
       const youtubeUrl = formData.websites[2]?.trim() || undefined;
 
-      const recentLives = formData.recentLiveLink.trim()
+      const recentLives = trimmedRecentLive
         ? [
             {
-              url: formData.recentLiveLink.trim(),
+              url: trimmedRecentLive,
               title: undefined,
               date: undefined,
             },
@@ -220,6 +249,7 @@ export const usePortfolioRegisterForm = () => {
     portfolioFile,
     portfolioRepository,
     resumeFile,
+    toggles,
     showToast,
     uploadFile,
   ]);
