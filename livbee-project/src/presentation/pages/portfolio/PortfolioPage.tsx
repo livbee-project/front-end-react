@@ -15,6 +15,8 @@ import { useListSearch } from '@/presentation/hooks/useListSearch';
 import { H1, H3, PMuted, Caption, Highlight } from '@/presentation/components/styled/Typography';
 import { Input, Badge } from '@/presentation/components/styled/CommonStyles';
 import { Card } from '@/presentation/components/styled/SectionStyles';
+import { buildPortfolioBadgeItems, formatExperience } from '@/shared/utils/badgeUtils';
+import { useScrapToggle } from '@/presentation/hooks/useScrapToggle';
 
 const filters: Array<{ label: string; value: string }> = [
   { label: '전체', value: '전체' },
@@ -30,7 +32,7 @@ const PortfolioPage: React.FC = () => {
   const [currentPage, setCurrentPage] = React.useState<number>(1);
   const { searchInputValue, setSearchInputValue, searchQuery, handleSearchSubmit, clearSearch } = useListSearch();
   const { activeFilter, setActiveFilter } = useListFilters<string>('전체');
-  const [scrapMap, setScrapMap] = React.useState<Record<string, boolean>>({});
+  const { handleScrapToggle, isScrapped } = useScrapToggle();
 
   const portfolioRepository = useRepository(PortfolioRepository);
 
@@ -67,27 +69,6 @@ const PortfolioPage: React.FC = () => {
   const handleFilterChange = (value: string) => {
     setActiveFilter(value);
     setCurrentPage(1);
-  };
-
-  const handleScrapToggle = (portfolioId: string) => {
-    setScrapMap((prev) => ({
-      ...prev,
-      [portfolioId]: !prev[portfolioId],
-    }));
-  };
-
-  const buildBadgeItems = (portfolio: Portfolio): string[] => {
-    const badges: string[] = [];
-    // TODO: 카테고리 데이터 추가 시 categories 사용
-    if (portfolio.detailedRegion) {
-      badges.push(portfolio.detailedRegion);
-    }
-    return badges;
-  };
-
-  const formatExperience = (years: number | null): string => {
-    if (years == null || years === 0) return '';
-    return `· 경력 ${years}년`;
   };
 
   const renderState = () => {
@@ -144,7 +125,7 @@ const PortfolioPage: React.FC = () => {
                     <ScrapButton
                       type="button"
                       aria-label="스크랩"
-                      aria-pressed={Boolean(scrapMap[portfolio.id])}
+                      aria-pressed={isScrapped(portfolio.id)}
                       onClick={(event) => {
                         event.stopPropagation();
                         handleScrapToggle(portfolio.id);
@@ -152,7 +133,7 @@ const PortfolioPage: React.FC = () => {
                     >
                       <StyledStar
                         size={16}
-                        $active={Boolean(scrapMap[portfolio.id])}
+                        $active={isScrapped(portfolio.id)}
                         aria-hidden="true"
                       />
                     </ScrapButton>
@@ -163,7 +144,7 @@ const PortfolioPage: React.FC = () => {
               </TopSection>
 
               <BadgeContainer>
-                {buildBadgeItems(portfolio).map((badge, index) => (
+                {buildPortfolioBadgeItems(portfolio).map((badge, index) => (
                   <Badge key={`${portfolio.id}-${index}`} $variant="secondary" as="span">{badge}</Badge>
                 ))}
                 {portfolio.experienceYears != null && portfolio.experienceYears > 0 && (

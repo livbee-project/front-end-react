@@ -1,10 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import PortraitCard from '@/presentation/components/cards/PortraitCard';
 import ListPageLayout from '@/presentation/layouts/ListPageLayout';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { ErrorState } from '@/presentation/components/states/ErrorState';
-import { SPACING } from '@/presentation/styles/constants';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
 import type { Model } from '@/domain/entities/Model';
 import { useRepository } from '@/presentation/hooks/useRepository';
@@ -53,33 +53,10 @@ const ModelsPage: React.FC = () => {
       searchPlaceholder="모델명·소개로 검색"
       floatingActionButtonPath="/models/register"
     >
-      {/* 모델 리스트 - 2열 그리드 구조 */}
-      <div
-        style={{
-          width: '100%',
-          boxSizing: 'border-box',
-        }}
-      >
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-            gap: '0 30px',
-            width: '100%',
-            boxSizing: 'border-box',
-            minWidth: 0,
-          }}
-        >
+      <ModelsGridContainer>
+        <ModelsGrid>
           {models.map((model) => (
-            <div
-              key={model.id}
-              style={{
-                width: '100%',
-                minWidth: 0,
-                marginBottom: SPACING.XL,
-                boxSizing: 'border-box',
-              }}
-            >
+            <ModelCardWrapper key={model.id}>
               <PortraitCard
                 title={model.nickname || '이름 없음'}
                 content={model.oneLineIntro || '소개 없음'}
@@ -87,13 +64,34 @@ const ModelsPage: React.FC = () => {
                 width="100%"
                 onPress={() => navigate(`/models/${model.id}`)}
               />
-            </div>
+            </ModelCardWrapper>
           ))}
-        </div>
-      </div>
+        </ModelsGrid>
+      </ModelsGridContainer>
     </ListPageLayout>
   );
 };
+
+const ModelsGridContainer = styled.div`
+  width: 100%;
+  box-sizing: border-box;
+`;
+
+const ModelsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 ${({ theme }) => theme.spacing['2xl']};
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+`;
+
+const ModelCardWrapper = styled.div`
+  width: 100%;
+  min-width: 0;
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
+  box-sizing: border-box;
+`;
 
 export default ModelsPage;
 

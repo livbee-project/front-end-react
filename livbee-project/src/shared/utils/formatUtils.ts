@@ -34,3 +34,47 @@ export const maskPhoneNumber = (value: string) => {
   return digits.replace(/(\d{2,3})(\d{3,4})(\d{4})/, '$1-***-$3');
 };
 
+/**
+ * 수수료를 포맷팅합니다.
+ * @param fee - 수수료 (원 단위)
+ * @returns 포맷팅된 수수료 문자열
+ */
+export const formatFee = (fee?: number | null): string => {
+  if (fee == null) {
+    return '협의';
+  }
+
+  if (fee >= 10000) {
+    const millionWon = Math.round(fee / 10000);
+    return `${millionWon.toLocaleString('ko-KR')}만원`;
+  }
+
+  return formatCurrency(fee);
+};
+
+/**
+ * 마감일 라벨을 생성합니다.
+ * @param deadline - 마감일 문자열
+ * @param calculateDDay - D-Day 계산 함수
+ * @param formatRelativeTime - 상대 시간 포맷 함수
+ * @returns 마감일 라벨 문자열
+ */
+export const getDeadlineLabel = (
+  deadline?: string | null,
+  calculateDDay?: (date: string) => string,
+  formatRelativeTime?: (date: string) => string
+): string => {
+  if (!deadline) return '상시';
+  
+  if (!calculateDDay || !formatRelativeTime) {
+    return deadline;
+  }
+
+  const dday = calculateDDay(deadline);
+  const relative = formatRelativeTime(deadline);
+  if (!dday) {
+    return relative;
+  }
+  return relative ? `${dday} · ${relative}` : dday;
+};
+

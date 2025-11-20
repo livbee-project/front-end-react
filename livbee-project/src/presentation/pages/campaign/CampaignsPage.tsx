@@ -15,8 +15,10 @@ import { useListSearch } from '@/presentation/hooks/useListSearch';
 import { H1, H2, H3, PMuted, CaptionMedium, Highlight } from '@/presentation/components/styled/Typography';
 import { Input, Badge } from '@/presentation/components/styled/CommonStyles';
 import { Card, CardHeader, CardFooter } from '@/presentation/components/styled/SectionStyles';
-import { calculateDDay, formatDate as formatDateLabel, formatRelativeTime } from '@/shared/utils/dateUtils';
-import { formatCurrency } from '@/shared/utils/formatUtils';
+import { calculateDDay, formatRelativeTime } from '@/shared/utils/dateUtils';
+import { formatFee, getDeadlineLabel } from '@/shared/utils/formatUtils';
+import { buildCampaignBadgeItems } from '@/shared/utils/badgeUtils';
+import { useScrapToggle } from '@/presentation/hooks/useScrapToggle';
 
 const filters: Array<{ label: string; value: '전체' | Campaign['category'] }> = [
   { label: '전체', value: '전체' },
@@ -32,7 +34,7 @@ const CampaignsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = React.useState<number>(1);
   const { searchInputValue, setSearchInputValue, searchQuery, handleSearchSubmit, clearSearch } = useListSearch();
   const { activeFilter, setActiveFilter } = useListFilters<(typeof filters)[number]['value']>('전체');
-  const [scrapMap, setScrapMap] = React.useState<Record<string, boolean>>({});
+  const { handleScrapToggle, isScrapped } = useScrapToggle();
 
   const campaignRepository = useRepository(CampaignRepository);
 
@@ -72,13 +74,6 @@ const CampaignsPage: React.FC = () => {
   const handleFilterChange = (value: (typeof filters)[number]['value']) => {
     setActiveFilter(value);
     setCurrentPage(1);
-  };
-
-  const handleScrapToggle = (campaignId: string) => {
-    setScrapMap((prev) => ({
-      ...prev,
-      [campaignId]: !prev[campaignId],
-    }));
   };
 
   const renderState = () => {
@@ -125,7 +120,7 @@ const CampaignsPage: React.FC = () => {
                 <ScrapButton
                   type="button"
                   aria-label="스크랩"
-                  aria-pressed={Boolean(scrapMap[campaign.id])}
+                  aria-pressed={isScrapped(campaign.id)}
                   onClick={(event) => {
                     event.stopPropagation();
                     handleScrapToggle(campaign.id);
@@ -133,7 +128,7 @@ const CampaignsPage: React.FC = () => {
                 >
                   <StyledStar
                     size={20}
-                    $active={Boolean(scrapMap[campaign.id])}
+                    $active={isScrapped(campaign.id)}
                     aria-hidden="true"
                   />
                 </ScrapButton>
@@ -142,14 +137,14 @@ const CampaignsPage: React.FC = () => {
               <CampaignTitle as={H2}>{campaign.title}</CampaignTitle>
 
               <BadgeContainer>
-                {buildBadgeItems(campaign).map((badge) => (
+                {buildCampaignBadgeItems(campaign).map((badge) => (
                   <Badge key={`${campaign.id}-${badge}`} $variant="secondary" as="span">{badge}</Badge>
                 ))}
               </BadgeContainer>
 
               <StyledCardFooter>
                 <FeeText>{formatFee(campaign.fee)}</FeeText>
-                <DeadlineText>{getDeadlineLabel(campaign.closeAt)}</DeadlineText>
+                <DeadlineText>{getDeadlineLabel(campaign.closeAt, calculateDDay, formatRelativeTime)}</DeadlineText>
               </StyledCardFooter>
             </CampaignCard>
           ))}
@@ -205,46 +200,6 @@ const CampaignsPage: React.FC = () => {
       </RegisterFab>
     </PageWrapper>
   );
-};
-
-const buildBadgeItems = (campaign: Campaign): string[] => {
-  const badges: string[] = [];
-  if (campaign.location) {
-    badges.push(campaign.location);
-  }
-  if (campaign.prefix) {
-    badges.push(campaign.prefix);
-  }
-  if (campaign.category) {
-    badges.push(campaign.category);
-  }
-  if (campaign.shootDate) {
-    badges.push(`촬영 ${formatDateLabel(campaign.shootDate)}`);
-  }
-  return badges;
-};
-
-const formatFee = (fee?: number) => {
-  if (fee == null) {
-    return '협의';
-  }
-
-  if (fee >= 10000) {
-    const millionWon = Math.round(fee / 10000);
-    return `${millionWon.toLocaleString('ko-KR')}만원`;
-  }
-
-  return formatCurrency(fee);
-};
-
-const getDeadlineLabel = (deadline?: string) => {
-  if (!deadline) return '상시';
-  const dday = calculateDDay(deadline);
-  const relative = formatRelativeTime(deadline);
-  if (!dday) {
-    return relative;
-  }
-  return relative ? `${dday} · ${relative}` : dday;
 };
 
 const PageWrapper = styled.div`
