@@ -24,7 +24,6 @@ const TitleText = styled(PMuted)`
 const ContentText = styled(PMuted)`
   color: ${({ theme }) => theme.colors.foreground};
   font-weight: 600;
-  line-height: 1.5;
 `;
 
 const InfoItem: React.FC<InfoItemProps> = ({ title, content, children }) => {

@@ -62,13 +62,11 @@ const BrandName = styled(PMuted)`
 
 const TitleText = styled(H1)`
   margin: 0;
-  line-height: 1.4;
 `;
 
 const SummaryText = styled(PMuted)`
   margin: 0;
   color: ${({ theme }) => theme.colors.foreground};
-  line-height: 1.6;
 `;
 
 const DetailHeader: React.FC<DetailHeaderProps> = ({

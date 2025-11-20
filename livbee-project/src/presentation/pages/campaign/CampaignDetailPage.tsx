@@ -19,9 +19,7 @@ import { useDetailData } from '@/presentation/hooks/useDetailData';
 import { P } from '@/presentation/components/styled/Typography';
 import '@/presentation/styles/global.css';
 
-const ContentWrapper = styled(P)`
-  line-height: 1.6;
-`;
+const ContentWrapper = styled(P)``;
 
 const FooterActions = styled.div`
   padding: ${({ theme }) => theme.spacing.lg};

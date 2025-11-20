@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { AlertTriangle } from 'lucide-react';
 import Modal from '@/presentation/components/ui/Modal';
 import { useToast } from '@/presentation/contexts/ToastContext';
-import { H2, PMuted, Caption } from '@/presentation/components/styled/Typography';
+import { H2, H3, PMuted, Caption } from '@/presentation/components/styled/Typography';
 import Button from '@/presentation/components/ui/Button';
 import { Badge } from '@/presentation/components/styled/CommonStyles';
 
@@ -187,8 +187,9 @@ const ModalTitle = styled(H2)`
 const CloseButton = styled.button`
   border: none;
   background: transparent;
-  font-size: 1.25rem;
   cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
 `;
 
 const Section = styled.div`
@@ -202,9 +203,8 @@ const SectionLabel = styled(PMuted)`
   font-weight: 600;
 `;
 
-const CampaignName = styled.h3`
+const CampaignName = styled(H3)`
   margin: 0;
-  font-size: 1rem;
 `;
 
 const PortfolioList = styled.div`
@@ -255,9 +255,8 @@ const PortfolioInfo = styled.div`
   gap: ${({ theme }) => theme.spacing.xs};
 `;
 
-const PortfolioTitle = styled.h4`
+const PortfolioTitle = styled(H3)`
   margin: 0;
-  font-size: 0.95rem;
 `;
 
 const PortfolioSummary = styled(PMuted)`
@@ -271,9 +270,7 @@ const TagGroup = styled.div`
   flex-wrap: wrap;
 `;
 
-const TagBadge = styled(Badge)`
-  font-size: 12px;
-`;
+const TagBadge = styled(Badge)``;
 
 const Indicator = styled.span<{ $selected: boolean }>`
   width: 18px;

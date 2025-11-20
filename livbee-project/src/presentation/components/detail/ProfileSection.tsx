@@ -74,9 +74,6 @@ const ProfileInfo = styled.div`
 `;
 
 const Name = styled(H1)`
-  font-size: 32px;
-  font-weight: 700;
-  line-height: 1.4;
   color: ${({ theme }) => theme.colors.foreground};
 `;
 
@@ -126,8 +123,6 @@ const Tag = styled(Caption)`
   color: ${({ theme }) => theme.colors.foreground};
   border-radius: ${({ theme }) => theme.radii.md};
   white-space: nowrap;
-  font-size: 14px;
-  font-weight: 400;
 `;
 
 const WebsiteLink = styled.a`

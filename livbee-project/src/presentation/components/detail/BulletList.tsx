@@ -1,4 +1,6 @@
 import React from 'react';
+import styled from 'styled-components';
+import { P } from '@/presentation/components/styled/Typography';
 
 /**
  * BulletList 컴포넌트가 받을 props 타입을 정의합니다.
@@ -10,60 +12,45 @@ interface BulletListProps {
   bullet?: string;
 }
 
+const List = styled.ul`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.sm};
+  padding: 0;
+  margin: 0;
+  list-style: none;
+`;
+
+const ListItem = styled.li`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const Bullet = styled.span`
+  flex-shrink: 0;
+  margin-top: 2px;
+`;
+
+const ItemText = styled(P)`
+  flex: 1;
+`;
+
 /**
  * 불릿 리스트를 표시하는 컴포넌트입니다.
  * 브랜드 소개, 담당 업무, 자격요건, 우대사항 등에 사용됩니다.
  */
 const BulletList: React.FC<BulletListProps> = ({ items, bullet = '•' }) => {
-  /**
-   * 리스트 컨테이너 스타일
-   */
-  const listStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-    padding: '0',
-    margin: '0',
-  };
-
-  /**
-   * 리스트 아이템 스타일
-   */
-  const itemStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: '8px',
-    fontSize: 'var(--p2)', // 14px
-    fontWeight: 400,
-    color: 'var(--black)',
-    lineHeight: 1.6,
-  };
-
-  /**
-   * 불릿 스타일
-   */
-  const bulletStyle: React.CSSProperties = {
-    flexShrink: 0,
-    marginTop: '2px',
-  };
-
-  /**
-   * 텍스트 스타일
-   */
-  const textStyle: React.CSSProperties = {
-    flex: 1,
-  };
-
   return (
-    <ul style={listStyle}>
+    <List>
       {items.map((item, index) => (
-        <li key={index} style={itemStyle}>
-          <span style={bulletStyle}>{bullet}</span>
-          <span style={textStyle}>{item}</span>
-        </li>
+        <ListItem key={index}>
+          <Bullet>{bullet}</Bullet>
+          <ItemText>{item}</ItemText>
+        </ListItem>
       ))}
-    </ul>
+    </List>
   );
 };
 
