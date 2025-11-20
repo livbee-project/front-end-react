@@ -166,7 +166,7 @@ const CampaignApplyModal: React.FC<CampaignApplyModalProps> = ({ isOpen, campaig
 };
 
 const ModalContainer = styled.div`
-  border-radius: ${({ theme }) => theme.radii['2xl']};
+  border-radius: ${({ theme }) => theme.radii.xl};
   max-height: 80vh;
   overflow-y: auto;
   display: flex;
