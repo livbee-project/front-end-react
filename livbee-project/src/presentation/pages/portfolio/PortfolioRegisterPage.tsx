@@ -16,6 +16,7 @@ import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import type { CreatePortfolioRequest } from '@/domain/entities/Portfolio';
+import { H1, H2, P, PMuted, Small, Caption } from '@/presentation/components/styled/Typography';
 
 const PageWrapper = styled.div`
   min-height: 100vh;
@@ -54,18 +55,13 @@ const FormSection = styled.section`
   }
 `;
 
-const SectionTitle = styled.h2`
-  font-size: 18px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.foreground};
-  margin: 0 0 12px;
+const SectionTitle = styled(H1)`
+  margin: 0 0 ${({ theme }) => theme.spacing.md};
 `;
 
-const SectionDescription = styled.p`
-  font-size: 13px;
-  font-weight: 300;
+const SectionDescription = styled(Small)`
   color: ${({ theme }) => theme.colors.muted};
-  margin: 0 0 20px;
+  margin: 0 0 ${({ theme }) => theme.spacing.xl};
   line-height: 1.5;
 `;
 
@@ -90,21 +86,13 @@ const ProfileInfo = styled.div`
   }
 `;
 
-const ProfileLabel = styled.span`
-  font-size: 14px;
-  color: ${({ theme }) => theme.colors.muted};
-  font-weight: 300;
-`;
+const ProfileLabel = styled(PMuted)``;
 
-const ProfileTitle = styled.h3`
-  margin: 0;
-  font-size: 16px;
+const ProfileTitle = styled(H2)`
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.foreground};
 `;
 
-const ProfileHint = styled.span`
-  font-size: 13px;
+const ProfileHint = styled(Small)`
   color: ${({ theme }) => theme.colors.muted};
 `;
 
@@ -155,8 +143,7 @@ const ProfileOverlay = styled.div`
   }
 `;
 
-const OverlayText = styled.span`
-  font-size: 14px;
+const OverlayText = styled(H2)`
   font-weight: 500;
 `;
 
@@ -169,8 +156,8 @@ const StyledSelect = styled.select`
   border: none;
   border-bottom: 1px solid #e5e7eb;
   border-radius: 0;
-  padding: 12px 0;
-  font-size: 16px;
+  padding: ${({ theme }) => theme.spacing.md} 0;
+  font: ${({ theme }) => theme.fonts.body};
   background: transparent;
   color: ${({ theme }) => theme.colors.foreground};
   &:focus {
@@ -185,19 +172,15 @@ const InputGroup = styled.div`
   gap: 20px;
 `;
 
-const LabelText = styled.div`
-  font-size: 16px;
+const LabelText = styled(H2)`
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.foreground};
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: ${({ theme }) => theme.spacing.sm};
+  margin-bottom: ${({ theme }) => theme.spacing.sm};
 `;
 
-const LabelNote = styled.span`
-  font-size: 12px;
-  font-weight: 300;
+const LabelNote = styled(Caption)`
   color: ${({ theme }) => theme.colors.muted};
 `;
 
@@ -206,8 +189,8 @@ const underlineField = css`
   border: none;
   border-bottom: 1px solid #e5e7eb;
   border-radius: 0;
-  padding: 12px 0;
-  font-size: 16px;
+  padding: ${({ theme }) => theme.spacing.md} 0;
+  font: ${({ theme }) => theme.fonts.body};
   background: transparent;
   color: ${({ theme }) => theme.colors.foreground};
   &::placeholder {
@@ -269,38 +252,37 @@ const SnsInputWrapper = styled.div`
   gap: 4px;
 `;
 
-const SnsLabel = styled.span`
-  font-size: 14px;
+const SnsLabel = styled(H2)`
   font-weight: 500;
 `;
 
 const SnsInput = styled.input`
   ${underlineField};
-  font-size: 14px;
-  padding: 8px 0;
+  font: ${({ theme }) => theme.fonts.body};
+  padding: ${({ theme }) => theme.spacing.sm} 0;
 `;
 
 const PortfolioHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 20px;
-  font-size: 14px;
-  color: ${({ theme }) => theme.colors.muted};
+  gap: ${({ theme }) => theme.spacing.lg};
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
+  ${PMuted} {
+    color: ${({ theme }) => theme.colors.muted};
+  }
 `;
 
 const AddButton = styled.button`
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
+  gap: ${({ theme }) => theme.spacing.xs};
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.lg};
   border: 1px solid ${({ theme }) => theme.colors.primary};
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: transparent;
   color: ${({ theme }) => theme.colors.primary};
-  font-size: 14px;
-  font-weight: 500;
+  font: ${({ theme }) => theme.fonts.button};
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
   &:hover {
@@ -359,18 +341,14 @@ const FileInfo = styled.div`
   min-width: 0;
 `;
 
-const FileName = styled.div`
-  font-size: 15px;
+const FileName = styled(P)`
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.foreground};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 `;
 
-const FileSize = styled.div`
-  font-size: 13px;
-  font-weight: 300;
+const FileSize = styled(Small)`
   color: ${({ theme }) => theme.colors.muted};
 `;
 
@@ -522,10 +500,10 @@ const SubmitButton = styled.button`
   width: 100%;
   height: 52px;
   border: none;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.primaryForeground};
-  font-size: 16px;
+  font: ${({ theme }) => theme.fonts.body};
   font-weight: 500;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s, background 0.2s;

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import TextInput from '@/presentation/components/forms/TextInput';
 import ToggleSwitch from '@/presentation/components/ui/ToggleSwitch';
 import FileUpload from '@/presentation/components/upload/FileUpload';
@@ -16,6 +17,19 @@ import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import type { CreateModelRequest } from '@/domain/entities/Model';
+import { Caption, PMuted } from '@/presentation/components/styled/Typography';
+
+const HelperText = styled(Caption)`
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
+const SuccessText = styled(Caption)`
+  color: ${({ theme }) => theme.colors.primary};
+`;
+
+const ErrorText = styled(Caption)`
+  color: ${({ theme }) => theme.colors.error};
+`;
 
 /**
  * 모델 등록 페이지
@@ -392,9 +406,7 @@ const ModelRegisterPage: React.FC = () => {
             onFileSelect={handlePortfolioFileSelect}
           />
           {portfolioFileUrl && (
-            <div style={{ fontSize: '12px', color: 'var(--primary)' }}>
-              ✓ 포트폴리오 파일이 업로드되었습니다.
-            </div>
+            <SuccessText>✓ 포트폴리오 파일이 업로드되었습니다.</SuccessText>
           )}
         </div>
       </FormSection>
@@ -439,16 +451,14 @@ const ModelRegisterPage: React.FC = () => {
           {formData.tags.map((tag, index) => (
             <ListItem key={index} style={{ padding: '0', marginBottom: '12px' }}>
               <FormRow>
-                <span
+                <HelperText
                   style={{
-                    fontSize: '12px',
-                    color: 'var(--dark-gray)',
                     flexShrink: 0,
                     width: '60px',
                   }}
                 >
                   {tag.label}
-                </span>
+                </HelperText>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <TextInput
                     placeholder="내용을 입력해주세요"
@@ -521,9 +531,7 @@ const ModelRegisterPage: React.FC = () => {
             </div>
           )}
           {galleryImageUrls.length >= 5 && (
-            <div style={{ fontSize: '12px', color: 'var(--dark-gray)' }}>
-              갤러리 이미지는 최대 5개까지 업로드 가능합니다.
-            </div>
+            <HelperText>갤러리 이미지는 최대 5개까지 업로드 가능합니다.</HelperText>
           )}
         </div>
       </FormSection>

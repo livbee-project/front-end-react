@@ -14,6 +14,11 @@ import { useToast } from '@/presentation/contexts/ToastContext';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import type { CreateCampaignRequest } from '@/domain/entities/Campaign';
 
+const UploadMessage = styled(Caption)`
+  margin-top: ${({ theme }) => theme.spacing.sm};
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
 /**
  * 모집공고 등록 페이지
  */
@@ -259,9 +264,7 @@ const CampaignRegisterPage: React.FC = () => {
           onImageSelect={(file) => handleImageSelect(file, 'cover')}
         />
         {coverImageUrl && (
-          <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--dark-gray)' }}>
-            이미지 업로드 완료
-          </div>
+          <UploadMessage>이미지 업로드 완료</UploadMessage>
         )}
       </FormSection>
 
@@ -395,9 +398,7 @@ const CampaignRegisterPage: React.FC = () => {
           onImageSelect={(file) => handleImageSelect(file, 'product')}
         />
         {productImageUrl && (
-          <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--dark-gray)' }}>
-            이미지 업로드 완료
-          </div>
+          <UploadMessage>이미지 업로드 완료</UploadMessage>
         )}
       </FormSection>
 
@@ -409,9 +410,7 @@ const CampaignRegisterPage: React.FC = () => {
           onImageSelect={(file) => handleImageSelect(file, 'liveCover')}
         />
         {liveCoverImageUrl && (
-          <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--dark-gray)' }}>
-            이미지 업로드 완료
-          </div>
+          <UploadMessage>이미지 업로드 완료</UploadMessage>
         )}
       </FormSection>
 

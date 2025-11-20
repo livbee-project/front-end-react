@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import ProfileSection from '@/presentation/components/detail/ProfileSection';
 import SectionHeader from '@/presentation/components/section/SectionHeader';
 import GalleryGrid from '@/presentation/components/detail/GalleryGrid';
@@ -16,6 +17,7 @@ import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { PortfolioDetail } from '@/domain/entities/Portfolio';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useDetailData } from '@/presentation/hooks/useDetailData';
+import { P } from '@/presentation/components/styled/Typography';
 import '@/presentation/styles/global.css';
 
 /**
@@ -27,6 +29,11 @@ import '@/presentation/styles/global.css';
  * 4. 정보 및 태그 섹션
  * 5. 하단 버튼
  */
+
+const ContentWrapper = styled(P)`
+  line-height: 1.6;
+`;
+
 const PortfolioDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -114,8 +121,7 @@ const PortfolioDetailPage: React.FC = () => {
             <SectionHeader title="상세소개" />
           </div>
           <DetailContent>
-            <div
-              style={{ fontSize: 'var(--p2)', lineHeight: 1.6 }}
+            <ContentWrapper
               dangerouslySetInnerHTML={{ __html: portfolio.detailedIntro }}
             />
           </DetailContent>

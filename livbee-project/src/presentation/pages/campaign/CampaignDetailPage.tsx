@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import DetailHeader from '@/presentation/components/detail/DetailHeader';
 import BulletList from '@/presentation/components/detail/BulletList';
 import InfoItem from '@/presentation/components/detail/InfoItem';
@@ -15,7 +16,12 @@ import type { CampaignDetail } from '@/domain/entities/Campaign';
 import { htmlToText } from '@/shared/utils/htmlUtils';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useDetailData } from '@/presentation/hooks/useDetailData';
+import { P } from '@/presentation/components/styled/Typography';
 import '@/presentation/styles/global.css';
+
+const ContentWrapper = styled(P)`
+  line-height: 1.6;
+`;
 
 /**
  * 모집 공고 상세 페이지 컴포넌트입니다.
@@ -146,8 +152,7 @@ const CampaignDetailPage: React.FC = () => {
       {/* 2. 브랜드 소개 섹션 */}
       {campaign.brandIntroduction && (
         <DetailSection title="브랜드 소개">
-          <div
-            style={{ fontSize: 'var(--p2)', lineHeight: 1.6 }}
+          <ContentWrapper
             dangerouslySetInnerHTML={{ __html: campaign.brandIntroduction }}
           />
         </DetailSection>
@@ -162,8 +167,7 @@ const CampaignDetailPage: React.FC = () => {
               : '모집부문'
           }
         >
-          <div
-            style={{ fontSize: 'var(--p2)', lineHeight: 1.6 }}
+          <ContentWrapper
             dangerouslySetInnerHTML={{ __html: campaign.recruitmentSection }}
           />
         </DetailSection>
