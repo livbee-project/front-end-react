@@ -1,4 +1,5 @@
 import React from 'react';
+import styled, { css } from 'styled-components';
 import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
 
 /**
@@ -13,6 +14,45 @@ interface GalleryGridProps {
   onImageClick?: (index: number) => void;
 }
 
+const GridContainer = styled.div<{ $columns: number }>`
+  display: grid;
+  grid-template-columns: repeat(${({ $columns }) => $columns}, 1fr);
+  gap: ${({ theme }) => theme.spacing.lg};
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    gap: ${({ theme }) => theme.spacing.md};
+  }
+`;
+
+const ImageItem = styled.div<{ $hasClick: boolean }>`
+  aspect-ratio: 1 / 1;
+  background-color: ${({ theme }) => theme.colors.secondary};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: ${({ $hasClick }) => ($hasClick ? 'pointer' : 'default')};
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, border-color 0.2s;
+
+  ${({ $hasClick, theme }) =>
+    $hasClick &&
+    css`
+      &:hover {
+        transform: scale(1.02);
+        border-color: ${theme.colors.primary};
+      }
+    `}
+`;
+
+const Image = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
 /**
  * 모델 상세 페이지의 갤러리 섹션에서 사용되는
  * 이미지 그리드 컴포넌트입니다.
@@ -23,42 +63,6 @@ const GalleryGrid: React.FC<GalleryGridProps> = ({
   columns = 3,
   onImageClick,
 }) => {
-  /**
-   * 그리드 컨테이너 스타일
-   * CSS Grid를 사용하여 동적으로 열 개수를 조정합니다.
-   */
-  const gridStyle: React.CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: `repeat(${columns}, 1fr)`,
-    gap: '1px',
-    backgroundColor: '#F7F8FA', // 구분선 색상
-    border: '1px solid #F7F8FA',
-    borderRadius: '4px',
-    overflow: 'hidden',
-  };
-
-  /**
-   * 개별 이미지 아이템 스타일
-   */
-  const imageItemStyle: React.CSSProperties = {
-    aspectRatio: '1 / 1', // 정사각형 비율
-    backgroundColor: '#F7F8FA',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    cursor: onImageClick ? 'pointer' : 'default',
-    position: 'relative',
-    overflow: 'hidden',
-  };
-
-  /**
-   * 이미지 스타일
-   */
-  const imageStyle: React.CSSProperties = {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-  };
 
 
   /**
@@ -71,21 +75,21 @@ const GalleryGrid: React.FC<GalleryGridProps> = ({
     : Array(placeholderCount).fill(null);
 
   return (
-    <div style={gridStyle}>
+    <GridContainer $columns={columns}>
       {displayItems.map((imageUrl, index) => (
-        <div
+        <ImageItem
           key={index}
-          style={imageItemStyle}
+          $hasClick={!!onImageClick}
           onClick={() => onImageClick && onImageClick(index)}
         >
           {imageUrl ? (
-            <img src={imageUrl} alt={`갤러리 이미지 ${index + 1}`} style={imageStyle} />
+            <Image src={imageUrl} alt={`갤러리 이미지 ${index + 1}`} />
           ) : (
             <PlaceholderImage size={40} />
           )}
-        </div>
+        </ImageItem>
       ))}
-    </div>
+    </GridContainer>
   );
 };
 
