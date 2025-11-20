@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import type { IconType } from 'react-icons';
 
 interface InputIconProps {
@@ -7,17 +8,24 @@ interface InputIconProps {
   size?: number;
 }
 
-const InputIcon: React.FC<InputIconProps> = ({ icon: Icon, color = 'var(--dark-gray)', size = 20 }) => {
-  const iconStyle: React.CSSProperties = {
-    position: 'absolute',
-    right: '16px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    pointerEvents: 'none',
-    color,
-  };
+const IconWrapper = styled.span<{ $color?: string }>`
+  position: absolute;
+  right: ${({ theme }) => theme.spacing.md};
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: ${({ $color, theme }) => $color ?? theme.colors.muted};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
-  return <Icon size={size} style={iconStyle} />;
+const InputIcon: React.FC<InputIconProps> = ({ icon: Icon, color, size = 20 }) => {
+  return (
+    <IconWrapper $color={color}>
+      <Icon size={size} />
+    </IconWrapper>
+  );
 };
 
 export default InputIcon;

@@ -1,16 +1,17 @@
 import React from 'react';
+import styled from 'styled-components';
 
 interface InputWrapperProps {
   children: React.ReactNode;
 }
 
-const InputWrapper: React.FC<InputWrapperProps> = ({ children }) => {
-  const wrapperStyle: React.CSSProperties = {
-    position: 'relative',
-    width: '100%',
-  };
+const Wrapper = styled.div`
+  position: relative;
+  width: 100%;
+`;
 
-  return <div style={wrapperStyle}>{children}</div>;
+const InputWrapper: React.FC<InputWrapperProps> = ({ children }) => {
+  return <Wrapper>{children}</Wrapper>;
 };
 
 export default InputWrapper;
