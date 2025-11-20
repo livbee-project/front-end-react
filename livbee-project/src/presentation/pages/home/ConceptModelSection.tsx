@@ -64,7 +64,7 @@ const ConceptModelSection: React.FC = () => {
       <HorizontalScroll>
         {models.map((model) => (
           <StyledCard key={model.id} onClick={() => navigate(`/models/${model.id}`)}>
-            <HomeCardImage src={model.mainThumbnailUrl || undefined} alt={model.nickname || '모델'} ratio="3 / 4" />
+            <HomeCardImage src={model.mainThumbnailUrl || undefined} alt={model.nickname || '모델'} aspectRatio="3 / 4" />
             <HomeCardBody>
               <HomeCardTitle>{model.nickname || '이름 없음'}</HomeCardTitle>
               <HomeCardDescription>{model.oneLineIntro || '소개 없음'}</HomeCardDescription>

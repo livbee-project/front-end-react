@@ -2,9 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
 
-const ImageWrapper = styled.div<{ $ratio: string }>`
+const ImageWrapper = styled.div<{ $aspectRatio: string }>`
   width: 100%;
-  aspect-ratio: ${({ $ratio }) => $ratio};
+  aspect-ratio: ${({ $aspectRatio }) => $aspectRatio};
   position: relative;
   overflow: hidden;
   background-color: ${({ theme }) => theme.colors.secondary};
@@ -24,13 +24,13 @@ const ImageElement = styled.img`
 export interface HomeCardImageProps {
   src?: string;
   alt: string;
-  ratio?: string;
+  aspectRatio?: string;
   children?: React.ReactNode;
 }
 
-export const HomeCardImage: React.FC<HomeCardImageProps> = ({ src, alt, ratio = '1 / 1', children }) => {
+export const HomeCardImage: React.FC<HomeCardImageProps> = ({ src, alt, aspectRatio = '1 / 1', children }) => {
   return (
-    <ImageWrapper $ratio={ratio}>
+    <ImageWrapper $aspectRatio={aspectRatio}>
       {src ? <ImageElement src={src} alt={alt} /> : <PlaceholderImage size={48} />}
       {children}
     </ImageWrapper>

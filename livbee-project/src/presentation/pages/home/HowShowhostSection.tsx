@@ -36,6 +36,12 @@ const Avatar = styled.div`
   flex-shrink: 0;
 `;
 
+const AvatarImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
 const Info = styled.div`
   flex: 1;
   min-width: 0;
@@ -87,11 +93,7 @@ const HowShowhostSection: React.FC = () => {
           <Card key={portfolio.id} onClick={() => navigate(`/portfolios/${portfolio.id}`)}>
             <Avatar>
               {portfolio.mainThumbnailUrl && (
-                <img
-                  src={portfolio.mainThumbnailUrl}
-                  alt={portfolio.nickname || '쇼호스트'}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
+                <AvatarImage src={portfolio.mainThumbnailUrl} alt={portfolio.nickname || '쇼호스트'} />
               )}
             </Avatar>
             <Info>

@@ -78,7 +78,7 @@ const Duration = styled.span`
   bottom: ${({ theme }) => theme.spacing.sm};
   right: ${({ theme }) => theme.spacing.sm};
   background-color: rgba(0, 0, 0, 0.7);
-  color: #fff;
+  color: ${({ theme }) => theme.colors.primaryForeground};
   padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.xs};
   border-radius: ${({ theme }) => theme.radii.sm};
   ${Caption} {

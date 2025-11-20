@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import { Sparkles } from 'lucide-react';
+import { Caption } from '@/presentation/components/styled/Typography';
 
 const highlights = [
   {
@@ -40,15 +41,15 @@ const pulse = keyframes`
 `;
 
 const Wrapper = styled.section`
-  padding: 1rem 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding: ${({ theme }) => theme.spacing.lg} 0;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
 const ScrollArea = styled.div`
   display: flex;
-  gap: 1rem;
+  gap: ${({ theme }) => theme.spacing.lg};
   overflow-x: auto;
-  padding-bottom: 0.5rem;
+  padding-bottom: ${({ theme }) => theme.spacing.sm};
   -ms-overflow-style: none;
   scrollbar-width: none;
 
@@ -63,13 +64,13 @@ const HighlightItem = styled.div`
   align-items: center;
   min-width: 80px;
   text-align: center;
-  gap: 0.5rem;
+  gap: ${({ theme }) => theme.spacing.sm};
 `;
 
 const HighlightRing = styled.div<{ $gradient: string; $animate: boolean }>`
   width: 72px;
   height: 72px;
-  border-radius: 50%;
+  border-radius: ${({ theme }) => theme.radii.full};
   padding: 2.5px;
   background: ${({ $gradient }) => $gradient};
   animation: ${({ $animate }) =>
@@ -84,7 +85,7 @@ const HighlightRing = styled.div<{ $gradient: string; $animate: boolean }>`
 const HighlightImage = styled.div`
   width: 100%;
   height: 100%;
-  border-radius: 50%;
+  border-radius: ${({ theme }) => theme.radii.full};
   overflow: hidden;
   background-color: ${({ theme }) => theme.colors.secondary};
   display: flex;
@@ -92,13 +93,24 @@ const HighlightImage = styled.div`
   justify-content: center;
 `;
 
-const HighlightTitle = styled.span`
-  font-size: 0.75rem;
+const HighlightImageElement = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+const HighlightTitle = styled(Caption)`
   font-weight: 500;
   max-width: 80px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+`;
+
+const SparklesWrapper = styled.div`
+  position: absolute;
+  top: -6px;
+  right: -6px;
 `;
 
 const StoryHighlightsSection: React.FC = () => (
@@ -108,14 +120,12 @@ const StoryHighlightsSection: React.FC = () => (
         <HighlightItem key={story.id}>
           <HighlightRing $gradient={story.gradient} $animate={story.isNew}>
             {story.isNew && (
-              <Sparkles
-                size={20}
-                color="#687CF4"
-                style={{ position: 'absolute', top: -6, right: -6 }}
-              />
+              <SparklesWrapper>
+                <Sparkles size={20} color="#687CF4" />
+              </SparklesWrapper>
             )}
             <HighlightImage>
-              <img src={story.image} alt={story.title} width={66} height={66} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+              <HighlightImageElement src={story.image} alt={story.title} />
             </HighlightImage>
           </HighlightRing>
           <HighlightTitle>{story.title}</HighlightTitle>

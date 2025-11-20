@@ -1,7 +1,6 @@
 import React from 'react';
-// (추가) 방금 생성한 useSlider 훅 임포트
+import styled from 'styled-components';
 import { useSlider } from '@/presentation/hooks/useSlider';
-
 import banner01 from '@/presentation/assets/images/banner_01.jpg';
 import banner02 from '@/presentation/assets/images/banner_02.jpg';
 
@@ -31,84 +30,74 @@ const BannerSliderSection: React.FC = () => {
     // ---
 
     return (
-        <section
-            style={{
-                width: '100%',
-                aspectRatio: '16 / 9',
-                position: 'relative',
-                overflow: 'hidden',
-                cursor: 'grab', // 드래그 가능 커서
-            }}
-            // (수정) 훅에서 반환된 이벤트 핸들러 묶음을 적용
-            {...containerProps}
-        >
-            {/* 1. 배너 컨테이너 */}
-            <div
-                style={{
-                    display: 'flex',
-                    height: '100%',
-                    width: `${MOCK_BANNERS.length * 100}%`,
-                    // (수정) 훅에서 계산된 스타일 적용
-                    transform: transform,
-                    transition: transition,
-                    userSelect: 'none', // 드래그 시 텍스트 선택 방지
-                }}
-            >
-                {/* (수정) MOCK_BANNERS 배열을 순회하며 <img> 태그를 렌더링 */}
+        <SliderSection {...containerProps}>
+            <BannerContainer $transform={transform} $transition={transition} $itemCount={MOCK_BANNERS.length}>
                 {MOCK_BANNERS.map((banner) => (
-                    // (수정) 배경색/텍스트 div 대신 img 태그 사용
-                    <img
-                        key={banner.id}
-                        src={banner.src} // 임포트한 이미지 경로
-                        alt={`배너 ${banner.id}`}
-                        style={{
-                            // (수정) div 스타일 대신 img 스타일 적용
-                            width: `${100 / MOCK_BANNERS.length}%`, // 50%
-                            height: '100%',
-                            objectFit: 'cover', // 16:9 비율을 꽉 채우도록
-                            // (추가) 드래그 방지
-                            userSelect: 'none',
-                            pointerEvents: 'none',
-                        }}
-                    />
+                    <BannerImage key={banner.id} src={banner.src} alt={`배너 ${banner.id}`} $itemCount={MOCK_BANNERS.length} />
                 ))}
-            </div>
+            </BannerContainer>
 
-            {/* 2. 페이지 인디케이터 (점) */}
-            <div
-                style={{
-                    position: 'absolute',
-                    bottom: 16,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    display: 'flex',
-                    gap: 8,
-                    pointerEvents: 'none', // 이벤트가 배너 섹션으로 전달되도록
-                }}
-            >
+            <IndicatorContainer>
                 {MOCK_BANNERS.map((_, index) => (
-                    <div
+                    <Indicator
                         key={index}
-                        style={{
-                            // (수정) 훅의 currentPage 사용
-                            width: currentPage === index ? 24 : 8,
-                            height: 8,
-                            backgroundColor:
-                                currentPage === index ? 'white' : 'rgba(255, 255, 255, 0.5)',
-                            borderRadius: 12,
-                            transition: 'width 0.15s ease-in-out',
-                            pointerEvents: 'auto', // 인디케이터는 클릭 가능하도록
-                        }}
+                        $isActive={currentPage === index}
                         onClick={(e) => {
-                            e.stopPropagation(); // 이벤트 버블링 방지
-                            // (수정) 훅에서 제공하는 goToPage 함수 사용
+                            e.stopPropagation();
                             goToPage(index);
                         }}
                     />
                 ))}
-            </div>
-        </section>
+            </IndicatorContainer>
+        </SliderSection>
     );
 };
+
+const SliderSection = styled.section`
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  position: relative;
+  overflow: hidden;
+  cursor: grab;
+`;
+
+const BannerContainer = styled.div<{ $transform: string; $transition: string; $itemCount: number }>`
+  display: flex;
+  height: 100%;
+  width: ${({ $itemCount }) => $itemCount * 100}%;
+  transform: ${({ $transform }) => $transform};
+  transition: ${({ $transition }) => $transition};
+  user-select: none;
+`;
+
+const BannerImage = styled.img<{ $itemCount: number }>`
+  width: ${({ $itemCount }) => `calc(100% / ${$itemCount})`};
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  pointer-events: none;
+`;
+
+const IndicatorContainer = styled.div`
+  position: absolute;
+  bottom: ${({ theme }) => theme.spacing.lg};
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: ${({ theme }) => theme.spacing.sm};
+  pointer-events: none;
+`;
+
+const Indicator = styled.button<{ $isActive: boolean }>`
+  width: ${({ $isActive }) => ($isActive ? '24px' : '8px')};
+  height: 8px;
+  background-color: ${({ $isActive, theme }) =>
+    $isActive ? theme.colors.primaryForeground : 'rgba(255, 255, 255, 0.5)'};
+  border-radius: ${({ theme }) => theme.radii.full};
+  border: none;
+  transition: width 0.15s ease-in-out;
+  pointer-events: auto;
+  cursor: pointer;
+`;
 
 export default BannerSliderSection;
