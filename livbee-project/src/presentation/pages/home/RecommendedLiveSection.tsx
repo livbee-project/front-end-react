@@ -9,7 +9,7 @@ import { htmlToText } from '@/shared/utils/htmlUtils';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
 import { H3, Caption, PMuted, CaptionMedium } from '@/presentation/components/styled/Typography';
-import { PrimaryBadge } from '@/presentation/components/styled/CommonStyles';
+import { Badge } from '@/presentation/components/styled/CommonStyles';
 
 const Card = styled.article`
   flex: 0 0 65vw;
@@ -49,7 +49,7 @@ const CoverImage = styled.img`
   }
 `;
 
-const Badge = styled(PrimaryBadge)`
+const StyledBadge = styled(Badge)`
   position: absolute;
   top: ${({ theme }) => theme.spacing.md};
   right: ${({ theme }) => theme.spacing.md};
@@ -134,7 +134,7 @@ const RecommendedLiveSection: React.FC = () => {
             <Card key={campaign.id} onClick={() => navigate(`/campaigns/${campaign.id}`)}>
               <ImageWrapper>
                 {imageUrl ? <CoverImage src={imageUrl} alt={campaign.title} /> : <div />}
-                {dday && <Badge><CaptionMedium>{dday}</CaptionMedium></Badge>}
+                {dday && <StyledBadge><CaptionMedium>{dday}</CaptionMedium></StyledBadge>}
               </ImageWrapper>
               <CardBody>
                 <Brand>{campaign.brandName}</Brand>

@@ -11,7 +11,7 @@ import type { Campaign } from '@/domain/entities/Campaign';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
 import { H1, H2, H3, PMuted, CaptionMedium, Highlight } from '@/presentation/components/styled/Typography';
-import { Input, SecondaryBadge } from '@/presentation/components/styled/CommonStyles';
+import { Input, Badge } from '@/presentation/components/styled/CommonStyles';
 import { Card, CardHeader, CardFooter } from '@/presentation/components/styled/SectionStyles';
 
 const filters: Array<{ label: string; value: '전체' | Campaign['category'] }> = [
@@ -144,7 +144,7 @@ const CampaignsPage: React.FC = () => {
 
               <BadgeContainer>
                 {buildBadgeItems(campaign).map((badge) => (
-                  <SecondaryBadge key={`${campaign.id}-${badge}`} as="span">{badge}</SecondaryBadge>
+                  <Badge key={`${campaign.id}-${badge}`} $variant="secondary" as="span">{badge}</Badge>
                 ))}
               </BadgeContainer>
 

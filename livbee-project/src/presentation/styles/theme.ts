@@ -17,6 +17,7 @@ export const theme = {
     primaryHover: '#5b6de0',
     primaryForeground: '#ffffff',
     secondary: '#F5F6FF',
+    secondaryForeground: '#030213',
     background: '#ffffff',
     foreground: '#030213',
     muted: '#717182',
@@ -94,7 +95,7 @@ export const theme = {
     },
   },
   breakpoints: {
-    tablet: '640px',
+    tablet: '768px',
     desktop: '1024px',
   },
   /**

@@ -11,7 +11,7 @@ import type { Portfolio } from '@/domain/entities/Portfolio';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
 import { H1, H3, PMuted, Caption, Highlight } from '@/presentation/components/styled/Typography';
-import { Input, SecondaryBadge } from '@/presentation/components/styled/CommonStyles';
+import { Input, Badge } from '@/presentation/components/styled/CommonStyles';
 import { Card } from '@/presentation/components/styled/SectionStyles';
 
 const filters: Array<{ label: string; value: string }> = [
@@ -167,7 +167,7 @@ const PortfolioPage: React.FC = () => {
 
               <BadgeContainer>
                 {buildBadgeItems(portfolio).map((badge, index) => (
-                  <SecondaryBadge key={`${portfolio.id}-${index}`} as="span">{badge}</SecondaryBadge>
+                  <Badge key={`${portfolio.id}-${index}`} $variant="secondary" as="span">{badge}</Badge>
                 ))}
                 {portfolio.experienceYears != null && portfolio.experienceYears > 0 && (
                   <InfoText as={Caption}>{formatExperience(portfolio.experienceYears)}</InfoText>

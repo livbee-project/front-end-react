@@ -17,8 +17,8 @@ export const Input = styled.input`
   padding: ${({ theme }) => theme.input.padding};
   background-color: ${({ theme }) => theme.input.backgroundColor};
   border-radius: ${({ theme }) => theme.input.borderRadius};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  font: ${({ theme }) => theme.fonts.body};
+  border: 1px solid transparent;
+  font: 400 15px/1.6 'NexonLv2Gothic';
   color: ${({ theme }) => theme.colors.foreground};
   outline: none;
   box-sizing: border-box;
@@ -47,8 +47,8 @@ export const Textarea = styled.textarea`
   padding: ${({ theme }) => theme.input.padding};
   background-color: ${({ theme }) => theme.input.backgroundColor};
   border-radius: ${({ theme }) => theme.input.borderRadius};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  font: ${({ theme }) => theme.fonts.body};
+  border: 1px solid transparent;
+  font: 400 15px/1.6 'NexonLv2Gothic';
   color: ${({ theme }) => theme.colors.foreground};
   outline: none;
   box-sizing: border-box;
@@ -101,12 +101,13 @@ export const ButtonBase = styled.button`
 `;
 
 /**
- * PrimaryButton - Primary 버튼 스타일
+ * @deprecated Button 컴포넌트는 @/presentation/components/ui/Button을 사용하세요
+ * @deprecated Button 컴포넌트의 $variant="default" prop을 사용하세요
  */
 export const PrimaryButton = styled(ButtonBase)`
   background-color: ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.primaryForeground};
-  border-radius: ${({ theme }) => theme.radii.lg};
+  border-radius: ${({ theme }) => theme.radii.md};
   padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.xl};
 
   &:hover:not(:disabled) {
@@ -115,12 +116,12 @@ export const PrimaryButton = styled(ButtonBase)`
 `;
 
 /**
- * SecondaryButton - Secondary 버튼 스타일
+ * @deprecated Button 컴포넌트의 $variant="secondary" prop을 사용하세요
  */
 export const SecondaryButton = styled(ButtonBase)`
   background-color: ${({ theme }) => theme.colors.secondary};
-  color: ${({ theme }) => theme.colors.foreground};
-  border-radius: ${({ theme }) => theme.radii.lg};
+  color: ${({ theme }) => theme.colors.secondaryForeground};
+  border-radius: ${({ theme }) => theme.radii.md};
   padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.xl};
 
   &:hover:not(:disabled) {
@@ -129,13 +130,13 @@ export const SecondaryButton = styled(ButtonBase)`
 `;
 
 /**
- * OutlineButton - Outline 버튼 스타일
+ * @deprecated Button 컴포넌트의 $variant="outline" prop을 사용하세요
  */
 export const OutlineButton = styled(ButtonBase)`
   background-color: transparent;
   color: ${({ theme }) => theme.colors.primary};
   border: 1px solid ${({ theme }) => theme.colors.primary};
-  border-radius: ${({ theme }) => theme.radii.lg};
+  border-radius: ${({ theme }) => theme.radii.md};
   padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.xl};
 
   &:hover:not(:disabled) {
@@ -155,22 +156,44 @@ export const SmallButton = styled(ButtonBase)`
 // ===== 배지 스타일 =====
 
 /**
- * Badge - 기본 배지 스타일
+ * Badge - 배지 컴포넌트 (variant 기반)
  * theme spacing 및 radii 토큰 사용
+ * @param $variant - 배지 스타일 변형 ('default' | 'secondary' | 'outline')
  */
-export const Badge = styled.span`
+export const Badge = styled.span<{ $variant?: 'default' | 'secondary' | 'outline' }>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.md};
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
   border-radius: ${({ theme }) => theme.radii.sm};
-  font: ${({ theme }) => theme.fonts.caption};
+  font: ${({ theme }) => theme.fonts.button};
   line-height: 1.4;
   white-space: nowrap;
+
+  ${({ $variant = 'default', theme }) => {
+    switch ($variant) {
+      case 'secondary':
+        return `
+          background-color: ${theme.colors.secondary};
+          color: ${theme.colors.secondaryForeground};
+        `;
+      case 'outline':
+        return `
+          background-color: transparent;
+          border: 1px solid ${theme.colors.border};
+          color: ${theme.colors.foreground};
+        `;
+      default:
+        return `
+          background-color: ${theme.colors.primary};
+          color: ${theme.colors.primaryForeground};
+        `;
+    }
+  }}
 `;
 
 /**
- * PrimaryBadge - Primary 배지 스타일
+ * @deprecated Badge 컴포넌트의 $variant="default" prop을 사용하세요
  */
 export const PrimaryBadge = styled(Badge)`
   background-color: ${({ theme }) => theme.colors.primary};
@@ -178,15 +201,15 @@ export const PrimaryBadge = styled(Badge)`
 `;
 
 /**
- * SecondaryBadge - Secondary 배지 스타일
+ * @deprecated Badge 컴포넌트의 $variant="secondary" prop을 사용하세요
  */
 export const SecondaryBadge = styled(Badge)`
   background-color: ${({ theme }) => theme.colors.secondary};
-  color: ${({ theme }) => theme.colors.foreground};
+  color: ${({ theme }) => theme.colors.secondaryForeground};
 `;
 
 /**
- * MutedBadge - Muted 배지 스타일
+ * @deprecated Badge 컴포넌트의 $variant="outline" prop을 사용하세요
  */
 export const MutedBadge = styled(Badge)`
   background-color: ${({ theme }) => theme.colors.inputBackground};

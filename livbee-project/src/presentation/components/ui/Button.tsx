@@ -30,7 +30,7 @@ const sizeStyles = {
   `,
   medium: css`
     padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.xl};
-    border-radius: ${({ theme }) => theme.radii.lg};
+    border-radius: ${({ theme }) => theme.radii.md};
     font: ${({ theme }) => theme.fonts.button};
   `,
   large: css`
@@ -54,12 +54,12 @@ const variantStyles = {
     }
   `,
   secondary: css`
-    background-color: ${({ theme }) => theme.colors.muted};
-    color: ${({ theme }) => theme.colors.primaryForeground};
+    background-color: ${({ theme }) => theme.colors.secondary};
+    color: ${({ theme }) => theme.colors.secondaryForeground};
     border: none;
 
     &:hover:not(:disabled) {
-      opacity: 0.9;
+      background-color: rgba(245, 246, 255, 0.8);
     }
   `,
   outline: css`
