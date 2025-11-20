@@ -42,7 +42,7 @@ export const Highlight = styled.span`
 const MoreButton = styled.button`
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
-  background-color: rgba(104, 124, 244, 0.1);
+  background-color: ${({ theme }) => theme.primaryOpacity['10']};
   color: ${({ theme }) => theme.colors.primary};
   padding: 0.25rem 0.75rem;
   font-size: 12px;
@@ -51,7 +51,7 @@ const MoreButton = styled.button`
   transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: rgba(104, 124, 244, 0.2);
+    background-color: ${({ theme }) => theme.primaryOpacity['20']};
   }
 `;
 

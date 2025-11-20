@@ -534,9 +534,9 @@ const SubmitButton = styled.button`
     cursor: not-allowed;
   }
   &:not(:disabled):hover {
-    background: #5b6de0;
+    background: ${({ theme }) => theme.colors.primaryHover};
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(104, 124, 244, 0.25);
+    box-shadow: 0 4px 12px ${({ theme }) => theme.primaryOpacity['25']};
   }
 `;
 

@@ -1,6 +1,20 @@
+/**
+ * Hex 색상을 RGBA로 변환하는 유틸리티 함수
+ * @param hex - Hex 색상 코드 (예: '#687CF4')
+ * @param alpha - 투명도 (0-1)
+ * @returns RGBA 색상 문자열
+ */
+export const hexToRgba = (hex: string, alpha: number): string => {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 export const theme = {
   colors: {
     primary: '#687CF4',
+    primaryHover: '#5b6de0',
     primaryForeground: '#ffffff',
     secondary: '#F5F6FF',
     background: '#ffffff',
@@ -9,6 +23,22 @@ export const theme = {
     border: 'rgba(0, 0, 0, 0.1)',
     card: '#ffffff',
     inputBackground: '#f3f3f5',
+    error: '#ff5a5f',
+    errorForeground: '#ffffff',
+  },
+  /**
+   * Primary 색상의 opacity 값들
+   * 자주 사용되는 opacity 레벨을 미리 정의
+   */
+  primaryOpacity: {
+    '05': 'rgba(104, 124, 244, 0.05)',
+    '10': 'rgba(104, 124, 244, 0.1)',
+    '15': 'rgba(104, 124, 244, 0.15)',
+    '20': 'rgba(104, 124, 244, 0.2)',
+    '25': 'rgba(104, 124, 244, 0.25)',
+    '30': 'rgba(104, 124, 244, 0.3)',
+    '35': 'rgba(104, 124, 244, 0.35)',
+    '60': 'rgba(104, 124, 244, 0.6)',
   },
   spacing: {
     xs: '4px',

@@ -140,7 +140,7 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
     }
 
     .rdp-day_today {
-      background-color: rgba(104, 124, 244, 0.1);
+      background-color: ${({ theme }) => theme.primaryOpacity['10']};
       color: var(--black);
       font-weight: 400;
     }

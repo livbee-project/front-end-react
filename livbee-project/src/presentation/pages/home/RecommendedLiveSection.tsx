@@ -26,11 +26,11 @@ const Card = styled.article`
   flex: 0 0 240px;
   background: linear-gradient(
     180deg,
-    rgba(104, 124, 244, 0.15) 0%,
-    rgba(104, 124, 244, 0.05) 100%
+    ${({ theme }) => theme.primaryOpacity['15']} 0%,
+    ${({ theme }) => theme.primaryOpacity['05']} 100%
   );
   border-radius: ${({ theme }) => theme.radii.lg};
-  border: 1px solid rgba(104, 124, 244, 0.3);
+  border: 1px solid ${({ theme }) => theme.primaryOpacity['30']};
   padding: 0.75rem;
   display: flex;
   flex-direction: column;

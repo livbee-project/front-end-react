@@ -342,7 +342,7 @@ const TypeBadge = styled.button<{ $isActive: boolean }>`
           color: ${({ theme }) => theme.colors.foreground};
         `}
   &:hover {
-    background: rgba(104, 124, 244, 0.1);
+    background: ${({ theme }) => theme.primaryOpacity['10']};
     color: ${({ theme }) => theme.colors.primary};
   }
 `;
@@ -364,7 +364,7 @@ const Avatar = styled.div`
   width: 5rem;
   height: 5rem;
   border-radius: ${({ theme }) => theme.radii.full};
-  background: linear-gradient(135deg, ${({ theme }) => theme.colors.primary} 0%, rgba(104, 124, 244, 0.6) 100%);
+  background: linear-gradient(135deg, ${({ theme }) => theme.colors.primary} 0%, ${({ theme }) => theme.primaryOpacity['60']} 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -473,8 +473,8 @@ const LogoutButton = styled.button`
   width: 100%;
   padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
   background: transparent;
-  border: 1px solid #ff5a5f;
-  color: #ff5a5f;
+  border: 1px solid ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.error};
   border-radius: ${({ theme }) => theme.radii.lg};
   display: flex;
   align-items: center;
@@ -485,8 +485,8 @@ const LogoutButton = styled.button`
   transition: background-color 0.2s, color 0.2s;
   margin-bottom: ${({ theme }) => theme.spacing.xl};
   &:hover {
-    background: #ff5a5f;
-    color: #ffffff;
+    background: ${({ theme }) => theme.colors.error};
+    color: ${({ theme }) => theme.colors.errorForeground};
   }
 `;
 

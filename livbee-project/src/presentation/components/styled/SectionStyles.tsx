@@ -102,7 +102,7 @@ export const Card = styled.div`
   transition: box-shadow 0.2s, transform 0.2s;
 
   &:hover {
-    box-shadow: 0 2px 8px rgba(104, 124, 244, 0.1);
+    box-shadow: 0 2px 8px ${({ theme }) => theme.primaryOpacity['10']};
   }
 `;
 

@@ -316,7 +316,7 @@ const FilterBadge = styled.button<{ $isActive: boolean }>`
           color: ${({ theme }) => theme.colors.foreground};
         `}
   &:hover {
-    background: rgba(104, 124, 244, 0.1);
+    background: ${({ theme }) => theme.primaryOpacity['10']};
     color: ${({ theme }) => theme.colors.primary};
   }
   &:active {
@@ -336,7 +336,7 @@ const PortfolioCard = styled(Card)`
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
   &:hover {
     border-color: ${({ theme }) => theme.colors.primary};
-    box-shadow: 0 2px 8px rgba(104, 124, 244, 0.1);
+    box-shadow: 0 2px 8px ${({ theme }) => theme.primaryOpacity['10']};
     transform: translateY(-2px);
   }
 `;
@@ -401,7 +401,7 @@ const ScrapButton = styled.button`
   transition: border-color 0.2s, background-color 0.2s;
   &:hover {
     border-color: ${({ theme }) => theme.colors.primary};
-    background: rgba(104, 124, 244, 0.05);
+    background: ${({ theme }) => theme.primaryOpacity['05']};
   }
 `;
 
@@ -464,12 +464,12 @@ const RegisterFab = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 12px 24px rgba(104, 124, 244, 0.35);
+  box-shadow: 0 12px 24px ${({ theme }) => theme.primaryOpacity['35']};
   cursor: pointer;
   z-index: 50;
   transition: transform 0.2s, background 0.2s;
   &:hover {
-    background: #5b6de0;
+    background: ${({ theme }) => theme.colors.primaryHover};
     transform: scale(1.05);
   }
   &:active {

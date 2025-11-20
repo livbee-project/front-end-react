@@ -30,7 +30,7 @@ export const Input = styled.input`
 
   &:focus {
     border-color: ${({ theme }) => theme.input.focusBorderColor};
-    box-shadow: 0 0 0 3px rgba(104, 124, 244, 0.15);
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.primaryOpacity['15']};
   }
 
   &:disabled {
@@ -62,7 +62,7 @@ export const Textarea = styled.textarea`
 
   &:focus {
     border-color: ${({ theme }) => theme.input.focusBorderColor};
-    box-shadow: 0 0 0 3px rgba(104, 124, 244, 0.15);
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.primaryOpacity['15']};
   }
 
   &:disabled {
@@ -110,7 +110,7 @@ export const PrimaryButton = styled(ButtonBase)`
   padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.xl};
 
   &:hover:not(:disabled) {
-    background-color: #5b6de0;
+    background-color: ${({ theme }) => theme.colors.primaryHover};
   }
 `;
 
