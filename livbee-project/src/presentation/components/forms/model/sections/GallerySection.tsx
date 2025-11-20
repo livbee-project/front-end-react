@@ -31,6 +31,10 @@ const GalleryImage = styled.img`
   object-fit: cover;
 `;
 
+const UploadWrapper = styled.div`
+  margin-bottom: ${({ theme }) => theme.spacing.sm};
+`;
+
 const RemoveButton = styled.button`
   position: absolute;
   top: -8px;
@@ -48,7 +52,9 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images, onSelect
   return (
     <FormSection title="갤러리">
       {images.length < MAX_GALLERY_IMAGES && (
-        <ImageUpload size={120} onImageSelect={onSelectImage} style={{ marginBottom: '12px' }} />
+        <UploadWrapper>
+          <ImageUpload size={120} onImageSelect={onSelectImage} />
+        </UploadWrapper>
       )}
       {images.length > 0 && (
         <GalleryGrid>
