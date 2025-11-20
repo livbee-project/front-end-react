@@ -174,9 +174,9 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         <ProfileInfo>
           <Name>{name}</Name>
           <BadgeContainer>
-            <TypeBadge as="span">[{type === 'showhost' ? '쇼호스트' : '모델'}]</TypeBadge>
+            <TypeBadge as="span">{type === 'showhost' ? '쇼호스트' : '모델'}</TypeBadge>
             {categories.map((category, index) => (
-              <CategoryBadge key={index} as="span">[{category}]</CategoryBadge>
+              <CategoryBadge key={index} as="span">{category}</CategoryBadge>
             ))}
           </BadgeContainer>
           {description && <Description>{description}</Description>}
@@ -190,7 +190,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       {tags.length > 0 && (
         <TagsContainer>
           {tags.map((tag, index) => (
-            <Tag key={index}>[{tag}]</Tag>
+            <Tag key={index}>{tag}</Tag>
           ))}
         </TagsContainer>
       )}
