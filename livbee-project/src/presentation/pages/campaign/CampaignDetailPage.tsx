@@ -10,7 +10,6 @@ import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { ErrorState } from '@/presentation/components/states/ErrorState';
-import { theme } from '@/presentation/styles/theme';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { CampaignDetail } from '@/domain/entities/Campaign';
 import { htmlToText } from '@/shared/utils/htmlUtils';
@@ -22,6 +21,10 @@ import '@/presentation/styles/global.css';
 
 const ContentWrapper = styled(P)`
   line-height: 1.6;
+`;
+
+const FooterActions = styled.div`
+  padding: ${({ theme }) => theme.spacing.lg};
 `;
 
 /**
@@ -209,7 +212,7 @@ const CampaignDetailPage: React.FC = () => {
       )}
 
       {/* 8. 하단 액션 버튼 */}
-      <div style={{ padding: theme.spacing.lg }}>
+      <FooterActions>
         <Button
           variant="primary"
           size="large"
@@ -219,7 +222,7 @@ const CampaignDetailPage: React.FC = () => {
         >
           {campaign.isApplied ? '이미 지원한 공고입니다' : '지원하기'}
         </Button>
-      </div>
+      </FooterActions>
     </DetailPageLayout>
   );
 };

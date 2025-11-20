@@ -1,6 +1,8 @@
 import React from 'react';
+import styled from 'styled-components';
 import Tag from '@/presentation/components/ui/Tag';
 import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
+import { H1, PMuted } from '@/presentation/components/styled/Typography';
 
 interface DetailHeaderProps {
   imageUrl?: string;
@@ -11,6 +13,64 @@ interface DetailHeaderProps {
   onImageClick?: () => void;
 }
 
+const HeaderWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.lg};
+`;
+
+const ImageContainer = styled.div<{ $clickable: boolean }>`
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: ${({ theme }) => theme.colors.secondary};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
+`;
+
+const HeaderImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+const InfoContainer = styled.div`
+  padding: ${({ theme }) => theme.spacing.lg};
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.sm};
+  background: ${({ theme }) => theme.colors.card};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+`;
+
+const BrandRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const BrandName = styled(PMuted)`
+  flex: 1;
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
+const TitleText = styled(H1)`
+  margin: 0;
+  line-height: 1.4;
+`;
+
+const SummaryText = styled(PMuted)`
+  margin: 0;
+  color: ${({ theme }) => theme.colors.foreground};
+  line-height: 1.6;
+`;
+
 const DetailHeader: React.FC<DetailHeaderProps> = ({
   imageUrl,
   brandName,
@@ -19,80 +79,21 @@ const DetailHeader: React.FC<DetailHeaderProps> = ({
   content,
   onImageClick,
 }) => {
-  const imageContainerStyle: React.CSSProperties = {
-    width: '100%',
-    aspectRatio: '16 / 9',
-    backgroundColor: '#F7F8FA',
-    border: '1px solid #ECEFF1',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    cursor: onImageClick ? 'pointer' : 'default',
-    overflow: 'hidden',
-    position: 'relative',
-  };
-
-  const imageStyle: React.CSSProperties = {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-  };
-
-  const infoContainerStyle: React.CSSProperties = {
-    padding: '16px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-  };
-
-  const brandTagContainerStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '8px',
-  };
-
-  const brandNameStyle: React.CSSProperties = {
-    fontSize: 'var(--p2)',
-    fontWeight: 400,
-    color: 'var(--dark-gray)',
-    flex: 1,
-  };
-
-  const titleStyle: React.CSSProperties = {
-    fontSize: 'var(--h1)',
-    fontWeight: 700,
-    color: 'var(--black)',
-    lineHeight: 1.4,
-  };
-
-  const contentStyle: React.CSSProperties = {
-    fontSize: 'var(--p2)',
-    fontWeight: 400,
-    color: 'var(--dark-gray)',
-    lineHeight: 1.5,
-  };
-
   return (
-    <div>
-      <div style={imageContainerStyle} onClick={onImageClick}>
-        {imageUrl ? (
-          <img src={imageUrl} alt={title} style={imageStyle} />
-        ) : (
-          <PlaceholderImage size={64} />
-        )}
-      </div>
+    <HeaderWrapper>
+      <ImageContainer onClick={onImageClick} $clickable={Boolean(onImageClick)}>
+        {imageUrl ? <HeaderImage src={imageUrl} alt={title} /> : <PlaceholderImage size={64} />}
+      </ImageContainer>
 
-      <div style={infoContainerStyle}>
-        <div style={brandTagContainerStyle}>
-          <span style={brandNameStyle}>{brandName}</span>
+      <InfoContainer>
+        <BrandRow>
+          <BrandName>{brandName}</BrandName>
           {deadlineDay && <Tag label={`마감 ${deadlineDay}`} variant="rounded" />}
-        </div>
-        <h1 style={titleStyle}>{title}</h1>
-        <p style={contentStyle}>{content}</p>
-      </div>
-    </div>
+        </BrandRow>
+        <TitleText>{title}</TitleText>
+        <SummaryText>{content}</SummaryText>
+      </InfoContainer>
+    </HeaderWrapper>
   );
 };
 

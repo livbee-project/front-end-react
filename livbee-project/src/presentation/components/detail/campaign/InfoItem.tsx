@@ -1,4 +1,6 @@
 import React from 'react';
+import styled from 'styled-components';
+import { PMuted } from '@/presentation/components/styled/Typography';
 
 interface InfoItemProps {
   title: string;
@@ -6,33 +8,32 @@ interface InfoItemProps {
   children?: React.ReactNode;
 }
 
-const containerStyle: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 6,
-  padding: '12px 0',
-  borderBottom: '1px solid #F1F3F5',
-};
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.xs};
+  padding: ${({ theme }) => `${theme.spacing.md} 0`};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+`;
 
-const titleStyle: React.CSSProperties = {
-  fontSize: 'var(--p2)',
-  color: 'var(--dark-gray)',
-  fontWeight: 500,
-};
+const TitleText = styled(PMuted)`
+  color: ${({ theme }) => theme.colors.muted};
+  font-weight: 500;
+`;
 
-const contentStyle: React.CSSProperties = {
-  fontSize: 'var(--p2)',
-  color: 'var(--black)',
-  fontWeight: 600,
-  lineHeight: 1.5,
-};
+const ContentText = styled(PMuted)`
+  color: ${({ theme }) => theme.colors.foreground};
+  font-weight: 600;
+  line-height: 1.5;
+`;
 
 const InfoItem: React.FC<InfoItemProps> = ({ title, content, children }) => {
+  const displayContent = content ?? '-';
   return (
-    <div style={containerStyle}>
-      <span style={titleStyle}>{title}</span>
-      {children ?? <span style={contentStyle}>{content || '-'}</span>}
-    </div>
+    <Container>
+      <TitleText>{title}</TitleText>
+      {children ?? <ContentText>{displayContent}</ContentText>}
+    </Container>
   );
 };
 

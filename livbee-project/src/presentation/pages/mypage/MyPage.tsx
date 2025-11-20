@@ -301,7 +301,7 @@ const MyPage: React.FC = () => {
 
 const PageWrapper = styled.div`
   min-height: 100vh;
-  background: rgba(245, 246, 255, 0.33);
+  background: ${({ theme }) => theme.primaryOpacity['25']};
   padding: 2rem 1rem;
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     padding: 2.5rem 1.5rem;
@@ -430,7 +430,7 @@ const MenuItem = styled.button<{ $isLast: boolean }>`
   cursor: pointer;
   transition: background-color 0.2s;
   &:hover {
-    background: rgba(245, 246, 255, 0.5);
+    background: ${({ theme }) => theme.primaryOpacity['10']};
   }
 `;
 

@@ -33,7 +33,7 @@ export const RegisterForm = styled.form`
 
 export const FormSection = styled.section`
   padding: 30px 0;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
 
   &:last-of-type {
     border-bottom: none;
@@ -145,7 +145,7 @@ export const SmallText = styled(Small)`
 export const ButtonGroup = styled.div`
   padding-top: 30px;
   margin-top: 40px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
 export const SubmitButton = styled.button`

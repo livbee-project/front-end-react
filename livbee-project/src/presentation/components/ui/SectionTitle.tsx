@@ -1,12 +1,6 @@
 import React from 'react';
+import styled, { css } from 'styled-components';
 
-/**
- * SectionTitle 컴포넌트가 받을 props 타입을 정의합니다.
- * @param children - 제목 텍스트
- * @param variant - 제목 스타일 변형 ('default' | 'subtitle' | 'detail')
- * @param showBullet - "■" 기호 표시 여부 (기본값: false)
- * @param marginBottom - 하단 마진 (기본값: '16px')
- */
 interface SectionTitleProps {
   children: React.ReactNode;
   variant?: 'default' | 'subtitle' | 'detail';
@@ -14,62 +8,46 @@ interface SectionTitleProps {
   marginBottom?: string;
 }
 
-/**
- * 공통 섹션 제목 컴포넌트입니다.
- * 다양한 스타일 변형을 지원합니다.
- */
+const variantStyles = {
+  default: css`
+    font: ${({ theme }) => theme.fonts.h2};
+    color: ${({ theme }) => theme.colors.foreground};
+    font-weight: 700;
+  `,
+  subtitle: css`
+    font: ${({ theme }) => theme.fonts.body};
+    color: ${({ theme }) => theme.colors.muted};
+    font-weight: 500;
+  `,
+  detail: css`
+    font: ${({ theme }) => theme.fonts.h2};
+    color: ${({ theme }) => theme.colors.foreground};
+    font-weight: 700;
+  `,
+} as const;
+
+const Title = styled.h2<{ $variant: NonNullable<SectionTitleProps['variant']>; $marginBottom: string }>`
+  margin: 0;
+  margin-bottom: ${({ $marginBottom }) => $marginBottom};
+  ${({ $variant }) => variantStyles[$variant]}
+`;
+
+const Bullet = styled.span`
+  margin-right: ${({ theme }) => theme.spacing.xs};
+  color: ${({ theme }) => theme.colors.primary};
+`;
+
 const SectionTitle: React.FC<SectionTitleProps> = ({
   children,
   variant = 'default',
   showBullet = false,
   marginBottom = '16px',
 }) => {
-  /**
-   * variant에 따른 스타일
-   */
-  const getVariantStyle = (): React.CSSProperties => {
-    switch (variant) {
-      case 'default':
-        return {
-          fontSize: 'var(--h2)', // 18px
-          fontWeight: 700,
-          color: 'var(--black)',
-        };
-      case 'subtitle':
-        return {
-          fontSize: 'var(--h3)', // 16px
-          fontWeight: 500,
-          color: 'var(--dark-gray)',
-        };
-      case 'detail':
-        return {
-          fontSize: 'var(--h2)', // 18px
-          fontWeight: 700,
-          color: 'var(--black)',
-        };
-      default:
-        return {
-          fontSize: 'var(--h2)',
-          fontWeight: 700,
-          color: 'var(--black)',
-        };
-    }
-  };
-
-  /**
-   * 제목 스타일
-   */
-  const titleStyle: React.CSSProperties = {
-    ...getVariantStyle(),
-    marginBottom,
-    marginTop: 0,
-  };
-
   return (
-    <h2 style={titleStyle}>
-      {showBullet && '■ '}
+    <Title $variant={variant} $marginBottom={marginBottom}>
+      {showBullet && <Bullet>■</Bullet>}
       {children}
-    </h2>
+    </Title>
   );
 };
 
