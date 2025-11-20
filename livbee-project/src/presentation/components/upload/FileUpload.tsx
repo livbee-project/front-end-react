@@ -2,13 +2,13 @@ import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { RiFileLine } from 'react-icons/ri';
 import { H3, Caption } from '@/presentation/components/styled/Typography';
+import type { FileUploadProps as BaseFileUploadProps } from '@/types/components';
 
 /**
  * FileUpload가 받을 props 타입을 정의합니다.
  */
-interface FileUploadProps {
+interface FileUploadProps extends BaseFileUploadProps {
   label: string;
-  onFileSelect?: (file: File) => void;
 }
 
 /**

@@ -3,13 +3,9 @@ import styled from 'styled-components';
 import Tag from '@/presentation/components/ui/Tag';
 import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
 import { H1, PMuted } from '@/presentation/components/styled/Typography';
+import type { DetailHeaderProps as BaseDetailHeaderProps } from '@/types/components';
 
-interface DetailHeaderProps {
-  imageUrl?: string;
-  brandName: string;
-  deadlineDay?: string;
-  title: string;
-  content: string;
+interface DetailHeaderProps extends BaseDetailHeaderProps {
   onImageClick?: () => void;
 }
 

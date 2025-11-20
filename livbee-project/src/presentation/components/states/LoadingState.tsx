@@ -1,16 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import { P } from '@/presentation/components/styled/Typography';
-
-interface LoadingStateProps {
-  message?: string;
-  padding?: string;
-}
+import type { StateComponentProps } from '@/types/components';
 
 /**
  * 로딩 상태를 표시하는 컴포넌트
  */
-export const LoadingState: React.FC<LoadingStateProps> = ({
+export const LoadingState: React.FC<StateComponentProps> = ({
   message = '로딩 중...',
   padding = '20px',
 }) => {

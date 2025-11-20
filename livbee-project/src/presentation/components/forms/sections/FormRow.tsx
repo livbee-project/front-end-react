@@ -1,19 +1,17 @@
 import React from 'react';
-
-interface FormRowProps {
-  children: React.ReactNode;
-}
+import styled from 'styled-components';
+import type { FormRowProps } from '@/types/forms';
 
 const FormRow: React.FC<FormRowProps> = ({ children }) => {
-  const rowStyle: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    marginBottom: '12px',
-  };
-
-  return <div style={rowStyle}>{children}</div>;
+  return <RowContainer>{children}</RowContainer>;
 };
+
+const RowContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.md};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
+`;
 
 export default FormRow;
 

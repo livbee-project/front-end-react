@@ -2,13 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { P } from '@/presentation/components/styled/Typography';
 import { PrimaryButton } from '@/presentation/components/styled/CommonStyles';
-
-interface ErrorStateProps {
-  message: string;
-  padding?: string;
-  onRetry?: () => void;
-  retryLabel?: string;
-}
+import type { ErrorStateProps } from '@/types/components';
 
 /**
  * 에러 상태를 표시하는 컴포넌트

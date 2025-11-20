@@ -1,15 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { PMuted } from '@/presentation/components/styled/Typography';
-
-interface FormFieldProps {
-  label?: React.ReactNode;
-  required?: boolean;
-  description?: React.ReactNode;
-  helper?: React.ReactNode;
-  action?: React.ReactNode;
-  children: React.ReactNode;
-}
+import type { FormFieldProps } from '@/types/forms';
 
 export const FormField: React.FC<FormFieldProps> = ({
   label,

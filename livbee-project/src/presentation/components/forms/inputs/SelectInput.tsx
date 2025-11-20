@@ -1,12 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { ChevronDown } from 'lucide-react';
-
-interface SelectInputProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  options: { value: string; label: string }[];
-  value: string;
-  onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-}
+import type { SelectInputProps } from '@/types/components';
 
 const SelectWrapper = styled.div`
   position: relative;

@@ -2,11 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Clock } from 'lucide-react';
 import { Input } from '@/presentation/components/styled/CommonStyles';
-
-interface TimeInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> {
-  value: string;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}
+import type { TimeInputProps } from '@/types/forms';
 
 const InputWrapper = styled.div`
   position: relative;

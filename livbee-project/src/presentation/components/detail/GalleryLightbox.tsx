@@ -1,13 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import type { GalleryLightboxProps as BaseGalleryLightboxProps } from '@/types/components';
 
-interface GalleryLightboxProps {
-  image?: string;
-  isOpen: boolean;
-  onClose: () => void;
-  onPrev?: () => void;
-  onNext?: () => void;
+interface GalleryLightboxProps extends BaseGalleryLightboxProps {
   showControls?: boolean;
 }
 

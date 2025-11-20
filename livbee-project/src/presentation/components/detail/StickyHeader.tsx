@@ -3,16 +3,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Share2 } from 'lucide-react';
 import { H1 } from '@/presentation/components/styled/Typography';
-
-/**
- * StickyHeader 컴포넌트가 받을 props 타입을 정의합니다.
- * @param title - 헤더에 표시될 제목
- * @param onShare - 공유 버튼 클릭 시 실행될 함수 (선택)
- */
-interface StickyHeaderProps {
-  title: string;
-  onShare?: () => void;
-}
+import type { StickyHeaderProps } from '@/types/components';
 
 const HeaderContainer = styled.header`
   position: sticky;

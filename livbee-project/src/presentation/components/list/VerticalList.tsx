@@ -1,21 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-
-/**
- * VerticalList가 받을 props 타입을 정의합니다.
- * @param children - ListItem 컴포넌트들의 목록
- * @param showDividers - (추가) 구분선 표시 여부 (기본값: true)
- */
-interface VerticalListProps {
-  children: React.ReactNode;
-  showDividers?: boolean;
-}
+import type { ListContainerProps } from '@/types/components';
 
 /**
  * 자식 컴포넌트들 '사이'에 구분선을 렌더링하는 세로 리스트 컨테이너입니다.
  * (구. DividedList)
  */
-const VerticalList: React.FC<VerticalListProps> = ({
+const VerticalList: React.FC<ListContainerProps> = ({
   children,
   showDividers = true, // (수정) 기본값을 true로 설정
 }) => {

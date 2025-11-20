@@ -1,11 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Input, Label, LabelDescription } from '@/presentation/components/styled/CommonStyles';
-
-interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
-  description?: string;
-}
+import type { TextInputProps } from '@/types/forms';
 
 const InputContainer = styled.div`
   width: 100%;

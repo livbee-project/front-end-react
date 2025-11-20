@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { RiImageLine } from 'react-icons/ri';
+import type { ImageUploadProps } from '@/types/components';
 
 /**
  * 전역 타입 확장
@@ -12,16 +13,6 @@ declare global {
       [key: string]: (file: File) => void;
     };
   }
-}
-
-/**
- * ImageUpload가 받을 props 타입을 정의합니다.
- */
-interface ImageUploadProps {
-  size?: number;
-  aspectRatio?: string; // 예: '1:2', '1:1', '3:4'
-  onImageSelect?: (file: File) => void;
-  enableCrop?: boolean; // 크롭 기능 활성화 여부 (기본값: true)
 }
 
 /**

@@ -2,12 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import SectionTitle from '@/presentation/components/ui/SectionTitle';
 import { PMuted } from '@/presentation/components/styled/Typography';
-
-interface FormSectionProps {
-  title?: string;
-  description?: string;
-  children: React.ReactNode;
-}
+import type { FormSectionProps } from '@/types/forms';
 
 const FormSection: React.FC<FormSectionProps> = ({ title, description, children }) => {
   return (

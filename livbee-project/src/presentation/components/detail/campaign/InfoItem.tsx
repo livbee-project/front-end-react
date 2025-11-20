@@ -1,12 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { PMuted } from '@/presentation/components/styled/Typography';
-
-interface InfoItemProps {
-  title: string;
-  content?: string | number | null;
-  children?: React.ReactNode;
-}
+import type { InfoItemProps } from '@/types/components';
 
 const Container = styled.div`
   display: flex;

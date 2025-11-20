@@ -5,24 +5,16 @@ import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
 import { H1, PMuted, Caption } from '@/presentation/components/styled/Typography';
 import { Badge } from '@/presentation/components/styled/CommonStyles';
 
+import type { ProfileSectionProps as BaseProfileSectionProps } from '@/types/components';
+
 /**
  * ProfileSection 컴포넌트가 받을 props 타입을 정의합니다.
- * @param name - 프로필 이름
- * @param description - 한 줄 소개
- * @param detailedIntro - 여러 줄 설명 (HTML 가능)
- * @param profileImageUrl - 프로필 이미지 URL (선택)
- * @param type - 타입 ('showhost' | 'model')
  * @param categories - 카테고리 배열 (선택)
  * @param tags - 태그 배열 (예: ['키 168cm', '사이즈 55', '경력 5년'])
  * @param websiteUrl - 웹사이트 URL (선택)
  * @param onImageClick - 프로필 이미지 클릭 시 실행될 함수 (선택)
  */
-interface ProfileSectionProps {
-  name: string;
-  description?: string | null;
-  detailedIntro?: string | null;
-  profileImageUrl?: string;
-  type: 'showhost' | 'model';
+interface ProfileSectionProps extends BaseProfileSectionProps {
   categories?: string[];
   tags?: string[];
   websiteUrl?: string | null;

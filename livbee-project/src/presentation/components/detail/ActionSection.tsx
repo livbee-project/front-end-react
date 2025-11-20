@@ -3,20 +3,7 @@ import styled from 'styled-components';
 import { Heart } from 'lucide-react';
 import { ButtonBase } from '@/presentation/components/styled/CommonStyles';
 import { Caption } from '@/presentation/components/styled/Typography';
-
-/**
- * ActionSection 컴포넌트가 받을 props 타입을 정의합니다.
- * @param isScraped - 찜하기 상태 (초기값)
- * @param isReceivingOffers - 제안 받기 가능 여부
- * @param onScrap - 찜하기 버튼 클릭 시 실행될 함수 (선택)
- * @param onOffer - 제안하기 버튼 클릭 시 실행될 함수 (선택)
- */
-interface ActionSectionProps {
-  isScraped?: boolean;
-  isReceivingOffers?: boolean;
-  onScrap?: () => void;
-  onOffer?: () => void;
-}
+import type { ActionSectionProps } from '@/types/components';
 
 const Section = styled.section`
   max-width: 672px;
