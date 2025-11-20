@@ -1,13 +1,9 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { Upload, Video, FileText, X } from 'lucide-react';
-import {
-  FormSection,
-  SectionTitle,
-  SectionDescription,
-  HiddenInput,
-  SmallText,
-} from '../PortfolioRegisterStyles';
+import FormSection from '@/presentation/components/forms/sections/FormSection';
+import FormField from '@/presentation/components/forms/common/FormField';
+import { HiddenInput, SmallText } from '../PortfolioRegisterStyles';
 import { Small } from '@/presentation/components/styled/Typography';
 
 interface PortfolioFilesSectionProps {
@@ -160,25 +156,25 @@ export const PortfolioFilesSection: React.FC<PortfolioFilesSectionProps> = ({
   const hasFiles = resumeFileInfo || portfolioFileInfo;
 
   return (
-    <FormSection>
-      <SectionTitle>포트폴리오</SectionTitle>
-      <SectionDescription>PDF, 영상 등 관련 자료를 업로드해주세요.</SectionDescription>
-      <HiddenInput
-        ref={fileInputRef}
-        type="file"
-        accept=".pdf,.ppt,.pptx,.mp4,.mov,.avi,.mkv"
-        onChange={handleFileChange}
-      />
-      <PortfolioList>
-        {!hasFiles && (
-          <EmptyStateButton type="button" onClick={() => fileInputRef.current?.click()}>
-            <Upload size={24} />
-            <Small>추가된 파일이 없습니다</Small>
-          </EmptyStateButton>
-        )}
-        {renderFileItem('resume', resumeFileInfo)}
-        {renderFileItem('portfolio', portfolioFileInfo)}
-      </PortfolioList>
+    <FormSection title="포트폴리오" description="PDF, 영상 등 관련 자료를 업로드해주세요.">
+      <FormField helper="파일은 1개씩 업로드되며, 새 파일 업로드 시 교체됩니다.">
+        <HiddenInput
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,.ppt,.pptx,.mp4,.mov,.avi,.mkv"
+          onChange={handleFileChange}
+        />
+        <PortfolioList>
+          {!hasFiles && (
+            <EmptyStateButton type="button" onClick={() => fileInputRef.current?.click()}>
+              <Upload size={24} />
+              <Small>추가된 파일이 없습니다</Small>
+            </EmptyStateButton>
+          )}
+          {renderFileItem('resume', resumeFileInfo)}
+          {renderFileItem('portfolio', portfolioFileInfo)}
+        </PortfolioList>
+      </FormField>
     </FormSection>
   );
 };

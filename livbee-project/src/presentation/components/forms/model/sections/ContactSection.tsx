@@ -1,8 +1,8 @@
 import React from 'react';
 import FormSection from '@/presentation/components/forms/sections/FormSection';
-import FormRow from '@/presentation/components/forms/sections/FormRow';
 import TextInput from '@/presentation/components/forms/inputs/TextInput';
 import ToggleSwitch from '@/presentation/components/ui/ToggleSwitch';
+import FormField from '@/presentation/components/forms/common/FormField';
 
 interface ContactSectionProps {
   contact: string;
@@ -28,20 +28,32 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   return (
     <>
       <FormSection title="연락처">
-        <FormRow>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <TextInput placeholder="내용을 입력해주세요" value={contact} onChange={(e) => onContactChange(e.target.value)} disabled={!contactEnabled} />
-          </div>
-          <ToggleSwitch checked={contactEnabled} onChange={onContactToggle} />
-        </FormRow>
+        <FormField
+          label="연락처"
+          helper="연락 가능한 번호를 입력해주세요."
+          action={<ToggleSwitch checked={contactEnabled} onChange={onContactToggle} />}
+        >
+          <TextInput
+            placeholder="010-0000-0000"
+            value={contact}
+            onChange={(e) => onContactChange(e.target.value)}
+            disabled={!contactEnabled}
+          />
+        </FormField>
       </FormSection>
       <FormSection title="오픈채팅방">
-        <FormRow>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <TextInput placeholder="내용을 입력해주세요" value={openChat} onChange={(e) => onOpenChatChange(e.target.value)} disabled={!openChatEnabled} />
-          </div>
-          <ToggleSwitch checked={openChatEnabled} onChange={onOpenChatToggle} />
-        </FormRow>
+        <FormField
+          label="채팅 링크"
+          helper="카카오톡 오픈채팅 등 링크를 입력해주세요."
+          action={<ToggleSwitch checked={openChatEnabled} onChange={onOpenChatToggle} />}
+        >
+          <TextInput
+            placeholder="https://open.kakao.com/..."
+            value={openChat}
+            onChange={(e) => onOpenChatChange(e.target.value)}
+            disabled={!openChatEnabled}
+          />
+        </FormField>
       </FormSection>
     </>
   );

@@ -1,13 +1,8 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { Plus, X } from 'lucide-react';
-import {
-  FormSection,
-  SectionTitle,
-  SectionDescription,
-  HiddenInput,
-  SmallText,
-} from '../PortfolioRegisterStyles';
+import FormSection from '@/presentation/components/forms/sections/FormSection';
+import { HiddenInput, SmallText } from '../PortfolioRegisterStyles';
 import { Small } from '@/presentation/components/styled/Typography';
 
 interface GallerySectionProps {
@@ -119,9 +114,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images, onSelect
   };
 
   return (
-    <FormSection>
-      <SectionTitle>갤러리</SectionTitle>
-      <SectionDescription>최대 9장의 활동 이미지를 등록할 수 있습니다.</SectionDescription>
+    <FormSection title="갤러리" description="최대 9장의 활동 이미지를 등록할 수 있습니다.">
       <GalleryGrid>
         {images.map((url, index) => (
           <GalleryItem key={url}>
@@ -141,10 +134,12 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images, onSelect
           </AddImageButton>
         )}
       </GalleryGrid>
-      <SmallText as="p" style={{ marginTop: 12 }}>
-        * 이미지를 삭제하려면 각 썸네일을 눌러주세요.
-      </SmallText>
+      <HelperText as="p">* 이미지를 삭제하려면 각 썸네일을 눌러주세요.</HelperText>
     </FormSection>
   );
 };
+
+const HelperText = styled(SmallText)`
+  margin-top: ${({ theme }) => theme.spacing.sm};
+`;
 

@@ -1,12 +1,12 @@
 import React from 'react';
+import styled from 'styled-components';
 import VerticalList from '@/presentation/components/list/VerticalList';
 import ListItem from '@/presentation/components/list/ListItem';
 import FormSection from '@/presentation/components/forms/sections/FormSection';
-import FormRow from '@/presentation/components/forms/sections/FormRow';
 import TextInput from '@/presentation/components/forms/inputs/TextInput';
 import ToggleSwitch from '@/presentation/components/ui/ToggleSwitch';
-import { Caption } from '@/presentation/components/styled/Typography';
 import type { ModelTagEntry } from '../types';
+import FormField from '@/presentation/components/forms/common/FormField';
 
 interface TagsSectionProps {
   tags: ModelTagEntry[];
@@ -17,26 +17,30 @@ interface TagsSectionProps {
 
 export const TagsSection: React.FC<TagsSectionProps> = ({ tags, tagToggles, onTagChange, onToggleChange }) => {
   return (
-    <FormSection title="태그">
+    <FormSection title="태그" description="키, 사이즈 등 주요 정보를 태그로 등록하세요.">
       <VerticalList showDividers={false}>
         {tags.map((tag, index) => (
-          <ListItem key={tag.label} style={{ padding: 0, marginBottom: '12px' }}>
-            <FormRow>
-              <Caption style={{ width: 60 }}>{tag.label}</Caption>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <TextInput
-                  placeholder="내용을 입력해주세요"
-                  value={tag.value}
-                  onChange={(e) => onTagChange(index, e.target.value)}
-                  disabled={!tagToggles[index]}
-                />
-              </div>
-              <ToggleSwitch checked={tagToggles[index]} onChange={() => onToggleChange(index)} />
-            </FormRow>
-          </ListItem>
+          <StyledListItem key={tag.label}>
+            <FormField
+              label={tag.label}
+              action={<ToggleSwitch checked={tagToggles[index]} onChange={() => onToggleChange(index)} />}
+            >
+              <TextInput
+                placeholder="내용을 입력해주세요"
+                value={tag.value}
+                onChange={(e) => onTagChange(index, e.target.value)}
+                disabled={!tagToggles[index]}
+              />
+            </FormField>
+          </StyledListItem>
         ))}
       </VerticalList>
     </FormSection>
   );
 };
+
+const StyledListItem = styled(ListItem)`
+  padding: 0;
+  margin-bottom: ${({ theme }) => theme.spacing.md};
+`;
 

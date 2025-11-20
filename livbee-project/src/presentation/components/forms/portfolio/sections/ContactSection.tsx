@@ -1,15 +1,8 @@
 import React from 'react';
 import ToggleSwitch from '@/presentation/components/ui/ToggleSwitch';
-import {
-  FormSection,
-  SectionTitle,
-  SectionDescription,
-  InputGroup,
-  LabelText,
-  LabelNote,
-  FieldRow,
-  StyledInput,
-} from '../PortfolioRegisterStyles';
+import FormSection from '@/presentation/components/forms/sections/FormSection';
+import FormField from '@/presentation/components/forms/common/FormField';
+import { InputGroup, LabelNote, FieldRow, StyledInput } from '../PortfolioRegisterStyles';
 
 interface ContactSectionProps {
   contact: string;
@@ -29,15 +22,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   onToggleChange,
 }) => {
   return (
-    <FormSection>
-      <SectionTitle>연락처</SectionTitle>
-      <SectionDescription>브랜드와의 원활한 소통을 위해 정확히 입력해주세요.</SectionDescription>
+    <FormSection title="연락처" description="브랜드와의 원활한 소통을 위해 정확히 입력해주세요.">
       <InputGroup>
-        <label>
-          <LabelText>
-            연락처
-            <LabelNote>계약 완료 시 브랜드에 전달됩니다</LabelNote>
-          </LabelText>
+        <FormField
+          label="연락처"
+          helper={<LabelNote>계약 완료 시 브랜드에 전달됩니다.</LabelNote>}
+          action={<ToggleSwitch checked={contactEnabled} onChange={() => onToggleChange('contact')} />}
+        >
           <FieldRow>
             <StyledInput
               value={contact}
@@ -45,11 +36,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
               placeholder="010-1234-5678"
               disabled={!contactEnabled}
             />
-            <ToggleSwitch checked={contactEnabled} onChange={() => onToggleChange('contact')} />
           </FieldRow>
-        </label>
-        <label>
-          <LabelText>오픈채팅방</LabelText>
+        </FormField>
+
+        <FormField
+          label="오픈채팅방"
+          action={<ToggleSwitch checked={openChatEnabled} onChange={() => onToggleChange('openChat')} />}
+        >
           <FieldRow>
             <StyledInput
               value={openChat}
@@ -57,9 +50,8 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
               placeholder="https://open.kakao.com/..."
               disabled={!openChatEnabled}
             />
-            <ToggleSwitch checked={openChatEnabled} onChange={() => onToggleChange('openChat')} />
           </FieldRow>
-        </label>
+        </FormField>
       </InputGroup>
     </FormSection>
   );

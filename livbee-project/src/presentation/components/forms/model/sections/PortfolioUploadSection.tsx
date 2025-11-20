@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import styled from 'styled-components';
 import FormSection from '@/presentation/components/forms/sections/FormSection';
 import { Caption } from '@/presentation/components/styled/Typography';
+import FormField from '@/presentation/components/forms/common/FormField';
 
 interface PortfolioUploadSectionProps {
   fileInfo: string;
@@ -55,27 +56,38 @@ export const PortfolioUploadSection: React.FC<PortfolioUploadSectionProps> = ({
   };
 
   return (
-    <FormSection title="포트폴리오">
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".pdf,.ppt,.pptx,.mp4,.mov,.avi,.mkv"
-        style={{ display: 'none' }}
-        onChange={handleChange}
-      />
-      {!fileInfo ? (
-        <UploadButton type="button" onClick={() => fileInputRef.current?.click()}>
-          <Caption>추가된 파일이 없습니다</Caption>
-        </UploadButton>
-      ) : (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <SuccessText>✓ {fileInfo}</SuccessText>
-          <RemoveLink type="button" onClick={onFileRemove}>
-            삭제
-          </RemoveLink>
-        </div>
-      )}
+    <FormSection title="포트폴리오 파일">
+      <FormField helper="PDF, PPT, 동영상 파일을 첨부할 수 있습니다.">
+        <HiddenInput
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,.ppt,.pptx,.mp4,.mov,.avi,.mkv"
+          onChange={handleChange}
+        />
+        {!fileInfo ? (
+          <UploadButton type="button" onClick={() => fileInputRef.current?.click()}>
+            <Caption>추가된 파일이 없습니다</Caption>
+          </UploadButton>
+        ) : (
+          <InfoRow>
+            <SuccessText>✓ {fileInfo}</SuccessText>
+            <RemoveLink type="button" onClick={onFileRemove}>
+              삭제
+            </RemoveLink>
+          </InfoRow>
+        )}
+      </FormField>
     </FormSection>
   );
 };
+
+const HiddenInput = styled.input`
+  display: none;
+`;
+
+const InfoRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
 

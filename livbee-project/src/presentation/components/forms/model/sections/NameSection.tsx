@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import FormSection from '@/presentation/components/forms/sections/FormSection';
-import SectionTitle from '@/presentation/components/ui/SectionTitle';
 import TextInput from '@/presentation/components/forms/inputs/TextInput';
 import ImageUpload from '@/presentation/components/upload/ImageUpload';
+import FormField from '@/presentation/components/forms/common/FormField';
 
 interface NameSectionProps {
   name: string;
@@ -59,23 +59,24 @@ export const NameSection: React.FC<NameSectionProps> = ({
   onImageRemove,
 }) => {
   return (
-    <FormSection>
-      <SectionTitle variant="default" marginBottom="12px">
-        이름
-      </SectionTitle>
-      <NameRow>
+    <FormSection title="기본 정보" description="프로필 기본 정보를 입력해주세요.">
+      <FormField label="이름" required helper="실제 계약에 사용되는 이름입니다.">
         <TextInput placeholder="내용을 입력해주세요" value={name} onChange={(e) => onNameChange(e.target.value)} />
-        {mainThumbnailUrl ? (
-          <ImagePreviewWrapper>
-            <ImagePreview src={mainThumbnailUrl} alt="프로필" />
-            <RemoveButton type="button" onClick={onImageRemove} aria-label="프로필 이미지 삭제">
-              ×
-            </RemoveButton>
-          </ImagePreviewWrapper>
-        ) : (
-          <ImageUpload size={100} onImageSelect={onImageSelect} />
-        )}
-      </NameRow>
+      </FormField>
+      <FormField label="프로필 이미지" helper="정면에서 촬영한 사진을 업로드해주세요.">
+        <NameRow>
+          {mainThumbnailUrl ? (
+            <ImagePreviewWrapper>
+              <ImagePreview src={mainThumbnailUrl} alt="프로필" />
+              <RemoveButton type="button" onClick={onImageRemove} aria-label="프로필 이미지 삭제">
+                ×
+              </RemoveButton>
+            </ImagePreviewWrapper>
+          ) : (
+            <ImageUpload size={100} onImageSelect={onImageSelect} />
+          )}
+        </NameRow>
+      </FormField>
     </FormSection>
   );
 };

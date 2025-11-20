@@ -1,9 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import ToggleSwitch from '@/presentation/components/ui/ToggleSwitch';
-import { FormSection, SectionTitle, SectionDescription, StyledInput } from '../PortfolioRegisterStyles';
+import FormSection from '@/presentation/components/forms/sections/FormSection';
+import FormField from '@/presentation/components/forms/common/FormField';
+import { StyledInput } from '../PortfolioRegisterStyles';
 import { SNS_ENTRIES } from '../constants';
-import { H2 } from '@/presentation/components/styled/Typography';
 
 interface SnsSectionProps {
   websites: string[];
@@ -40,30 +41,23 @@ const SnsIconWrapper = styled.div`
   justify-content: center;
 `;
 
-const SnsInputWrapper = styled.div`
+const StyledFormField = styled(FormField)`
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.xs};
-`;
-
-const SnsLabel = styled(H2)`
-  font-weight: 500;
 `;
 
 export const SnsSection: React.FC<SnsSectionProps> = ({ websites, websiteToggles, onInputChange, onToggleChange }) => {
   return (
-    <FormSection>
-      <SectionTitle>SNS / 사이트</SectionTitle>
-      <SectionDescription>활동 채널을 등록하면 검색 노출이 향상돼요.</SectionDescription>
+    <FormSection title="SNS / 사이트" description="활동 채널을 등록하면 검색 노출이 향상돼요.">
       <SnsGroup>
         {SNS_ENTRIES.map((sns) => (
           <SnsItem key={sns.id}>
             <SnsIconWrapper>
               <sns.icon size={20} />
             </SnsIconWrapper>
-            <SnsInputWrapper>
-              <SnsLabel>{sns.label}</SnsLabel>
+            <StyledFormField
+              label={sns.label}
+              action={<ToggleSwitch checked={websiteToggles[sns.id]} onChange={() => onToggleChange(sns.id)} />}
+            >
               <StyledInput
                 as="input"
                 value={websites[sns.id]}
@@ -71,8 +65,7 @@ export const SnsSection: React.FC<SnsSectionProps> = ({ websites, websiteToggles
                 placeholder={sns.placeholder}
                 disabled={!websiteToggles[sns.id]}
               />
-            </SnsInputWrapper>
-            <ToggleSwitch checked={websiteToggles[sns.id]} onChange={() => onToggleChange(sns.id)} />
+            </StyledFormField>
           </SnsItem>
         ))}
       </SnsGroup>
