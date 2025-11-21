@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Outlet } from 'react-router-dom';
 import BottomNavBar from '@/presentation/components/navigation/BottomNavBar';
+import AppFooter from '@/presentation/components/footer/AppFooter';
 import { ToastProvider } from '@/presentation/contexts/ToastContext';
 
 const RootLayout: React.FC = () => {
@@ -11,6 +12,7 @@ const RootLayout: React.FC = () => {
         <MainContent className="hide-scrollbar">
           <Outlet />
         </MainContent>
+        <AppFooter />
         <Footer>
           <BottomNavBar />
         </Footer>
