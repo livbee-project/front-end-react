@@ -114,10 +114,10 @@ export class UserApiSource {
 
     // 에러 응답 처리
     if (!result.ok && !result.success) {
-      const error = result as ApiErrorResponse | { error?: string };
+      const error = result as any;
       
       // 토큰이 유효하지 않거나 만료된 경우
-      if (error.code === 'INVALID_TOKEN' || error.code === 'AUTH_REQUIRED' || (error as any).error === 'UNAUTHORIZED') {
+      if (error.code === 'INVALID_TOKEN' || error.code === 'AUTH_REQUIRED' || error.error === 'UNAUTHORIZED') {
         throw new Error('인증이 만료되었습니다. 다시 로그인해주세요.');
       }
 
