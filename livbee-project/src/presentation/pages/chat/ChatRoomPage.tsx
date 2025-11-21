@@ -17,7 +17,7 @@ const ChatRoomPage: React.FC = () => {
   const state = (location.state || {}) as ChatRoomState;
 
   const campaignTitle = state.campaignTitle ?? '코트니엘 겨울맞이 쇼핑라이브';
-  const portfolioTitle = state.portfolioTitle ?? '패션 쇼핑라이브 포트폴리오';
+  const portfolioTitle = state.portfolioTitle ?? '이수아';
   const message = state.message && state.message.trim().length > 0 ? state.message.trim() : 'dd';
   const availableDate = state.availableDate ? state.availableDate.replace(/-/g, '. ') : '2025. 11. 29';
   const availableTime = state.availableTime ?? '22:57';
@@ -157,16 +157,23 @@ const ChatColumn = styled.div`
 `;
 
 const FixedPanel = styled.div`
-  position: sticky;
-  top: 110px;
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 112px;
   z-index: 50;
-  background: #f4f5fb;
-  padding-bottom: 8px;
+  width: 100%;
+  max-width: 1200px;
+  background: #ffffff;
+  padding: 8px 16px;
+  box-sizing: border-box;
 `;
 
 const ScrollArea = styled.div`
-  margin-top: 8px;
+  padding-top: 60px;
   padding-bottom: 150px;
+  overflow-y: auto;
+  max-height: calc(100vh - 112px - 60px - 72px);
 `;
 
 const ContactHeader = styled.div`
@@ -285,7 +292,8 @@ const ApplicationCard = styled.div`
   border: 1px solid #eceff7;
   box-shadow: 0 8px 24px rgba(125, 130, 166, 0.15);
   padding: 18px;
-  width: 100%;
+  width: 60%;
+  max-width: 100%;
 `;
 
 const ApplicationHeader = styled.div`
@@ -415,19 +423,20 @@ const SendButton = styled.button`
 
 const ComposerBar = styled.div`
   position: fixed;
-  left: 0;
-  right: 0;
+  left: 50%;
+  transform: translateX(-50%);
   bottom: 56px;
   z-index: 60;
+  width: 100%;
+  max-width: 1200px;
   padding: 12px 16px;
-  background: #f4f5fb;
+  background: #ffffff;
   border-top: 1px solid #e1e4f2;
+  box-sizing: border-box;
 `;
 
 const ComposerInner = styled.div`
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
   display: flex;
   align-items: center;
   gap: 10px;
