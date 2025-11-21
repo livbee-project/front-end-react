@@ -1,4 +1,5 @@
 import type {
+  Model,
   ModelListResponse,
   ModelListQuery,
   ModelDetailResponse,
@@ -44,10 +45,16 @@ export class ModelApiSource {
       throw new Error(errorMessage || `API 요청 실패: ${response.status} ${response.statusText}`);
     }
 
-    // FastAPI 응답 형식: { ok: true, data: {...} } 또는 { success: true, data: {...} }
-    const data = extractData<ModelListResponse>(result);
+    // FastAPI 응답 형식: { ok: true, data: { items: [...], currentPage, totalPages, totalItems } }
+    const data = extractData<{ items: Model[]; currentPage: number; totalPages: number; totalItems: number }>(result);
     if (data) {
-      return data;
+      return {
+        ok: true,
+        items: data.items || [],
+        currentPage: data.currentPage || 1,
+        totalPages: data.totalPages || 1,
+        totalItems: data.totalItems || 0,
+      };
     }
 
     // 기존 응답 형식: { ok: true, items: [...], ... }

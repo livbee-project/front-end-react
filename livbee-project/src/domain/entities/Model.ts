@@ -14,6 +14,9 @@ export interface Model {
   detailedRegion: string | null;
   height: number | null;
   gender: string | null;
+  // 백엔드에서 아직 제공하지 않는 필드 (임시로 optional 처리)
+  concept?: string | null;
+  categories?: string[] | null;
 }
 
 /**

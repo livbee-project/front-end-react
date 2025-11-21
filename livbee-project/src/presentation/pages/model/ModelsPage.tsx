@@ -304,31 +304,40 @@ const ModelsPage: React.FC = () => {
   // 실제 데이터가 있으면 사용, 없으면 하드코딩 데이터 사용
   const modelsList = (models && Array.isArray(models) && models.length > 0) ? models : mockModels;
   
+  // API 응답 데이터를 UI 표시 형식으로 변환
+  // concept/categories 필드는 백엔드에서 아직 제공하지 않으므로 기본값 처리
   const displayModels = modelsList.map((model) => {
-    // 실제 모델 데이터를 하드코딩 형식에 맞게 변환
-    if ('height' in model && typeof model.height === 'number' && 'concept' in model && 'categories' in model) {
+    // API 응답 데이터인 경우 (concept/categories가 없을 수 있음)
+    if ('height' in model && typeof model.height === 'number') {
       return {
         ...model,
-        categories: Array.isArray(model.categories) ? model.categories : [],
+        concept: model.concept || null, // 백엔드에서 제공하지 않으면 null
+        categories: Array.isArray(model.categories) ? model.categories : [], // 기본값: 빈 배열
       };
     }
-    // Model 타입인 경우 mock 데이터 형식으로 변환
-    const mockModel = mockModels.find((m) => m.id === model.id) || mockModels[0];
+    // Mock 데이터인 경우 (이미 concept/categories 포함)
     return {
       id: model.id,
-      nickname: model.nickname || mockModel.nickname,
-      oneLineIntro: model.oneLineIntro || mockModel.oneLineIntro,
-      mainThumbnailUrl: model.mainThumbnailUrl || mockModel.mainThumbnailUrl,
-      height: (model as any).height || mockModel.height,
-      concept: mockModel.concept,
-      categories: Array.isArray(mockModel.categories) ? mockModel.categories : [],
+      nickname: model.nickname || '',
+      oneLineIntro: model.oneLineIntro || '',
+      mainThumbnailUrl: model.mainThumbnailUrl || '',
+      height: (model as any).height || 0,
+      concept: (model as any).concept || null,
+      categories: Array.isArray((model as any).categories) ? (model as any).categories : [],
     };
   });
 
   // 필터링
+  // concept 필드가 없는 경우 필터링에서 제외 (모든 모델 표시)
   const filteredModels = (displayModels || []).filter((model) => {
-    if (selectedFilter !== '전체' && model.concept !== selectedFilter) {
-      return false;
+    if (selectedFilter !== '전체') {
+      // concept가 없으면 필터링에서 제외 (모든 필터에 표시)
+      if (!model.concept) {
+        return true;
+      }
+      if (model.concept !== selectedFilter) {
+        return false;
+      }
     }
     if (searchQuery && model.nickname && model.oneLineIntro) {
       const query = searchQuery.toLowerCase();
