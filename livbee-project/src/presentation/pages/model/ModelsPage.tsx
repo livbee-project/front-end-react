@@ -422,7 +422,7 @@ const ModelsPage: React.FC = () => {
                 <ModelName>{model.nickname || '이름 없음'}</ModelName>
                 <ModelHeight>{model.height || 0}cm</ModelHeight>
                 <CategoryTags>
-                  {(model.categories || []).map((category, index) => (
+                  {(model.categories || []).map((category: string, index: number) => (
                     <CategoryTag key={index}>{category}</CategoryTag>
                   ))}
                 </CategoryTags>
