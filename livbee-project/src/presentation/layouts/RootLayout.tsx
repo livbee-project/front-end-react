@@ -11,8 +11,8 @@ const RootLayout: React.FC = () => {
       <RootContainer>
         <MainContent className="hide-scrollbar">
           <Outlet />
+          <AppFooter />
         </MainContent>
-        <AppFooter />
         <Footer>
           <BottomNavBar />
         </Footer>
