@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import styled from 'styled-components';
 import ClipCard from '@/presentation/components/cards/ClipCard';
 import Pagination from '@/presentation/components/list/Pagination';
-import { SPACING, GAP } from '@/presentation/styles/constants';
+import { devLog } from '@/shared/utils/logger';
 
 /**
  * 숏클립 페이지 컴포넌트입니다.
@@ -48,7 +49,7 @@ const ClipsPage: React.FC = () => {
    * 클립 카드 클릭 핸들러
    */
   const handleClipClick = (clipId: number) => {
-    console.log(`클립 ${clipId} 클릭`);
+    devLog(`클립 ${clipId} 클릭`);
     // TODO: 클립 상세 페이지로 이동
     // navigate(`/clips/${clipId}`);
   };
@@ -58,33 +59,14 @@ const ClipsPage: React.FC = () => {
    */
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    console.log(`페이지 ${page}로 변경`);
+    devLog(`페이지 ${page}로 변경`);
     // TODO: 페이지 변경 시 데이터 로드
   };
 
-  /**
-   * 그리드 컨테이너 스타일
-   */
-  const gridStyle: React.CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: GAP.XXL,
-    padding: SPACING.LG,
-  };
-
-  /**
-   * 페이지네이션 컨테이너 스타일
-   */
-  const paginationContainerStyle: React.CSSProperties = {
-    display: 'flex',
-    justifyContent: 'center',
-    padding: `${SPACING.XXL} 0`,
-  };
-
   return (
-    <div>
+    <Container>
       {/* 클립 그리드 */}
-      <div style={gridStyle}>
+      <GridContainer>
         {clips.map((clip) => (
           <ClipCard
             key={clip.id}
@@ -95,19 +77,36 @@ const ClipsPage: React.FC = () => {
             onClick={() => handleClipClick(clip.id)}
           />
         ))}
-      </div>
+      </GridContainer>
 
       {/* 페이지네이션 */}
-      <div style={paginationContainerStyle}>
+      <PaginationContainer>
         <Pagination
           currentPage={currentPage}
           totalPages={5}
           onPageChange={handlePageChange}
         />
-      </div>
-    </div>
+      </PaginationContainer>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  width: 100%;
+`;
+
+const GridContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => theme.spacing.lg};
+`;
+
+const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: ${({ theme }) => theme.spacing.xl} 0;
+`;
 
 export default ClipsPage;
 

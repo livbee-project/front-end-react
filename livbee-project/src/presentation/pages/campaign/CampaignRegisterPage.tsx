@@ -1,205 +1,123 @@
-import React, { useState } from 'react';
-import TextInput from '@/presentation/components/forms/TextInput';
-import SelectInput from '@/presentation/components/forms/SelectInput';
-import DateInput from '@/presentation/components/forms/DateInput';
-import TimeInput from '@/presentation/components/forms/TimeInput';
+import React from 'react';
+import styled from 'styled-components';
+import TextInput from '@/presentation/components/forms/inputs/TextInput';
+import SelectInput from '@/presentation/components/forms/inputs/SelectInput';
+import DateInput from '@/presentation/components/forms/inputs/DateInput';
+import TimeInput from '@/presentation/components/forms/inputs/TimeInput';
 import ImageUpload from '@/presentation/components/upload/ImageUpload';
 import Button from '@/presentation/components/ui/Button';
 import RegisterPageLayout from '@/presentation/layouts/RegisterPageLayout';
-import FormSection from '@/presentation/components/forms/FormSection';
+import FormSection from '@/presentation/components/forms/sections/FormSection';
+import { Caption } from '@/presentation/components/styled/Typography';
+import { useCampaignRegisterForm } from '@/presentation/components/forms/campaign/useCampaignRegisterForm';
 
-/**
- * 모집공고 등록 페이지
- */
+const UploadMessage = styled(Caption)`
+  margin-top: ${({ theme }) => theme.spacing.sm};
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
+const recruitmentTypeOptions = [
+  { value: 'store', label: '스토어 모집' },
+  { value: 'model', label: '모델 모집' },
+  { value: 'showhost', label: '쇼호스트 모집' },
+  { value: 'staff', label: '스태프 모집' },
+];
+
+const categoryOptions = [
+  { value: 'food', label: '식품' },
+  { value: 'fashion', label: '패션' },
+  { value: 'beauty', label: '뷰티' },
+  { value: 'electronics', label: '전자제품' },
+  { value: 'lifestyle', label: '생활/리빙' },
+];
+
 const CampaignRegisterPage: React.FC = () => {
-  // 폼 상태 관리
-  const [formData, setFormData] = useState({
-    brandName: '',
-    title: '',
-    content: '',
-    detailedContent: '',
-    recruitmentType: 'store',
-    category: 'food',
-    location: '',
-    filmingDate: '',
-    deadline: '',
-    startTime: '',
-    endTime: '',
-    productName: '',
-  });
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData({ ...formData, [field]: value });
-  };
-
-  const handleSubmit = () => {
-    console.log('모집공고 등록:', formData);
-    // TODO: 실제 등록 로직 구현
-  };
-
-  const recruitmentTypeOptions = [
-    { value: 'store', label: '스토스트 모집' },
-    { value: 'model', label: '모델 모집' },
-    { value: 'showhost', label: '쇼호스트 모집' },
-  ];
-
-  const categoryOptions = [
-    { value: 'food', label: '식품' },
-    { value: 'fashion', label: '패션' },
-    { value: 'beauty', label: '뷰티' },
-    { value: 'electronics', label: '전자제품' },
-  ];
+  const {
+    formData,
+    coverImageUrl,
+    productImageUrl,
+    liveCoverImageUrl,
+    isSubmitting,
+    isImageUploading,
+    handleInputChange,
+    handleImageSelect,
+    handleSubmit,
+  } = useCampaignRegisterForm();
 
   return (
     <RegisterPageLayout>
-      {/* 대표이미지 1:2 */}
       <FormSection title="대표이미지 1:2*">
-        <ImageUpload size={200} aspectRatio="1:2" />
+        <ImageUpload size={200} aspectRatio="1:2" onImageSelect={(file) => handleImageSelect(file, 'cover')} />
+        {coverImageUrl && <UploadMessage>이미지 업로드 완료</UploadMessage>}
       </FormSection>
 
-      {/* 브랜드명 */}
-      <FormSection>
-        <TextInput
-          label="브랜드명*"
-          placeholder="내용을 입력해주세요"
-          value={formData.brandName}
-          onChange={(e) => handleInputChange('brandName', e.target.value)}
-        />
+      <FormSection title="브랜드명*">
+        <TextInput placeholder="내용을 입력해주세요" value={formData.brandName} onChange={(e) => handleInputChange('brandName', e.target.value)} />
       </FormSection>
 
-      {/* 제목 */}
-      <FormSection>
-        <TextInput
-          label="제목*"
-          placeholder="내용을 입력해주세요"
-          value={formData.title}
-          onChange={(e) => handleInputChange('title', e.target.value)}
-        />
+      <FormSection title="제목*">
+        <TextInput placeholder="내용을 입력해주세요" value={formData.title} onChange={(e) => handleInputChange('title', e.target.value)} />
       </FormSection>
 
-      {/* 내용 */}
-      <FormSection>
-        <TextInput
-          label="내용*"
-          placeholder="내용을 입력해주세요"
-          value={formData.content}
-          onChange={(e) => handleInputChange('content', e.target.value)}
-        />
+      <FormSection title="내용*">
+        <TextInput placeholder="내용을 입력해주세요" value={formData.content} onChange={(e) => handleInputChange('content', e.target.value)} />
       </FormSection>
 
-      {/* 상세 내용 */}
-      <FormSection>
-        <TextInput
-          label="상세 내용*"
-          placeholder="내용을 입력해주세요"
-          value={formData.detailedContent}
-          onChange={(e) => handleInputChange('detailedContent', e.target.value)}
-        />
+      <FormSection title="상세 내용*">
+        <TextInput placeholder="내용을 입력해주세요" value={formData.detailedContent} onChange={(e) => handleInputChange('detailedContent', e.target.value)} />
       </FormSection>
 
-      {/* 모집구분 */}
-      <FormSection>
-        <SelectInput
-          label="모집구분*"
-          options={recruitmentTypeOptions}
-          value={formData.recruitmentType}
-          onChange={(e) => handleInputChange('recruitmentType', e.target.value)}
-        />
+      <FormSection title="모집구분*">
+        <SelectInput value={formData.recruitmentType} options={recruitmentTypeOptions} onChange={(e) => handleInputChange('recruitmentType', e.target.value)} />
       </FormSection>
 
-      {/* 카테고리 */}
-      <FormSection>
-        <SelectInput
-          label="카테고리*"
-          options={categoryOptions}
-          value={formData.category}
-          onChange={(e) => handleInputChange('category', e.target.value)}
-        />
+      <FormSection title="카테고리*">
+        <SelectInput value={formData.category} options={categoryOptions} onChange={(e) => handleInputChange('category', e.target.value)} />
       </FormSection>
 
-      {/* 장소 */}
-      <FormSection>
-        <TextInput
-          label="장소"
-          placeholder="내용을 입력해주세요"
-          value={formData.location}
-          onChange={(e) => handleInputChange('location', e.target.value)}
-        />
+      <FormSection title="장소">
+        <TextInput placeholder="내용을 입력해주세요" value={formData.location} onChange={(e) => handleInputChange('location', e.target.value)} />
       </FormSection>
 
-      {/* 촬영일 */}
-      <FormSection>
-        <DateInput
-          label="촬영일*"
-          placeholder="내용을 입력해주세요"
-          value={formData.filmingDate}
-          onChange={(e) => handleInputChange('filmingDate', e.target.value)}
-        />
+      <FormSection title="촬영일*">
+        <DateInput placeholder="내용을 입력해주세요" value={formData.filmingDate} onChange={(e) => handleInputChange('filmingDate', e.target.value)} />
       </FormSection>
 
-      {/* 공고 마감일 */}
-      <FormSection>
-        <DateInput
-          label="공고 마감일*"
-          placeholder="내용을 입력해주세요"
-          value={formData.deadline}
-          onChange={(e) => handleInputChange('deadline', e.target.value)}
-        />
+      <FormSection title="공고 마감일*">
+        <DateInput placeholder="내용을 입력해주세요" value={formData.deadline} onChange={(e) => handleInputChange('deadline', e.target.value)} />
       </FormSection>
 
-      {/* 시작시간, 종료시간 */}
-      <FormSection>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '12px',
-          }}
-        >
-          <TimeInput
-            label="시작시간"
-            value={formData.startTime}
-            onChange={(e) => handleInputChange('startTime', e.target.value)}
-          />
-          <TimeInput
-            label="종료시간"
-            value={formData.endTime}
-            onChange={(e) => handleInputChange('endTime', e.target.value)}
-          />
-        </div>
+      <FormSection title="시작시간*">
+        <TimeInput placeholder="내용을 입력해주세요" value={formData.startTime} onChange={(e) => handleInputChange('startTime', e.target.value)} />
       </FormSection>
 
-      {/* 상품명 */}
-      <FormSection>
-        <TextInput
-          label="상품명"
-          placeholder="내용을 입력해주세요"
-          value={formData.productName}
-          onChange={(e) => handleInputChange('productName', e.target.value)}
-        />
+      <FormSection title="종료시간*">
+        <TimeInput placeholder="내용을 입력해주세요" value={formData.endTime} onChange={(e) => handleInputChange('endTime', e.target.value)} />
       </FormSection>
 
-      {/* 상품 이미지 1:1 */}
-      <FormSection title="상품 이미지 1:1">
-        <ImageUpload size={200} aspectRatio="1:1" />
+      <FormSection title="상품명">
+        <TextInput placeholder="내용을 입력해주세요" value={formData.productName} onChange={(e) => handleInputChange('productName', e.target.value)} />
       </FormSection>
 
-      {/* 쇼핑라이브 커버 3:4 */}
-      <FormSection title="쇼핑라이브 커버 3:4">
-        <ImageUpload size={200} aspectRatio="3:4" />
+      <FormSection title="상품 이미지">
+        <ImageUpload size={200} onImageSelect={(file) => handleImageSelect(file, 'product')} />
+        {productImageUrl && <UploadMessage>이미지 업로드 완료</UploadMessage>}
       </FormSection>
 
-      {/* 하단 버튼 */}
-      <div style={{ marginTop: '32px' }}>
-        <Button
-          variant="primary"
-          size="medium"
-          fullWidth
-          onClick={handleSubmit}
-        >
-          BUTTON
-        </Button>
-      </div>
+      <FormSection title="라이브 커버 이미지">
+        <ImageUpload size={200} onImageSelect={(file) => handleImageSelect(file, 'liveCover')} />
+        {liveCoverImageUrl && <UploadMessage>이미지 업로드 완료</UploadMessage>}
+      </FormSection>
+
+      <Button
+        variant="primary"
+        size="medium"
+        fullWidth
+        onClick={handleSubmit}
+        disabled={isSubmitting || isImageUploading}
+      >
+        {isSubmitting ? '등록 중...' : '등록하기'}
+      </Button>
     </RegisterPageLayout>
   );
 };

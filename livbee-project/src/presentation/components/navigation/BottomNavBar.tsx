@@ -1,7 +1,9 @@
 import React from 'react';
+import styled from 'styled-components';
 import { useLocation, useNavigate } from 'react-router-dom';
 import BottomNavItem from './BottomNavItem';
 import { useToast } from '@/presentation/contexts/ToastContext';
+import { useAuth } from '@/presentation/hooks/useAuth';
 // (추가) react-icons/ri (Remix Icon) 라이브러리에서 아이콘들을 임포트합니다.
 import {
   RiHomeLine,
@@ -10,21 +12,6 @@ import {
   RiUser3Line,
   RiUserSettingsLine,
 } from 'react-icons/ri';
-// CSS 변수를 사용하기 위해 global.css 임포트
-import '@/presentation/styles/global.css';
-
-/**
- * (임시) 인증 상태를 확인하는 훅
- * TODO: 추후 React Context API 등을 사용한
- * 실제 useAuth 훅으로 교체해야 합니다.
- * Flutter의 AuthProvider 역할을 대신합니다.
- */
-const useAuth = () => {
-  // 테스트를 위해 'false'로 설정
-  // 이 값을 'true'로 바꾸면 '마이페이지' 탭이 정상 동작합니다.
-  const isLoggedIn = false;
-  return { isLoggedIn };
-};
 
 /**
  * (수정) 탭 메뉴의 데이터
@@ -80,31 +67,9 @@ const BottomNavBar: React.FC = () => {
     }
   };
 
-  // --- 4. 스타일 정의 ---
-
-  /** 최상위 <nav> 태그 스타일 */
-  const navStyle: React.CSSProperties = {
-    backgroundColor: 'var(--white)',
-    width: '100%',
-    // Flutter의 border/boxShadow
-    borderTop: '1px solid #ECEFF1',
-    boxShadow: '0 -8px 22px rgba(0, 0, 0, 0.06)',
-    // iOS의 'safe area'를 고려한 하단 패딩
-    paddingBottom: 'env(safe-area-inset-bottom, 0)',
-    boxSizing: 'border-box',
-  };
-
-  /** 탭 버튼들을 감싸는 래퍼 스타일 (Flutter의 Row) */
-  const wrapperStyle: React.CSSProperties = {
-    display: 'flex',
-    justifyContent: 'space-around', // Flutter의 spaceAround
-    alignItems: 'stretch',
-    height: '100%',
-  };
-
   return (
-    <nav style={navStyle}>
-      <div style={wrapperStyle}>
+    <Nav>
+      <Wrapper>
         {/*
           --- (수정) TABS.map() 내부 ---
           복잡한 <button> JSX 대신 BottomNavItem 컴포넌트를 렌더링
@@ -122,9 +87,25 @@ const BottomNavBar: React.FC = () => {
             />
           );
         })}
-      </div>
-    </nav>
+      </Wrapper>
+    </Nav>
   );
 };
+
+const Nav = styled.nav`
+  background-color: ${({ theme }) => theme.colors.background};
+  width: 100%;
+  border-top: 1px solid ${({ theme }) => theme.colors.border};
+  box-shadow: 0 -8px 22px rgba(0, 0, 0, 0.06);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  box-sizing: border-box;
+`;
+
+const Wrapper = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: stretch;
+  height: 100%;
+`;
 
 export default BottomNavBar;

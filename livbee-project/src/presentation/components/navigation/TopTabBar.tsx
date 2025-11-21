@@ -1,7 +1,9 @@
 import React from 'react';
+import styled from 'styled-components';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useToast } from '@/presentation/contexts/ToastContext';
-// global.css의 CSS 변수(색상)와 .hide-scrollbar 클래스를 사용합니다.
+import { H2 } from '@/presentation/components/styled/Typography';
+// global.css의 .hide-scrollbar 클래스를 사용합니다.
 import '@/presentation/styles/global.css';
 
 /**
@@ -45,85 +47,75 @@ const TopTabBar: React.FC = () => {
         }
     };
 
-    // --- 3. 스타일 정의 ---
-
-    /** 가로 스크롤 컨테이너 스타일 (Flutter의 SingleChildScrollView) */
-    const containerStyle: React.CSSProperties = {
-        width: '100%',
-        backgroundColor: 'var(--white)',
-        borderBottom: '1px solid #F7F8FA', // --background-color
-        display: 'flex',
-        overflowX: 'auto', // 가로 스크롤 활성화
-        overflowY: 'hidden',
-        boxSizing: 'border-box',
-    };
-
-    /** (추가) 탭 버튼들을 감싸서 중앙 정렬시키는 래퍼 */
-    const innerWrapperStyle: React.CSSProperties = {
-        display: 'flex',
-        alignItems: 'center',
-        margin: '0 auto', // (핵심) 이 부분이 탭 그룹을 중앙 정렬시킴
-        padding: '0 12px', // container의 좌우 패딩을 여기로 이동
-        flexShrink: 0, // 스크롤 시 찌그러지지 않도록
-    };
-
-    /** 개별 탭 버튼 (TextButton) 스타일 */
-    const tabButtonStyle: React.CSSProperties = {
-        background: 'none',
-        border: 'none',
-        padding: '40px 20px',
-        cursor: 'pointer',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0, // 가로 스크롤 시 탭이 찌그러지지 않도록 설정
-    };
-
     // --- 4. 렌더링 ---
     return (
         // 1. 스크롤 컨테이너
-        <div style={containerStyle} className="hide-scrollbar">
+        <Container className="hide-scrollbar">
             {/* 2. (추가) 중앙 정렬 래퍼 */}
-            <div style={innerWrapperStyle}>
+            <InnerWrapper>
                 {TABS.map((tab) => {
                     const isActive = location.pathname === tab.path;
 
-                    /** (수정) 탭 텍스트 스타일 */
-                    const textStyle: React.CSSProperties = {
-                        // (수정) 14px -> var(--h2) (18px)
-                        fontSize: 'var(--h2)',
-                        // (수정) 비활성 색상: var(--black) -> var(--dark-gray)
-                        // (수정) 비활성 굵기: normal (유지)
-                        color: isActive ? 'var(--primary)' : 'var(--dark-gray)',
-                        fontWeight: isActive ? 'bold' : 'normal',
-                    };
-
-                    /** 하단 밑줄 스타일 (변경 없음) */
-                    const underlineStyle: React.CSSProperties = {
-                        marginTop: 2,
-                        height: 3,
-                        width: 30,
-                        backgroundColor: isActive ? 'var(--primary)' : 'transparent',
-                        borderRadius: 3,
-                    };
-
                     return (
-                        <button
+                        <TabButton
                             key={tab.path}
-                            style={tabButtonStyle}
                             onClick={() => handleTabClick(tab.path)}
                         >
-                            <span style={textStyle}>{tab.label}</span>
-                            <div style={underlineStyle} />
-                        </button>
+                            <TabText>{tab.label}</TabText>
+                            <Underline $isActive={isActive} />
+                        </TabButton>
                     );
                 })}
-            </div>
+            </InnerWrapper>
             {/* --- 중앙 정렬 래퍼 종료 --- */}
-        </div>
+        </Container>
         /* --- 스크롤 컨테이너 종료 --- */
     );
 };
+
+const Container = styled.div`
+    width: 100%;
+    background-color: ${({ theme }) => theme.colors.background};
+    border-bottom: 1px solid ${({ theme }) => theme.colors.secondary};
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    box-sizing: border-box;
+`;
+
+const InnerWrapper = styled.div`
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+    padding: 0 ${({ theme }) => theme.spacing.md};
+    flex-shrink: 0;
+`;
+
+const TabButton = styled.button`
+    background: none;
+    border: none;
+    padding: 20px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+`;
+
+const TabText = styled(H2)`
+    color: ${({ theme }) => theme.colors.muted};
+    font-weight: 400;
+    margin: 0;
+`;
+
+const Underline = styled.div<{ $isActive: boolean }>`
+    margin-top: 2px;
+    height: 3px;
+    width: 30px;
+    background-color: ${({ $isActive, theme }) =>
+        $isActive ? theme.colors.primary : 'transparent'};
+    border-radius: 3px;
+`;
 
 export default TopTabBar;

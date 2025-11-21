@@ -21,15 +21,24 @@
 
 
 :root {
-  --font-size-h1: 20px;
-  --h1: 20px;
+  --font-size-h1: 18px;
+  --h1: 18px;
   --h2: 18px;
   --h3: 16px;
+  --p: 16px;
   --p2: 14px;
-  --black: #000000;
+  --ct: 14px;
+  --black: #111111;
   --dark-gray: #5E5E5E;
   --primary: #687CF4;
+  --slate-gray: #708090;
+  --lavender-gray: #CAC4D0;
+  --paint-gray: #E5E7ED;
+  --light-gray: #fbfcff;
   --white: #FFFFFF;
+  --placeholder-bg: #f0f0f0;
+  --product-bg: #F7F8FA;
+  --product-border: #ECEFF1;
 }
 
 body {

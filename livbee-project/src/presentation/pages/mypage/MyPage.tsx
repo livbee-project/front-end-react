@@ -1,171 +1,90 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RiArrowRightSLine } from 'react-icons/ri';
-import VerticalList from '@/presentation/components/list/VerticalList';
-import ListItem from '@/presentation/components/list/ListItem';
-import SectionTitle from '@/presentation/components/ui/SectionTitle';
-
-const PLACEHOLDER_SUBTITLE = 'P.동해물과 백두산이 마르고 닳도록';
-
-/**
- * 마이페이지 메뉴 아이템 컴포넌트
- */
-interface MenuItemProps {
-  title: string;
-  subtitle?: string;
-  onTap?: () => void;
-}
-
-const MenuItem: React.FC<MenuItemProps> = ({ title, subtitle, onTap }) => {
-  return (
-    <ListItem onTap={onTap}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '100%',
-        }}
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
-          <span
-            style={{
-              fontSize: 'var(--h3)', // 16px
-              fontWeight: 400,
-              color: 'var(--black)',
-            }}
-          >
-            {title}
-          </span>
-          {subtitle && (
-            <span
-              style={{
-                fontSize: '12px',
-                fontWeight: 400,
-                color: 'var(--dark-gray)',
-              }}
-            >
-              {subtitle}
-            </span>
-          )}
-        </div>
-        <RiArrowRightSLine
-          size={20}
-          style={{
-            color: 'var(--dark-gray)',
-            flexShrink: 0,
-            marginLeft: '16px',
-          }}
-        />
-      </div>
-    </ListItem>
-  );
-};
-
+import styled from 'styled-components';
+import { useAuth } from '@/presentation/hooks/useAuth';
+import { useToast } from '@/presentation/contexts/ToastContext';
+import { useMyPageData } from '@/presentation/hooks/useMyPageData';
+import { TypeSwitcher } from '@/presentation/components/mypage/TypeSwitcher';
+import { ProfileSection } from '@/presentation/components/mypage/ProfileSection';
+import { MenuSection } from '@/presentation/components/mypage/MenuSection';
+import { LogoutButton } from '@/presentation/components/mypage/LogoutButton';
+import { AppInfo } from '@/presentation/components/mypage/AppInfo';
+import type { UserType } from '@/types/mypage';
 
 const MyPage: React.FC = () => {
   const navigate = useNavigate();
+  const { logout, isLoggedIn, user, isLoading } = useAuth();
+  const { showToast } = useToast();
+  
+  const [userType, setUserType] = useState<UserType>('brand');
+
+  // 사용자 역할에 따라 userType 업데이트
+  useEffect(() => {
+    if (user?.role === 'brand') {
+      setUserType('brand');
+    } else if (user?.role === 'showhost') {
+      setUserType('showhost');
+    }
+  }, [user?.role]);
+
+  // 로그인 안되어있으면 로그인 페이지로 리다이렉트
+  useEffect(() => {
+    if (!isLoading && !isLoggedIn) {
+      navigate('/login', { replace: true });
+    }
+  }, [isLoading, isLoggedIn, navigate]);
+
+  const handleLogout = () => {
+    logout();
+    showToast('로그아웃되었습니다.');
+  };
+
+  const { profileData, menuItems } = useMyPageData(userType);
+
+  // 로딩 중이거나 로그인 안되어있으면 아무것도 렌더링하지 않음
+  if (isLoading || !isLoggedIn || !user) {
+    return null;
+  }
+
+  // 사용자 역할에 따라 표시할 타입 버튼 결정
+  const availableTypes: UserType[] = user.role === 'brand' 
+    ? ['brand'] 
+    : ['showhost', 'model'];
 
   return (
-    <div style={{ padding: '0' }}>
-      {/* 공통 섹션 */}
-      <div style={{ padding: '16px 16px 16px 16px' }}>
-        <SectionTitle variant="subtitle" marginBottom="0">공통</SectionTitle>
-      </div>
-      <div style={{ padding: '0 16px' }}>
-        <VerticalList showDividers={true}>
-          <MenuItem
-            title="개인정보 관리"
-            subtitle={PLACEHOLDER_SUBTITLE}
-            onTap={() => console.log('개인정보 관리 클릭')}
-          />
-          <MenuItem
-            title="알림 설정"
-            subtitle={PLACEHOLDER_SUBTITLE}
-            onTap={() => console.log('알림 설정 클릭')}
-          />
-          <MenuItem
-            title="메시지"
-            subtitle={PLACEHOLDER_SUBTITLE}
-            onTap={() => console.log('메시지 클릭')}
-          />
-          <MenuItem
-            title="로그아웃"
-            onTap={() => console.log('로그아웃 클릭')}
-          />
-        </VerticalList>
-      </div>
-
-      {/* 브랜드 섹션 */}
-      <div style={{ padding: '32px 16px 16px 16px' }}>
-        <SectionTitle variant="subtitle" marginBottom="0">브랜드</SectionTitle>
-      </div>
-      <div style={{ padding: '0 16px' }}>
-        <VerticalList showDividers={true}>
-          <MenuItem
-            title="캠페인 목록"
-            subtitle={PLACEHOLDER_SUBTITLE}
-            onTap={() => console.log('캠페인 목록 클릭')}
-          />
-          <MenuItem
-            title="지원자 현황"
-            subtitle={PLACEHOLDER_SUBTITLE}
-            onTap={() => console.log('지원자 현황 클릭')}
-          />
-          <MenuItem
-            title="받은 제안"
-            subtitle={PLACEHOLDER_SUBTITLE}
-            onTap={() => console.log('받은 제안 클릭')}
-          />
-          <MenuItem
-            title="계약 및 정산"
-            subtitle={PLACEHOLDER_SUBTITLE}
-            onTap={() => console.log('계약 및 정산 클릭')}
-          />
-        </VerticalList>
-      </div>
-
-      {/* 쇼호스트 & 모델 섹션 */}
-      <div style={{ padding: '32px 16px 16px 16px' }}>
-        <SectionTitle variant="subtitle" marginBottom="0">쇼호스트 & 모델</SectionTitle>
-      </div>
-      <div style={{ padding: '0 16px' }}>
-        <VerticalList showDividers={true}>
-          <MenuItem
-            title="내가 지원한 캠페인"
-            subtitle={PLACEHOLDER_SUBTITLE}
-            onTap={() => console.log('내가 지원한 캠페인 클릭')}
-          />
-          <MenuItem
-            title="쇼호스트 포트폴리오 관리"
-            subtitle={PLACEHOLDER_SUBTITLE}
-            onTap={() => navigate('/mypage/portfolios')}
-          />
-          <MenuItem
-            title="모델 포트폴리오 관리"
-            subtitle={PLACEHOLDER_SUBTITLE}
-            onTap={() => console.log('모델 포트폴리오 관리 클릭')}
-          />
-          <MenuItem
-            title="숏클립 관리"
-            subtitle={PLACEHOLDER_SUBTITLE}
-            onTap={() => navigate('/mypage/clips')}
-          />
-          <MenuItem
-            title="받은 제안"
-            subtitle={PLACEHOLDER_SUBTITLE}
-            onTap={() => console.log('받은 제안 클릭')}
-          />
-          <MenuItem
-            title="계약 및 정산"
-            subtitle={PLACEHOLDER_SUBTITLE}
-            onTap={() => console.log('계약 및 정산 클릭')}
-          />
-        </VerticalList>
-      </div>
-    </div>
+    <PageWrapper>
+      <PageInner>
+        <TypeSwitcher
+          availableTypes={availableTypes}
+          selectedType={userType}
+          onTypeChange={setUserType}
+        />
+        <ProfileSection profileData={profileData} />
+        <MenuSection menuItems={menuItems} />
+        <LogoutButton onClick={handleLogout} />
+        <AppInfo />
+      </PageInner>
+    </PageWrapper>
   );
 };
 
-export default MyPage;
+const PageWrapper = styled.div`
+  min-height: 100vh;
+  background: ${({ theme }) => theme.primaryOpacity['25']};
+  padding: 2rem 1rem;
+  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    padding: 2.5rem 1.5rem;
+  }
+  @media (min-width: ${({ theme }) => theme.breakpoints.desktop}) {
+    padding: 3rem 2rem;
+  }
+`;
 
+const PageInner = styled.div`
+  max-width: 768px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+`;
+
+export default MyPage;

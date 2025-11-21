@@ -1,5 +1,7 @@
 import React from 'react';
-import { GAP, FONT_SIZE, FONT_WEIGHT, TEXT_COLOR, ELLIPSIS_TEXT, BORDER_RADIUS, SPACING } from '@/presentation/styles/constants';
+import styled from 'styled-components';
+import { H3, PMuted } from '@/presentation/components/styled/Typography';
+import { EllipsisText } from '@/presentation/components/styled/CommonStyles';
 
 /**
  * PortraitCard가 받을 props 타입을 정의합니다.
@@ -17,6 +19,44 @@ interface PortraitCardProps {
   width?: number | string;
 }
 
+const CardContainer = styled.div<{ $width: number | string; $isDefault: boolean }>`
+  width: ${({ $isDefault, $width }) => ($isDefault ? '300px' : typeof $width === 'number' ? `${$width}px` : $width)};
+  flex-shrink: ${({ $isDefault }) => ($isDefault ? 0 : 1)};
+  cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
+  max-width: 100%;
+  box-sizing: border-box;
+`;
+
+const ImageContainer = styled.div<{ $hasImage: boolean; $isDefault: boolean; $imageUrl?: string }>`
+  width: ${({ $isDefault }) => ($isDefault ? '300px' : '100%')};
+  height: ${({ $isDefault }) => ($isDefault ? '400px' : undefined)};
+  aspect-ratio: ${({ $isDefault }) => ($isDefault ? undefined : '3/4')};
+  background-color: ${({ theme }) => theme.colors.secondary};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  border: ${({ $hasImage, theme }) => ($hasImage ? 'none' : `1px solid ${theme.colors.border}`)};
+  background-image: ${({ $hasImage, $imageUrl }) => ($hasImage && $imageUrl ? `url(${$imageUrl})` : 'none')};
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: ${({ theme }) => theme.colors.muted};
+  overflow: hidden;
+`;
+
+const TextContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding-top: ${({ theme }) => theme.spacing.xl};
+  gap: ${({ theme }) => theme.spacing.lg};
+`;
+
+const Title = styled(H3)`
+  color: ${({ theme }) => theme.colors.foreground};
+`;
+
+const Content = styled(PMuted)``;
+
 /**
  * "컨셉 모델" 및 "HOT CLIP" 섹션에서 사용될
  * 세로형 이미지(300x400) 기반의 공통 카드 컴포넌트입니다.
@@ -28,84 +68,27 @@ const PortraitCard: React.FC<PortraitCardProps> = ({
   onPress,
   width = 300,
 }) => {
-  // --- 스타일 정의 ---
-  
-  // width를 숫자 또는 문자열로 처리
   const isDefaultWidth = width === 300 || width === undefined;
 
-  // 1. 카드 전체 컨테이너
-  const cardStyle: React.CSSProperties = {
-    width: isDefaultWidth ? 300 : width,
-    flexShrink: isDefaultWidth ? 0 : 1, // 반응형일 때는 줄어들 수 있도록
-    cursor: onPress ? 'pointer' : 'default',
-    maxWidth: '100%', // 부모를 넘지 않도록
-    boxSizing: 'border-box',
-  };
-
-  // 2. 300x400 이미지 영역
-  const imageStyle: React.CSSProperties = {
-    width: isDefaultWidth ? 300 : '100%',
-    height: isDefaultWidth ? 400 : undefined,
-    aspectRatio: isDefaultWidth ? undefined : '3/4', // 비율 유지 (3:4) - 반응형일 때만 적용
-    backgroundColor: '#f0f0f0',
-    borderRadius: BORDER_RADIUS.MD,
-    border: `1px solid ${TEXT_COLOR.DARK_GRAY}`,
-
-    // 이미지 처리
-    backgroundImage: imageUrl ? `url(${imageUrl})` : 'none',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-
-    // 플레이스홀더 텍스트 (이미지 없을 시)
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    color: 'var(--dark-gray)',
-    overflow: 'hidden',
-  };
-
-  // 3. 텍스트 컨테이너
-  const textContainerStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    paddingTop: SPACING.XL,
-    gap: GAP.LG,
-  };
-
-  // 4. 제목 텍스트
-  const titleStyle: React.CSSProperties = {
-    fontWeight: FONT_WEIGHT.NORMAL,
-    fontSize: FONT_SIZE.MD,
-    color: TEXT_COLOR.BLACK,
-    width: '100%',
-    ...ELLIPSIS_TEXT,
-  };
-
-  // 5. 내용 텍스트
-  const contentStyle: React.CSSProperties = {
-    fontWeight: FONT_WEIGHT.NORMAL,
-    fontSize: FONT_SIZE.XS,
-    color: TEXT_COLOR.DARK_GRAY,
-    width: '100%',
-    ...ELLIPSIS_TEXT,
-  };
-
-  // --- 컴포넌트 렌더링 ---
   return (
-    <div onClick={onPress} style={cardStyle}>
+    <CardContainer $width={width} $isDefault={isDefaultWidth} onClick={onPress}>
       {/* 1. 300x400 이미지 영역 */}
-      <div style={imageStyle}>
+      <ImageContainer $hasImage={!!imageUrl} $isDefault={isDefaultWidth} $imageUrl={imageUrl}>
         {!imageUrl && <span>(Image 300x400)</span>}
-      </div>
+      </ImageContainer>
 
       {/* 2. 텍스트 영역 */}
-      <div style={textContainerStyle}>
+      <TextContainer>
         {/* 2a. 제목 (모델명 또는 클립명) */}
-        <span style={titleStyle}>{title}</span>
+        <EllipsisText>
+          <Title>{title}</Title>
+        </EllipsisText>
         {/* 2b. 내용 (한 줄 소개) */}
-        <span style={contentStyle}>{content}</span>
-      </div>
-    </div>
+        <EllipsisText>
+          <Content>{content}</Content>
+        </EllipsisText>
+      </TextContainer>
+    </CardContainer>
   );
 };
 

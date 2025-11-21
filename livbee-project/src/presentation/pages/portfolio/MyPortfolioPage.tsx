@@ -1,102 +1,103 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import PortfolioRowCard from '@/presentation/components/cards/PortfolioRowCard';
-import VerticalList from '@/presentation/components/list/VerticalList';
-import ListItem from '@/presentation/components/list/ListItem';
+import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import Pagination from '@/presentation/components/list/Pagination';
 import FloatingActionButton from '@/presentation/components/ui/FloatingActionButton';
+import { EmptyState } from '@/presentation/components/states/EmptyState';
+import { MOCK_PORTFOLIOS, ITEMS_PER_PAGE } from '@/shared/constants/portfolio';
+import { useMyPortfolio } from '@/presentation/hooks/useMyPortfolio';
+import { MyPortfolioHeader } from '@/presentation/components/portfolio/MyPortfolioHeader';
+import { MyPortfolioCard } from '@/presentation/components/portfolio/MyPortfolioCard';
+import type { PortfolioRole } from '@/types/portfolio';
 
-/**
- * 리스트 렌더링을 위한 임시 목업 데이터
- */
-const MOCK_MY_PORTFOLIOS = Array.from({ length: 15 }, (_, i) => ({
-  id: i + 1,
-  name: `오해원${i + 1 > 1 ? ` ${i + 1}` : ''}`,
-  content: 'P.동해물과 백두산이 마르고 닳도록',
-  imageUrl: undefined, // 프로필 이미지 URL (선택)
-}));
-
-/**
- * 페이지당 표시할 항목 수
- */
-const ITEMS_PER_PAGE = 5;
-
-/**
- * 마이 포트폴리오 목록 페이지 컴포넌트입니다.
- * 마이페이지에서 "쇼호스트 포트폴리오 관리"를 클릭하면 이 페이지로 이동합니다.
- */
 const MyPortfolioPage: React.FC = () => {
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState(1);
+  const location = useLocation();
+  const activeRole: PortfolioRole =
+    (location.state as { role?: PortfolioRole } | null)?.role ?? 'showhost';
 
-  /**
-   * 전체 페이지 수 계산
-   */
-  const totalPages = Math.ceil(MOCK_MY_PORTFOLIOS.length / ITEMS_PER_PAGE);
+  const {
+    filteredPortfolios,
+    currentPage,
+    totalPages,
+    pageItems,
+    handleTogglePinned,
+    handleSetDefault,
+    handleDelete,
+    handlePageChange,
+  } = useMyPortfolio({
+    initialPortfolios: MOCK_PORTFOLIOS,
+    activeRole,
+  });
 
-  /**
-   * 현재 페이지에 표시할 항목들 계산
-   */
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentItems = MOCK_MY_PORTFOLIOS.slice(startIndex, endIndex);
-
-  /**
-   * 페이지 변경 핸들러
-   */
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    // 페이지 변경 시 스크롤을 맨 위로 이동
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  /**
-   * 포트폴리오 카드 클릭 핸들러
-   */
-  const handlePortfolioClick = (id: number) => {
+  const handleCardClick = (id: number) => {
     navigate(`/portfolios/${id}`);
   };
 
-  /**
-   * 포트폴리오 등록 버튼 클릭 핸들러
-   */
+  const handleEdit = (id: number) => {
+    navigate('/portfolios/register', { state: { portfolioId: id } });
+  };
+
   const handleRegisterClick = () => {
     navigate('/portfolios/register');
   };
 
   return (
-    <div style={{ padding: '0' }}>
-      {/* 포트폴리오 리스트 */}
-      <VerticalList showDividers={true}>
-        {currentItems.map((portfolio) => (
-          <ListItem
-            key={portfolio.id}
-            onTap={() => handlePortfolioClick(portfolio.id)}
-          >
-            <PortfolioRowCard
-              title={portfolio.name}
-              content={portfolio.content}
-              imageUrl={portfolio.imageUrl}
-              onCardPress={() => handlePortfolioClick(portfolio.id)}
-            />
-          </ListItem>
-        ))}
-      </VerticalList>
+    <PageWrapper>
+      <MyPortfolioHeader activeRole={activeRole} onManageClick={handleRegisterClick} />
 
-      {/* 페이지네이션 */}
-      {totalPages > 1 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
+      {pageItems.length === 0 ? (
+        <EmptyState message="등록된 포트폴리오가 없습니다." />
+      ) : (
+        <CardList>
+          {pageItems.map((item) => (
+            <MyPortfolioCard
+              key={item.id}
+              item={item}
+              onCardClick={() => handleCardClick(item.id)}
+              onPinClick={(event) => {
+                event.stopPropagation();
+                handleTogglePinned(item.id);
+              }}
+              onDefaultClick={() => handleSetDefault(item.id)}
+              onEditClick={() => handleEdit(item.id)}
+              onDeleteClick={() => handleDelete(item.id)}
+            />
+          ))}
+        </CardList>
       )}
 
-      {/* 플로팅 액션 버튼 */}
+      {filteredPortfolios.length > ITEMS_PER_PAGE && (
+        <PaginationWrapper>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </PaginationWrapper>
+      )}
+
       <FloatingActionButton onClick={handleRegisterClick} />
-    </div>
+    </PageWrapper>
   );
 };
 
-export default MyPortfolioPage;
+const PageWrapper = styled.div`
+  padding: ${({ theme }) => theme.spacing.lg};
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing['2xl']};
+`;
 
+const CardList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.lg};
+`;
+
+const PaginationWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
+export default MyPortfolioPage;

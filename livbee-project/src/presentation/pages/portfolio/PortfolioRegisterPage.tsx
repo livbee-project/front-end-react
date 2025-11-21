@@ -1,272 +1,97 @@
-import React, { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
-import TextInput from '@/presentation/components/forms/TextInput';
-import ToggleSwitch from '@/presentation/components/ui/ToggleSwitch';
-import FileUpload from '@/presentation/components/upload/FileUpload';
-import ImageUpload from '@/presentation/components/upload/ImageUpload';
-import VerticalList from '@/presentation/components/list/VerticalList';
-import ListItem from '@/presentation/components/list/ListItem';
-import Button from '@/presentation/components/ui/Button';
-import SectionTitle from '@/presentation/components/ui/SectionTitle';
-import RegisterPageLayout from '@/presentation/layouts/RegisterPageLayout';
-import FormSection from '@/presentation/components/forms/FormSection';
-import FormRow from '@/presentation/components/forms/FormRow';
+import React from 'react';
+import {
+  PageWrapper,
+  FormContainer,
+  RegisterForm,
+} from '@/presentation/components/forms/portfolio/PortfolioRegisterStyles';
+import {
+  ProfileImageSection,
+  RegistrationTypeSection,
+  BasicInfoSection,
+  ContactSection,
+  SnsSection,
+  PortfolioFilesSection,
+  TagsSection,
+  GallerySection,
+  SubmitSection,
+} from '@/presentation/components/forms/portfolio/sections';
+import { usePortfolioRegisterForm } from '@/presentation/components/forms/portfolio/usePortfolioRegisterForm';
 
-/**
- * 포트폴리오 등록 페이지
- */
 const PortfolioRegisterPage: React.FC = () => {
-  // const navigate = useNavigate(); // TODO: 추후 사용 예정
-
-  // 폼 상태 관리
-  const [formData, setFormData] = useState({
-    registrationType: '',
-    name: '',
-    oneLineIntro: '',
-    detailedIntro: '',
-    websites: ['', '', ''],
-    recentLiveLink: '',
-    contact: '',
-    openChat: '',
-    tags: ['', '', '', '', ''],
-  });
-
-  const [toggles, setToggles] = useState({
-    websites: [true, true, true],
-    contact: true,
-    openChat: true,
-    tags: [true, true, true, true, true],
-  });
-
-  const handleInputChange = (field: string, value: string, index?: number) => {
-    if (index !== undefined) {
-      if (field === 'websites' || field === 'tags') {
-        const newArray = [...formData[field as keyof typeof formData] as string[]];
-        newArray[index] = value;
-        setFormData({ ...formData, [field]: newArray });
-      }
-    } else {
-      setFormData({ ...formData, [field]: value });
-    }
-  };
-
-  const handleToggleChange = (field: string, index?: number) => {
-    if (index !== undefined) {
-      const newArray = [...toggles[field as keyof typeof toggles] as boolean[]];
-      newArray[index] = !newArray[index];
-      setToggles({ ...toggles, [field]: newArray });
-    } else {
-      setToggles({ ...toggles, [field]: !toggles[field as keyof typeof toggles] });
-    }
-  };
-
-  const handleSubmit = () => {
-    console.log('포트폴리오 등록:', formData);
-    // TODO: 실제 등록 로직 구현
-  };
+  const {
+    formData,
+    toggles,
+    mainThumbnailUrl,
+    galleryImageUrls,
+    resumeFileUrl,
+    portfolioFileUrl,
+    isSubmitting,
+    isImageUploading,
+    handleInputChange,
+    handleToggleChange,
+    handleProfileImageSelect,
+    handleGalleryImageSelect,
+    handleGalleryImageRemove,
+    handlePortfolioFileAdd,
+    handleResumeFileRemove,
+    handlePortfolioFileRemove,
+    handleSubmitForm,
+  } = usePortfolioRegisterForm();
 
   return (
-    <RegisterPageLayout>
-      {/* 이름 섹션 (이미지 업로드 포함) */}
-      <FormSection>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-          <div style={{ flex: 1 }}>
-            <SectionTitle variant="default" marginBottom="12px">이름</SectionTitle>
-            <div
-              style={{
-                fontSize: '12px',
-                color: 'var(--dark-gray)',
-                marginBottom: '12px',
-              }}
-            >
-              P.농해물과 백두산이 마르고 덮도록
-            </div>
-          </div>
-          <ImageUpload size={100} />
-        </div>
-      </FormSection>
-
-      {/* 등록구분 */}
-      <FormSection>
-        <TextInput
-          label="등록구분"
-          placeholder="내용을 입력해주세요."
-          value={formData.registrationType}
-          onChange={(e) => handleInputChange('registrationType', e.target.value)}
-        />
-      </FormSection>
-
-      {/* 이름 (두 번째) */}
-      <FormSection>
-        <TextInput
-          label="이름"
-          placeholder="내용을 입력해주세요."
-          value={formData.name}
-          onChange={(e) => handleInputChange('name', e.target.value)}
-        />
-      </FormSection>
-
-      {/* 한줄 소개 */}
-      <FormSection>
-        <TextInput
-          label="한줄 소개"
-          placeholder="내용을 입력해주세요."
-          value={formData.oneLineIntro}
-          onChange={(e) => handleInputChange('oneLineIntro', e.target.value)}
-        />
-      </FormSection>
-
-      {/* 상세소개 */}
-      <FormSection>
-        <TextInput
-          label="상세소개"
-          placeholder="내용을 입력해주세요."
-          value={formData.detailedIntro}
-          onChange={(e) => handleInputChange('detailedIntro', e.target.value)}
-        />
-      </FormSection>
-
-      {/* 웹사이트 */}
-      <FormSection title="웹사이트">
-        <VerticalList showDividers={false}>
-          {[0, 1, 2].map((index) => (
-            <ListItem key={index} style={{ padding: '0', marginBottom: '12px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <FormRow>
-                  <span
-                    style={{
-                      fontSize: '12px',
-                      color: 'var(--dark-gray)',
-                      flexShrink: 0,
-                      width: '80px',
-                    }}
-                  >
-                    관리자 입력
-                  </span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <TextInput
-                      placeholder="내용을 입력해주세요."
-                      value={formData.websites[index]}
-                      onChange={(e) =>
-                        handleInputChange('websites', e.target.value, index)
-                      }
-                    />
-                  </div>
-                  <ToggleSwitch
-                    checked={toggles.websites[index]}
-                    onChange={() => handleToggleChange('websites', index)}
-                  />
-                </FormRow>
-              </div>
-            </ListItem>
-          ))}
-        </VerticalList>
-      </FormSection>
-
-      {/* 최근 라이브 링크 */}
-      <FormSection>
-        <TextInput
-          label="최근 라이브 링크"
-          placeholder="내용을 입력해주세요."
-          value={formData.recentLiveLink}
-          onChange={(e) => handleInputChange('recentLiveLink', e.target.value)}
-        />
-      </FormSection>
-
-      {/* 포트폴리오 */}
-      <FormSection title="포트폴리오">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <FileUpload label="이력서" />
-          <FileUpload label="포트폴리오" />
-        </div>
-      </FormSection>
-
-      {/* 연락처 */}
-      <FormSection title="연락처">
-        <FormRow>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <TextInput
-              placeholder="내용을 입력해주세요."
-              value={formData.contact}
-              onChange={(e) => handleInputChange('contact', e.target.value)}
-            />
-          </div>
-          <ToggleSwitch
-            checked={toggles.contact}
-            onChange={() => handleToggleChange('contact')}
+    <PageWrapper>
+      <FormContainer>
+        <RegisterForm onSubmit={handleSubmitForm}>
+          <ProfileImageSection
+            thumbnailUrl={mainThumbnailUrl}
+            onSelectImage={handleProfileImageSelect}
           />
-        </FormRow>
-      </FormSection>
-
-      {/* 오픈채팅방 */}
-      <FormSection title="오픈채팅방">
-        <FormRow>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <TextInput
-              placeholder="내용을 입력해주세요."
-              value={formData.openChat}
-              onChange={(e) => handleInputChange('openChat', e.target.value)}
-            />
-          </div>
-          <ToggleSwitch
-            checked={toggles.openChat}
-            onChange={() => handleToggleChange('openChat')}
+          <RegistrationTypeSection
+            value={formData.registrationType}
+            onChange={(value) => handleInputChange('registrationType', value)}
           />
-        </FormRow>
-      </FormSection>
-
-      {/* 태그 */}
-      <FormSection title="태그">
-        <VerticalList showDividers={false}>
-          {[0, 1, 2, 3, 4].map((index) => (
-            <ListItem key={index} style={{ padding: '0', marginBottom: '12px' }}>
-              <FormRow>
-                <span
-                  style={{
-                    fontSize: '12px',
-                    color: 'var(--dark-gray)',
-                    flexShrink: 0,
-                    width: '80px',
-                  }}
-                >
-                  관리자 입력
-                </span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <TextInput
-                    placeholder="내용을 입력해주세요."
-                    value={formData.tags[index]}
-                    onChange={(e) =>
-                      handleInputChange('tags', e.target.value, index)
-                    }
-                  />
-                </div>
-                <ToggleSwitch
-                  checked={toggles.tags[index]}
-                  onChange={() => handleToggleChange('tags', index)}
-                />
-              </FormRow>
-            </ListItem>
-          ))}
-        </VerticalList>
-      </FormSection>
-
-      {/* 갤러리 */}
-      <FormSection title="갤러리">
-        <ImageUpload size={120} />
-      </FormSection>
-
-      {/* 하단 버튼 */}
-      <div style={{ marginTop: '32px' }}>
-        <Button
-          variant="primary"
-          size="medium"
-          fullWidth
-          onClick={handleSubmit}
-        >
-          BUTTON
-        </Button>
-      </div>
-    </RegisterPageLayout>
+          <BasicInfoSection
+            name={formData.name}
+            oneLineIntro={formData.oneLineIntro}
+            detailedIntro={formData.detailedIntro}
+            onChange={(field, value) => handleInputChange(field, value)}
+          />
+          <ContactSection
+            contact={formData.contact}
+            openChat={formData.openChat}
+            contactEnabled={toggles.contact}
+            openChatEnabled={toggles.openChat}
+            onInputChange={(field, value) => handleInputChange(field, value)}
+            onToggleChange={(field) => handleToggleChange(field)}
+          />
+          <SnsSection
+            websites={formData.websites}
+            websiteToggles={toggles.websites}
+            onInputChange={(value, index) => handleInputChange('websites', value, index)}
+            onToggleChange={(index) => handleToggleChange('websites', index)}
+          />
+          <PortfolioFilesSection
+            resumeFileInfo={resumeFileUrl}
+            portfolioFileInfo={portfolioFileUrl}
+            onFileAdd={handlePortfolioFileAdd}
+            onResumeRemove={handleResumeFileRemove}
+            onPortfolioRemove={handlePortfolioFileRemove}
+          />
+          <TagsSection
+            tags={formData.tags}
+            tagToggles={toggles.tags}
+            onInputChange={(value, index) => handleInputChange('tags', value, index)}
+            onToggleChange={(index) => handleToggleChange('tags', index)}
+          />
+          <GallerySection
+            images={galleryImageUrls}
+            onSelectImage={handleGalleryImageSelect}
+            onRemoveImage={handleGalleryImageRemove}
+          />
+          <SubmitSection disabled={isSubmitting || isImageUploading} isSubmitting={isSubmitting} />
+        </RegisterForm>
+      </FormContainer>
+    </PageWrapper>
   );
 };
 

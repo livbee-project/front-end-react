@@ -1,9 +1,10 @@
 import React from 'react';
+import styled from 'styled-components';
 
 /**
  * PlaceholderImage 컴포넌트가 받을 props 타입을 정의합니다.
  * @param size - 아이콘 크기 (기본값: 48)
- * @param color - 아이콘 색상 (기본값: 'var(--dark-gray)')
+ * @param color - 아이콘 색상 (기본값: theme.colors.muted)
  * @param opacity - 투명도 (기본값: 0.5)
  */
 interface PlaceholderImageProps {
@@ -18,22 +19,14 @@ interface PlaceholderImageProps {
  */
 const PlaceholderImage: React.FC<PlaceholderImageProps> = ({
   size = 48,
-  color = 'var(--dark-gray)',
+  color,
   opacity = 0.5,
 }) => {
-  /**
-   * 플레이스홀더 아이콘 스타일
-   */
-  const placeholderStyle: React.CSSProperties = {
-    width: `${size}px`,
-    height: `${size}px`,
-    color,
-    opacity,
-  };
-
   return (
-    <svg
-      style={placeholderStyle}
+    <StyledSvg
+      $size={size}
+      $color={color}
+      $opacity={opacity}
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -45,9 +38,20 @@ const PlaceholderImage: React.FC<PlaceholderImageProps> = ({
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-    </svg>
+    </StyledSvg>
   );
 };
+
+const StyledSvg = styled.svg<{
+  $size: number;
+  $color?: string;
+  $opacity: number;
+}>`
+  width: ${({ $size }) => $size}px;
+  height: ${({ $size }) => $size}px;
+  color: ${({ $color, theme }) => $color || theme.colors.muted};
+  opacity: ${({ $opacity }) => $opacity};
+`;
 
 export default PlaceholderImage;
 

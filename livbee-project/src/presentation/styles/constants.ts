@@ -1,19 +1,123 @@
 /**
- * 공통 스타일 상수 정의
+ * @deprecated 이 파일은 레거시 호환성을 위해 유지됩니다.
+ * 새로운 코드에서는 theme.ts를 직접 사용하세요.
+ * 
+ * 이 파일의 모든 상수는 theme.legacy에서 re-export됩니다.
  */
 
-// ===== 공통 간격 상수 =====
-export const SPACING = {
-  XS: '4px',
-  SM: '8px',
-  MD: '12px',
-  LG: '16px',
-  XL: '20px',
-  XXL: '24px',
-  XXXL: '32px',
+import type { CSSProperties } from 'react';
+import { theme } from './theme';
+
+/**
+ * @deprecated theme.spacing을 사용하세요
+ */
+export const SPACING = theme.legacy.spacing;
+
+/**
+ * @deprecated theme.spacing을 사용하세요
+ */
+export const GAP = theme.legacy.gap;
+
+/**
+ * @deprecated theme.radii를 사용하세요
+ */
+export const BORDER_RADIUS = theme.legacy.borderRadius;
+
+/**
+ * @deprecated theme.fonts를 사용하세요
+ */
+export const FONT_SIZE = theme.legacy.fontSize;
+
+/**
+ * @deprecated theme.fonts를 사용하세요
+ */
+export const FONT_WEIGHT = theme.legacy.fontWeight;
+
+/**
+ * @deprecated theme.colors를 사용하세요
+ */
+export const TEXT_COLOR = theme.legacy.textColor;
+
+/**
+ * @deprecated theme.colors를 사용하세요
+ */
+export const BACKGROUND_COLOR = {
+  PLACEHOLDER: theme.colors.secondary,
+  PRODUCT: theme.colors.secondary,
+  PRODUCT_BORDER: theme.colors.border,
+  WHITE: theme.colors.background,
+  LIGHT_GRAY: theme.colors.secondary,
 } as const;
 
-// ===== 공통 패딩 상수 =====
+/**
+ * @deprecated CommonStyles의 FlexCenter, FlexRow, FlexColumn을 사용하세요
+ */
+export const FLEX_CENTER: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+
+/**
+ * @deprecated CommonStyles의 FlexRow를 사용하세요
+ */
+export const FLEX_ROW: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+};
+
+/**
+ * @deprecated CommonStyles의 FlexColumn을 사용하세요
+ */
+export const FLEX_COLUMN: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+};
+
+/**
+ * @deprecated CommonStyles의 EllipsisText를 사용하세요
+ */
+export const ELLIPSIS_TEXT: CSSProperties = {
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+};
+
+/**
+ * @deprecated theme.input을 사용하세요
+ */
+export const INPUT_BASE_STYLE: CSSProperties = {
+  width: '100%',
+  padding: theme.input.padding,
+  paddingRight: '40px',
+  backgroundColor: theme.input.backgroundColor,
+  borderRadius: theme.input.borderRadius,
+  border: `1px solid ${theme.colors.border}`,
+  fontSize: '14px',
+  color: theme.colors.foreground,
+  fontWeight: 400,
+  outline: 'none',
+  boxSizing: 'border-box',
+};
+
+/**
+ * @deprecated theme.input.focusBorderColor를 사용하세요
+ */
+export const INPUT_FOCUS_STYLE: CSSProperties = {
+  borderColor: theme.input.focusBorderColor,
+};
+
+/**
+ * @deprecated theme.colors.error를 사용하세요
+ */
+export const INPUT_ERROR_STYLE: CSSProperties = {
+  borderColor: theme.colors.error,
+};
+
+/**
+ * @deprecated 사용하지 않습니다. theme.spacing을 사용하세요
+ */
 export const PADDING = {
   SM: '8px 16px',
   MD: '12px 16px',
@@ -24,7 +128,9 @@ export const PADDING = {
   PAGE_BOTTOM_LARGE: '32px',
 } as const;
 
-// ===== 공통 마진 상수 =====
+/**
+ * @deprecated 사용하지 않습니다. theme.spacing을 사용하세요
+ */
 export const MARGIN = {
   XS: '4px',
   SM: '8px',
@@ -34,99 +140,3 @@ export const MARGIN = {
   XXL: '24px',
   XXXL: '32px',
 } as const;
-
-// ===== 공통 간격(Gap) 상수 =====
-export const GAP = {
-  XS: '4px',
-  SM: '5px',
-  MD: '8px',
-  LG: '10px',
-  XL: '12px',
-  XXL: '16px',
-} as const;
-
-// ===== 공통 Border Radius 상수 =====
-export const BORDER_RADIUS = {
-  SM: 8,
-  MD: 10,
-  LG: 12,
-  XL: 16,
-  CIRCLE: '50%',
-} as const;
-
-// ===== 공통 폰트 스타일 상수 =====
-export const FONT_SIZE = {
-  XS: '12px',
-  SM: 'var(--p2)', // 14px
-  MD: 'var(--h3)', // 16px
-  LG: 'var(--h2)', // 18px
-  XL: 'var(--h1)', // 20px
-} as const;
-
-export const FONT_WEIGHT = {
-  NORMAL: 400,
-  MEDIUM: 500,
-  BOLD: 700,
-} as const;
-
-// ===== 공통 색상 스타일 상수 =====
-export const TEXT_COLOR = {
-  BLACK: 'var(--black)',
-  DARK_GRAY: 'var(--dark-gray)',
-  PRIMARY: 'var(--primary)',
-  WHITE: 'var(--white)',
-} as const;
-
-// ===== 공통 레이아웃 스타일 =====
-export const FLEX_CENTER: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
-
-export const FLEX_ROW: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-};
-
-export const FLEX_COLUMN: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-};
-
-export const ELLIPSIS_TEXT: React.CSSProperties = {
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-};
-
-// ===== 입력 필드 기본 스타일 =====
-export const INPUT_BASE_STYLE: React.CSSProperties = {
-  width: '100%',
-  padding: PADDING.MD,
-  paddingRight: '40px',
-  backgroundColor: TEXT_COLOR.WHITE,
-  borderRadius: BORDER_RADIUS.LG,
-  border: '1px solid var(--paint-gray, #E5E7ED)',
-  fontSize: FONT_SIZE.MD,
-  color: TEXT_COLOR.BLACK,
-  fontWeight: FONT_WEIGHT.NORMAL,
-  outline: 'none',
-  boxSizing: 'border-box',
-};
-
-/**
- * 입력 필드 포커스 스타일
- */
-export const INPUT_FOCUS_STYLE: React.CSSProperties = {
-  borderColor: TEXT_COLOR.PRIMARY,
-};
-
-/**
- * 입력 필드 에러 스타일
- */
-export const INPUT_ERROR_STYLE: React.CSSProperties = {
-  borderColor: 'var(--error, #FF0000)',
-};
-

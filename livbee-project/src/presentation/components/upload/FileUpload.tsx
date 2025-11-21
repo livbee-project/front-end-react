@@ -1,12 +1,14 @@
 import React, { useRef } from 'react';
+import styled from 'styled-components';
 import { RiFileLine } from 'react-icons/ri';
+import { H3, Caption } from '@/presentation/components/styled/Typography';
+import type { FileUploadProps as BaseFileUploadProps } from '@/types/components';
 
 /**
  * FileUpload가 받을 props 타입을 정의합니다.
  */
-interface FileUploadProps {
+interface FileUploadProps extends BaseFileUploadProps {
   label: string;
-  onFileSelect?: (file: File) => void;
 }
 
 /**
@@ -26,50 +28,53 @@ const FileUpload: React.FC<FileUploadProps> = ({ label, onFileSelect }) => {
     }
   };
 
-  const containerStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '12px 16px',
-    backgroundColor: 'var(--white)',
-    borderRadius: 12,
-    border: '1px solid var(--paint-gray, #E5E7ED)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    boxSizing: 'border-box',
-  };
-
   return (
-    <div style={containerStyle} onClick={handleClick}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <RiFileLine size={20} color="var(--dark-gray)" />
-        <span
-          style={{
-            fontSize: 'var(--h3)',
-            color: 'var(--black)',
-            fontWeight: 400,
-          }}
-        >
-          {label}
-        </span>
-      </div>
-      <span
-        style={{
-          fontSize: '12px',
-          color: 'var(--dark-gray)',
-        }}
-      >
-        파일업로드
-      </span>
-      <input
-        ref={fileInputRef}
-        type="file"
-        style={{ display: 'none' }}
-        onChange={handleFileChange}
-      />
-    </div>
+    <Container onClick={handleClick}>
+      <LabelRow>
+        <FileIcon size={20} />
+        <LabelText as={H3}>{label}</LabelText>
+      </LabelRow>
+      <UploadText as={Caption}>파일업로드</UploadText>
+      <HiddenInput ref={fileInputRef} type="file" onChange={handleFileChange} />
+    </Container>
   );
 };
+
+const Container = styled.div`
+  width: 100%;
+  padding: ${({ theme }) => theme.input.padding};
+  background-color: ${({ theme }) => theme.colors.background};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  box-sizing: border-box;
+`;
+
+const LabelRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const FileIcon = styled(RiFileLine)`
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
+const LabelText = styled(H3)`
+  color: ${({ theme }) => theme.colors.foreground};
+  font-weight: 400;
+`;
+
+const UploadText = styled(Caption)`
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
+const HiddenInput = styled.input`
+  display: none;
+`;
 
 export default FileUpload;
 

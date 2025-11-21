@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
+import styled from 'styled-components';
 import type { ReactNode } from 'react';
 import Toast from '@/presentation/components/ui/Toast';
+import type { ToastVariant } from '@/presentation/components/ui/Toast';
 
 /**
  * Toast 메시지 정보 타입
@@ -9,13 +11,14 @@ interface ToastMessage {
   id: string;
   message: string;
   duration?: number;
+  variant?: ToastVariant;
 }
 
 /**
  * ToastContext의 타입 정의
  */
 interface ToastContextType {
-  showToast: (message: string, duration?: number) => void;
+  showToast: (message: string, duration?: number, variant?: ToastVariant) => void;
 }
 
 /**
@@ -39,10 +42,13 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
 
   /**
    * 토스트 메시지를 표시하는 함수
+   * @param message - 표시할 메시지
+   * @param duration - 표시 시간 (밀리초)
+   * @param variant - 토스트 타입 ('info' 또는 'error', 기본값: 'info')
    */
-  const showToast = useCallback((message: string, duration?: number) => {
+  const showToast = useCallback((message: string, duration?: number, variant: ToastVariant = 'info') => {
     const id = `toast-${Date.now()}-${Math.random()}`;
-    setToasts((prev) => [...prev, { id, message, duration }]);
+    setToasts((prev) => [...prev, { id, message, duration, variant }]);
   }, []);
 
   /**
@@ -56,43 +62,43 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
     <ToastContext.Provider value={{ showToast }}>
       {children}
       {/* 토스트 메시지들을 렌더링 */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 9999,
-          pointerEvents: 'none', // 클릭 이벤트를 차단하지 않음
-        }}
-      >
+      <ToastContainer>
         {toasts.map((toast, index) => (
-          <div
-            key={toast.id}
-            style={{
-              position: 'absolute',
-              bottom: `${80 + index * 80}px`, // 바텀 네비게이션 바 위 20px부터 시작, 여러 토스트가 겹치지 않도록
-              left: '50%',
-              transform: 'translateX(-50%)',
-              pointerEvents: 'auto',
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              padding: '0 16px',
-              boxSizing: 'border-box',
-            }}
-          >
+          <ToastWrapper key={toast.id} $bottom={80 + index * 80}>
             <Toast
               message={toast.message}
               duration={toast.duration}
+              variant={toast.variant}
               onClose={() => removeToast(toast.id)}
             />
-          </div>
+          </ToastWrapper>
         ))}
-      </div>
+      </ToastContainer>
     </ToastContext.Provider>
   );
 };
+
+const ToastContainer = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  pointer-events: none;
+`;
+
+const ToastWrapper = styled.div<{ $bottom: number }>`
+  position: absolute;
+  bottom: ${({ $bottom }) => $bottom}px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0 ${({ theme }) => theme.spacing.lg};
+  box-sizing: border-box;
+`;
 
 /**
  * useToast 훅

@@ -1,115 +1,164 @@
 import React from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import StickyHeader from '@/presentation/components/detail/StickyHeader';
 import ProfileSection from '@/presentation/components/detail/ProfileSection';
-import SectionHeader from '@/presentation/components/section/SectionHeader';
+import HomeSectionHeader from '@/presentation/components/section/HomeSectionHeader';
 import GalleryGrid from '@/presentation/components/detail/GalleryGrid';
-import InfoItem from '@/presentation/components/detail/InfoItem';
-import TagContainer from '@/presentation/components/ui/TagContainer';
-import Button from '@/presentation/components/ui/Button';
+import ActionSection from '@/presentation/components/detail/ActionSection';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';
-import DetailContent from '@/presentation/layouts/DetailContent';
-import '@/presentation/styles/global.css';
+import { LoadingState } from '@/presentation/components/states/LoadingState';
+import { ErrorState } from '@/presentation/components/states/ErrorState';
+import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
+import type { PortfolioDetail } from '@/domain/entities/Portfolio';
+import { useRepository } from '@/presentation/hooks/useRepository';
+import { useDetailData } from '@/presentation/hooks/useDetailData';
+import { useImageGallery } from '@/presentation/hooks/useImageGallery';
+import GalleryLightbox from '@/presentation/components/detail/GalleryLightbox';
 
-/**
- * 포트폴리오 상세 페이지 컴포넌트입니다.
- * 이미지에 맞게 다음 섹션들을 포함합니다:
- * 1. 포트폴리오 프로필 섹션 (이름, 설명, 프로필 이미지)
- * 2. 상세소개 섹션
- * 3. 갤러리 섹션 (3x3 그리드)
- * 4. 정보 및 태그 섹션
- * 5. 하단 버튼
- */
+const GallerySection = styled(DetailSection)`
+  padding: ${({ theme }) => theme.spacing.xl} ${({ theme }) => theme.spacing.lg};
+`;
+
+const GalleryWrapper = styled.div`
+  margin-top: ${({ theme }) => theme.spacing.lg};
+`;
+
 const PortfolioDetailPage: React.FC = () => {
-  /**
-   * 프로필 이미지 클릭 핸들러
-   */
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
+  const portfolioRepository = useRepository(PortfolioRepository);
+
+  const { data: portfolio, loading: isLoading, error } = useDetailData<PortfolioDetail>(
+    (id, signal) => portfolioRepository.getPortfolioById(id, signal),
+    id,
+    '포트폴리오를 불러오는데 실패했습니다.'
+  );
+
+  const gallery = useImageGallery(portfolio?.subThumbnailUrls ?? []);
+
   const handleProfileImageClick = () => {
-    console.log('프로필 이미지 클릭');
     // TODO: 이미지 확대 또는 갤러리 열기 기능 구현
   };
 
-  /**
-   * 갤러리 이미지 클릭 핸들러
-   */
   const handleGalleryImageClick = (index: number) => {
-    console.log(`갤러리 이미지 ${index + 1} 클릭`);
-    // TODO: 이미지 확대 또는 갤러리 뷰어 열기 기능 구현
+    gallery.open(index);
   };
 
-  /**
-   * 하단 버튼 클릭 핸들러
-   */
-  const handleButtonClick = () => {
-    console.log('버튼 클릭');
-    // TODO: 버튼 액션 구현 (예: 제안하기, 문의하기 등)
+  const handleScrap = () => {
+    // TODO: 찜하기 기능 구현
   };
+
+  const handleOffer = () => {
+    // TODO: 제안하기 기능 구현
+  };
+
+  const handleShare = () => {
+    // TODO: 공유 기능 구현
+  };
+
+  if (isLoading) {
+    return (
+      <DetailPageLayout>
+        <LoadingState padding="16px" />
+      </DetailPageLayout>
+    );
+  }
+
+  if (error || !portfolio) {
+    return (
+      <DetailPageLayout>
+        <ErrorState
+          message={error || '포트폴리오를 찾을 수 없습니다.'}
+          padding="16px"
+          onRetry={() => navigate('/portfolios')}
+          retryLabel="목록으로 돌아가기"
+        />
+      </DetailPageLayout>
+    );
+  }
+
+  // 카테고리 배열 생성 (description에서 추출)
+  const categories: string[] = [];
+  const description = portfolio.oneLineIntro || '';
+  if (description.includes('패션')) {
+    categories.push('패션');
+  }
+  if (description.includes('뷰티')) {
+    categories.push('뷰티');
+  }
+  if (description.includes('식품')) {
+    categories.push('식품');
+  }
+  if (description.includes('가전')) {
+    categories.push('가전');
+  }
+  if (description.includes('생활') || description.includes('리빙')) {
+    categories.push('생활/리빙');
+  }
+
+  // 태그 배열 생성
+  const tags: string[] = [];
+  if (portfolio.height != null) {
+    tags.push(`키 ${portfolio.height}cm`);
+  }
+  if (portfolio.weight != null) {
+    tags.push(`몸무게 ${portfolio.weight}kg`);
+  }
+  if (portfolio.topSize) {
+    tags.push(`사이즈 ${portfolio.topSize}`);
+  }
+  if (portfolio.experienceYears != null && portfolio.experienceYears > 0) {
+    tags.push(`경력 ${portfolio.experienceYears}년`);
+  }
 
   return (
     <DetailPageLayout>
-      {/* 1. 포트폴리오 프로필 섹션 */}
+      <StickyHeader title={portfolio.nickname || '쇼호스트'} onShare={handleShare} />
+
       <ProfileSection
-        name="오해원"
-        description="깔끔한 이미지의 모델로써 열정적인 활동을 하고 있습니다."
+        name={portfolio.nickname || '이름 없음'}
+        description={portfolio.oneLineIntro}
+        detailedIntro={portfolio.detailedIntro}
+        profileImageUrl={portfolio.mainThumbnailUrl || undefined}
+        type="showhost"
+        categories={categories}
+        tags={tags}
+        websiteUrl={portfolio.websiteUrl}
         onImageClick={handleProfileImageClick}
       />
 
-      {/* 2. 상세소개 섹션 */}
-      <DetailSection showDivider>
-        <div style={{ paddingBottom: '16px' }}>
-          <SectionHeader title="상세소개" />
-        </div>
-        <DetailContent>내용을 입력해주세요</DetailContent>
-      </DetailSection>
+      {portfolio.subThumbnailUrls && portfolio.subThumbnailUrls.length > 0 && (
+        <GallerySection>
+          <HomeSectionHeader title="갤러리" />
+          <GalleryWrapper>
+            <GalleryGrid
+              images={portfolio.subThumbnailUrls}
+              columns={3}
+              onImageClick={handleGalleryImageClick}
+            />
+          </GalleryWrapper>
+        </GallerySection>
+      )}
 
-      {/* 3. 갤러리 섹션 */}
-      <DetailSection>
-        <SectionHeader title="갤러리" />
-        <div style={{ marginTop: '16px' }}>
-          <GalleryGrid
-            columns={3}
-            onImageClick={handleGalleryImageClick}
-          />
-        </div>
-      </DetailSection>
-
-      {/* 4. 정보 및 태그 섹션 */}
-      <div>
-        {/* 정보 항목들 */}
-        <InfoItem title="타이틀" />
-        <InfoItem title="타이틀" />
-        <InfoItem title="타이틀" />
-        <InfoItem title="타이틀" />
-        <InfoItem title="타이틀" />
-        
-        {/* 태그가 포함된 정보 항목 */}
-        <InfoItem title="타이틀">
-          <TagContainer
-            tags={[
-              { label: 'CH', variant: 'circle' },
-              { label: 'CH', variant: 'circle' },
-              { label: 'CH', variant: 'circle' },
-              { label: 'CH', variant: 'circle' },
-              { label: 'CH', variant: 'circle' },
-              { label: 'CH', variant: 'circle' },
-            ]}
-          />
-        </InfoItem>
-      </div>
-
-      {/* 5. 하단 버튼 */}
-      <div style={{ padding: '16px' }}>
-        <Button
-          variant="primary"
-          size="large"
-          fullWidth
-          onClick={handleButtonClick}
-        >
-          BUTTON
-        </Button>
-      </div>
+      <ActionSection
+        isScraped={false}
+        isReceivingOffers={portfolio.isReceivingOffers}
+        onScrap={handleScrap}
+        onOffer={handleOffer}
+      />
+      <GalleryLightbox
+        image={gallery.currentImage}
+        isOpen={gallery.isOpen}
+        onClose={gallery.close}
+        onPrev={gallery.showPrev}
+        onNext={gallery.showNext}
+        showControls={gallery.images.length > 1}
+      />
     </DetailPageLayout>
   );
 };
 
 export default PortfolioDetailPage;
-

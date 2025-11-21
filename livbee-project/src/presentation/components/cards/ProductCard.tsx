@@ -1,5 +1,7 @@
 import React from 'react';
+import styled from 'styled-components';
 import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
+import { P } from '@/presentation/components/styled/Typography';
 
 /**
  * ProductCard 컴포넌트가 받을 props 타입을 정의합니다.
@@ -13,6 +15,41 @@ interface ProductCardProps {
   onClick?: () => void;
 }
 
+const CardContainer = styled.div<{ $hasClick: boolean }>`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => theme.spacing.md};
+  cursor: ${({ $hasClick }) => ($hasClick ? 'pointer' : 'default')};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+`;
+
+const ImageContainer = styled.div<{ $hasImage: boolean }>`
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  background-color: ${({ theme }) => theme.colors.secondary};
+  border: ${({ $hasImage, theme }) => ($hasImage ? 'none' : `1px solid ${theme.colors.border}`)};
+  border-radius: ${({ theme }) => theme.radii.md};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+`;
+
+const ProductImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+const ProductName = styled(P)`
+  flex: 1;
+  color: ${({ theme }) => theme.colors.foreground};
+`;
+
 /**
  * 관련 상품 정보를 표시하는 카드 컴포넌트입니다.
  * 모집 공고 상세 페이지의 관련 상품 섹션에서 사용됩니다.
@@ -22,71 +59,20 @@ const ProductCard: React.FC<ProductCardProps> = ({
   productName,
   onClick,
 }) => {
-  /**
-   * 카드 컨테이너 스타일
-   */
-  const cardStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '12px',
-    cursor: onClick ? 'pointer' : 'default',
-    borderRadius: '8px',
-    border: '1px solid #F7F8FA',
-  };
-
-  /**
-   * 이미지 컨테이너 스타일
-   * 작은 정사각형 이미지입니다.
-   */
-  const imageContainerStyle: React.CSSProperties = {
-    width: '60px',
-    height: '60px',
-    flexShrink: 0,
-    backgroundColor: '#F7F8FA',
-    border: '1px solid #ECEFF1',
-    borderRadius: '4px',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-  };
-
-  /**
-   * 이미지 스타일
-   */
-  const imageStyle: React.CSSProperties = {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-  };
-
-
-  /**
-   * 상품명 스타일
-   */
-  const productNameStyle: React.CSSProperties = {
-    fontSize: 'var(--p2)', // 14px
-    fontWeight: 400,
-    color: 'var(--black)',
-    flex: 1,
-  };
-
   return (
-    <div style={cardStyle} onClick={onClick}>
+    <CardContainer $hasClick={!!onClick} onClick={onClick}>
       {/* 이미지 */}
-      <div style={imageContainerStyle}>
+      <ImageContainer $hasImage={!!imageUrl}>
         {imageUrl ? (
-          <img src={imageUrl} alt={productName} style={imageStyle} />
+          <ProductImage src={imageUrl} alt={productName} />
         ) : (
           <PlaceholderImage size={24} />
         )}
-      </div>
+      </ImageContainer>
 
       {/* 상품명 */}
-      <span style={productNameStyle}>{productName}</span>
-    </div>
+      <ProductName>{productName}</ProductName>
+    </CardContainer>
   );
 };
 

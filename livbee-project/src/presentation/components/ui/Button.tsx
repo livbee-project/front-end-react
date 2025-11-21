@@ -1,4 +1,6 @@
 import React from 'react';
+import styled, { css } from 'styled-components';
+import { ButtonBase } from '@/presentation/components/styled/CommonStyles';
 
 /**
  * Button 컴포넌트가 받을 props 타입을 정의합니다.
@@ -13,9 +15,80 @@ interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>
   variant?: 'primary' | 'secondary' | 'outline';
   size?: 'small' | 'medium' | 'large';
   fullWidth?: boolean;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   children: React.ReactNode;
 }
+
+/**
+ * 버튼 크기별 스타일
+ */
+const sizeStyles = {
+  small: css`
+    padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.lg};
+    border-radius: ${({ theme }) => theme.radii.md};
+    font: ${({ theme }) => theme.fonts.caption};
+  `,
+  medium: css`
+    padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.xl};
+    border-radius: ${({ theme }) => theme.radii.md};
+    font: ${({ theme }) => theme.fonts.button};
+  `,
+  large: css`
+    padding: ${({ theme }) => theme.spacing.lg} ${({ theme }) => theme.spacing['2xl']};
+    border-radius: ${({ theme }) => theme.radii.xl};
+    font: ${({ theme }) => theme.fonts.h2};
+  `,
+};
+
+/**
+ * 버튼 variant별 스타일
+ */
+const variantStyles = {
+  primary: css`
+    background-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.primaryForeground};
+    border: none;
+
+    &:hover:not(:disabled) {
+      background-color: ${({ theme }) => theme.colors.primaryHover};
+    }
+  `,
+  secondary: css`
+    background-color: ${({ theme }) => theme.colors.secondary};
+    color: ${({ theme }) => theme.colors.secondaryForeground};
+    border: none;
+
+    &:hover:not(:disabled) {
+      background-color: rgba(245, 246, 255, 0.8);
+    }
+  `,
+  outline: css`
+    background-color: transparent;
+    color: ${({ theme }) => theme.colors.primary};
+    border: 1px solid ${({ theme }) => theme.colors.primary};
+
+    &:hover:not(:disabled) {
+      background-color: ${({ theme }) => theme.primaryOpacity['10']};
+    }
+  `,
+};
+
+/**
+ * StyledButton - styled-components 기반 버튼
+ */
+const StyledButton = styled(ButtonBase)<{
+  $variant: 'primary' | 'secondary' | 'outline';
+  $size: 'small' | 'medium' | 'large';
+  $fullWidth: boolean;
+}>`
+  ${({ $variant }) => variantStyles[$variant]}
+  ${({ $size }) => sizeStyles[$size]}
+  ${({ $fullWidth }) =>
+    $fullWidth &&
+    css`
+      width: 100%;
+    `}
+`;
 
 /**
  * 공통 버튼 컴포넌트입니다.
@@ -28,123 +101,29 @@ const Button: React.FC<ButtonProps> = ({
   disabled = false,
   onClick,
   children,
-  style,
   ...rest
 }) => {
   /**
-   * variant에 따른 기본 스타일
-   */
-  const getVariantStyle = (): React.CSSProperties => {
-    switch (variant) {
-      case 'primary':
-        return {
-          backgroundColor: 'var(--primary)',
-          color: 'var(--white)',
-          border: 'none',
-        };
-      case 'secondary':
-        return {
-          backgroundColor: 'var(--dark-gray)',
-          color: 'var(--white)',
-          border: 'none',
-        };
-      case 'outline':
-        return {
-          backgroundColor: 'transparent',
-          color: 'var(--primary)',
-          border: '1px solid var(--primary)',
-        };
-      default:
-        return {
-          backgroundColor: 'var(--primary)',
-          color: 'var(--white)',
-          border: 'none',
-        };
-    }
-  };
-
-  /**
-   * size에 따른 스타일
-   */
-  const getSizeStyle = (): React.CSSProperties => {
-    switch (size) {
-      case 'small':
-        return {
-          padding: '8px 16px',
-          fontSize: 'var(--p2)', // 14px
-          fontWeight: 400,
-          borderRadius: '8px',
-        };
-      case 'medium':
-        return {
-          padding: '12px 24px',
-          fontSize: 'var(--h3)', // 16px
-          fontWeight: 500,
-          borderRadius: '10px',
-        };
-      case 'large':
-        return {
-          padding: '16px 32px',
-          fontSize: 'var(--h2)', // 18px
-          fontWeight: 700,
-          borderRadius: '12px',
-        };
-      default:
-        return {
-          padding: '12px 24px',
-          fontSize: 'var(--h3)',
-          fontWeight: 500,
-          borderRadius: '10px',
-        };
-    }
-  };
-
-  /**
-   * 버튼 기본 스타일
-   */
-  const baseStyle: React.CSSProperties = {
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    outline: 'none',
-    boxSizing: 'border-box',
-    transition: 'all 0.2s',
-    opacity: disabled ? 0.6 : 1,
-    width: fullWidth ? '100%' : 'auto',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center',
-  };
-
-  /**
-   * 최종 스타일 병합
-   */
-  const buttonStyle: React.CSSProperties = {
-    ...baseStyle,
-    ...getVariantStyle(),
-    ...getSizeStyle(),
-    ...style,
-  };
-
-  /**
    * 클릭 핸들러
    */
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!disabled && onClick) {
-      onClick();
+      onClick(e);
     }
   };
 
   return (
-    <button
-      style={buttonStyle}
+    <StyledButton
+      $variant={variant}
+      $size={size}
+      $fullWidth={fullWidth}
       onClick={handleClick}
       disabled={disabled}
       {...rest}
     >
       {children}
-    </button>
+    </StyledButton>
   );
 };
 
 export default Button;
-

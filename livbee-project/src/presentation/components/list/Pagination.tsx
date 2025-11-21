@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 
 /**
  * Pagination 컴포넌트가 받을 props 타입을 정의합니다.
@@ -22,57 +23,49 @@ const Pagination: React.FC<PaginationProps> = ({
   onPageChange,
 }) => {
   /**
-   * 페이지네이션 컨테이너 스타일
-   */
-  const containerStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '24px 16px',
-  };
-
-  /**
-   * 페이지 번호 버튼 스타일
-   */
-  const getPageButtonStyle = (page: number): React.CSSProperties => {
-    const isActive = page === currentPage;
-    return {
-      minWidth: '32px',
-      height: '32px',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      fontSize: 'var(--p2)', // 14px
-      fontWeight: isActive ? 700 : 400,
-      color: isActive ? 'var(--black)' : 'var(--dark-gray)',
-      backgroundColor: 'transparent',
-      border: 'none',
-      cursor: 'pointer',
-      padding: '0 8px',
-    };
-  };
-
-  /**
    * 페이지 번호 배열 생성
    */
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
-    <div style={containerStyle}>
+    <Container>
       {pages.map((page) => (
-        <button
+        <PageButton
           key={page}
-          style={getPageButtonStyle(page)}
+          $isActive={page === currentPage}
           onClick={() => onPageChange(page)}
         >
           {page}
-        </button>
+        </PageButton>
       ))}
-    </div>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.xs};
+  padding: ${({ theme }) => theme.spacing.xl} ${({ theme }) => theme.spacing.lg};
+`;
+
+const PageButton = styled.button<{ $isActive: boolean }>`
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font: ${({ theme }) => theme.fonts.body};
+  font-weight: ${({ $isActive }) => ($isActive ? 700 : 400)};
+  color: ${({ $isActive, theme }) =>
+    $isActive ? theme.colors.foreground : theme.colors.muted};
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0 ${({ theme }) => theme.spacing.xs};
+`;
 
 export default Pagination;
 
