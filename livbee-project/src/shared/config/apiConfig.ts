@@ -47,9 +47,10 @@ export const getAuthHeaders = (token?: string): HeadersInit => {
   };
 
   // 토큰이 제공되지 않으면 storage에서 가져오기
-  let authToken = token;
+  let authToken: string | undefined = token;
   if (!authToken && typeof window !== 'undefined') {
-    authToken = getToken();
+    const tokenFromStorage = getToken();
+    authToken = tokenFromStorage || undefined;
   }
 
   if (authToken) {

@@ -3,7 +3,6 @@ import type {
   PortfolioListQuery,
   PortfolioDetailResponse,
   PortfolioDetail,
-  PortfolioApiErrorResponse,
   CreatePortfolioRequest,
   CreatePortfolioResponse,
 } from '@/domain/entities/Portfolio';

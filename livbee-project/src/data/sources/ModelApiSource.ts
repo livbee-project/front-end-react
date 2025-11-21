@@ -3,7 +3,6 @@ import type {
   ModelListQuery,
   ModelDetailResponse,
   ModelDetail,
-  ModelApiErrorResponse,
   CreateModelRequest,
   CreateModelResponse,
 } from '@/domain/entities/Model';
