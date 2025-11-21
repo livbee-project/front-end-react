@@ -18,6 +18,7 @@ const MyPortfolioPage = lazy(() => import('@/presentation/pages/portfolio/MyPort
 const MyPage = lazy(() => import('@/presentation/pages/mypage/MyPage'));
 const ClipsPage = lazy(() => import('@/presentation/pages/clip/ClipsPage'));
 const MyClipsPage = lazy(() => import('@/presentation/pages/clip/MyClipsPage'));
+const MyAppliedCampaignsPage = lazy(() => import('@/presentation/pages/mypage/MyAppliedCampaignsPage'));
 const LoginPage = lazy(() => import('@/presentation/pages/auth/LoginPage'));
 const ImageCropPage = lazy(() => import('@/presentation/pages/image/ImageCropPage'));
 const ChatRoomPage = lazy(() => import('@/presentation/pages/chat/ChatRoomPage'));
@@ -138,6 +139,14 @@ const AppRouter = () => (
               element={
                 <Suspense fallback={null}>
                   <MyClipsPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/mypage/applied-campaigns"
+              element={
+                <Suspense fallback={null}>
+                  <MyAppliedCampaignsPage />
                 </Suspense>
               }
             />

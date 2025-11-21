@@ -124,7 +124,7 @@ export const useMyPageData = (userType: UserType) => {
               icon: Briefcase,
               label: '내가 지원한 캠페인',
               description: '지원한 캠페인 확인',
-              onClick: () => console.log('내가 지원한 캠페인 클릭'),
+              onClick: () => navigate('/mypage/applied-campaigns'),
             },
             {
               icon: FileText,
