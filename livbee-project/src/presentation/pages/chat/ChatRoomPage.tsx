@@ -392,14 +392,6 @@ const ActionButton = styled.button<{ $variant: 'primary' | 'secondary' }>`
   align-items: center;
 `;
 
-const InputRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-top: 8px;
-  border-top: 1px solid #f0f2f8;
-`;
-
 const InputField = styled.input`
   flex: 1;
   border-radius: 999px;
