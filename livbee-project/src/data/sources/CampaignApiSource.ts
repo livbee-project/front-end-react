@@ -8,7 +8,7 @@ import type {
   CampaignDetail,
 } from '@/domain/entities/Campaign';
 import { buildApiUrl, getAuthHeaders } from '@/shared/config/apiConfig';
-import { getToken } from '@/shared/utils/storage';
+import { isSuccessResponse, extractData, extractErrorMessage } from '@/shared/utils/apiResponseHandler';
 
 /**
  * 캠페인 API 소스
@@ -48,11 +48,21 @@ export class CampaignApiSource {
       signal,
     });
 
-    if (!response.ok) {
-      throw new Error(`API 요청 실패: ${response.status} ${response.statusText}`);
+    const result = await response.json();
+
+    if (!response.ok || !isSuccessResponse(result)) {
+      const errorMessage = extractErrorMessage(result);
+      throw new Error(errorMessage || `API 요청 실패: ${response.status} ${response.statusText}`);
     }
 
-    return await response.json();
+    // FastAPI 응답 형식: { ok: true, data: {...} } 또는 { success: true, data: {...} }
+    const data = extractData<CampaignListResponse>(result);
+    if (data) {
+      return data;
+    }
+
+    // 기존 응답 형식: { ok: true, items: [...], ... }
+    return result as CampaignListResponse;
   }
 
   /**
@@ -62,13 +72,8 @@ export class CampaignApiSource {
    * @throws {Error} 등록 실패 시
    */
   async createCampaign(request: CreateCampaignRequest): Promise<CreateCampaignResponse> {
-    const token = getToken();
-    if (!token) {
-      throw new Error('인증 토큰이 없습니다.');
-    }
-
     const url = buildApiUrl('/campaigns');
-    const headers = getAuthHeaders(token);
+    const headers = getAuthHeaders();
 
     const response = await fetch(url, {
       method: 'POST',
@@ -76,10 +81,10 @@ export class CampaignApiSource {
       body: JSON.stringify(request),
     });
 
-    const data: CreateCampaignResponse | CampaignApiErrorResponse = await response.json();
+    const result = await response.json();
 
-    if (!data.ok) {
-      const error = data as CampaignApiErrorResponse;
+    if (!response.ok || !isSuccessResponse(result)) {
+      const error = result as CampaignApiErrorResponse;
       
       // 유효성 검사 실패 시 상세 에러 메시지 처리
       if (error.errors && Array.isArray(error.errors)) {
@@ -87,10 +92,16 @@ export class CampaignApiSource {
         throw new Error(errorMessages);
       }
 
-      throw new Error(error.userMessage || error.message || '모집 공고 등록에 실패했습니다.');
+      const errorMessage = extractErrorMessage(result);
+      throw new Error(errorMessage || '모집 공고 등록에 실패했습니다.');
     }
 
-    return data as CreateCampaignResponse;
+    const data = extractData<CreateCampaignResponse>(result);
+    if (data) {
+      return data;
+    }
+
+    return result as CreateCampaignResponse;
   }
 
   /**
@@ -101,9 +112,8 @@ export class CampaignApiSource {
    * @throws {Error} 조회 실패 시
    */
   async getCampaignById(id: string, signal?: AbortSignal): Promise<CampaignDetail> {
-    const token = getToken();
     const url = buildApiUrl(`/campaigns/${id}`);
-    const headers = getAuthHeaders(token || undefined);
+    const headers = getAuthHeaders();
 
     const response = await fetch(url, {
       method: 'GET',
@@ -111,53 +121,56 @@ export class CampaignApiSource {
       signal,
     });
 
-    const data: CampaignDetailResponse | CampaignApiErrorResponse = await response.json();
+    const result = await response.json();
 
-    if (!data.ok) {
-      const error = data as CampaignApiErrorResponse;
-      throw new Error(error.userMessage || error.message || '모집 공고 상세 조회에 실패했습니다.');
+    if (!response.ok || !isSuccessResponse(result)) {
+      const errorMessage = extractErrorMessage(result);
+      throw new Error(errorMessage || '모집 공고 상세 조회에 실패했습니다.');
     }
 
-    const responseData = (data as CampaignDetailResponse).data;
+    // FastAPI 응답 형식: { ok: true, data: {...} } 또는 { success: true, data: {...} }
+    const data = extractData<CampaignDetailResponse>(result);
+    const responseData = data || (result as CampaignDetailResponse);
 
     // API 응답을 프론트엔드 타입으로 변환
+    const responseDataObj = (responseData as any).data || responseData;
     const campaignDetail: CampaignDetail = {
-      id: responseData.id,
-      brandName: responseData.brandName,
-      prefix: this.mapPrefixToKorean(responseData.prefix),
-      prefixName: responseData.prefixName,
-      title: responseData.title,
-      content: responseData.content,
-      detailedContent: responseData.detailedContent,
-      category: this.mapCategoryToKorean(responseData.category),
-      categoryName: responseData.categoryName,
-      location: responseData.location,
-      shootDate: responseData.shootDate,
-      closeAt: responseData.closeAt,
-      durationHours: responseData.durationHours,
-      startTime: responseData.startTime,
-      endTime: responseData.endTime,
-      fee: responseData.fee,
-      feeNegotiable: responseData.feeNegotiable,
-      coverImageUrl: responseData.coverImageUrl,
-      imageUrl: responseData.imageUrl,
-      thumbnailUrl: responseData.thumbnailUrl,
-      liveVerticalCoverUrl: responseData.liveVerticalCoverUrl,
-      liveStreamUrl: responseData.liveStreamUrl,
-      productThumbnailUrl: responseData.productThumbnailUrl,
-      productImageUrl: responseData.productImageUrl,
-      productName: responseData.productName,
-      productUrl: responseData.productUrl,
-      brandIntroduction: responseData.brandIntroduction,
-      recruitmentSection: responseData.recruitmentSection,
-      qualifications: responseData.qualifications,
-      preferredQualifications: responseData.preferredQualifications,
-      isPublic: responseData.isPublic,
-      createdAt: responseData.createdAt,
-      updatedAt: responseData.updatedAt,
-      createdBy: responseData.createdBy,
-      metrics: responseData.metrics,
-      isApplied: responseData.isApplied,
+      id: responseDataObj.id || responseDataObj._id || id,
+      brandName: responseDataObj.brandName,
+      prefix: this.mapPrefixToKorean(responseDataObj.prefix),
+      prefixName: responseDataObj.prefixName,
+      title: responseDataObj.title,
+      content: responseDataObj.content,
+      detailedContent: responseDataObj.detailedContent,
+      category: this.mapCategoryToKorean(responseDataObj.category),
+      categoryName: responseDataObj.categoryName,
+      location: responseDataObj.location,
+      shootDate: responseDataObj.shootDate,
+      closeAt: responseDataObj.closeAt,
+      durationHours: responseDataObj.durationHours,
+      startTime: responseDataObj.startTime,
+      endTime: responseDataObj.endTime,
+      fee: responseDataObj.fee,
+      feeNegotiable: responseDataObj.feeNegotiable,
+      coverImageUrl: responseDataObj.coverImageUrl,
+      imageUrl: responseDataObj.imageUrl,
+      thumbnailUrl: responseDataObj.thumbnailUrl,
+      liveVerticalCoverUrl: responseDataObj.liveVerticalCoverUrl,
+      liveStreamUrl: responseDataObj.liveStreamUrl,
+      productThumbnailUrl: responseDataObj.productThumbnailUrl,
+      productImageUrl: responseDataObj.productImageUrl,
+      productName: responseDataObj.productName,
+      productUrl: responseDataObj.productUrl,
+      brandIntroduction: responseDataObj.brandIntroduction,
+      recruitmentSection: responseDataObj.recruitmentSection,
+      qualifications: responseDataObj.qualifications,
+      preferredQualifications: responseDataObj.preferredQualifications,
+      isPublic: responseDataObj.isPublic,
+      createdAt: responseDataObj.createdAt,
+      updatedAt: responseDataObj.updatedAt,
+      createdBy: responseDataObj.createdBy,
+      metrics: responseDataObj.metrics,
+      isApplied: responseDataObj.isApplied,
     };
 
     return campaignDetail;

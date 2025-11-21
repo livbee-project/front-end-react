@@ -1,5 +1,4 @@
 import { buildApiUrl, getAuthHeaders } from '@/shared/config/apiConfig';
-import { getToken } from '@/shared/utils/storage';
 import type {
   LoginRequest,
   LoginResponse,
@@ -30,18 +29,29 @@ export class UserApiSource {
       body: JSON.stringify({
         email: request.email.toLowerCase(), // 이메일 소문자 변환
         password: request.password,
-        role: request.role,
       }),
     });
 
-    const data: LoginResponse | ApiErrorResponse = await response.json();
+    const result = await response.json();
 
-    if (!data.ok) {
-      const error = data as ApiErrorResponse;
+    // 에러 응답 처리
+    if (!result.ok && !result.success) {
+      const error = result as ApiErrorResponse;
       throw new Error(error.userMessage || error.message || '로그인에 실패했습니다.');
     }
 
-    return data as LoginResponse;
+    // FastAPI 응답 형식: { success: true, data: { token: "...", user: {...} } }
+    if (result.success && result.data) {
+      return {
+        ok: true,
+        token: result.data.token,
+        name: result.data.user?.name || '',
+        role: result.data.user?.role || request.role,
+      };
+    }
+
+    // 기존 응답 형식: { ok: true, token: "...", name: "...", role: "..." }
+    return result as LoginResponse;
   }
 
   /**
@@ -63,14 +73,25 @@ export class UserApiSource {
       }),
     });
 
-    const data: SignupResponse | ApiErrorResponse = await response.json();
+    const result = await response.json();
 
-    if (!data.ok) {
-      const error = data as ApiErrorResponse;
+    // 에러 응답 처리
+    if (!result.ok && !result.success) {
+      const error = result as ApiErrorResponse;
       throw new Error(error.userMessage || error.message || '회원가입에 실패했습니다.');
     }
 
-    return data as SignupResponse;
+    // FastAPI 응답 형식: { success: true, data: { token: "...", user: {...} } }
+    if (result.success && result.data) {
+      return {
+        ok: true,
+        userId: result.data.user?.id || '',
+        role: result.data.user?.role || request.role,
+      };
+    }
+
+    // 기존 응답 형식: { ok: true, userId: "...", role: "..." }
+    return result as SignupResponse;
   }
 
   /**
@@ -80,13 +101,8 @@ export class UserApiSource {
    * @throws {Error} 조회 실패 시
    */
   async getMe(signal?: AbortSignal): Promise<MeResponse> {
-    const token = getToken();
-    if (!token) {
-      throw new Error('인증 토큰이 없습니다.');
-    }
-
     const url = buildApiUrl('/users/me');
-    const headers = getAuthHeaders(token);
+    const headers = getAuthHeaders();
 
     const response = await fetch(url, {
       method: 'GET',
@@ -94,21 +110,32 @@ export class UserApiSource {
       signal,
     });
 
-    const data: MeResponse | ApiErrorResponse = await response.json();
+    const result = await response.json();
 
-    if (!data.ok) {
-      const error = data as ApiErrorResponse;
+    // 에러 응답 처리
+    if (!result.ok && !result.success) {
+      const error = result as ApiErrorResponse;
       
       // 토큰이 유효하지 않거나 만료된 경우
-      if (error.code === 'INVALID_TOKEN' || error.code === 'AUTH_REQUIRED') {
-        // 토큰 제거는 호출하는 쪽에서 처리
+      if (error.code === 'INVALID_TOKEN' || error.code === 'AUTH_REQUIRED' || error.error === 'UNAUTHORIZED') {
         throw new Error('인증이 만료되었습니다. 다시 로그인해주세요.');
       }
 
       throw new Error(error.userMessage || error.message || '내 정보 조회에 실패했습니다.');
     }
 
-    return data as MeResponse;
+    // FastAPI 응답 형식: { ok: true, data: {...} } 또는 { success: true, data: {...} }
+    if ((result.ok || result.success) && result.data) {
+      return {
+        ok: true,
+        id: result.data.id,
+        name: result.data.name,
+        role: result.data.role,
+      };
+    }
+
+    // 기존 응답 형식: { ok: true, id: "...", name: "...", role: "..." }
+    return result as MeResponse;
   }
 }
 
