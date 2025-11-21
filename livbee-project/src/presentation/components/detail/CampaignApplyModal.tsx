@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { AlertTriangle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Modal from '@/presentation/components/ui/Modal';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { H2, H3, PMuted, Caption } from '@/presentation/components/styled/Typography';
@@ -51,6 +52,11 @@ const CampaignApplyModal: React.FC<CampaignApplyModalProps> = ({ isOpen, campaig
   const [message, setMessage] = useState('');
   const [availableDate, setAvailableDate] = useState('');
   const [availableTime, setAvailableTime] = useState('');
+  const navigate = useNavigate();
+
+  const selectedPortfolioData = selectedPortfolio
+    ? MOCK_PORTFOLIOS.find((portfolio) => portfolio.id === selectedPortfolio)
+    : null;
 
   useEffect(() => {
     if (!isOpen) {
@@ -68,6 +74,15 @@ const CampaignApplyModal: React.FC<CampaignApplyModalProps> = ({ isOpen, campaig
     }
     showToast('지원서가 제출되었습니다.');
     onClose();
+    navigate('/chat', {
+      state: {
+        campaignTitle,
+        portfolioTitle: selectedPortfolioData?.title,
+        availableDate,
+        availableTime,
+        message: message.trim(),
+      },
+    });
   };
 
   return (

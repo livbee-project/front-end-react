@@ -20,6 +20,7 @@ const ClipsPage = lazy(() => import('@/presentation/pages/clip/ClipsPage'));
 const MyClipsPage = lazy(() => import('@/presentation/pages/clip/MyClipsPage'));
 const LoginPage = lazy(() => import('@/presentation/pages/auth/LoginPage'));
 const ImageCropPage = lazy(() => import('@/presentation/pages/image/ImageCropPage'));
+const ChatRoomPage = lazy(() => import('@/presentation/pages/chat/ChatRoomPage'));
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -66,6 +67,14 @@ const AppRouter = () => (
             <Route path="/news" element={<div>뉴스 페이지</div>} />
             <Route path="/event" element={<div>이벤트 페이지</div>} />
             <Route path="/service" element={<div>서비스 페이지</div>} />
+            <Route
+              path="/chat"
+              element={
+                <Suspense fallback={null}>
+                  <ChatRoomPage />
+                </Suspense>
+              }
+            />
 
             {/* (추가) BottomNavBar의 탭 경로들을 추가합니다. */}
             <Route
