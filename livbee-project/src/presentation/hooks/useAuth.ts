@@ -151,7 +151,7 @@ export const useAuth = (): UseAuthReturn => {
         setAuthState({
           isLoggedIn: true,
           user: {
-            id: '', // 로그인 응답에 id가 없으므로 나중에 getMe로 가져올 수 있음
+            id: loginResponse.userId || '', // 백엔드 응답의 user.id 사용
             name: loginResponse.name,
             role: loginResponse.role,
           },

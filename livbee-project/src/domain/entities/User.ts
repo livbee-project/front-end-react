@@ -19,7 +19,7 @@ export interface User {
 export interface LoginRequest {
   email: string;
   password: string;
-  role: UserRole;
+  role?: UserRole; // 선택사항: 제공하지 않으면 사용자의 실제 역할 사용
 }
 
 /**
@@ -30,6 +30,7 @@ export interface LoginResponse {
   token: string;
   name: string;
   role: UserRole;
+  userId?: string; // 백엔드 응답의 user.id (선택사항)
 }
 
 /**

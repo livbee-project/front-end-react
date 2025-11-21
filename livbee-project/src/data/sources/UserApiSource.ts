@@ -40,13 +40,15 @@ export class UserApiSource {
       throw new Error(error.userMessage || error.message || '로그인에 실패했습니다.');
     }
 
-    // FastAPI 응답 형식: { success: true, data: { token: "...", user: {...} } }
-    if (result.success && result.data) {
+    // 백엔드 응답 형식: { ok: true, data: { token: "...", user: { id, name, email, role } } }
+    if ((result.ok || result.success) && result.data) {
+      const data = result.data;
       return {
         ok: true,
-        token: result.data.token,
-        name: result.data.user?.name || '',
-        role: result.data.user?.role || request.role,
+        token: data.token,
+        name: data.user?.name || '',
+        role: data.user?.role || request.role || 'showhost',
+        userId: data.user?.id,
       };
     }
 
