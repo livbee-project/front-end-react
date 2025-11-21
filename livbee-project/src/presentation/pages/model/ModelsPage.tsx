@@ -344,7 +344,7 @@ const ModelsPage: React.FC = () => {
     navigate(`/models/${modelId}`);
   };
 
-  const handleCastingProposal = (e: React.MouseEvent, modelId: string) => {
+  const handleCastingProposal = (e: React.MouseEvent) => {
     e.stopPropagation();
     // TODO: 캐스팅 제안 기능 구현
   };
@@ -419,7 +419,7 @@ const ModelsPage: React.FC = () => {
                 </CategoryTags>
                 <CastingButton
                   variant="primary"
-                  onClick={(e) => handleCastingProposal(e, model.id)}
+                  onClick={handleCastingProposal}
                 >
                   캐스팅 제안
                 </CastingButton>
