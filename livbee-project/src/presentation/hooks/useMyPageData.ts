@@ -81,7 +81,7 @@ export const useMyPageData = (userType: UserType) => {
         icon: MessageSquare,
         label: '메시지',
         description: '받은 메시지 확인',
-        onClick: () => console.log('메시지 클릭'),
+        onClick: () => navigate('/mypage/messages'),
       },
     ];
 
