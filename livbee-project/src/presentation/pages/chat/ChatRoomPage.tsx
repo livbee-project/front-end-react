@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Paperclip, Smile, Info, RefreshCcw } from 'lucide-react';
 import { useChatRoomDetail } from '@/presentation/hooks/useChatRoomDetail';
 
 interface ChatRoomState {
@@ -23,6 +23,8 @@ const ChatRoomPage: React.FC = () => {
     useChatRoomDetail(activeRoomId);
   const [composer, setComposer] = useState('');
   const [sendError, setSendError] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [autoScroll, setAutoScroll] = useState(true);
 
   const formatTimestamp = (iso?: string) => {
     if (!iso) return '';
@@ -59,6 +61,7 @@ const ChatRoomPage: React.FC = () => {
       setSendError(null);
       await sendMessage({ content: composer.trim(), messageType: 'text' });
       setComposer('');
+      setAutoScroll(true);
     } catch (err) {
       setSendError(err instanceof Error ? err.message : '메시지를 전송하지 못했습니다.');
     }
@@ -80,6 +83,28 @@ const ChatRoomPage: React.FC = () => {
     handleMarkAsRead();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages, roomDetail?.room.me.lastReadMessageId]);
+
+  React.useEffect(() => {
+    if (autoScroll && scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, autoScroll]);
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+    const isBottom = scrollHeight - (scrollTop + clientHeight) < 60;
+    setAutoScroll(isBottom);
+  };
+
+  const dateLabel = (iso: string) => {
+    const date = new Date(iso);
+    return new Intl.DateTimeFormat('ko-KR', {
+      month: 'long',
+      day: 'numeric',
+      weekday: 'short',
+    }).format(date);
+  };
 
   if (!activeRoomId) {
     return (
@@ -115,9 +140,27 @@ const ChatRoomPage: React.FC = () => {
             </ProfileGroup>
             <ContractButton>{displayCampaign}</ContractButton>
           </ContactHeader>
+          <RoomMetaPanel>
+            <MetaItem>
+              <MetaLabel>캠페인</MetaLabel>
+              <MetaValue>{roomDetail?.room.campaign?.title ?? '비공개'}</MetaValue>
+            </MetaItem>
+            <MetaItem>
+              <MetaLabel>브랜드 담당자</MetaLabel>
+              <MetaValue>{roomDetail?.room.brandUser?.name ?? '미지정'}</MetaValue>
+            </MetaItem>
+            <MetaItem>
+              <MetaLabel>쇼호스트</MetaLabel>
+              <MetaValue>{roomDetail?.room.showhostUser?.name ?? '미지정'}</MetaValue>
+            </MetaItem>
+            <MetaItem>
+              <MetaLabel>최근 업데이트</MetaLabel>
+              <MetaValue>{formatTimestamp(roomDetail?.room.updatedAt)}</MetaValue>
+            </MetaItem>
+          </RoomMetaPanel>
         </FixedPanel>
 
-        <ScrollArea>
+        <ScrollArea ref={scrollRef} onScroll={handleScroll}>
           <ChatCard>
             {loading && <MessageValue>채팅을 불러오는 중입니다...</MessageValue>}
             {error && <MessageValue>{error}</MessageValue>}
@@ -125,18 +168,42 @@ const ChatRoomPage: React.FC = () => {
               <MessageValue>아직 주고받은 메시지가 없습니다.</MessageValue>
             )}
             <Messages>
-              {messages.map((chatMessage) => {
+              {messages.map((chatMessage, index) => {
+                const previous = messages[index - 1];
+                const showDivider =
+                  !previous ||
+                  new Date(previous.createdAt).toDateString() !==
+                    new Date(chatMessage.createdAt).toDateString();
                 const isMyMessage = chatMessage.senderId === roomDetail?.room.me.userId;
+                const isSystem = chatMessage.messageType === 'system';
                 return (
-                  <MessageGroup key={chatMessage.id} $align={isMyMessage ? 'end' : 'start'}>
-                    <MessageBubble $variant={isMyMessage ? 'sent' : 'received'}>
-                      {chatMessage.content}
-                    </MessageBubble>
-                    <MessageTime>{formatTimestamp(chatMessage.createdAt)}</MessageTime>
-                  </MessageGroup>
+                  <React.Fragment key={chatMessage.id}>
+                    {showDivider && <DateDivider>{dateLabel(chatMessage.createdAt)}</DateDivider>}
+                    <MessageGroup $align={isMyMessage ? 'end' : 'start'}>
+                      {isSystem ? (
+                        <SystemMessage>{chatMessage.content}</SystemMessage>
+                      ) : (
+                        <MessageBubble $variant={isMyMessage ? 'sent' : 'received'}>
+                          {chatMessage.content}
+                        </MessageBubble>
+                      )}
+                      <MessageMeta>
+                        <MessageTime>{formatTimestamp(chatMessage.createdAt)}</MessageTime>
+                        {isMyMessage && roomDetail?.room.unreadCount === 0 && (
+                          <MessageStatus>읽음</MessageStatus>
+                        )}
+                      </MessageMeta>
+                    </MessageGroup>
+                  </React.Fragment>
                 );
               })}
             </Messages>
+            {!loading && !error && !autoScroll && (
+              <ScrollHintButton type="button" onClick={() => setAutoScroll(true)}>
+                <Info size={14} />
+                최근 메시지로 이동
+              </ScrollHintButton>
+            )}
           </ChatCard>
         </ScrollArea>
       </ChatColumn>
@@ -155,6 +222,16 @@ const ChatRoomPage: React.FC = () => {
             }}
             disabled={loading || Boolean(error)}
           />
+          <ComposerActions>
+            <ComposerActionButton type="button">
+              <Paperclip size={16} />
+              파일
+            </ComposerActionButton>
+            <ComposerActionButton type="button">
+              <Smile size={16} />
+              이모지
+            </ComposerActionButton>
+          </ComposerActions>
           <SendButton
             type="button"
             aria-label="메시지 전송"
@@ -165,6 +242,23 @@ const ChatRoomPage: React.FC = () => {
           </SendButton>
         </ComposerInner>
         {sendError && <SendError>{sendError}</SendError>}
+        <ComposerFooter>
+          <span>Shift + Enter 로 줄바꿈 • Enter 로 전송</span>
+          <FooterRefresh
+            type="button"
+            onClick={() => {
+              if (messages.length > 0) {
+                const latest = messages[messages.length - 1];
+                markAsRead(latest.id);
+              } else {
+                handleMarkAsRead();
+              }
+            }}
+          >
+            <RefreshCcw size={14} />
+            새로고침
+          </FooterRefresh>
+        </ComposerFooter>
       </ComposerBar>
     </PageWrapper>
   );
@@ -211,6 +305,30 @@ const ContactHeader = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 8px 4px;
+`;
+
+const RoomMetaPanel = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  padding: 8px 4px 0;
+`;
+
+const MetaItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const MetaLabel = styled.span`
+  font-size: 0.75rem;
+  color: #7d8299;
+`;
+
+const MetaValue = styled.span`
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1f1f25;
 `;
 
 const ProfileGroup = styled.div`
@@ -324,6 +442,49 @@ const MessageValue = styled.div`
   margin: 8px 0;
 `;
 
+const MessageMeta = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const MessageStatus = styled.span`
+  font-size: 0.75rem;
+  color: #5a64ff;
+  font-weight: 600;
+`;
+
+const SystemMessage = styled.div`
+  font-size: 0.85rem;
+  color: #7d8299;
+  background: #f4f5fb;
+  border-radius: 999px;
+  padding: 6px 14px;
+`;
+
+const DateDivider = styled.div`
+  align-self: center;
+  font-size: 0.75rem;
+  color: #7d8299;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(125, 130, 153, 0.12);
+`;
+
+const ScrollHintButton = styled.button`
+  align-self: center;
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e1e4f2;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.75rem;
+  color: #7d8299;
+  background: #fff;
+`;
+
 const InputField = styled.input`
   flex: 1;
   border-radius: 999px;
@@ -365,11 +526,51 @@ const ComposerInner = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 `;
 
 const SendError = styled.p`
   margin-top: 8px;
   color: #e64444;
+`;
+
+const ComposerActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const ComposerActionButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 12px;
+  border: 1px solid #e1e4f2;
+  background: #fff;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  color: #5a64ff;
+`;
+
+const ComposerFooter = styled.div`
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #9a9fb9;
+  gap: 12px;
+  flex-wrap: wrap;
+`;
+
+const FooterRefresh = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  color: #5a64ff;
+  font-size: 0.75rem;
 `;
 
 export default ChatRoomPage;
