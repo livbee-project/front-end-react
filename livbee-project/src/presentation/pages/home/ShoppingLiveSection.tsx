@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import HomeSection, { Highlight, HorizontalScroll } from './components/HomeSection';
@@ -62,16 +62,28 @@ const PriceValue = styled(H2)`
   text-overflow: ellipsis;
 `;
 
-const ShoppingLiveSection: React.FC = () => {
+const ShoppingLiveSection: React.FC = React.memo(() => {
   const navigate = useNavigate();
   const campaignRepository = useRepository(CampaignRepository);
+
+  // query 객체 메모이제이션
+  const query = useMemo(() => ({ page: 1, limit: 10, sort: 'latest' as const }), []);
+  
+  // fetchFunction 메모이제이션
+  const fetchCampaigns = useCallback(
+    (query: { page: number; limit: number; sort?: 'latest' | 'deadline' }, signal?: AbortSignal) => {
+      return campaignRepository.getCampaignList(query, signal);
+    },
+    [campaignRepository]
+  );
+
   const { data: campaigns, loading, error } = useListData<
     Campaign,
     { page: number; limit: number; sort?: 'latest' | 'deadline' },
     { items: Campaign[] }
   >(
-    (query, signal) => campaignRepository.getCampaignList(query, signal),
-    { page: 1, limit: 10, sort: 'latest' },
+    fetchCampaigns,
+    query,
     [],
     '쇼핑 라이브 목록을 불러오는 중 오류가 발생했습니다.'
   );
@@ -149,6 +161,8 @@ const ShoppingLiveSection: React.FC = () => {
       </HorizontalScroll>
     </HomeSection>
   );
-};
+});
+
+ShoppingLiveSection.displayName = 'ShoppingLiveSection';
 
 export default ShoppingLiveSection;

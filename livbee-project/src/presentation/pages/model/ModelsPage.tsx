@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Search, Heart } from 'lucide-react';
@@ -244,9 +244,20 @@ const ModelsPage: React.FC = () => {
 
   const modelRepository = useRepository(ModelRepository);
 
+  // query 객체 메모이제이션
+  const query = useMemo(() => ({ page: 1, limit: 20 }), []);
+
+  // fetchFunction 메모이제이션
+  const fetchModels = useCallback(
+    (query: { page: number; limit: number }, signal?: AbortSignal) => {
+      return modelRepository.getModelList(query, signal);
+    },
+    [modelRepository]
+  );
+
   const { data: models, loading, error } = useListData<Model, { page: number; limit: number }, { items: Model[]; currentPage?: number; totalPages?: number }>(
-    (query, signal) => modelRepository.getModelList(query, signal),
-    { page: 1, limit: 20 },
+    fetchModels,
+    query,
     [],
     '모델 목록을 불러오는 중 오류가 발생했습니다.'
   );

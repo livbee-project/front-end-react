@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Plus } from 'lucide-react';
@@ -23,6 +23,24 @@ const PortfolioPage: React.FC = () => {
 
   const portfolioRepository = useRepository(PortfolioRepository);
 
+  // query 객체 메모이제이션
+  const query = useMemo(
+    () => ({
+      page: currentPage,
+      limit: 20,
+      search: searchQuery || undefined,
+    }),
+    [currentPage, searchQuery]
+  );
+
+  // fetchFunction 메모이제이션
+  const fetchPortfolios = useCallback(
+    (query: { page: number; limit: number; search?: string }, signal?: AbortSignal) => {
+      return portfolioRepository.getPortfolioList(query, signal);
+    },
+    [portfolioRepository]
+  );
+
   const {
     data: portfolios,
     loading,
@@ -33,12 +51,8 @@ const PortfolioPage: React.FC = () => {
     { page: number; limit: number; search?: string },
     { items: Portfolio[]; currentPage?: number; totalPages?: number; totalItems?: number }
   >(
-    (query, signal) => portfolioRepository.getPortfolioList(query, signal),
-    {
-      page: currentPage,
-      limit: 20,
-      search: searchQuery || undefined,
-    },
+    fetchPortfolios,
+    query,
     [currentPage, searchQuery],
     '포트폴리오 목록을 불러오는 중 오류가 발생했습니다.'
   );

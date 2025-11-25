@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { FileText, CheckCircle, Briefcase, MapPin, Calendar, Clock, DollarSign, Tag, ChevronLeft } from 'lucide-react';
@@ -238,9 +238,17 @@ const ActionButtons = styled.div`
 const CampaignDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [isApplyModalOpen, setIsApplyModalOpen] = React.useState(false);
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
 
   const campaignRepository = useRepository(CampaignRepository);
+
+  // fetchFunction 메모이제이션
+  const fetchCampaign = useCallback(
+    (id: string, signal?: AbortSignal) => {
+      return campaignRepository.getCampaignById(id, signal);
+    },
+    [campaignRepository]
+  );
 
   const {
     data: campaign,
@@ -248,7 +256,7 @@ const CampaignDetailPage: React.FC = () => {
     error,
     setData: setCampaign,
   } = useDetailData<CampaignDetail>(
-    (id, signal) => campaignRepository.getCampaignById(id, signal),
+    fetchCampaign,
     id,
     '공고를 불러오는데 실패했습니다.'
   );

@@ -76,19 +76,22 @@ export const useCampaignRegisterForm = () => {
   const [liveCoverImageFile, setLiveCoverImageFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 이미지 URL 변경 시 sessionStorage에 저장
+  // 이미지 URL 변경 시 sessionStorage에 저장 (값이 실제로 변경되었을 때만)
   useEffect(() => {
     if (typeof window === 'undefined') return;
     
     try {
-      sessionStorage.setItem(
-        IMAGE_STORAGE_KEY,
-        JSON.stringify({
-          cover: coverImageUrl,
-          product: productImageUrl,
-          liveCover: liveCoverImageUrl,
-        })
-      );
+      const currentStored = sessionStorage.getItem(IMAGE_STORAGE_KEY);
+      const newValue = JSON.stringify({
+        cover: coverImageUrl,
+        product: productImageUrl,
+        liveCover: liveCoverImageUrl,
+      });
+      
+      // 이전 값과 다를 때만 저장 (불필요한 저장 방지)
+      if (currentStored !== newValue) {
+        sessionStorage.setItem(IMAGE_STORAGE_KEY, newValue);
+      }
     } catch (error) {
       console.warn('Failed to save image URLs to sessionStorage:', error);
     }

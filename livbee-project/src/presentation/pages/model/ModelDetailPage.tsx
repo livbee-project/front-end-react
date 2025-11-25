@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { FileText, CheckCircle, Briefcase, MapPin, Calendar, Clock, DollarSign, Tag, ChevronLeft } from 'lucide-react';
@@ -228,8 +228,16 @@ const ModelDetailPage: React.FC = () => {
 
   const modelRepository = useRepository(ModelRepository);
 
+  // fetchFunction 메모이제이션
+  const fetchModel = useCallback(
+    (id: string, signal?: AbortSignal) => {
+      return modelRepository.getModelById(id, signal);
+    },
+    [modelRepository]
+  );
+
   const { data: model, loading: isLoading, error } = useDetailData<ModelDetail>(
-    (id, signal) => modelRepository.getModelById(id, signal),
+    fetchModel,
     id,
     '모델을 불러오는데 실패했습니다.'
   );

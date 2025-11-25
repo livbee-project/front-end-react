@@ -25,19 +25,31 @@ export const useFormState = <T>(initialState: T, storageKey?: string) => {
   }, [initialState, storageKey]);
 
   const [formData, setFormData] = useState<T>(getInitialState);
+  const [isInitialMount, setIsInitialMount] = useState(true);
 
-  // sessionStorage에 저장
+  // 초기 마운트 시에는 저장하지 않음 (복원만 수행)
   useEffect(() => {
-    if (!storageKey || typeof window === 'undefined') {
+    setIsInitialMount(false);
+  }, []);
+
+  // sessionStorage에 저장 (초기 마운트 제외, 실제 변경 시에만 저장)
+  useEffect(() => {
+    if (isInitialMount || !storageKey || typeof window === 'undefined') {
       return;
     }
 
     try {
-      sessionStorage.setItem(storageKey, JSON.stringify(formData));
+      const currentStored = sessionStorage.getItem(storageKey);
+      const newValue = JSON.stringify(formData);
+      
+      // 이전 값과 다를 때만 저장 (불필요한 저장 방지)
+      if (currentStored !== newValue) {
+        sessionStorage.setItem(storageKey, newValue);
+      }
     } catch (error) {
       console.warn(`Failed to save form state to sessionStorage (${storageKey}):`, error);
     }
-  }, [formData, storageKey]);
+  }, [formData, storageKey, isInitialMount]);
 
   /**
    * 필드 값을 업데이트합니다.

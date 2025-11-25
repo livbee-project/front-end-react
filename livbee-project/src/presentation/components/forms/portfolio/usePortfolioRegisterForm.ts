@@ -100,15 +100,18 @@ export const usePortfolioRegisterForm = () => {
     if (typeof window === 'undefined') return;
     
     try {
-      sessionStorage.setItem(
-        IMAGE_STORAGE_KEY,
-        JSON.stringify({
-          mainThumbnail: mainThumbnailUrlState,
-          gallery: galleryImageUrlsState,
-          resume: resumeFileUrl,
-          portfolio: portfolioFileUrl,
-        })
-      );
+      const currentStored = sessionStorage.getItem(IMAGE_STORAGE_KEY);
+      const newValue = JSON.stringify({
+        mainThumbnail: mainThumbnailUrlState,
+        gallery: galleryImageUrlsState,
+        resume: resumeFileUrl,
+        portfolio: portfolioFileUrl,
+      });
+      
+      // 이전 값과 다를 때만 저장 (불필요한 저장 방지)
+      if (currentStored !== newValue) {
+        sessionStorage.setItem(IMAGE_STORAGE_KEY, newValue);
+      }
     } catch (error) {
       console.warn('Failed to save image URLs to sessionStorage:', error);
     }

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Plus } from 'lucide-react';
@@ -25,6 +25,28 @@ const CampaignsPage: React.FC = () => {
 
   const campaignRepository = useRepository(CampaignRepository);
 
+  // query 객체 메모이제이션
+  const query = useMemo(
+    () => ({
+      page: currentPage,
+      limit: 20,
+      search: searchQuery || undefined,
+      sort: 'latest' as const,
+    }),
+    [currentPage, searchQuery]
+  );
+
+  // fetchFunction 메모이제이션
+  const fetchCampaigns = useCallback(
+    (
+      query: { page: number; limit: number; search?: string; sort?: 'latest' | 'deadline' },
+      signal?: AbortSignal
+    ) => {
+      return campaignRepository.getCampaignList(query, signal);
+    },
+    [campaignRepository]
+  );
+
   const {
     data: campaigns,
     loading,
@@ -35,13 +57,8 @@ const CampaignsPage: React.FC = () => {
     { page: number; limit: number; search?: string; sort?: 'latest' | 'deadline' },
     { items: Campaign[]; currentPage?: number; totalPages?: number; totalItems?: number }
   >(
-    (query, signal) => campaignRepository.getCampaignList(query, signal),
-    {
-      page: currentPage,
-      limit: 20,
-      search: searchQuery || undefined,
-      sort: 'latest' as const,
-    },
+    fetchCampaigns,
+    query,
     [currentPage, searchQuery],
     '캠페인 목록을 불러오는 중 오류가 발생했습니다.'
   );

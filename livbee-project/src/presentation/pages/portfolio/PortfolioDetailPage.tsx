@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import StickyHeader from '@/presentation/components/detail/StickyHeader';
@@ -31,8 +31,16 @@ const PortfolioDetailPage: React.FC = () => {
 
   const portfolioRepository = useRepository(PortfolioRepository);
 
+  // fetchFunction 메모이제이션
+  const fetchPortfolio = useCallback(
+    (id: string, signal?: AbortSignal) => {
+      return portfolioRepository.getPortfolioById(id, signal);
+    },
+    [portfolioRepository]
+  );
+
   const { data: portfolio, loading: isLoading, error } = useDetailData<PortfolioDetail>(
-    (id, signal) => portfolioRepository.getPortfolioById(id, signal),
+    fetchPortfolio,
     id,
     '포트폴리오를 불러오는데 실패했습니다.'
   );
