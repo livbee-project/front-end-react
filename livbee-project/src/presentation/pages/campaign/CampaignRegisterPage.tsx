@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
 import TextInput from '@/presentation/components/forms/inputs/TextInput';
 import SelectInput from '@/presentation/components/forms/inputs/SelectInput';
 import DateInput from '@/presentation/components/forms/inputs/DateInput';
@@ -8,13 +7,7 @@ import ImageUpload from '@/presentation/components/upload/ImageUpload';
 import Button from '@/presentation/components/ui/Button';
 import RegisterPageLayout from '@/presentation/layouts/RegisterPageLayout';
 import FormSection from '@/presentation/components/forms/sections/FormSection';
-import { Caption } from '@/presentation/components/styled/Typography';
 import { useCampaignRegisterForm } from '@/presentation/components/forms/campaign/useCampaignRegisterForm';
-
-const UploadMessage = styled(Caption)`
-  margin-top: ${({ theme }) => theme.spacing.sm};
-  color: ${({ theme }) => theme.colors.muted};
-`;
 
 const recruitmentTypeOptions = [
   { value: 'store', label: '스토어 모집' },
@@ -47,8 +40,7 @@ const CampaignRegisterPage: React.FC = () => {
   return (
     <RegisterPageLayout>
       <FormSection title="대표이미지 1:2*">
-        <ImageUpload size={200} aspectRatio="1:2" onImageSelect={(file) => handleImageSelect(file, 'cover')} />
-        {coverImageUrl && <UploadMessage>이미지 업로드 완료</UploadMessage>}
+        <ImageUpload size={200} aspectRatio="1:2" imageUrl={coverImageUrl} onImageSelect={(file) => handleImageSelect(file, 'cover')} />
       </FormSection>
 
       <FormSection title="브랜드명*">
@@ -100,13 +92,11 @@ const CampaignRegisterPage: React.FC = () => {
       </FormSection>
 
       <FormSection title="상품 이미지">
-        <ImageUpload size={200} onImageSelect={(file) => handleImageSelect(file, 'product')} />
-        {productImageUrl && <UploadMessage>이미지 업로드 완료</UploadMessage>}
+        <ImageUpload size={200} imageUrl={productImageUrl} onImageSelect={(file) => handleImageSelect(file, 'product')} />
       </FormSection>
 
       <FormSection title="라이브 커버 이미지">
-        <ImageUpload size={200} onImageSelect={(file) => handleImageSelect(file, 'liveCover')} />
-        {liveCoverImageUrl && <UploadMessage>이미지 업로드 완료</UploadMessage>}
+        <ImageUpload size={200} imageUrl={liveCoverImageUrl} onImageSelect={(file) => handleImageSelect(file, 'liveCover')} />
       </FormSection>
 
       <Button

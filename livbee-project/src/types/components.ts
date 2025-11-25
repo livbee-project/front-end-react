@@ -75,6 +75,7 @@ export interface ImageUploadProps extends FileUploadProps {
   size?: number;
   aspectRatio?: string;
   enableCrop?: boolean;
+  imageUrl?: string;
 }
 
 // ===== 입력 컴포넌트 =====

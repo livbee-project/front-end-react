@@ -23,6 +23,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   aspectRatio,
   onImageSelect,
   enableCrop = true,
+  imageUrl,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -92,7 +93,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       $isCircle={isCircle}
       onClick={handleClick}
     >
-      <ImageIcon size={size * 0.4} />
+      {imageUrl ? (
+        <PreviewImage src={imageUrl} alt="미리보기" $width={width} $height={height} $isCircle={isCircle} />
+      ) : (
+        <ImageIcon size={size * 0.4} />
+      )}
       <HiddenInput
         ref={fileInputRef}
         type="file"
@@ -118,6 +123,13 @@ const Container = styled.div<{ $width: number; $height: number; $isCircle: boole
 
 const ImageIcon = styled(RiImageLine)`
   color: ${({ theme }) => theme.colors.muted};
+`;
+
+const PreviewImage = styled.img<{ $width: number; $height: number; $isCircle: boolean }>`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: ${({ $isCircle, theme }) => ($isCircle ? theme.radii.full : theme.radii.lg)};
 `;
 
 const HiddenInput = styled.input`

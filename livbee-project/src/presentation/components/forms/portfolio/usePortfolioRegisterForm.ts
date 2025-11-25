@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
@@ -9,6 +9,10 @@ import { useFormUpload } from '@/presentation/hooks/useFormUpload';
 import type { CreatePortfolioRequest } from '@/domain/entities/Portfolio';
 import { isValidPhoneNumber, isValidUrl } from '@/shared/utils/validation';
 import type { PortfolioFormData, PortfolioToggleState } from './types';
+
+const FORM_STORAGE_KEY = 'portfolio-register-form';
+const TOGGLE_STORAGE_KEY = 'portfolio-register-toggles';
+const IMAGE_STORAGE_KEY = 'portfolio-register-images';
 
 const INITIAL_FORM_DATA: PortfolioFormData = {
   registrationType: '',
@@ -35,13 +39,31 @@ export const usePortfolioRegisterForm = () => {
   const { showToast } = useToast();
   const portfolioRepository = useRepository(PortfolioRepository);
 
-  const { formData, updateField, updateArrayField } = useFormState<PortfolioFormData>(INITIAL_FORM_DATA);
+  const { formData, updateField, updateArrayField, clearStorage: clearFormStorage } = useFormState<PortfolioFormData>(INITIAL_FORM_DATA, FORM_STORAGE_KEY);
   const {
     formData: toggles,
     updateField: updateToggleField,
     updateArrayField: updateToggleArrayField,
-  } = useFormState<PortfolioToggleState>(INITIAL_TOGGLE_STATE);
+    clearStorage: clearToggleStorage,
+  } = useFormState<PortfolioToggleState>(INITIAL_TOGGLE_STATE, TOGGLE_STORAGE_KEY);
 
+  // 이미지 URL 복원
+  const getStoredImageUrls = (): { mainThumbnail: string; gallery: string[]; resume: string; portfolio: string } => {
+    if (typeof window === 'undefined') {
+      return { mainThumbnail: '', gallery: [], resume: '', portfolio: '' };
+    }
+    try {
+      const stored = sessionStorage.getItem(IMAGE_STORAGE_KEY);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (error) {
+      console.warn('Failed to restore image URLs from sessionStorage:', error);
+    }
+    return { mainThumbnail: '', gallery: [], resume: '', portfolio: '' };
+  };
+
+  const storedImages = getStoredImageUrls();
   const {
     profileFile: mainThumbnailFile,
     profileUrl: mainThumbnailUrl,
@@ -52,12 +74,45 @@ export const usePortfolioRegisterForm = () => {
     removeGalleryImage,
   } = useFormUpload({ maxGalleryImages: 9 });
 
-  const [resumeFileUrl, setResumeFileUrl] = useState('');
-  const [portfolioFileUrl, setPortfolioFileUrl] = useState('');
-
+  // 복원된 이미지 URL로 초기화
+  const [mainThumbnailUrlState, setMainThumbnailUrlState] = useState(storedImages.mainThumbnail || mainThumbnailUrl);
+  const [galleryImageUrlsState, setGalleryImageUrlsState] = useState<string[]>(storedImages.gallery.length > 0 ? storedImages.gallery : galleryImageUrls);
+  const [resumeFileUrl, setResumeFileUrl] = useState(storedImages.resume);
+  const [portfolioFileUrl, setPortfolioFileUrl] = useState(storedImages.portfolio);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 이미지 URL 동기화 및 저장
+  useEffect(() => {
+    if (mainThumbnailUrl && mainThumbnailUrl !== mainThumbnailUrlState) {
+      setMainThumbnailUrlState(mainThumbnailUrl);
+    }
+  }, [mainThumbnailUrl]);
+
+  useEffect(() => {
+    if (galleryImageUrls.length > 0 && JSON.stringify(galleryImageUrls) !== JSON.stringify(galleryImageUrlsState)) {
+      setGalleryImageUrlsState(galleryImageUrls);
+    }
+  }, [galleryImageUrls]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      sessionStorage.setItem(
+        IMAGE_STORAGE_KEY,
+        JSON.stringify({
+          mainThumbnail: mainThumbnailUrlState,
+          gallery: galleryImageUrlsState,
+          resume: resumeFileUrl,
+          portfolio: portfolioFileUrl,
+        })
+      );
+    } catch (error) {
+      console.warn('Failed to save image URLs to sessionStorage:', error);
+    }
+  }, [mainThumbnailUrlState, galleryImageUrlsState, resumeFileUrl, portfolioFileUrl]);
 
   const handleInputChange = useCallback(
     (field: keyof PortfolioFormData, value: string, index?: number) => {
@@ -232,6 +287,16 @@ export const usePortfolioRegisterForm = () => {
       const response = await portfolioRepository.createPortfolio(request);
 
       if (response.ok) {
+        // 제출 성공 시 sessionStorage 삭제
+        clearFormStorage();
+        clearToggleStorage();
+        if (typeof window !== 'undefined') {
+          try {
+            sessionStorage.removeItem(IMAGE_STORAGE_KEY);
+          } catch (error) {
+            console.warn('Failed to remove image URLs from sessionStorage:', error);
+          }
+        }
         showToast('포트폴리오가 등록되었습니다.');
         navigate('/portfolios', { replace: true });
       }
@@ -267,8 +332,8 @@ export const usePortfolioRegisterForm = () => {
   return {
     formData,
     toggles,
-    mainThumbnailUrl,
-    galleryImageUrls,
+    mainThumbnailUrl: mainThumbnailUrlState || mainThumbnailUrl,
+    galleryImageUrls: galleryImageUrlsState.length > 0 ? galleryImageUrlsState : galleryImageUrls,
     resumeFileUrl,
     portfolioFileUrl,
     isSubmitting,

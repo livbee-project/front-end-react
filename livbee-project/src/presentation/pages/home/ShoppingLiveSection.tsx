@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import HomeSection, { Highlight, HorizontalScroll } from './components/HomeSection';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
+import { EmptyState } from '@/presentation/components/states/EmptyState';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { Campaign } from '@/domain/entities/Campaign';
 import { htmlToText } from '@/shared/utils/htmlUtils';
@@ -64,7 +65,7 @@ const PriceValue = styled(H2)`
 const ShoppingLiveSection: React.FC = () => {
   const navigate = useNavigate();
   const campaignRepository = useRepository(CampaignRepository);
-  const { data: campaigns, loading } = useListData<
+  const { data: campaigns, loading, error } = useListData<
     Campaign,
     { page: number; limit: number; sort?: 'latest' | 'deadline' },
     { items: Campaign[] }
@@ -75,21 +76,40 @@ const ShoppingLiveSection: React.FC = () => {
     '쇼핑 라이브 목록을 불러오는 중 오류가 발생했습니다.'
   );
 
+  const sectionTitle = (
+    <>
+      <span>지금 뜨는 </span>
+      <Highlight>쇼핑라이브</Highlight>
+    </>
+  );
+
   if (loading) {
     return (
-      <HomeSection title={<><span>지금 뜨는 </span><Highlight>쇼핑라이브</Highlight></>}>
+      <HomeSection title={sectionTitle}>
         <LoadingState />
       </HomeSection>
     );
   }
 
+  if (error) {
+    return (
+      <HomeSection title={sectionTitle} onMore={() => navigate('/campaigns')}>
+        <EmptyState message={error} />
+      </HomeSection>
+    );
+  }
+
   if (campaigns.length === 0) {
-    return null;
+    return (
+      <HomeSection title={sectionTitle} onMore={() => navigate('/campaigns')}>
+        <EmptyState message="현재 표시할 쇼핑라이브가 없습니다." />
+      </HomeSection>
+    );
   }
 
   return (
     <HomeSection
-      title={<><span>지금 뜨는 </span><Highlight>쇼핑라이브</Highlight></>}
+      title={sectionTitle}
       onMore={() => navigate('/campaigns')}
     >
       <HorizontalScroll>

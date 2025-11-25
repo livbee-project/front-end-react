@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
 import { useRepository } from '@/presentation/hooks/useRepository';
@@ -9,6 +9,10 @@ import { useFormUpload } from '@/presentation/hooks/useFormUpload';
 import type { CreateModelRequest } from '@/domain/entities/Model';
 import type { ModelFormData, ModelToggleState } from './types';
 import { isValidPhoneNumber, isValidUrl } from '@/shared/utils/validation';
+
+const FORM_STORAGE_KEY = 'model-register-form';
+const TOGGLE_STORAGE_KEY = 'model-register-toggles';
+const IMAGE_STORAGE_KEY = 'model-register-images';
 
 const INITIAL_FORM_DATA: ModelFormData = {
   name: '',
@@ -46,13 +50,31 @@ export const useModelRegisterForm = () => {
   const { showToast } = useToast();
   const modelRepository = useRepository(ModelRepository);
 
-  const { formData, updateField, updateArrayField } = useFormState<ModelFormData>(INITIAL_FORM_DATA);
+  const { formData, updateField, updateArrayField, clearStorage: clearFormStorage } = useFormState<ModelFormData>(INITIAL_FORM_DATA, FORM_STORAGE_KEY);
   const {
     formData: toggles,
     updateField: updateToggleField,
     updateArrayField: updateToggleArrayField,
-  } = useFormState<ModelToggleState>(INITIAL_TOGGLE_STATE);
+    clearStorage: clearToggleStorage,
+  } = useFormState<ModelToggleState>(INITIAL_TOGGLE_STATE, TOGGLE_STORAGE_KEY);
 
+  // 이미지 URL 복원
+  const getStoredImageUrls = (): { mainThumbnail: string; gallery: string[]; portfolio: string } => {
+    if (typeof window === 'undefined') {
+      return { mainThumbnail: '', gallery: [], portfolio: '' };
+    }
+    try {
+      const stored = sessionStorage.getItem(IMAGE_STORAGE_KEY);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (error) {
+      console.warn('Failed to restore image URLs from sessionStorage:', error);
+    }
+    return { mainThumbnail: '', gallery: [], portfolio: '' };
+  };
+
+  const storedImages = getStoredImageUrls();
   const {
     profileFile: mainThumbnailFile,
     profileUrl: mainThumbnailUrl,
@@ -64,11 +86,42 @@ export const useModelRegisterForm = () => {
     removeGalleryImage,
   } = useFormUpload({ maxGalleryImages: MAX_GALLERY_IMAGES });
 
-  const [portfolioFileUrl, setPortfolioFileUrl] = useState('');
-
+  // 복원된 이미지 URL로 초기화
+  const [mainThumbnailUrlState, setMainThumbnailUrlState] = useState(storedImages.mainThumbnail || mainThumbnailUrl);
+  const [galleryImageUrlsState, setGalleryImageUrlsState] = useState<string[]>(storedImages.gallery.length > 0 ? storedImages.gallery : galleryImageUrls);
+  const [portfolioFileUrl, setPortfolioFileUrl] = useState(storedImages.portfolio);
   const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 이미지 URL 동기화 및 저장
+  useEffect(() => {
+    if (mainThumbnailUrl && mainThumbnailUrl !== mainThumbnailUrlState) {
+      setMainThumbnailUrlState(mainThumbnailUrl);
+    }
+  }, [mainThumbnailUrl]);
+
+  useEffect(() => {
+    if (galleryImageUrls.length > 0 && JSON.stringify(galleryImageUrls) !== JSON.stringify(galleryImageUrlsState)) {
+      setGalleryImageUrlsState(galleryImageUrls);
+    }
+  }, [galleryImageUrls]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      sessionStorage.setItem(
+        IMAGE_STORAGE_KEY,
+        JSON.stringify({
+          mainThumbnail: mainThumbnailUrlState,
+          gallery: galleryImageUrlsState,
+          portfolio: portfolioFileUrl,
+        })
+      );
+    } catch (error) {
+      console.warn('Failed to save image URLs to sessionStorage:', error);
+    }
+  }, [mainThumbnailUrlState, galleryImageUrlsState, portfolioFileUrl]);
 
   const handleInputChange = useCallback(
     (field: keyof ModelFormData, value: string, index?: number, subField?: keyof (ModelFormData['websites'][number]) ) => {
@@ -229,6 +282,16 @@ export const useModelRegisterForm = () => {
       const response = await modelRepository.createModel(request);
 
       if (response.ok) {
+        // 제출 성공 시 sessionStorage 삭제
+        clearFormStorage();
+        clearToggleStorage();
+        if (typeof window !== 'undefined') {
+          try {
+            sessionStorage.removeItem(IMAGE_STORAGE_KEY);
+          } catch (error) {
+            console.warn('Failed to remove image URLs from sessionStorage:', error);
+          }
+        }
         showToast('모델이 등록되었습니다.');
         navigate('/models', { replace: true });
       }
@@ -253,8 +316,8 @@ export const useModelRegisterForm = () => {
   return {
     formData,
     toggles,
-    mainThumbnailUrl,
-    galleryImageUrls,
+    mainThumbnailUrl: mainThumbnailUrlState || mainThumbnailUrl,
+    galleryImageUrls: galleryImageUrlsState.length > 0 ? galleryImageUrlsState : galleryImageUrls,
     portfolioFileUrl,
     isSubmitting,
     isImageUploading,

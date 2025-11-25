@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import HomeSection, { Highlight, HorizontalScroll } from './components/HomeSection';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
+import { EmptyState } from '@/presentation/components/states/EmptyState';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { Campaign } from '@/domain/entities/Campaign';
 import { htmlToText } from '@/shared/utils/htmlUtils';
@@ -34,7 +35,7 @@ const RecommendedLiveSection: React.FC = () => {
   const navigate = useNavigate();
   const [selectedCampaign, setSelectedCampaign] = React.useState<Campaign | null>(null);
   const campaignRepository = useRepository(CampaignRepository);
-  const { data: campaigns, loading } = useListData<
+  const { data: campaigns, loading, error } = useListData<
     Campaign,
     { page: number; limit: number; sort?: 'latest' | 'deadline' },
     { items: Campaign[] }
@@ -45,21 +46,40 @@ const RecommendedLiveSection: React.FC = () => {
     '라이브 추천 목록을 불러오는 중 오류가 발생했습니다.'
   );
 
+  const sectionTitle = (
+    <>
+      <Highlight>라이브</Highlight>
+      <span> PICK!!</span>
+    </>
+  );
+
   if (loading) {
     return (
-      <HomeSection title={<><Highlight>라이브</Highlight><span> PICK!!</span></>}>
+      <HomeSection title={sectionTitle}>
         <LoadingState />
       </HomeSection>
     );
   }
 
+  if (error) {
+    return (
+      <HomeSection title={sectionTitle} onMore={() => navigate('/campaigns')}>
+        <EmptyState message={error} />
+      </HomeSection>
+    );
+  }
+
   if (campaigns.length === 0) {
-    return null;
+    return (
+      <HomeSection title={sectionTitle} onMore={() => navigate('/campaigns')}>
+        <EmptyState message="현재 추천할 라이브가 없습니다." />
+      </HomeSection>
+    );
   }
 
   return (
     <HomeSection
-      title={<><Highlight>라이브</Highlight><span> PICK!!</span></>}
+      title={sectionTitle}
       onMore={() => navigate('/campaigns')}
     >
       <HorizontalScroll>

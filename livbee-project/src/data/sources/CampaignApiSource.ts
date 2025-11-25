@@ -86,6 +86,11 @@ export class CampaignApiSource {
     const result = await response.json();
 
     if (!response.ok || !isSuccessResponse(result)) {
+      // 인증 오류 처리
+      if (response.status === 401) {
+        throw new Error('인증이 필요합니다. 브랜드 계정으로 다시 로그인해주세요.');
+      }
+      
       const error = result as CampaignApiErrorResponse;
       
       // 유효성 검사 실패 시 상세 에러 메시지 처리

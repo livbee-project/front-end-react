@@ -1,10 +1,43 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 
 /**
  * 범용 폼 상태를 관리하는 훅
+ * @param initialState 초기 상태
+ * @param storageKey sessionStorage에 저장할 키 (선택적, 제공 시 자동 저장/복원)
  */
-export const useFormState = <T>(initialState: T) => {
-  const [formData, setFormData] = useState<T>(initialState);
+export const useFormState = <T>(initialState: T, storageKey?: string) => {
+  // sessionStorage에서 복원 또는 초기 상태 사용
+  const getInitialState = useCallback((): T => {
+    if (!storageKey || typeof window === 'undefined') {
+      return initialState;
+    }
+    
+    try {
+      const stored = sessionStorage.getItem(storageKey);
+      if (stored) {
+        return JSON.parse(stored) as T;
+      }
+    } catch (error) {
+      console.warn(`Failed to restore form state from sessionStorage (${storageKey}):`, error);
+    }
+    
+    return initialState;
+  }, [initialState, storageKey]);
+
+  const [formData, setFormData] = useState<T>(getInitialState);
+
+  // sessionStorage에 저장
+  useEffect(() => {
+    if (!storageKey || typeof window === 'undefined') {
+      return;
+    }
+
+    try {
+      sessionStorage.setItem(storageKey, JSON.stringify(formData));
+    } catch (error) {
+      console.warn(`Failed to save form state to sessionStorage (${storageKey}):`, error);
+    }
+  }, [formData, storageKey]);
 
   /**
    * 필드 값을 업데이트합니다.
@@ -57,7 +90,27 @@ export const useFormState = <T>(initialState: T) => {
    */
   const resetForm = useCallback(() => {
     setFormData(initialState);
-  }, [initialState]);
+    if (storageKey && typeof window !== 'undefined') {
+      try {
+        sessionStorage.removeItem(storageKey);
+      } catch (error) {
+        console.warn(`Failed to remove form state from sessionStorage (${storageKey}):`, error);
+      }
+    }
+  }, [initialState, storageKey]);
+
+  /**
+   * sessionStorage에서 폼 데이터를 삭제합니다.
+   */
+  const clearStorage = useCallback(() => {
+    if (storageKey && typeof window !== 'undefined') {
+      try {
+        sessionStorage.removeItem(storageKey);
+      } catch (error) {
+        console.warn(`Failed to clear form state from sessionStorage (${storageKey}):`, error);
+      }
+    }
+  }, [storageKey]);
 
   return {
     formData,
@@ -65,6 +118,7 @@ export const useFormState = <T>(initialState: T) => {
     updateField,
     updateArrayField,
     resetForm,
+    clearStorage,
   };
 };
 

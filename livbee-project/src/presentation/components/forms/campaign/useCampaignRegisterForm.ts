@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import { useRepository } from '@/presentation/hooks/useRepository';
@@ -8,6 +8,9 @@ import { useFormState } from '@/presentation/hooks/useFormState';
 import { validateRequiredFields, validateTimeRange } from '@/shared/utils/validation';
 import type { CreateCampaignRequest } from '@/domain/entities/Campaign';
 import type { CampaignFormData } from './types';
+
+const STORAGE_KEY = 'campaign-register-form';
+const IMAGE_STORAGE_KEY = 'campaign-register-images';
 
 const INITIAL_FORM_DATA: CampaignFormData = {
   brandName: '',
@@ -46,14 +49,50 @@ export const useCampaignRegisterForm = () => {
   const { showToast } = useToast();
   const campaignRepository = useRepository(CampaignRepository);
 
-  const { formData, updateField } = useFormState<CampaignFormData>(INITIAL_FORM_DATA);
-  const [coverImageUrl, setCoverImageUrl] = useState('');
-  const [productImageUrl, setProductImageUrl] = useState('');
-  const [liveCoverImageUrl, setLiveCoverImageUrl] = useState('');
+  const { formData, updateField, clearStorage } = useFormState<CampaignFormData>(INITIAL_FORM_DATA, STORAGE_KEY);
+  
+  // 이미지 URL 복원
+  const getStoredImageUrls = (): { cover: string; product: string; liveCover: string } => {
+    if (typeof window === 'undefined') {
+      return { cover: '', product: '', liveCover: '' };
+    }
+    try {
+      const stored = sessionStorage.getItem(IMAGE_STORAGE_KEY);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (error) {
+      console.warn('Failed to restore image URLs from sessionStorage:', error);
+    }
+    return { cover: '', product: '', liveCover: '' };
+  };
+
+  const storedImages = getStoredImageUrls();
+  const [coverImageUrl, setCoverImageUrl] = useState(storedImages.cover);
+  const [productImageUrl, setProductImageUrl] = useState(storedImages.product);
+  const [liveCoverImageUrl, setLiveCoverImageUrl] = useState(storedImages.liveCover);
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
   const [productImageFile, setProductImageFile] = useState<File | null>(null);
   const [liveCoverImageFile, setLiveCoverImageFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 이미지 URL 변경 시 sessionStorage에 저장
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      sessionStorage.setItem(
+        IMAGE_STORAGE_KEY,
+        JSON.stringify({
+          cover: coverImageUrl,
+          product: productImageUrl,
+          liveCover: liveCoverImageUrl,
+        })
+      );
+    } catch (error) {
+      console.warn('Failed to save image URLs to sessionStorage:', error);
+    }
+  }, [coverImageUrl, productImageUrl, liveCoverImageUrl]);
 
   const handleInputChange = useCallback((field: keyof CampaignFormData, value: string) => {
     updateField(field, value);
@@ -64,12 +103,60 @@ export const useCampaignRegisterForm = () => {
     if (type === 'cover') {
       setCoverImageFile(file);
       setCoverImageUrl(blobUrl);
+      // 즉시 sessionStorage에 저장
+      if (typeof window !== 'undefined') {
+        try {
+          const current = sessionStorage.getItem(IMAGE_STORAGE_KEY);
+          const currentData = current ? JSON.parse(current) : { cover: '', product: '', liveCover: '' };
+          sessionStorage.setItem(
+            IMAGE_STORAGE_KEY,
+            JSON.stringify({
+              ...currentData,
+              cover: blobUrl,
+            })
+          );
+        } catch (error) {
+          console.warn('Failed to save image URL to sessionStorage:', error);
+        }
+      }
     } else if (type === 'product') {
       setProductImageFile(file);
       setProductImageUrl(blobUrl);
+      // 즉시 sessionStorage에 저장
+      if (typeof window !== 'undefined') {
+        try {
+          const current = sessionStorage.getItem(IMAGE_STORAGE_KEY);
+          const currentData = current ? JSON.parse(current) : { cover: '', product: '', liveCover: '' };
+          sessionStorage.setItem(
+            IMAGE_STORAGE_KEY,
+            JSON.stringify({
+              ...currentData,
+              product: blobUrl,
+            })
+          );
+        } catch (error) {
+          console.warn('Failed to save image URL to sessionStorage:', error);
+        }
+      }
     } else {
       setLiveCoverImageFile(file);
       setLiveCoverImageUrl(blobUrl);
+      // 즉시 sessionStorage에 저장
+      if (typeof window !== 'undefined') {
+        try {
+          const current = sessionStorage.getItem(IMAGE_STORAGE_KEY);
+          const currentData = current ? JSON.parse(current) : { cover: '', product: '', liveCover: '' };
+          sessionStorage.setItem(
+            IMAGE_STORAGE_KEY,
+            JSON.stringify({
+              ...currentData,
+              liveCover: blobUrl,
+            })
+          );
+        } catch (error) {
+          console.warn('Failed to save image URL to sessionStorage:', error);
+        }
+      }
     }
   }, []);
 
@@ -160,6 +247,15 @@ export const useCampaignRegisterForm = () => {
       const response = await campaignRepository.createCampaign(request);
 
       if (response.ok) {
+        // 제출 성공 시 sessionStorage 삭제
+        clearStorage();
+        if (typeof window !== 'undefined') {
+          try {
+            sessionStorage.removeItem(IMAGE_STORAGE_KEY);
+          } catch (error) {
+            console.warn('Failed to remove image URLs from sessionStorage:', error);
+          }
+        }
         showToast('모집 공고가 등록되었습니다.');
         navigate('/campaigns', { replace: true });
       }

@@ -52,6 +52,53 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
   return payload as T;
 };
 
+type RawRoomsResponse =
+  | ChatRoomSummary[]
+  | {
+      rooms?: ChatRoomSummary[];
+      items?: ChatRoomSummary[];
+      list?: ChatRoomSummary[];
+      data?: ChatRoomSummary[] | { rooms?: ChatRoomSummary[]; items?: ChatRoomSummary[]; list?: ChatRoomSummary[] };
+    };
+
+const extractRooms = (payload: RawRoomsResponse): ChatRoomSummary[] => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (Array.isArray(payload.rooms)) {
+    return payload.rooms;
+  }
+
+  if (Array.isArray(payload.items)) {
+    return payload.items;
+  }
+
+  if (Array.isArray(payload.list)) {
+    return payload.list;
+  }
+
+  if (payload.data) {
+    if (Array.isArray(payload.data)) {
+      return payload.data;
+    }
+
+    if (Array.isArray(payload.data.rooms)) {
+      return payload.data.rooms;
+    }
+
+    if (Array.isArray(payload.data.items)) {
+      return payload.data.items;
+    }
+
+    if (Array.isArray(payload.data.list)) {
+      return payload.data.list;
+    }
+  }
+
+  return [];
+};
+
 export class ChatApiSource {
   async getRooms(params?: { page?: number; size?: number }): Promise<ChatRoomSummary[]> {
     const url = buildApiUrl('/chat/rooms', params);
@@ -59,7 +106,8 @@ export class ChatApiSource {
       method: 'GET',
       headers: getAuthHeaders(),
     });
-    return handleResponse<ChatRoomSummary[]>(response);
+    const payload = await handleResponse<RawRoomsResponse>(response);
+    return extractRooms(payload);
   }
 
   async getRoomDetail(roomId: string, params?: { page?: number; limit?: number; cursor?: string }): Promise<ChatRoomDetail> {
