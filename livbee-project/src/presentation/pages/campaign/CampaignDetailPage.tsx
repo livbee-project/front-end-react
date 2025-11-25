@@ -242,7 +242,12 @@ const CampaignDetailPage: React.FC = () => {
 
   const campaignRepository = useRepository(CampaignRepository);
 
-  const { data: campaign, loading: isLoading, error } = useDetailData<CampaignDetail>(
+  const {
+    data: campaign,
+    loading: isLoading,
+    error,
+    setData: setCampaign,
+  } = useDetailData<CampaignDetail>(
     (id, signal) => campaignRepository.getCampaignById(id, signal),
     id,
     '공고를 불러오는데 실패했습니다.'
@@ -314,6 +319,10 @@ const CampaignDetailPage: React.FC = () => {
 
   const handleBack = () => {
     navigate(-1);
+  };
+
+  const handleApplySuccess = () => {
+    setCampaign((prev) => (prev ? { ...prev, isApplied: true } : prev));
   };
 
   return (
@@ -467,8 +476,10 @@ const CampaignDetailPage: React.FC = () => {
 
       <CampaignApplyModal
         isOpen={isApplyModalOpen}
+        campaignId={campaign.id}
         campaignTitle={campaign.title || displayData.title}
         onClose={() => setIsApplyModalOpen(false)}
+        onApplied={handleApplySuccess}
       />
     </PageContainer>
   );

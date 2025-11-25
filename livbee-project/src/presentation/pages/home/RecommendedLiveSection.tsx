@@ -105,6 +105,7 @@ const RecommendedLiveSection: React.FC = () => {
       {selectedCampaign && (
         <CampaignApplyModal
           isOpen={Boolean(selectedCampaign)}
+          campaignId={selectedCampaign.id}
           campaignTitle={selectedCampaign.title}
           onClose={() => setSelectedCampaign(null)}
         />

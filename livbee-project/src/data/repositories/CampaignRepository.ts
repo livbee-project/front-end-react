@@ -4,6 +4,8 @@ import type {
   CreateCampaignRequest,
   CreateCampaignResponse,
   CampaignDetail,
+  CampaignApplyRequest,
+  CampaignApplyResponse,
 } from '@/domain/entities/Campaign';
 import { CampaignApiSource } from '@/data/sources/CampaignApiSource';
 
@@ -50,6 +52,15 @@ export class CampaignRepository {
       return await this.apiSource.getCampaignById(id, signal);
     } catch (error) {
       console.error('캠페인 상세 조회 실패:', error);
+      throw error;
+    }
+  }
+
+  async applyToCampaign(request: CampaignApplyRequest): Promise<CampaignApplyResponse> {
+    try {
+      return await this.apiSource.applyToCampaign(request);
+    } catch (error) {
+      console.error('캠페인 지원 실패:', error);
       throw error;
     }
   }

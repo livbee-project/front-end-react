@@ -96,3 +96,14 @@ export const buildApiUrl = (
   return url;
 };
 
+/**
+ * WebSocket URL 생성
+ * @param endpoint - API 기준 경로 (예: '/chat/rooms/123')
+ */
+export const buildWebSocketUrl = (endpoint: string): string => {
+  const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const httpUrl = new URL(`${API_BASE_URL}${path}`);
+  httpUrl.protocol = httpUrl.protocol === 'https:' ? 'wss:' : 'ws:';
+  return httpUrl.toString();
+};
+

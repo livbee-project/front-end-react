@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +7,11 @@ import { useToast } from '@/presentation/contexts/ToastContext';
 import { H2, H3, PMuted, Caption } from '@/presentation/components/styled/Typography';
 import Button from '@/presentation/components/ui/Button';
 import { Badge } from '@/presentation/components/styled/CommonStyles';
+import { CampaignRepository } from '@/data/repositories/CampaignRepository';
+import { useRepository } from '@/presentation/hooks/useRepository';
+import { MOCK_PORTFOLIOS } from '@/shared/constants/portfolio';
+
+const MAX_MESSAGE_LENGTH = 400;
 
 interface PortfolioOption {
   id: number;
@@ -16,7 +21,7 @@ interface PortfolioOption {
   tags: string[];
 }
 
-const MOCK_PORTFOLIOS: PortfolioOption[] = [
+const FALLBACK_PORTFOLIOS: PortfolioOption[] = [
   {
     id: 1,
     title: '패션 쇼핑라이브 포트폴리오',
@@ -42,20 +47,40 @@ const MOCK_PORTFOLIOS: PortfolioOption[] = [
 
 interface CampaignApplyModalProps {
   isOpen: boolean;
+  campaignId: string;
   campaignTitle: string;
   onClose: () => void;
+  onApplied?: (chatRoomId: string) => void;
 }
 
-const CampaignApplyModal: React.FC<CampaignApplyModalProps> = ({ isOpen, campaignTitle, onClose }) => {
+const CampaignApplyModal: React.FC<CampaignApplyModalProps> = ({
+  isOpen,
+  campaignId,
+  campaignTitle,
+  onClose,
+  onApplied,
+}) => {
   const { showToast } = useToast();
   const [selectedPortfolio, setSelectedPortfolio] = useState<number | null>(null);
   const [message, setMessage] = useState('');
   const [availableDate, setAvailableDate] = useState('');
   const [availableTime, setAvailableTime] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const campaignRepository = useRepository(CampaignRepository);
+
+  const portfolioOptions: PortfolioOption[] = useMemo(() => {
+    return (MOCK_PORTFOLIOS ?? FALLBACK_PORTFOLIOS).map((portfolio) => ({
+      id: portfolio.id,
+      title: portfolio.title,
+      summary: portfolio.summary,
+      imageUrl: portfolio.imageUrl,
+      tags: portfolio.categories || [],
+    }));
+  }, []);
 
   const selectedPortfolioData = selectedPortfolio
-    ? MOCK_PORTFOLIOS.find((portfolio) => portfolio.id === selectedPortfolio)
+    ? portfolioOptions.find((portfolio) => portfolio.id === selectedPortfolio)
     : null;
 
   useEffect(() => {
@@ -64,25 +89,69 @@ const CampaignApplyModal: React.FC<CampaignApplyModalProps> = ({ isOpen, campaig
       setMessage('');
       setAvailableDate('');
       setAvailableTime('');
+      setIsSubmitting(false);
     }
   }, [isOpen]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!selectedPortfolio || !message.trim()) {
       showToast('포트폴리오 선택과 메시지를 입력해주세요.', undefined, 'error');
       return;
     }
-    showToast('지원서가 제출되었습니다.');
-    onClose();
-    navigate('/chat', {
-      state: {
-        campaignTitle,
-        portfolioTitle: selectedPortfolioData?.title,
+    if (!availableDate || !availableTime) {
+      showToast('촬영 가능 날짜와 시간을 선택해주세요.', undefined, 'error');
+      return;
+    }
+    if (!campaignId) {
+      showToast('캠페인 정보가 올바르지 않습니다.', undefined, 'error');
+      return;
+    }
+
+    const trimmedMessage = message.trim();
+    setIsSubmitting(true);
+
+    try {
+      const response = await campaignRepository.applyToCampaign({
+        campaignId,
+        portfolioId: String(selectedPortfolio),
+        message: trimmedMessage,
         availableDate,
         availableTime,
-        message: message.trim(),
-      },
-    });
+      });
+
+      const chatRoomId = response.chatRoomId;
+
+      showToast('지원서가 제출되었습니다.');
+      onClose();
+      if (chatRoomId) {
+        onApplied?.(chatRoomId);
+        navigate(`/chat/${chatRoomId}`, {
+          state: {
+            campaignTitle,
+            portfolioTitle: selectedPortfolioData?.title,
+            availableDate,
+            availableTime,
+            message: trimmedMessage,
+            roomId: chatRoomId,
+          },
+        });
+      } else {
+        navigate('/chat', {
+          state: {
+            campaignTitle,
+            portfolioTitle: selectedPortfolioData?.title,
+            availableDate,
+            availableTime,
+            message: trimmedMessage,
+          },
+        });
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '지원에 실패했습니다.';
+      showToast(errorMessage, undefined, 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -103,7 +172,7 @@ const CampaignApplyModal: React.FC<CampaignApplyModalProps> = ({ isOpen, campaig
         <Section>
           <SectionLabel>포트폴리오 선택 *</SectionLabel>
           <PortfolioList>
-            {MOCK_PORTFOLIOS.map((portfolio) => (
+            {portfolioOptions.map((portfolio) => (
               <PortfolioCard
                 key={portfolio.id}
                 $selected={selectedPortfolio === portfolio.id}
@@ -117,9 +186,9 @@ const CampaignApplyModal: React.FC<CampaignApplyModalProps> = ({ isOpen, campaig
                 </PortfolioHeader>
                 <PortfolioInfo>
                   <PortfolioTitle>{portfolio.title}</PortfolioTitle>
-                  <PortfolioSummary>{portfolio.summary}</PortfolioSummary>
+                  <PortfolioSummary>{portfolio.summary || '포트폴리오 설명이 없습니다.'}</PortfolioSummary>
                   <TagGroup>
-                    {portfolio.tags.map((tag) => (
+                    {(portfolio.tags?.length ? portfolio.tags : ['등록된 태그 없음']).map((tag) => (
                       <TagBadge key={`${portfolio.id}-${tag}`} $variant="secondary">
                         {tag}
                       </TagBadge>
@@ -129,15 +198,20 @@ const CampaignApplyModal: React.FC<CampaignApplyModalProps> = ({ isOpen, campaig
               </PortfolioCard>
             ))}
           </PortfolioList>
+          {portfolioOptions.length === 0 && (
+            <HelperText>등록된 포트폴리오가 없습니다. 먼저 포트폴리오를 등록해 주세요.</HelperText>
+          )}
         </Section>
 
         <Section>
           <SectionLabel>메시지 *</SectionLabel>
           <MessageInput
             value={message}
+            maxLength={MAX_MESSAGE_LENGTH}
             placeholder="지원 메시지를 작성해주세요. 자신의 강점과 이 캠페인에 적합한 이유를 작성하면 좋습니다."
             onChange={(event) => setMessage(event.target.value)}
           />
+          <HelperText>{message.trim().length}/{MAX_MESSAGE_LENGTH}자</HelperText>
         </Section>
 
         <Section>
@@ -171,8 +245,19 @@ const CampaignApplyModal: React.FC<CampaignApplyModalProps> = ({ isOpen, campaig
           <Button variant="secondary" fullWidth onClick={onClose}>
             취소
           </Button>
-          <Button variant="primary" fullWidth onClick={handleSubmit}>
-            지원하기
+          <Button
+            variant="primary"
+            fullWidth
+            onClick={handleSubmit}
+            disabled={
+              isSubmitting ||
+              !selectedPortfolio ||
+              !message.trim() ||
+              !availableDate ||
+              !availableTime
+            }
+          >
+            {isSubmitting ? '지원 중...' : '지원하기'}
           </Button>
         </ActionRow>
       </ModalContainer>

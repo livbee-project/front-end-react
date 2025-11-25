@@ -77,6 +77,14 @@ const AppRouter = () => (
                 </Suspense>
               }
             />
+            <Route
+              path="/chat/:roomId"
+              element={
+                <Suspense fallback={null}>
+                  <ChatRoomPage />
+                </Suspense>
+              }
+            />
 
             {/* (추가) BottomNavBar의 탭 경로들을 추가합니다. */}
             <Route

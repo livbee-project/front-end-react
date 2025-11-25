@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Calendar, Clock, FileText, ChevronLeft } from 'lucide-react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { ChevronLeft, Paperclip, Smile, Info, RefreshCcw } from 'lucide-react';
+import { useChatRoomDetail } from '@/presentation/hooks/useChatRoomDetail';
+import { useChatWebSocket } from '@/presentation/hooks/useChatWebSocket';
 
 interface ChatRoomState {
   campaignTitle?: string;
@@ -9,18 +11,136 @@ interface ChatRoomState {
   message?: string;
   availableDate?: string;
   availableTime?: string;
+  roomId?: string;
 }
 
 const ChatRoomPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const state = (location.state || {}) as ChatRoomState;
+  const params = useParams<{ roomId: string }>();
+  const fallbackState = (location.state || {}) as ChatRoomState;
+  const activeRoomId = params.roomId || fallbackState.roomId;
+  const {
+    roomDetail,
+    messages,
+    loading,
+    error,
+    sendMessage,
+    markAsRead,
+    appendMessage,
+    updateReadStatus,
+  } = useChatRoomDetail(activeRoomId);
+  const [composer, setComposer] = useState('');
+  const [sendError, setSendError] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [autoScroll, setAutoScroll] = useState(true);
 
-  const campaignTitle = state.campaignTitle ?? '코트니엘 겨울맞이 쇼핑라이브';
-  const portfolioTitle = state.portfolioTitle ?? '이수아';
-  const message = state.message && state.message.trim().length > 0 ? state.message.trim() : 'dd';
-  const availableDate = state.availableDate ? state.availableDate.replace(/-/g, '. ') : '2025. 11. 29';
-  const availableTime = state.availableTime ?? '22:57';
+  const formatTimestamp = (iso?: string) => {
+    if (!iso) return '';
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return '';
+    return new Intl.DateTimeFormat('ko-KR', {
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+  };
+
+  const counterpart = useMemo(() => {
+    if (!roomDetail) return undefined;
+    const myId = roomDetail.room.me.userId;
+    if (roomDetail.room.brandUser && roomDetail.room.brandUser.id !== myId) {
+      return roomDetail.room.brandUser;
+    }
+    if (roomDetail.room.showhostUser && roomDetail.room.showhostUser.id !== myId) {
+      return roomDetail.room.showhostUser;
+    }
+    return roomDetail.room.brandUser ?? roomDetail.room.showhostUser;
+  }, [roomDetail]);
+
+  const displayCampaign =
+    roomDetail?.room.campaign?.title ?? fallbackState.campaignTitle ?? '캠페인 정보 없음';
+  const displayCounterpart =
+    counterpart?.name || counterpart?.nickname || fallbackState.portfolioTitle || '대화상대';
+
+  const handleSend = async () => {
+    if (!composer.trim() || !activeRoomId) return;
+    try {
+      setSendError(null);
+      await sendMessage({ content: composer.trim(), messageType: 'text' });
+      setComposer('');
+      setAutoScroll(true);
+    } catch (err) {
+      setSendError(err instanceof Error ? err.message : '메시지를 전송하지 못했습니다.');
+    }
+  };
+
+  const handleMarkAsRead = () => {
+    if (!roomDetail || messages.length === 0) return;
+    const latest = messages[messages.length - 1];
+    if (
+      latest &&
+      latest.senderId !== roomDetail.room.me.userId &&
+      latest.id !== roomDetail.room.me.lastReadMessageId
+    ) {
+      markAsRead(latest.id);
+    }
+  };
+
+  React.useEffect(() => {
+    handleMarkAsRead();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages, roomDetail?.room.me.lastReadMessageId]);
+
+  React.useEffect(() => {
+    if (autoScroll && scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, autoScroll]);
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+    const isBottom = scrollHeight - (scrollTop + clientHeight) < 60;
+    setAutoScroll(isBottom);
+  };
+
+  const dateLabel = (iso: string) => {
+    const date = new Date(iso);
+    return new Intl.DateTimeFormat('ko-KR', {
+      month: 'long',
+      day: 'numeric',
+      weekday: 'short',
+    }).format(date);
+  };
+
+  const handleSocketEvent = useCallback(
+    (event: { type: string; payload?: any }) => {
+      if (event.type === 'message.new' && event.payload?.message) {
+        appendMessage(event.payload.message);
+        return;
+      }
+      if (event.type === 'message.read' && event.payload) {
+        updateReadStatus(event.payload);
+      }
+    },
+    [appendMessage, updateReadStatus]
+  );
+
+  const { status: socketStatus } = useChatWebSocket({
+    roomId: activeRoomId,
+    enabled: Boolean(roomDetail),
+    onEvent: handleSocketEvent,
+  });
+
+  if (!activeRoomId) {
+    return (
+      <PageWrapper>
+        <MessageValue>채팅방 정보가 없습니다. 메시지 목록에서 대화를 선택해주세요.</MessageValue>
+      </PageWrapper>
+    );
+  }
 
   return (
     <PageWrapper>
@@ -33,108 +153,149 @@ const ChatRoomPage: React.FC = () => {
               </BackButton>
               <AvatarWrapper>
                 <Avatar
-                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=160&q=60"
-                  alt="쇼호스트 프로필"
+                  src={
+                    counterpart?.avatarUrl ||
+                    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=160&q=80'
+                  }
+                  alt={displayCounterpart}
                 />
                 <StatusDot />
               </AvatarWrapper>
               <div>
-                <HeaderName>{portfolioTitle}</HeaderName>
-                <HeaderRole>쇼호스트</HeaderRole>
+                <HeaderName>{displayCounterpart}</HeaderName>
+                <HeaderRole>{counterpart?.role === 'brand' ? '브랜드' : '쇼호스트'}</HeaderRole>
               </div>
             </ProfileGroup>
-            <ContractButton>계약 보내기</ContractButton>
+            <HeaderActions>
+              <ConnectionBadge data-status={socketStatus}>
+                {socketStatus === 'open'
+                  ? '실시간 연결됨'
+                  : socketStatus === 'connecting'
+                  ? '연결 중...'
+                  : '오프라인'}
+              </ConnectionBadge>
+              <ContractButton>{displayCampaign}</ContractButton>
+            </HeaderActions>
           </ContactHeader>
+          <RoomMetaPanel>
+            <MetaItem>
+              <MetaLabel>캠페인</MetaLabel>
+              <MetaValue>{roomDetail?.room.campaign?.title ?? '비공개'}</MetaValue>
+            </MetaItem>
+            <MetaItem>
+              <MetaLabel>브랜드 담당자</MetaLabel>
+              <MetaValue>{roomDetail?.room.brandUser?.name ?? '미지정'}</MetaValue>
+            </MetaItem>
+            <MetaItem>
+              <MetaLabel>쇼호스트</MetaLabel>
+              <MetaValue>{roomDetail?.room.showhostUser?.name ?? '미지정'}</MetaValue>
+            </MetaItem>
+            <MetaItem>
+              <MetaLabel>최근 업데이트</MetaLabel>
+              <MetaValue>{formatTimestamp(roomDetail?.room.updatedAt)}</MetaValue>
+            </MetaItem>
+          </RoomMetaPanel>
         </FixedPanel>
 
-        <ScrollArea>
+        <ScrollArea ref={scrollRef} onScroll={handleScroll}>
           <ChatCard>
-          <Messages>
-            <MessageGroup $align="start">
-              <MessageBubble $variant="received">
-                안녕하세요! 이번 패션 라이브 캠페인에 관심 가져주셔서 감사합니다.
-              </MessageBubble>
-              <MessageTime>오후 2:15</MessageTime>
-            </MessageGroup>
-
-            <MessageGroup $align="start">
-              <MessageBubble $variant="received">3월 25일 오후 2시에 촬영 가능하실까요?</MessageBubble>
-              <MessageTime>오후 2:16</MessageTime>
-            </MessageGroup>
-
-            <MessageGroup $align="end">
-              <MessageBubble $variant="sent">안녕하세요! 문의 주셔서 감사합니다.</MessageBubble>
-              <MessageTime>오후 3:20</MessageTime>
-            </MessageGroup>
-
-            <MessageGroup $align="end">
-              <MessageBubble $variant="sent">네, 해당 시간에 촬영 가능합니다!</MessageBubble>
-              <MessageTime>오후 3:24</MessageTime>
-            </MessageGroup>
-
-            <MessageGroup $align="start">
-              <ApplicationCard>
-                <ApplicationHeader>
-                  <ApplicationAvatar>👤</ApplicationAvatar>
-                  <div>
-                    <ApplicationTitle>지원서</ApplicationTitle>
-                    <ApplicationSubtitle>지원서 ID #23415</ApplicationSubtitle>
-                  </div>
-                </ApplicationHeader>
-
-                <ApplicationBody>
-                  <ApplicationField>
-                    <FieldLabel>캠페인</FieldLabel>
-                    <FieldValue>{campaignTitle}</FieldValue>
-                  </ApplicationField>
-                  <ApplicationField>
-                    <FieldLabel>포트폴리오</FieldLabel>
-                    <PortfolioValue>
-                      <FileText size={16} />
-                      {portfolioTitle}
-                    </PortfolioValue>
-                  </ApplicationField>
-                  <ApplicationField>
-                    <FieldLabel>가능 일정</FieldLabel>
-                    <ScheduleChips>
-                      <ScheduleChip>
-                        <Calendar size={16} />
-                        {availableDate}
-                      </ScheduleChip>
-                      <ScheduleChip>
-                        <Clock size={16} />
-                        {availableTime}
-                      </ScheduleChip>
-                    </ScheduleChips>
-                  </ApplicationField>
-                  <ApplicationField>
-                    <FieldLabel>메시지</FieldLabel>
-                    <MessageValue>{message}</MessageValue>
-                  </ApplicationField>
-                </ApplicationBody>
-
-                <ApplicationActions>
-                  <ActionButton $variant="secondary">
-                    <span>✕</span> 거절
-                  </ActionButton>
-                  <ActionButton $variant="primary">
-                    <span>✓</span> 수락
-                  </ActionButton>
-                </ApplicationActions>
-              </ApplicationCard>
-              <MessageTime>오후 5:34</MessageTime>
-            </MessageGroup>
-          </Messages>
-
+            {loading && <MessageValue>채팅을 불러오는 중입니다...</MessageValue>}
+            {error && <MessageValue>{error}</MessageValue>}
+            {!loading && !error && messages.length === 0 && (
+              <MessageValue>아직 주고받은 메시지가 없습니다.</MessageValue>
+            )}
+            <Messages>
+              {messages.map((chatMessage, index) => {
+                const previous = messages[index - 1];
+                const showDivider =
+                  !previous ||
+                  new Date(previous.createdAt).toDateString() !==
+                    new Date(chatMessage.createdAt).toDateString();
+                const isMyMessage = chatMessage.senderId === roomDetail?.room.me.userId;
+                const isSystem = chatMessage.messageType === 'system';
+                return (
+                  <React.Fragment key={chatMessage.id}>
+                    {showDivider && <DateDivider>{dateLabel(chatMessage.createdAt)}</DateDivider>}
+                    <MessageGroup $align={isMyMessage ? 'end' : 'start'}>
+                      {isSystem ? (
+                        <SystemMessage>{chatMessage.content}</SystemMessage>
+                      ) : (
+                        <MessageBubble $variant={isMyMessage ? 'sent' : 'received'}>
+                          {chatMessage.content}
+                        </MessageBubble>
+                      )}
+                      <MessageMeta>
+                        <MessageTime>{formatTimestamp(chatMessage.createdAt)}</MessageTime>
+                        {isMyMessage && roomDetail?.room.unreadCount === 0 && (
+                          <MessageStatus>읽음</MessageStatus>
+                        )}
+                      </MessageMeta>
+                    </MessageGroup>
+                  </React.Fragment>
+                );
+              })}
+            </Messages>
+            {!loading && !error && !autoScroll && (
+              <ScrollHintButton type="button" onClick={() => setAutoScroll(true)}>
+                <Info size={14} />
+                최근 메시지로 이동
+              </ScrollHintButton>
+            )}
           </ChatCard>
         </ScrollArea>
       </ChatColumn>
 
       <ComposerBar>
         <ComposerInner>
-          <InputField placeholder="메시지를 입력하세요" />
-          <SendButton aria-label="메시지 전송">➤</SendButton>
+          <InputField
+            placeholder="메시지를 입력하세요"
+            value={composer}
+            onChange={(event) => setComposer(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
+                event.preventDefault();
+                handleSend();
+              }
+            }}
+            disabled={loading || Boolean(error)}
+          />
+          <ComposerActions>
+            <ComposerActionButton type="button">
+              <Paperclip size={16} />
+              파일
+            </ComposerActionButton>
+            <ComposerActionButton type="button">
+              <Smile size={16} />
+              이모지
+            </ComposerActionButton>
+          </ComposerActions>
+          <SendButton
+            type="button"
+            aria-label="메시지 전송"
+            onClick={handleSend}
+            disabled={loading || Boolean(error) || !composer.trim()}
+          >
+            ➤
+          </SendButton>
         </ComposerInner>
+        {sendError && <SendError>{sendError}</SendError>}
+        <ComposerFooter>
+          <span>Shift + Enter 로 줄바꿈 • Enter 로 전송</span>
+          <FooterRefresh
+            type="button"
+            onClick={() => {
+              if (messages.length > 0) {
+                const latest = messages[messages.length - 1];
+                markAsRead(latest.id);
+              } else {
+                handleMarkAsRead();
+              }
+            }}
+          >
+            <RefreshCcw size={14} />
+            새로고침
+          </FooterRefresh>
+        </ComposerFooter>
       </ComposerBar>
     </PageWrapper>
   );
@@ -181,6 +342,58 @@ const ContactHeader = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 8px 4px;
+`;
+
+const HeaderActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const ConnectionBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #f3f6ff;
+  color: #5a64ff;
+
+  &[data-status='open'] {
+    background: #e6f9f0;
+    color: #15a86b;
+  }
+
+  &[data-status='error'],
+  &[data-status='closed'] {
+    background: #fff1f0;
+    color: #e53935;
+  }
+`;
+
+const RoomMetaPanel = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  padding: 8px 4px 0;
+`;
+
+const MetaItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const MetaLabel = styled.span`
+  font-size: 0.75rem;
+  color: #7d8299;
+`;
+
+const MetaValue = styled.span`
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1f1f25;
 `;
 
 const ProfileGroup = styled.div`
@@ -286,118 +499,55 @@ const MessageTime = styled.span`
   color: #a0a4b7;
 `;
 
-const ApplicationCard = styled.div`
-  background: #fff;
-  border-radius: 20px;
-  border: 1px solid #eceff7;
-  box-shadow: 0 8px 24px rgba(125, 130, 166, 0.15);
-  padding: 18px;
-  width: 60%;
-  max-width: 100%;
-`;
-
-const ApplicationHeader = styled.div`
-  display: flex;
-  gap: 10px;
-  align-items: center;
-`;
-
-const ApplicationAvatar = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #edf0ff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-`;
-
-const ApplicationTitle = styled.div`
-  font-weight: 700;
-`;
-
-const ApplicationSubtitle = styled.div`
-  font-size: 0.8rem;
-  color: #9297af;
-`;
-
-const ApplicationBody = styled.div`
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
-
-const ApplicationField = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-`;
-
-const FieldLabel = styled.span`
-  font-size: 0.8rem;
-  color: #a0a4b7;
-  font-weight: 600;
-`;
-
-const FieldValue = styled.span`
-  font-size: 0.95rem;
-  color: #1f1f25;
-`;
-
-const PortfolioValue = styled(FieldValue)`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  svg {
-    color: #5a64ff;
-  }
-`;
-
-const ScheduleChips = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-`;
-
-const ScheduleChip = styled.span`
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: #f4f5ff;
-  color: #5a64ff;
-  font-size: 0.85rem;
-`;
-
-const MessageValue = styled(FieldValue)`
+const MessageValue = styled.div`
   padding: 10px 12px;
   border-radius: 12px;
   background: #f5f6fc;
   color: #434659;
+  margin: 8px 0;
 `;
 
-const ApplicationActions = styled.div`
+const MessageMeta = styled.div`
   display: flex;
-  gap: 10px;
-  margin-top: 14px;
-`;
-
-const ActionButton = styled.button<{ $variant: 'primary' | 'secondary' }>`
-  flex: 1;
-  border-radius: 12px;
-  border: ${({ $variant }) => ($variant === 'primary' ? '1px solid #5a64ff' : '1px solid #dee2f0')};
-  background: ${({ $variant }) => ($variant === 'primary' ? '#5a64ff' : '#fff')};
-  color: ${({ $variant }) => ($variant === 'primary' ? '#fff' : '#1f1f25')};
-  font-weight: 600;
-  padding: 10px;
-  display: flex;
-  justify-content: center;
-  gap: 6px;
   align-items: center;
+  gap: 8px;
+`;
+
+const MessageStatus = styled.span`
+  font-size: 0.75rem;
+  color: #5a64ff;
+  font-weight: 600;
+`;
+
+const SystemMessage = styled.div`
+  font-size: 0.85rem;
+  color: #7d8299;
+  background: #f4f5fb;
+  border-radius: 999px;
+  padding: 6px 14px;
+`;
+
+const DateDivider = styled.div`
+  align-self: center;
+  font-size: 0.75rem;
+  color: #7d8299;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(125, 130, 153, 0.12);
+`;
+
+const ScrollHintButton = styled.button`
+  align-self: center;
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e1e4f2;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.75rem;
+  color: #7d8299;
+  background: #fff;
 `;
 
 const InputField = styled.input`
@@ -419,6 +569,7 @@ const SendButton = styled.button`
   color: #fff;
   font-size: 1rem;
   box-shadow: 0 10px 22px rgba(90, 100, 255, 0.35);
+  opacity: ${({ disabled }) => (disabled ? 0.6 : 1)};
 `;
 
 const ComposerBar = styled.div`
@@ -440,6 +591,51 @@ const ComposerInner = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
+`;
+
+const SendError = styled.p`
+  margin-top: 8px;
+  color: #e64444;
+`;
+
+const ComposerActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const ComposerActionButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 12px;
+  border: 1px solid #e1e4f2;
+  background: #fff;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  color: #5a64ff;
+`;
+
+const ComposerFooter = styled.div`
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #9a9fb9;
+  gap: 12px;
+  flex-wrap: wrap;
+`;
+
+const FooterRefresh = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  color: #5a64ff;
+  font-size: 0.75rem;
 `;
 
 export default ChatRoomPage;
