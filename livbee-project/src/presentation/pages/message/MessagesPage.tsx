@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { useChatRooms } from '@/presentation/hooks/useChatRooms';
+import type { ChatRoomSummary } from '@/domain/entities/Chat';
 
 const PageContainer = styled.div`
   width: 100%;
@@ -117,93 +119,87 @@ const UnreadBadge = styled.div`
   flex-shrink: 0;
 `;
 
-interface Message {
-  id: string;
-  name: string;
-  message: string;
-  timestamp: string;
-  avatarUrl: string;
-  isOnline: boolean;
-  unreadCount?: number;
-}
-
 const MessagesPage: React.FC = () => {
   const navigate = useNavigate();
+  const { rooms, loading, error, refresh } = useChatRooms();
 
-  // 하드코딩된 메시지 데이터
-  const mockMessages: Message[] = [
-    {
-      id: '1',
-      name: '김지현',
-      message: '네, 해당 시간에 촬영 가능합니다!',
-      timestamp: '오후 3:24',
-      avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80',
-      isOnline: true,
-      unreadCount: 2,
-    },
-    {
-      id: '2',
-      name: '이수진',
-      message: '포트폴리오 자료 전달드립니다.',
-      timestamp: '오후 1:42',
-      avatarUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=100&q=80',
-      isOnline: false,
-    },
-    {
-      id: '3',
-      name: '박서연',
-      message: '촬영 장소는 어디인가요?',
-      timestamp: '어제',
-      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80',
-      isOnline: false,
-      unreadCount: 1,
-    },
-    {
-      id: '4',
-      name: '최민지',
-      message: '감사합니다!',
-      timestamp: '2024.03.15',
-      avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=100&q=80',
-      isOnline: true,
-    },
-    {
-      id: '5',
-      name: '정다은',
-      message: '네, 알겠습니다.',
-      timestamp: '2024.03.14',
-      avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=100&q=80',
-      isOnline: false,
-    },
-  ];
+  const formatTimestamp = (iso?: string) => {
+    if (!iso) return '';
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return '';
+    return new Intl.DateTimeFormat('ko-KR', {
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+  };
 
-  const handleMessageClick = (messageId: string) => {
-    navigate(`/chat`, { state: { messageId } });
+  const getCounterpart = (room: ChatRoomSummary) => {
+    const myId = room.me.userId;
+    if (room.brandUser && room.brandUser.id !== myId) {
+      return room.brandUser;
+    }
+    if (room.showhostUser && room.showhostUser.id !== myId) {
+      return room.showhostUser;
+    }
+    // fallback
+    return room.brandUser ?? room.showhostUser;
+  };
+
+  const getRoleLabel = (role?: string) => {
+    if (role === 'brand') return '브랜드';
+    if (role === 'showhost') return '쇼호스트';
+    return '참여자';
+  };
+
+  const handleMessageClick = (roomId: string) => {
+    navigate(`/chat/${roomId}`);
   };
 
   return (
     <PageContainer>
+      {loading && <MessageText>메시지 목록을 불러오는 중입니다...</MessageText>}
+      {error && (
+        <MessageText>
+          {error}{' '}
+          <button type="button" onClick={refresh}>
+            다시 시도
+          </button>
+        </MessageText>
+      )}
+      {!loading && !error && rooms.length === 0 && (
+        <MessageText>아직 대화중인 상대가 없습니다.</MessageText>
+      )}
       <MessageList>
-        {mockMessages.map((message) => (
-          <MessageItem key={message.id} onClick={() => handleMessageClick(message.id)}>
-            <AvatarContainer>
-              <Avatar src={message.avatarUrl} alt={message.name} />
-              <StatusDot $isOnline={message.isOnline} />
-            </AvatarContainer>
-            <MessageContent>
-              <MessageHeader>
-                <Name>{message.name}</Name>
-                <Timestamp>{message.timestamp}</Timestamp>
-              </MessageHeader>
-              <MessageText>{message.message}</MessageText>
-              <TagAndBadge>
-                <RoleTag>쇼호스트</RoleTag>
-                {message.unreadCount && message.unreadCount > 0 && (
-                  <UnreadBadge>{message.unreadCount}</UnreadBadge>
-                )}
-              </TagAndBadge>
-            </MessageContent>
-          </MessageItem>
-        ))}
+        {rooms.map((room) => {
+          const counterpart = getCounterpart(room);
+          const displayName = counterpart?.name || counterpart?.nickname || '알 수 없는 사용자';
+          const avatarUrl =
+            counterpart?.avatarUrl ||
+            'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=120&q=80';
+          const previewText = room.lastMessage?.content || '메시지가 없습니다.';
+          const timestamp = formatTimestamp(room.lastMessage?.createdAt ?? room.updatedAt);
+          return (
+            <MessageItem key={room.roomId} onClick={() => handleMessageClick(room.roomId)}>
+              <AvatarContainer>
+                <Avatar src={avatarUrl} alt={displayName} />
+                <StatusDot $isOnline={false} />
+              </AvatarContainer>
+              <MessageContent>
+                <MessageHeader>
+                  <Name>{displayName}</Name>
+                  <Timestamp>{timestamp}</Timestamp>
+                </MessageHeader>
+                <MessageText>{previewText}</MessageText>
+                <TagAndBadge>
+                  <RoleTag>{getRoleLabel(counterpart?.role)}</RoleTag>
+                  {room.unreadCount > 0 && <UnreadBadge>{room.unreadCount}</UnreadBadge>}
+                </TagAndBadge>
+              </MessageContent>
+            </MessageItem>
+          );
+        })}
       </MessageList>
     </PageContainer>
   );

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Calendar, Clock, FileText, ChevronLeft } from 'lucide-react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { ChevronLeft } from 'lucide-react';
+import { useChatRoomDetail } from '@/presentation/hooks/useChatRoomDetail';
 
 interface ChatRoomState {
   campaignTitle?: string;
@@ -9,18 +10,84 @@ interface ChatRoomState {
   message?: string;
   availableDate?: string;
   availableTime?: string;
+  roomId?: string;
 }
 
 const ChatRoomPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const state = (location.state || {}) as ChatRoomState;
+  const params = useParams<{ roomId: string }>();
+  const fallbackState = (location.state || {}) as ChatRoomState;
+  const activeRoomId = params.roomId || fallbackState.roomId;
+  const { roomDetail, messages, loading, error, sendMessage, markAsRead } =
+    useChatRoomDetail(activeRoomId);
+  const [composer, setComposer] = useState('');
+  const [sendError, setSendError] = useState<string | null>(null);
 
-  const campaignTitle = state.campaignTitle ?? '코트니엘 겨울맞이 쇼핑라이브';
-  const portfolioTitle = state.portfolioTitle ?? '이수아';
-  const message = state.message && state.message.trim().length > 0 ? state.message.trim() : 'dd';
-  const availableDate = state.availableDate ? state.availableDate.replace(/-/g, '. ') : '2025. 11. 29';
-  const availableTime = state.availableTime ?? '22:57';
+  const formatTimestamp = (iso?: string) => {
+    if (!iso) return '';
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return '';
+    return new Intl.DateTimeFormat('ko-KR', {
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+  };
+
+  const counterpart = useMemo(() => {
+    if (!roomDetail) return undefined;
+    const myId = roomDetail.room.me.userId;
+    if (roomDetail.room.brandUser && roomDetail.room.brandUser.id !== myId) {
+      return roomDetail.room.brandUser;
+    }
+    if (roomDetail.room.showhostUser && roomDetail.room.showhostUser.id !== myId) {
+      return roomDetail.room.showhostUser;
+    }
+    return roomDetail.room.brandUser ?? roomDetail.room.showhostUser;
+  }, [roomDetail]);
+
+  const displayCampaign =
+    roomDetail?.room.campaign?.title ?? fallbackState.campaignTitle ?? '캠페인 정보 없음';
+  const displayCounterpart =
+    counterpart?.name || counterpart?.nickname || fallbackState.portfolioTitle || '대화상대';
+
+  const handleSend = async () => {
+    if (!composer.trim() || !activeRoomId) return;
+    try {
+      setSendError(null);
+      await sendMessage({ content: composer.trim(), messageType: 'text' });
+      setComposer('');
+    } catch (err) {
+      setSendError(err instanceof Error ? err.message : '메시지를 전송하지 못했습니다.');
+    }
+  };
+
+  const handleMarkAsRead = () => {
+    if (!roomDetail || messages.length === 0) return;
+    const latest = messages[messages.length - 1];
+    if (
+      latest &&
+      latest.senderId !== roomDetail.room.me.userId &&
+      latest.id !== roomDetail.room.me.lastReadMessageId
+    ) {
+      markAsRead(latest.id);
+    }
+  };
+
+  React.useEffect(() => {
+    handleMarkAsRead();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages, roomDetail?.room.me.lastReadMessageId]);
+
+  if (!activeRoomId) {
+    return (
+      <PageWrapper>
+        <MessageValue>채팅방 정보가 없습니다. 메시지 목록에서 대화를 선택해주세요.</MessageValue>
+      </PageWrapper>
+    );
+  }
 
   return (
     <PageWrapper>
@@ -33,108 +100,71 @@ const ChatRoomPage: React.FC = () => {
               </BackButton>
               <AvatarWrapper>
                 <Avatar
-                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=160&q=60"
-                  alt="쇼호스트 프로필"
+                  src={
+                    counterpart?.avatarUrl ||
+                    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=160&q=80'
+                  }
+                  alt={displayCounterpart}
                 />
                 <StatusDot />
               </AvatarWrapper>
               <div>
-                <HeaderName>{portfolioTitle}</HeaderName>
-                <HeaderRole>쇼호스트</HeaderRole>
+                <HeaderName>{displayCounterpart}</HeaderName>
+                <HeaderRole>{counterpart?.role === 'brand' ? '브랜드' : '쇼호스트'}</HeaderRole>
               </div>
             </ProfileGroup>
-            <ContractButton>계약 보내기</ContractButton>
+            <ContractButton>{displayCampaign}</ContractButton>
           </ContactHeader>
         </FixedPanel>
 
         <ScrollArea>
           <ChatCard>
-          <Messages>
-            <MessageGroup $align="start">
-              <MessageBubble $variant="received">
-                안녕하세요! 이번 패션 라이브 캠페인에 관심 가져주셔서 감사합니다.
-              </MessageBubble>
-              <MessageTime>오후 2:15</MessageTime>
-            </MessageGroup>
-
-            <MessageGroup $align="start">
-              <MessageBubble $variant="received">3월 25일 오후 2시에 촬영 가능하실까요?</MessageBubble>
-              <MessageTime>오후 2:16</MessageTime>
-            </MessageGroup>
-
-            <MessageGroup $align="end">
-              <MessageBubble $variant="sent">안녕하세요! 문의 주셔서 감사합니다.</MessageBubble>
-              <MessageTime>오후 3:20</MessageTime>
-            </MessageGroup>
-
-            <MessageGroup $align="end">
-              <MessageBubble $variant="sent">네, 해당 시간에 촬영 가능합니다!</MessageBubble>
-              <MessageTime>오후 3:24</MessageTime>
-            </MessageGroup>
-
-            <MessageGroup $align="start">
-              <ApplicationCard>
-                <ApplicationHeader>
-                  <ApplicationAvatar>👤</ApplicationAvatar>
-                  <div>
-                    <ApplicationTitle>지원서</ApplicationTitle>
-                    <ApplicationSubtitle>지원서 ID #23415</ApplicationSubtitle>
-                  </div>
-                </ApplicationHeader>
-
-                <ApplicationBody>
-                  <ApplicationField>
-                    <FieldLabel>캠페인</FieldLabel>
-                    <FieldValue>{campaignTitle}</FieldValue>
-                  </ApplicationField>
-                  <ApplicationField>
-                    <FieldLabel>포트폴리오</FieldLabel>
-                    <PortfolioValue>
-                      <FileText size={16} />
-                      {portfolioTitle}
-                    </PortfolioValue>
-                  </ApplicationField>
-                  <ApplicationField>
-                    <FieldLabel>가능 일정</FieldLabel>
-                    <ScheduleChips>
-                      <ScheduleChip>
-                        <Calendar size={16} />
-                        {availableDate}
-                      </ScheduleChip>
-                      <ScheduleChip>
-                        <Clock size={16} />
-                        {availableTime}
-                      </ScheduleChip>
-                    </ScheduleChips>
-                  </ApplicationField>
-                  <ApplicationField>
-                    <FieldLabel>메시지</FieldLabel>
-                    <MessageValue>{message}</MessageValue>
-                  </ApplicationField>
-                </ApplicationBody>
-
-                <ApplicationActions>
-                  <ActionButton $variant="secondary">
-                    <span>✕</span> 거절
-                  </ActionButton>
-                  <ActionButton $variant="primary">
-                    <span>✓</span> 수락
-                  </ActionButton>
-                </ApplicationActions>
-              </ApplicationCard>
-              <MessageTime>오후 5:34</MessageTime>
-            </MessageGroup>
-          </Messages>
-
+            {loading && <MessageValue>채팅을 불러오는 중입니다...</MessageValue>}
+            {error && <MessageValue>{error}</MessageValue>}
+            {!loading && !error && messages.length === 0 && (
+              <MessageValue>아직 주고받은 메시지가 없습니다.</MessageValue>
+            )}
+            <Messages>
+              {messages.map((chatMessage) => {
+                const isMyMessage = chatMessage.senderId === roomDetail?.room.me.userId;
+                return (
+                  <MessageGroup key={chatMessage.id} $align={isMyMessage ? 'end' : 'start'}>
+                    <MessageBubble $variant={isMyMessage ? 'sent' : 'received'}>
+                      {chatMessage.content}
+                    </MessageBubble>
+                    <MessageTime>{formatTimestamp(chatMessage.createdAt)}</MessageTime>
+                  </MessageGroup>
+                );
+              })}
+            </Messages>
           </ChatCard>
         </ScrollArea>
       </ChatColumn>
 
       <ComposerBar>
         <ComposerInner>
-          <InputField placeholder="메시지를 입력하세요" />
-          <SendButton aria-label="메시지 전송">➤</SendButton>
+          <InputField
+            placeholder="메시지를 입력하세요"
+            value={composer}
+            onChange={(event) => setComposer(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
+                event.preventDefault();
+                handleSend();
+              }
+            }}
+            disabled={loading || Boolean(error)}
+          />
+          <SendButton
+            type="button"
+            aria-label="메시지 전송"
+            onClick={handleSend}
+            disabled={loading || Boolean(error) || !composer.trim()}
+          >
+            ➤
+          </SendButton>
         </ComposerInner>
+        {sendError && <SendError>{sendError}</SendError>}
       </ComposerBar>
     </PageWrapper>
   );
@@ -286,118 +316,12 @@ const MessageTime = styled.span`
   color: #a0a4b7;
 `;
 
-const ApplicationCard = styled.div`
-  background: #fff;
-  border-radius: 20px;
-  border: 1px solid #eceff7;
-  box-shadow: 0 8px 24px rgba(125, 130, 166, 0.15);
-  padding: 18px;
-  width: 60%;
-  max-width: 100%;
-`;
-
-const ApplicationHeader = styled.div`
-  display: flex;
-  gap: 10px;
-  align-items: center;
-`;
-
-const ApplicationAvatar = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #edf0ff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-`;
-
-const ApplicationTitle = styled.div`
-  font-weight: 700;
-`;
-
-const ApplicationSubtitle = styled.div`
-  font-size: 0.8rem;
-  color: #9297af;
-`;
-
-const ApplicationBody = styled.div`
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
-
-const ApplicationField = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-`;
-
-const FieldLabel = styled.span`
-  font-size: 0.8rem;
-  color: #a0a4b7;
-  font-weight: 600;
-`;
-
-const FieldValue = styled.span`
-  font-size: 0.95rem;
-  color: #1f1f25;
-`;
-
-const PortfolioValue = styled(FieldValue)`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  svg {
-    color: #5a64ff;
-  }
-`;
-
-const ScheduleChips = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-`;
-
-const ScheduleChip = styled.span`
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: #f4f5ff;
-  color: #5a64ff;
-  font-size: 0.85rem;
-`;
-
-const MessageValue = styled(FieldValue)`
+const MessageValue = styled.div`
   padding: 10px 12px;
   border-radius: 12px;
   background: #f5f6fc;
   color: #434659;
-`;
-
-const ApplicationActions = styled.div`
-  display: flex;
-  gap: 10px;
-  margin-top: 14px;
-`;
-
-const ActionButton = styled.button<{ $variant: 'primary' | 'secondary' }>`
-  flex: 1;
-  border-radius: 12px;
-  border: ${({ $variant }) => ($variant === 'primary' ? '1px solid #5a64ff' : '1px solid #dee2f0')};
-  background: ${({ $variant }) => ($variant === 'primary' ? '#5a64ff' : '#fff')};
-  color: ${({ $variant }) => ($variant === 'primary' ? '#fff' : '#1f1f25')};
-  font-weight: 600;
-  padding: 10px;
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  align-items: center;
+  margin: 8px 0;
 `;
 
 const InputField = styled.input`
@@ -419,6 +343,7 @@ const SendButton = styled.button`
   color: #fff;
   font-size: 1rem;
   box-shadow: 0 10px 22px rgba(90, 100, 255, 0.35);
+  opacity: ${({ disabled }) => (disabled ? 0.6 : 1)};
 `;
 
 const ComposerBar = styled.div`
@@ -440,6 +365,11 @@ const ComposerInner = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+`;
+
+const SendError = styled.p`
+  margin-top: 8px;
+  color: #e64444;
 `;
 
 export default ChatRoomPage;
