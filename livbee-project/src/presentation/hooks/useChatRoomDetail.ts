@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { ChatMessage, ChatRoomDetail, SendChatMessageRequest } from '@/domain/entities/Chat';
+import type {
+  ChatMessage,
+  ChatRoomDetail,
+  SendChatMessageRequest,
+  ChatRole,
+} from '@/domain/entities/Chat';
 import { chatApiSource } from '@/data/sources/ChatApiSource';
 
 interface ChatRoomState {
@@ -96,6 +101,69 @@ export const useChatRoomDetail = (roomId?: string) => {
     [roomId]
   );
 
+  const appendMessage = useCallback((message: ChatMessage) => {
+    setState((prev) => {
+      if (!prev.detail) return prev;
+      const exists = prev.detail.messages.some((item) => item.id === message.id);
+      const messages = exists
+        ? prev.detail.messages.map((item) => (item.id === message.id ? message : item))
+        : [...prev.detail.messages, message];
+      return {
+        ...prev,
+        detail: {
+          ...prev.detail,
+          room: {
+            ...prev.detail.room,
+            lastMessage: message,
+            updatedAt: message.createdAt,
+            unreadCount:
+              message.senderId === prev.detail.room.me.userId
+                ? prev.detail.room.unreadCount
+                : prev.detail.room.unreadCount + 1,
+          },
+          messages,
+        },
+      };
+    });
+  }, []);
+
+  const updateReadStatus = useCallback((payload: { userId: string; lastMessageId: string }) => {
+    setState((prev) => {
+      if (!prev.detail) return prev;
+      const isMe = payload.userId === prev.detail.room.me.userId;
+      const nextRoom = { ...prev.detail.room };
+
+      if (isMe) {
+        nextRoom.me = {
+          ...nextRoom.me,
+          lastReadMessageId: payload.lastMessageId,
+          lastReadAt: new Date().toISOString(),
+        };
+        nextRoom.unreadCount = 0;
+      } else {
+        const resolveRole = (): ChatRole => {
+          if (payload.userId === nextRoom.brandUser?.id) return 'brand';
+          if (payload.userId === nextRoom.showhostUser?.id) return 'showhost';
+          return nextRoom.counterpart?.role || 'brand';
+        };
+
+        nextRoom.counterpart = {
+          ...(nextRoom.counterpart || { userId: payload.userId, role: resolveRole() }),
+          lastReadMessageId: payload.lastMessageId,
+          lastReadAt: new Date().toISOString(),
+        };
+      }
+
+      return {
+        ...prev,
+        detail: {
+          ...prev.detail,
+          room: nextRoom,
+        },
+      };
+    });
+  }, []);
+
   useEffect(() => {
     fetchRoom();
   }, [fetchRoom]);
@@ -108,6 +176,8 @@ export const useChatRoomDetail = (roomId?: string) => {
     refresh: fetchRoom,
     sendMessage,
     markAsRead,
+    appendMessage,
+    updateReadStatus,
   };
 };
 

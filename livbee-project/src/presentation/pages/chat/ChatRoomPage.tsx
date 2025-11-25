@@ -1,8 +1,9 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Paperclip, Smile, Info, RefreshCcw } from 'lucide-react';
 import { useChatRoomDetail } from '@/presentation/hooks/useChatRoomDetail';
+import { useChatWebSocket } from '@/presentation/hooks/useChatWebSocket';
 
 interface ChatRoomState {
   campaignTitle?: string;
@@ -19,8 +20,16 @@ const ChatRoomPage: React.FC = () => {
   const params = useParams<{ roomId: string }>();
   const fallbackState = (location.state || {}) as ChatRoomState;
   const activeRoomId = params.roomId || fallbackState.roomId;
-  const { roomDetail, messages, loading, error, sendMessage, markAsRead } =
-    useChatRoomDetail(activeRoomId);
+  const {
+    roomDetail,
+    messages,
+    loading,
+    error,
+    sendMessage,
+    markAsRead,
+    appendMessage,
+    updateReadStatus,
+  } = useChatRoomDetail(activeRoomId);
   const [composer, setComposer] = useState('');
   const [sendError, setSendError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -106,6 +115,25 @@ const ChatRoomPage: React.FC = () => {
     }).format(date);
   };
 
+  const handleSocketEvent = useCallback(
+    (event: { type: string; payload?: any }) => {
+      if (event.type === 'message.new' && event.payload?.message) {
+        appendMessage(event.payload.message);
+        return;
+      }
+      if (event.type === 'message.read' && event.payload) {
+        updateReadStatus(event.payload);
+      }
+    },
+    [appendMessage, updateReadStatus]
+  );
+
+  const { status: socketStatus } = useChatWebSocket({
+    roomId: activeRoomId,
+    enabled: Boolean(roomDetail),
+    onEvent: handleSocketEvent,
+  });
+
   if (!activeRoomId) {
     return (
       <PageWrapper>
@@ -138,7 +166,16 @@ const ChatRoomPage: React.FC = () => {
                 <HeaderRole>{counterpart?.role === 'brand' ? '브랜드' : '쇼호스트'}</HeaderRole>
               </div>
             </ProfileGroup>
-            <ContractButton>{displayCampaign}</ContractButton>
+            <HeaderActions>
+              <ConnectionBadge data-status={socketStatus}>
+                {socketStatus === 'open'
+                  ? '실시간 연결됨'
+                  : socketStatus === 'connecting'
+                  ? '연결 중...'
+                  : '오프라인'}
+              </ConnectionBadge>
+              <ContractButton>{displayCampaign}</ContractButton>
+            </HeaderActions>
           </ContactHeader>
           <RoomMetaPanel>
             <MetaItem>
@@ -305,6 +342,34 @@ const ContactHeader = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 8px 4px;
+`;
+
+const HeaderActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const ConnectionBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #f3f6ff;
+  color: #5a64ff;
+
+  &[data-status='open'] {
+    background: #e6f9f0;
+    color: #15a86b;
+  }
+
+  &[data-status='error'],
+  &[data-status='closed'] {
+    background: #fff1f0;
+    color: #e53935;
+  }
 `;
 
 const RoomMetaPanel = styled.div`

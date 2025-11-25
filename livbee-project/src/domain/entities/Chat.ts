@@ -32,6 +32,8 @@ export interface ChatRoomSummary {
   counterpart?: {
     userId: string;
     role: ChatRole;
+    lastReadMessageId?: string | null;
+    lastReadAt?: string | null;
   };
 }
 

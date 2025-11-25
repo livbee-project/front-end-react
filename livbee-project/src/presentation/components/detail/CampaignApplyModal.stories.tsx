@@ -23,6 +23,10 @@ const meta: Meta<typeof CampaignApplyModal> = {
       control: 'boolean',
       description: '모달 열림 상태',
     },
+    campaignId: {
+      control: 'text',
+      description: '캠페인 ID',
+    },
     campaignTitle: {
       control: 'text',
       description: '캠페인 제목',
@@ -30,6 +34,10 @@ const meta: Meta<typeof CampaignApplyModal> = {
     onClose: {
       action: 'closed',
       description: '모달 닫기 함수',
+    },
+    onApplied: {
+      action: 'applied',
+      description: '지원 완료 콜백',
     },
   },
 };
@@ -59,6 +67,7 @@ export const Default: Story = {
             <Button onClick={() => setIsOpen(true)}>지원하기 모달 열기</Button>
             <CampaignApplyModal
               isOpen={isOpen}
+              campaignId="camp-story-1"
               campaignTitle="2024 봄/여름 패션 라이브 쇼핑"
               onClose={() => setIsOpen(false)}
             />
@@ -98,16 +107,19 @@ export const DifferentCampaigns: Story = {
             </div>
             <CampaignApplyModal
               isOpen={isOpen1}
+              campaignId="camp-fashion"
               campaignTitle="2024 봄/여름 패션 라이브 쇼핑"
               onClose={() => setIsOpen1(false)}
             />
             <CampaignApplyModal
               isOpen={isOpen2}
+              campaignId="camp-beauty"
               campaignTitle="신제품 뷰티 제품 리뷰 및 소개"
               onClose={() => setIsOpen2(false)}
             />
             <CampaignApplyModal
               isOpen={isOpen3}
+              campaignId="camp-living"
               campaignTitle="홈데코 및 리빙 아이템 큐레이션"
               onClose={() => setIsOpen3(false)}
             />
@@ -137,6 +149,7 @@ export const LongCampaignTitle: Story = {
             <Button onClick={() => setIsOpen(true)}>긴 제목 모달 열기</Button>
             <CampaignApplyModal
               isOpen={isOpen}
+              campaignId="camp-long-title"
               campaignTitle="2024 봄/여름 시즌 신상품 패션 라이브 쇼핑 및 스타일링 가이드"
               onClose={() => setIsOpen(false)}
             />

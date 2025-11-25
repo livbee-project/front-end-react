@@ -6,6 +6,8 @@ import type {
   CampaignApiErrorResponse,
   CampaignDetailResponse,
   CampaignDetail,
+  CampaignApplyRequest,
+  CampaignApplyResponse,
 } from '@/domain/entities/Campaign';
 import { buildApiUrl, getAuthHeaders } from '@/shared/config/apiConfig';
 import { isSuccessResponse, extractData, extractErrorMessage } from '@/shared/utils/apiResponseHandler';
@@ -205,6 +207,34 @@ export class CampaignApiSource {
       lifestyle: '생활/리빙',
     };
     return category ? categoryMap[category] || null : null;
+  }
+
+  /**
+   * 캠페인 지원
+   */
+  async applyToCampaign(request: CampaignApplyRequest): Promise<CampaignApplyResponse> {
+    const url = buildApiUrl('/applications');
+    const headers = getAuthHeaders();
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(request),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !isSuccessResponse(result)) {
+      const errorMessage = extractErrorMessage(result);
+      throw new Error(errorMessage || '캠페인 지원에 실패했습니다.');
+    }
+
+    const data = extractData<CampaignApplyResponse>(result);
+    if (data) {
+      return data;
+    }
+
+    return result as CampaignApplyResponse;
   }
 }
 

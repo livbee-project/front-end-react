@@ -218,3 +218,16 @@ export interface CampaignDetail {
   };
   isApplied?: boolean;
 }
+
+export interface CampaignApplyRequest {
+  campaignId: string;
+  portfolioId: string;
+  message: string;
+  availableDate: string;
+  availableTime: string;
+}
+
+export interface CampaignApplyResponse {
+  applicationId: string;
+  chatRoomId: string;
+}
