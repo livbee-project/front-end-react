@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import Modal from './Modal';
 import Button from './Button';
 import styled from 'styled-components';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { H2, P } from '@/presentation/components/styled/Typography';
 
 const meta: Meta<typeof Modal> = {

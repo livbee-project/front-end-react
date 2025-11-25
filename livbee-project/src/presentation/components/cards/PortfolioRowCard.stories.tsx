@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import PortfolioRowCard from './PortfolioRowCard';
 import styled from 'styled-components';
-import React from 'react';
 
 const meta: Meta<typeof PortfolioRowCard> = {
   title: 'Cards/PortfolioRowCard',

@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import PortraitCard from './PortraitCard';
 import styled from 'styled-components';
-import React from 'react';
 
 const meta: Meta<typeof PortraitCard> = {
   title: 'Cards/PortraitCard',

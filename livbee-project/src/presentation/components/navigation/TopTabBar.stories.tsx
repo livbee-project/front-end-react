@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 import TopTabBar from './TopTabBar';
 import { MemoryRouter } from 'react-router-dom';
 import { ToastProvider } from '@/presentation/contexts/ToastContext';
-import React from 'react';
 
 const meta: Meta<typeof TopTabBar> = {
   title: 'Navigation/TopTabBar',

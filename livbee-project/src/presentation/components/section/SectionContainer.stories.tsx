@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 import SectionContainer from './SectionContainer';
 import PortraitCard from '@/presentation/components/cards/PortraitCard';
 import styled from 'styled-components';
-import React from 'react';
 
 const meta: Meta<typeof SectionContainer> = {
   title: 'Layouts/SectionContainer',

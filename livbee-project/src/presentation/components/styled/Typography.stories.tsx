@@ -12,7 +12,6 @@ import {
   Highlight,
 } from './Typography';
 import styled from 'styled-components';
-import React from 'react';
 
 const meta: Meta = {
   title: 'Design System/Typography',

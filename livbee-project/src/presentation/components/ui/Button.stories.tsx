@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import Button from './Button';
 import styled from 'styled-components';
-import React from 'react';
 
 const meta: Meta<typeof Button> = {
   title: 'UI Components/Button',

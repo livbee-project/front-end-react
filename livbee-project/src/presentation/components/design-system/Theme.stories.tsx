@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { theme } from '@/presentation/styles/theme';
 import styled from 'styled-components';
-import React from 'react';
 
 const meta: Meta = {
   title: 'Design System/Theme',

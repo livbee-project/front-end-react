@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import CampaignCard from './CampaignCard';
 import styled from 'styled-components';
-import React from 'react';
 
 const meta: Meta<typeof CampaignCard> = {
   title: 'Cards/CampaignCard',

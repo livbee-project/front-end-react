@@ -3,7 +3,6 @@ import { LoadingState } from './LoadingState';
 import { EmptyState } from './EmptyState';
 import { ErrorState } from './ErrorState';
 import styled from 'styled-components';
-import React from 'react';
 
 const meta: Meta = {
   title: 'UI Components/States',

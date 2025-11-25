@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import SectionTitle from './SectionTitle';
 import styled from 'styled-components';
-import React from 'react';
 
 const meta: Meta<typeof SectionTitle> = {
   title: 'UI Components/SectionTitle',

@@ -3,7 +3,6 @@ import { HomeCard } from './HomeCard';
 import { HomeCardImage } from './HomeCardImage';
 import { HomeCardBody, HomeCardBrand, HomeCardTitle, HomeCardDescription, HomeCardMetaRow, CTAButton } from './HomeCardBody';
 import styled from 'styled-components';
-import React from 'react';
 import { Caption } from '@/presentation/components/styled/Typography';
 
 const meta: Meta<typeof HomeCard> = {

@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import FloatingActionButton from './FloatingActionButton';
 import styled from 'styled-components';
-import React from 'react';
 
 const meta: Meta<typeof FloatingActionButton> = {
   title: 'UI Components/FloatingActionButton',
