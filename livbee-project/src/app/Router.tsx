@@ -69,22 +69,6 @@ const AppRouter = () => (
             <Route path="/news" element={<div>뉴스 페이지</div>} />
             <Route path="/event" element={<div>이벤트 페이지</div>} />
             <Route path="/service" element={<div>서비스 페이지</div>} />
-            <Route
-              path="/chat"
-              element={
-                <Suspense fallback={null}>
-                  <ChatRoomPage />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/chat/:roomId"
-              element={
-                <Suspense fallback={null}>
-                  <ChatRoomPage />
-                </Suspense>
-              }
-            />
 
             {/* (추가) BottomNavBar의 탭 경로들을 추가합니다. */}
             <Route
@@ -176,6 +160,24 @@ const AppRouter = () => (
               }
             />
           </Route>
+
+          {/* 채팅방 페이지는 TopNavLayout 밖에 위치 (상단 탭바 없음) */}
+          <Route
+            path="/chat"
+            element={
+              <Suspense fallback={null}>
+                <ChatRoomPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/chat/:roomId"
+            element={
+              <Suspense fallback={null}>
+                <ChatRoomPage />
+              </Suspense>
+            }
+          />
 
           {/* 상세 페이지는 TopNavLayout을 사용하지 않아 상단 바를 숨깁니다. */}
           <Route

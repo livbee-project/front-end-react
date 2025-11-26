@@ -229,6 +229,9 @@ export class CampaignApiSource {
 
     const result = await response.json();
 
+    // 디버깅: 원본 응답 로그
+    console.log('[CampaignApiSource] 원본 응답:', result);
+
     if (!response.ok || !isSuccessResponse(result)) {
       const errorMessage = extractErrorMessage(result);
       throw new Error(errorMessage || '캠페인 지원에 실패했습니다.');
@@ -236,10 +239,22 @@ export class CampaignApiSource {
 
     const data = extractData<CampaignApplyResponse>(result);
     if (data) {
-      return data;
+      // 백엔드가 snake_case를 사용할 수 있으므로 필드명 정규화
+      const normalizedData: CampaignApplyResponse = {
+        applicationId: data.applicationId || (data as any).application_id || '',
+        chatRoomId: data.chatRoomId || (data as any).chat_room_id || (data as any).roomId || '',
+      };
+      console.log('[CampaignApiSource] 정규화된 응답:', normalizedData);
+      return normalizedData;
     }
 
-    return result as CampaignApplyResponse;
+    // extractData가 null을 반환한 경우 원본 결과에서 필드명 정규화 시도
+    const fallbackData: CampaignApplyResponse = {
+      applicationId: (result as any).applicationId || (result as any).application_id || '',
+      chatRoomId: (result as any).chatRoomId || (result as any).chat_room_id || (result as any).roomId || '',
+    };
+    console.log('[CampaignApiSource] 폴백 응답:', fallbackData);
+    return fallbackData;
   }
 }
 

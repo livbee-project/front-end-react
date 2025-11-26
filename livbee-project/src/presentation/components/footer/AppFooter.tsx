@@ -5,8 +5,8 @@ import { useLocation } from 'react-router-dom';
 const AppFooter: React.FC = () => {
   const location = useLocation();
   
-  // 로그인 페이지에서는 풋터를 표시하지 않음
-  if (location.pathname === '/login') {
+  // 메인 페이지(/)에서만 풋터를 표시
+  if (location.pathname !== '/') {
     return null;
   }
 

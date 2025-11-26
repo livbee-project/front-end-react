@@ -119,12 +119,20 @@ const CampaignApplyModal: React.FC<CampaignApplyModalProps> = ({
         availableTime,
       });
 
-      const chatRoomId = response.chatRoomId;
+      // 디버깅: 응답 구조 확인
+      console.log('[CampaignApplyModal] 지원 응답:', response);
+      
+      // 백엔드가 snake_case를 사용할 수 있으므로 두 가지 필드명 모두 확인
+      const chatRoomId = response.chatRoomId || (response as any).chat_room_id || (response as any).roomId;
+      
+      console.log('[CampaignApplyModal] chatRoomId:', chatRoomId);
 
       showToast('지원서가 제출되었습니다.');
       onClose();
+      
       if (chatRoomId) {
         onApplied?.(chatRoomId);
+        console.log('[CampaignApplyModal] 채팅방으로 이동:', `/chat/${chatRoomId}`);
         navigate(`/chat/${chatRoomId}`, {
           state: {
             campaignTitle,
@@ -136,7 +144,8 @@ const CampaignApplyModal: React.FC<CampaignApplyModalProps> = ({
           },
         });
       } else {
-        navigate('/chat', {
+        console.warn('[CampaignApplyModal] chatRoomId가 없어 채팅 목록으로 이동');
+        navigate('/mypage/messages', {
           state: {
             campaignTitle,
             portfolioTitle: selectedPortfolioData?.title,

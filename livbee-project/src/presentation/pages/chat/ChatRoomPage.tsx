@@ -6,7 +6,6 @@ import { useChatRoomDetail } from '@/presentation/hooks/useChatRoomDetail';
 import { useChatWebSocket } from '@/presentation/hooks/useChatWebSocket';
 
 interface ChatRoomState {
-  campaignTitle?: string;
   portfolioTitle?: string;
   message?: string;
   availableDate?: string;
@@ -59,10 +58,11 @@ const ChatRoomPage: React.FC = () => {
     return roomDetail.room.brandUser ?? roomDetail.room.showhostUser;
   }, [roomDetail]);
 
-  const displayCampaign =
-    roomDetail?.room.campaign?.title ?? fallbackState.campaignTitle ?? '캠페인 정보 없음';
-  const displayCounterpart =
-    counterpart?.name || counterpart?.nickname || fallbackState.portfolioTitle || '대화상대';
+  // 브랜드명/사용자명: counterpart의 name 또는 nickname 사용 (fallback 제거)
+  const displayName = counterpart?.name || counterpart?.nickname || '대화상대';
+  
+  // Role 표시: counterpart의 role에 따라
+  const displayRole = counterpart?.role === 'brand' ? '브랜드' : counterpart?.role === 'showhost' ? '쇼호스트' : '';
 
   const handleSend = async () => {
     if (!composer.trim() || !activeRoomId) return;
@@ -128,16 +128,24 @@ const ChatRoomPage: React.FC = () => {
     [appendMessage, updateReadStatus]
   );
 
-  const { status: socketStatus } = useChatWebSocket({
+  useChatWebSocket({
     roomId: activeRoomId,
-    enabled: Boolean(roomDetail),
+    enabled: Boolean(roomDetail && activeRoomId),
     onEvent: handleSocketEvent,
   });
+
+  // activeRoomId가 없으면 채팅 목록으로 리다이렉트
+  React.useEffect(() => {
+    if (!activeRoomId) {
+      console.warn('[ChatRoomPage] activeRoomId가 없어 채팅 목록으로 이동');
+      navigate('/mypage/messages', { replace: true });
+    }
+  }, [activeRoomId, navigate]);
 
   if (!activeRoomId) {
     return (
       <PageWrapper>
-        <MessageValue>채팅방 정보가 없습니다. 메시지 목록에서 대화를 선택해주세요.</MessageValue>
+        <MessageValue>채팅방 정보가 없습니다. 메시지 목록으로 이동 중...</MessageValue>
       </PageWrapper>
     );
   }
@@ -157,44 +165,16 @@ const ChatRoomPage: React.FC = () => {
                     counterpart?.avatarUrl ||
                     'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=160&q=80'
                   }
-                  alt={displayCounterpart}
+                  alt={displayName}
                 />
                 <StatusDot />
               </AvatarWrapper>
-              <div>
-                <HeaderName>{displayCounterpart}</HeaderName>
-                <HeaderRole>{counterpart?.role === 'brand' ? '브랜드' : '쇼호스트'}</HeaderRole>
-              </div>
+              <NameRoleGroup>
+                <HeaderName>{displayName}</HeaderName>
+                {displayRole && <HeaderRole>{displayRole}</HeaderRole>}
+              </NameRoleGroup>
             </ProfileGroup>
-            <HeaderActions>
-              <ConnectionBadge data-status={socketStatus}>
-                {socketStatus === 'open'
-                  ? '실시간 연결됨'
-                  : socketStatus === 'connecting'
-                  ? '연결 중...'
-                  : '오프라인'}
-              </ConnectionBadge>
-              <ContractButton>{displayCampaign}</ContractButton>
-            </HeaderActions>
           </ContactHeader>
-          <RoomMetaPanel>
-            <MetaItem>
-              <MetaLabel>캠페인</MetaLabel>
-              <MetaValue>{roomDetail?.room.campaign?.title ?? '비공개'}</MetaValue>
-            </MetaItem>
-            <MetaItem>
-              <MetaLabel>브랜드 담당자</MetaLabel>
-              <MetaValue>{roomDetail?.room.brandUser?.name ?? '미지정'}</MetaValue>
-            </MetaItem>
-            <MetaItem>
-              <MetaLabel>쇼호스트</MetaLabel>
-              <MetaValue>{roomDetail?.room.showhostUser?.name ?? '미지정'}</MetaValue>
-            </MetaItem>
-            <MetaItem>
-              <MetaLabel>최근 업데이트</MetaLabel>
-              <MetaValue>{formatTimestamp(roomDetail?.room.updatedAt)}</MetaValue>
-            </MetaItem>
-          </RoomMetaPanel>
         </FixedPanel>
 
         <ScrollArea ref={scrollRef} onScroll={handleScroll}>
@@ -303,7 +283,7 @@ const ChatRoomPage: React.FC = () => {
 
 const PageWrapper = styled.div`
   min-height: 100vh;
-  padding: 24px 16px 120px;
+  padding: 0 0 120px;
   background: #f4f5fb;
   position: relative;
   width: 100%;
@@ -321,79 +301,27 @@ const FixedPanel = styled.div`
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  top: 112px;
+  top: 0;
   z-index: 50;
   width: 100%;
   max-width: 1200px;
   background: #ffffff;
-  padding: 8px 16px;
+  padding: 12px 16px;
   box-sizing: border-box;
+  border-bottom: 1px solid #e1e4f2;
 `;
 
 const ScrollArea = styled.div`
-  padding-top: 60px;
+  padding-top: 80px;
   padding-bottom: 150px;
   overflow-y: auto;
-  max-height: calc(100vh - 112px - 60px - 72px);
+  max-height: calc(100vh - 80px - 150px);
 `;
 
 const ContactHeader = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 4px;
-`;
-
-const HeaderActions = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
-
-const ConnectionBadge = styled.span`
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: #f3f6ff;
-  color: #5a64ff;
-
-  &[data-status='open'] {
-    background: #e6f9f0;
-    color: #15a86b;
-  }
-
-  &[data-status='error'],
-  &[data-status='closed'] {
-    background: #fff1f0;
-    color: #e53935;
-  }
-`;
-
-const RoomMetaPanel = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px;
-  padding: 8px 4px 0;
-`;
-
-const MetaItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-`;
-
-const MetaLabel = styled.span`
-  font-size: 0.75rem;
-  color: #7d8299;
-`;
-
-const MetaValue = styled.span`
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #1f1f25;
+  padding: 0;
 `;
 
 const ProfileGroup = styled.div`
@@ -444,31 +372,23 @@ const StatusDot = styled.span`
   border: 2px solid #fff;
 `;
 
+const NameRoleGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+`;
+
 const HeaderName = styled.div`
+  font-size: 1rem;
   font-weight: 700;
   color: #1f1f25;
+  line-height: 1.2;
 `;
 
 const HeaderRole = styled.div`
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #7d8299;
-`;
-
-const ContractButton = styled.button`
-  border: none;
-  background: #6c6bff;
-  color: #fff;
-  padding: 10px 22px;
-  border-radius: 20px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 12px 24px rgba(90, 100, 255, 0.35);
-
-  &::before {
-    content: '📄';
-  }
+  line-height: 1.2;
 `;
 
 const Messages = styled.div`
