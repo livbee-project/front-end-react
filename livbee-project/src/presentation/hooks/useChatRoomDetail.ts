@@ -25,6 +25,14 @@ export const useChatRoomDetail = (roomId?: string) => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
     try {
       const detail = await chatApiSource.getRoomDetail(roomId);
+      
+      // 디버깅: 받아온 채팅방 상세 정보 확인
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[useChatRoomDetail] fetchRoom 받아온 detail:', detail);
+        console.log('[useChatRoomDetail] fetchRoom messages:', detail?.messages);
+        console.log('[useChatRoomDetail] fetchRoom messages 개수:', detail?.messages?.length);
+      }
+      
       setState({ detail, loading: false, error: null });
     } catch (error) {
       setState({
@@ -40,25 +48,45 @@ export const useChatRoomDetail = (roomId?: string) => {
       if (!roomId) return null;
       try {
         const response = await chatApiSource.sendMessage(roomId, payload);
+        
+        // 디버깅: 응답 구조 확인
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[useChatRoomDetail] sendMessage 응답:', response);
+        }
+        
+        // response.message가 없는 경우 처리
+        if (!response || !response.message) {
+          console.error('[useChatRoomDetail] 응답에 message가 없습니다:', response);
+          throw new Error('메시지 전송 응답 형식이 올바르지 않습니다.');
+        }
+        
+        const message = response.message;
+        
         setState((prev) => {
           if (!prev.detail) {
             return prev;
           }
+          
+          // messages가 배열인지 확인하고, 배열이 아니면 빈 배열로 초기화
+          const currentMessages = Array.isArray(prev.detail.messages) 
+            ? prev.detail.messages 
+            : [];
+          
           return {
             ...prev,
             detail: {
               ...prev.detail,
               room: {
                 ...prev.detail.room,
-                lastMessage: response.message,
-                updatedAt: response.message.createdAt,
+                lastMessage: message,
+                updatedAt: message.createdAt || new Date().toISOString(),
                 unreadCount: prev.detail.room.unreadCount,
               },
-              messages: [...prev.detail.messages, response.message],
+              messages: [...currentMessages, message],
             },
           };
         });
-        return response.message;
+        return message;
       } catch (error) {
         throw new Error(
           error instanceof Error ? error.message : '메시지를 전송하지 못했습니다.'
@@ -102,12 +130,23 @@ export const useChatRoomDetail = (roomId?: string) => {
   );
 
   const appendMessage = useCallback((message: ChatMessage) => {
+    if (!message || !message.id) {
+      console.error('[useChatRoomDetail] appendMessage: 유효하지 않은 메시지:', message);
+      return;
+    }
+    
     setState((prev) => {
       if (!prev.detail) return prev;
-      const exists = prev.detail.messages.some((item) => item.id === message.id);
+      
+      // messages가 배열인지 확인하고, 배열이 아니면 빈 배열로 초기화
+      const currentMessages = Array.isArray(prev.detail.messages) 
+        ? prev.detail.messages 
+        : [];
+      
+      const exists = currentMessages.some((item) => item.id === message.id);
       const messages = exists
-        ? prev.detail.messages.map((item) => (item.id === message.id ? message : item))
-        : [...prev.detail.messages, message];
+        ? currentMessages.map((item) => (item.id === message.id ? message : item))
+        : [...currentMessages, message];
       return {
         ...prev,
         detail: {
@@ -115,7 +154,7 @@ export const useChatRoomDetail = (roomId?: string) => {
           room: {
             ...prev.detail.room,
             lastMessage: message,
-            updatedAt: message.createdAt,
+            updatedAt: message.createdAt || new Date().toISOString(),
             unreadCount:
               message.senderId === prev.detail.room.me.userId
                 ? prev.detail.room.unreadCount

@@ -106,8 +106,24 @@ export class ChatApiSource {
       method: 'GET',
       headers: getAuthHeaders(),
     });
+    
+    // 디버깅: 원본 응답 확인
+    if (process.env.NODE_ENV === 'development') {
+      const responseClone = response.clone();
+      responseClone.json().then((data) => {
+        console.log('[ChatApiSource] getRooms 원본 응답:', data);
+      }).catch(() => {});
+    }
+    
     const payload = await handleResponse<RawRoomsResponse>(response);
-    return extractRooms(payload);
+    const rooms = extractRooms(payload);
+    
+    // 디버깅: 추출된 채팅방 목록 확인
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[ChatApiSource] getRooms 추출된 채팅방 목록:', rooms);
+    }
+    
+    return rooms;
   }
 
   async getRoomDetail(roomId: string, params?: { page?: number; limit?: number; cursor?: string }): Promise<ChatRoomDetail> {
@@ -116,7 +132,53 @@ export class ChatApiSource {
       method: 'GET',
       headers: getAuthHeaders(),
     });
-    return handleResponse<ChatRoomDetail>(response);
+    
+    // 원본 응답을 먼저 파싱
+    const rawResponse = await response.json();
+    
+    // 디버깅: 원본 응답 확인
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[ChatApiSource] getRoomDetail 원본 응답:', JSON.stringify(rawResponse, null, 2));
+      console.log('[ChatApiSource] getRoomDetail 원본 응답 data:', rawResponse.data);
+      console.log('[ChatApiSource] getRoomDetail 원본 응답 data.items:', rawResponse.data?.items);
+      console.log('[ChatApiSource] getRoomDetail 원본 응답 data.messages:', rawResponse.data?.messages);
+    }
+    
+    if (!response.ok) {
+      const error = rawResponse as ApiErrorResponse;
+      throw new Error(error.userMessage || error.message || '채팅방을 불러오지 못했습니다.');
+    }
+    
+    // 백엔드 응답 형식 처리
+    if (rawResponse && typeof rawResponse === 'object' && 'data' in rawResponse) {
+      const data = rawResponse.data;
+      
+      // 백엔드 응답 형식: { ok: true, data: { room: {...}, items: [...], pagination: {...} } }
+      // 프론트엔드 기대 형식: { room: {...}, messages: [...], pagination: {...} }
+      if (data && typeof data === 'object' && 'room' in data) {
+        // items를 messages로 변환
+        const messages = Array.isArray(data.items) ? data.items : (Array.isArray(data.messages) ? data.messages : []);
+        
+        const result: ChatRoomDetail = {
+          room: data.room,
+          messages: messages,
+        };
+        
+        // pagination이 있으면 추가
+        if (data.pagination) {
+          result.pagination = {
+            hasMore: data.pagination.hasMore ?? (data.pagination.page < data.pagination.total / data.pagination.limit),
+            nextCursor: data.pagination.nextCursor,
+          };
+        }
+        
+        return result;
+      }
+    }
+    
+    // 예상치 못한 형식
+    console.error('[ChatApiSource] getRoomDetail 예상치 못한 응답 형식:', JSON.stringify(rawResponse, null, 2));
+    throw new Error('채팅방 정보 응답 형식이 올바르지 않습니다.');
   }
 
   async createRoom(payload: CreateChatRoomRequest): Promise<CreateChatRoomResponse> {
@@ -136,7 +198,55 @@ export class ChatApiSource {
       headers: getAuthHeaders(),
       body: JSON.stringify(payload),
     });
-    return handleResponse<SendChatMessageResponse>(response);
+    
+    // 원본 응답을 먼저 파싱
+    const rawResponse = await response.json();
+    
+    // 디버깅: 원본 응답 확인
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[ChatApiSource] sendMessage 원본 응답:', JSON.stringify(rawResponse, null, 2));
+      console.log('[ChatApiSource] sendMessage 원본 응답 data:', rawResponse.data);
+      console.log('[ChatApiSource] sendMessage 원본 응답 data.data:', rawResponse.data?.data);
+      console.log('[ChatApiSource] sendMessage 원본 응답 data.data.message:', rawResponse.data?.data?.message);
+    }
+    
+    // 백엔드 응답 형식: { ok: true, data: { message: ChatMessage } }
+    // 또는 { ok: true, data: ChatMessage } (이전 형식)
+    if (!response.ok) {
+      const error = rawResponse as ApiErrorResponse;
+      throw new Error(error.userMessage || error.message || '메시지 전송에 실패했습니다.');
+    }
+    
+    // 응답 형식에 따라 처리
+    if (rawResponse && typeof rawResponse === 'object' && 'data' in rawResponse) {
+      const data = rawResponse.data;
+      
+      // 형식 1: { ok: true, data: { data: { message: ChatMessage } } } (중첩된 data)
+      if (data && typeof data === 'object' && 'data' in data) {
+        const innerData = data.data;
+        if (innerData && typeof innerData === 'object' && 'message' in innerData) {
+          return { message: innerData.message };
+        }
+        // 중첩된 data 안에 직접 ChatMessage가 있는 경우
+        if (innerData && typeof innerData === 'object' && 'id' in innerData && 'content' in innerData) {
+          return { message: innerData };
+        }
+      }
+      
+      // 형식 2: { ok: true, data: { message: ChatMessage } }
+      if (data && typeof data === 'object' && 'message' in data) {
+        return { message: data.message };
+      }
+      
+      // 형식 3: { ok: true, data: ChatMessage } (이전 형식 호환)
+      if (data && typeof data === 'object' && 'id' in data && 'content' in data) {
+        return { message: data };
+      }
+    }
+    
+    // 예상치 못한 형식
+    console.error('[ChatApiSource] sendMessage 예상치 못한 응답 형식:', JSON.stringify(rawResponse, null, 2));
+    throw new Error('메시지 전송 응답 형식이 올바르지 않습니다.');
   }
 
   async markAsRead(roomId: string, payload: ReadChatMessageRequest): Promise<{ success: boolean }> {

@@ -38,11 +38,11 @@ const ChatRoomPage: React.FC = () => {
     if (!iso) return '';
     const date = new Date(iso);
     if (Number.isNaN(date.getTime())) return '';
+    // 시간만 표시 (오후/오전 형식)
     return new Intl.DateTimeFormat('ko-KR', {
-      month: '2-digit',
-      day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
+      hour12: true,
     }).format(date);
   };
 
@@ -284,7 +284,7 @@ const ChatRoomPage: React.FC = () => {
 const PageWrapper = styled.div`
   min-height: 100vh;
   padding: 0 0 120px;
-  background: #f4f5fb;
+  background: #F5F6FF1A;
   position: relative;
   width: 100%;
   max-width: 1200px;
@@ -352,6 +352,8 @@ const ChatCard = styled.div`
   flex-direction: column;
   gap: 20px;
   background: transparent;
+  padding: 24px 20px;
+  box-sizing: border-box;
 `;
 
 const Avatar = styled.img`
@@ -394,7 +396,7 @@ const HeaderRole = styled.div`
 const Messages = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 `;
 
 const MessageGroup = styled.div<{ $align: 'start' | 'end' }>`
@@ -405,18 +407,23 @@ const MessageGroup = styled.div<{ $align: 'start' | 'end' }>`
 `;
 
 const MessageBubble = styled.div<{ $variant: 'sent' | 'received' }>`
-  background: ${({ $variant }) => ($variant === 'sent' ? '#5a64ff' : '#f1f2f9')};
-  color: ${({ $variant }) => ($variant === 'sent' ? '#fff' : '#1f1f25')};
-  padding: 10px 14px;
-  border-radius: ${({ $variant }) => ($variant === 'sent' ? '16px 16px 4px 16px' : '16px 16px 16px 4px')};
+  background: ${({ $variant }) => ($variant === 'sent' ? '#687CF4' : '#FFFFFF')};
+  color: ${({ $variant }) => ($variant === 'sent' ? '#FFFFFF' : '#030213')};
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: ${({ $variant }) => ($variant === 'sent' ? 'none' : '1px solid rgba(0, 0, 0, 0.1)')};
   max-width: 90%;
-  font-size: 0.95rem;
-  line-height: 1.6;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.5;
+  word-wrap: break-word;
+  word-break: break-word;
 `;
 
 const MessageTime = styled.span`
-  font-size: 0.75rem;
-  color: #a0a4b7;
+  font-size: 12px;
+  font-weight: 300;
+  color: #717182;
 `;
 
 const MessageValue = styled.div`
