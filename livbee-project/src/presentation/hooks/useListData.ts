@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { error as logError } from '@/shared/utils/logger';
+import { dataCache } from '@/shared/state/dataCache';
 
 /**
  * 목록 데이터 조회를 위한 커스텀 훅
@@ -14,17 +16,24 @@ import { useState, useEffect } from 'react';
  * 
  * @returns { data, loading, error, currentPage, totalPages, setCurrentPage, setTotalPages }
  */
+interface ListDataOptions {
+  cacheKey?: string;
+  cacheTime?: number;
+}
+
 export function useListData<T, Q, Response extends { items: T[]; currentPage?: number; totalPages?: number }>(
   fetchFunction: (query: Q, signal?: AbortSignal) => Promise<Response>,
   query: Q,
-  dependencies: any[],
-  errorMessage: string = '데이터를 불러오는 중 오류가 발생했습니다.'
+  dependencies: ReadonlyArray<unknown>,
+  errorMessage: string = '데이터를 불러오는 중 오류가 발생했습니다.',
+  options: ListDataOptions = {}
 ) {
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const { cacheKey, cacheTime = 2 * 60 * 1000 } = options;
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -33,8 +42,17 @@ export function useListData<T, Q, Response extends { items: T[]; currentPage?: n
     const loadData = async () => {
       try {
         if (!isCancelled) {
-          setLoading(true);
-          setError(null);
+          const cachedValue = dataCache.get<Response>(cacheKey);
+          if (cachedValue) {
+            setData(cachedValue.items);
+            setCurrentPage(cachedValue.currentPage || 1);
+            setTotalPages(cachedValue.totalPages || 1);
+            setLoading(false);
+            setError(null);
+          } else {
+            setLoading(true);
+            setError(null);
+          }
         }
 
         const response = await fetchFunction(query, abortController.signal);
@@ -47,6 +65,7 @@ export function useListData<T, Q, Response extends { items: T[]; currentPage?: n
           if (response.totalPages !== undefined) {
             setTotalPages(response.totalPages);
           }
+          dataCache.set(cacheKey, response, cacheTime);
         }
       } catch (err) {
         // AbortError는 무시 (요청이 취소된 경우)
@@ -54,7 +73,7 @@ export function useListData<T, Q, Response extends { items: T[]; currentPage?: n
           return;
         }
         if (!isCancelled && !abortController.signal.aborted) {
-          console.error('목록 조회 실패:', err);
+          logError('useListData', '목록 조회 실패:', err);
           setError(errorMessage);
           setData([]);
         }
@@ -75,6 +94,20 @@ export function useListData<T, Q, Response extends { items: T[]; currentPage?: n
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, dependencies);
 
+  const updateData = useCallback(
+    (updater: React.SetStateAction<T[]>) => {
+      setData((prev) => {
+        const next = typeof updater === 'function' ? (updater as (prevState: T[]) => T[])(prev) : updater;
+        const cached = dataCache.get<Response>(cacheKey);
+        if (cached) {
+          dataCache.set(cacheKey, { ...cached, items: next, currentPage, totalPages } as Response, cacheTime);
+        }
+        return next;
+      });
+    },
+    [cacheKey, cacheTime, currentPage, totalPages]
+  );
+
   return {
     data,
     loading,
@@ -83,6 +116,7 @@ export function useListData<T, Q, Response extends { items: T[]; currentPage?: n
     totalPages,
     setCurrentPage,
     setTotalPages,
+    setData: updateData,
   };
 }
 

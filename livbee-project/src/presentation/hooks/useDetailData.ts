@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { error as logError } from '@/shared/utils/logger';
+import { dataCache } from '@/shared/state/dataCache';
 
 /**
  * 상세 데이터 조회를 위한 커스텀 훅
@@ -11,14 +13,22 @@ import { useState, useEffect } from 'react';
  * 
  * @returns { data, loading, error, setData }
  */
+interface DetailDataOptions {
+  cacheKey?: string;
+  cacheTime?: number;
+  onError?: (message: string) => void;
+}
+
 export function useDetailData<T>(
   fetchFunction: (id: string, signal?: AbortSignal) => Promise<T>,
   id: string | undefined,
-  errorMessage: string = '데이터를 불러오는데 실패했습니다.'
+  errorMessage: string = '데이터를 불러오는데 실패했습니다.',
+  options: DetailDataOptions = {}
 ) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { cacheKey, cacheTime = 5 * 60 * 1000, onError } = options;
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -35,14 +45,21 @@ export function useDetailData<T>(
 
       try {
         if (!isCancelled) {
-          setLoading(true);
-          setError(null);
+          const cachedValue = dataCache.get<T>(cacheKey ? `${cacheKey}:${id}` : undefined);
+          if (cachedValue) {
+            setData(cachedValue);
+            setLoading(false);
+          } else {
+            setLoading(true);
+            setError(null);
+          }
         }
 
         const result = await fetchFunction(id, abortController.signal);
 
         if (!isCancelled && !abortController.signal.aborted) {
           setData(result);
+          dataCache.set(cacheKey ? `${cacheKey}:${id}` : undefined, result, cacheTime);
         }
       } catch (err) {
         // AbortError는 무시 (요청이 취소된 경우)
@@ -52,7 +69,8 @@ export function useDetailData<T>(
         if (!isCancelled && !abortController.signal.aborted) {
           const errorMsg = err instanceof Error ? err.message : errorMessage;
           setError(errorMsg);
-          console.error('상세 조회 실패:', err);
+          onError?.(errorMsg);
+          logError('useDetailData', '상세 조회 실패:', err);
         }
       } finally {
         if (!isCancelled && !abortController.signal.aborted) {
@@ -71,11 +89,26 @@ export function useDetailData<T>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  const updateData = useCallback(
+    (updater: React.SetStateAction<T | null>) => {
+      setData((prev) => {
+        const next = typeof updater === 'function' ? (updater as (prevState: T | null) => T | null)(prev) : updater;
+        if (next) {
+          dataCache.set(cacheKey ? `${cacheKey}:${id}` : undefined, next, cacheTime);
+        } else {
+          dataCache.delete(cacheKey ? `${cacheKey}:${id}` : undefined);
+        }
+        return next;
+      });
+    },
+    [cacheKey, cacheTime, id]
+  );
+
   return {
     data,
     loading,
     error,
-    setData,
+    setData: updateData,
   };
 }
 

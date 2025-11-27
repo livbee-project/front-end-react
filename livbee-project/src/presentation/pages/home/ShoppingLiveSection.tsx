@@ -77,6 +77,8 @@ const ShoppingLiveSection: React.FC = React.memo(() => {
     [campaignRepository]
   );
 
+  const cacheKey = useMemo(() => `shopping-live-${JSON.stringify(query)}`, [query]);
+
   const { data: campaigns, loading, error } = useListData<
     Campaign,
     { page: number; limit: number; sort?: 'latest' | 'deadline' },
@@ -85,7 +87,8 @@ const ShoppingLiveSection: React.FC = React.memo(() => {
     fetchCampaigns,
     query,
     [],
-    '쇼핑 라이브 목록을 불러오는 중 오류가 발생했습니다.'
+    '쇼핑 라이브 목록을 불러오는 중 오류가 발생했습니다.',
+    { cacheKey }
   );
 
   const sectionTitle = (

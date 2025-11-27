@@ -1,5 +1,5 @@
-import React, { useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useMemo } from 'react';
+import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import StickyHeader from '@/presentation/components/detail/StickyHeader';
 import ProfileSection from '@/presentation/components/detail/ProfileSection';
@@ -8,14 +8,14 @@ import GalleryGrid from '@/presentation/components/detail/GalleryGrid';
 import ActionSection from '@/presentation/components/detail/ActionSection';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';
-import { LoadingState } from '@/presentation/components/states/LoadingState';
-import { ErrorState } from '@/presentation/components/states/ErrorState';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { PortfolioDetail } from '@/domain/entities/Portfolio';
 import { useRepository } from '@/presentation/hooks/useRepository';
-import { useDetailData } from '@/presentation/hooks/useDetailData';
+import { useDetailFetcher } from '@/presentation/hooks/useDetailFetcher';
+import { useDetailPageState } from '@/presentation/hooks/useDetailPageState';
 import { useImageGallery } from '@/presentation/hooks/useImageGallery';
 import GalleryLightbox from '@/presentation/components/detail/GalleryLightbox';
+import { extractCategories, generateProfileTags } from '@/shared/utils/detailPageUtils';
 
 const GallerySection = styled(DetailSection)`
   padding: ${({ theme }) => theme.spacing.xl} ${({ theme }) => theme.spacing.lg};
@@ -27,25 +27,61 @@ const GalleryWrapper = styled.div`
 
 const PortfolioDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
 
   const portfolioRepository = useRepository(PortfolioRepository);
 
-  // fetchFunction 메모이제이션
-  const fetchPortfolio = useCallback(
-    (id: string, signal?: AbortSignal) => {
-      return portfolioRepository.getPortfolioById(id, signal);
-    },
-    [portfolioRepository]
-  );
-
-  const { data: portfolio, loading: isLoading, error } = useDetailData<PortfolioDetail>(
-    fetchPortfolio,
+  const {
+    data: portfolio,
+    loading: isLoading,
+    error,
+  } = useDetailFetcher<PortfolioDetail, PortfolioRepository>({
+    repository: portfolioRepository,
+    method: 'getPortfolioById',
     id,
-    '포트폴리오를 불러오는데 실패했습니다.'
-  );
+    errorMessage: '포트폴리오를 불러오는데 실패했습니다.',
+  });
+
+  // 로딩/에러 상태 처리
+  const { renderState, isReady } = useDetailPageState({
+    data: portfolio,
+    loading: isLoading,
+    error,
+    notFoundMessage: '포트폴리오를 찾을 수 없습니다.',
+    listPath: '/portfolios',
+    LayoutComponent: DetailPageLayout,
+  });
 
   const gallery = useImageGallery(portfolio?.subThumbnailUrls ?? []);
+
+  const categories = useMemo(() => {
+    if (!portfolio?.oneLineIntro) {
+      return [];
+    }
+    return extractCategories({ description: portfolio.oneLineIntro });
+  }, [portfolio?.oneLineIntro]);
+
+  const tags = useMemo(() => {
+    if (!portfolio) {
+      return [];
+    }
+    return generateProfileTags({
+      height: portfolio.height,
+      weight: portfolio.weight,
+      topSize: portfolio.topSize,
+      experienceYears: portfolio.experienceYears,
+      isSizingPublic: true,
+    });
+  }, [portfolio]);
+
+  // 로딩/에러 상태일 경우 UI 반환
+  if (renderState) {
+    return <>{renderState}</>;
+  }
+
+  // 데이터가 준비되지 않았으면 아무것도 렌더링하지 않음 (방어 코드)
+  if (!isReady || !portfolio) {
+    return null;
+  }
 
   const handleProfileImageClick = () => {
     // TODO: 이미지 확대 또는 갤러리 열기 기능 구현
@@ -66,61 +102,6 @@ const PortfolioDetailPage: React.FC = () => {
   const handleShare = () => {
     // TODO: 공유 기능 구현
   };
-
-  if (isLoading) {
-    return (
-      <DetailPageLayout>
-        <LoadingState padding="16px" />
-      </DetailPageLayout>
-    );
-  }
-
-  if (error || !portfolio) {
-    return (
-      <DetailPageLayout>
-        <ErrorState
-          message={error || '포트폴리오를 찾을 수 없습니다.'}
-          padding="16px"
-          onRetry={() => navigate('/portfolios')}
-          retryLabel="목록으로 돌아가기"
-        />
-      </DetailPageLayout>
-    );
-  }
-
-  // 카테고리 배열 생성 (description에서 추출)
-  const categories: string[] = [];
-  const description = portfolio.oneLineIntro || '';
-  if (description.includes('패션')) {
-    categories.push('패션');
-  }
-  if (description.includes('뷰티')) {
-    categories.push('뷰티');
-  }
-  if (description.includes('식품')) {
-    categories.push('식품');
-  }
-  if (description.includes('가전')) {
-    categories.push('가전');
-  }
-  if (description.includes('생활') || description.includes('리빙')) {
-    categories.push('생활/리빙');
-  }
-
-  // 태그 배열 생성
-  const tags: string[] = [];
-  if (portfolio.height != null) {
-    tags.push(`키 ${portfolio.height}cm`);
-  }
-  if (portfolio.weight != null) {
-    tags.push(`몸무게 ${portfolio.weight}kg`);
-  }
-  if (portfolio.topSize) {
-    tags.push(`사이즈 ${portfolio.topSize}`);
-  }
-  if (portfolio.experienceYears != null && portfolio.experienceYears > 0) {
-    tags.push(`경력 ${portfolio.experienceYears}년`);
-  }
 
   return (
     <DetailPageLayout>

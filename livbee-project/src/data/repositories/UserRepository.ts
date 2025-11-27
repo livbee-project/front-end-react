@@ -6,6 +6,7 @@ import type {
   SignupResponse,
   MeResponse,
 } from '@/domain/entities/User';
+import { error as logError } from '@/shared/utils/logger';
 
 /**
  * 사용자 리포지토리
@@ -25,7 +26,7 @@ export class UserRepository {
     try {
       return await this.apiSource.login(request);
     } catch (error) {
-      console.error('로그인 실패:', error);
+      logError('UserRepository', '로그인 실패:', error);
       throw error;
     }
   }
@@ -37,7 +38,7 @@ export class UserRepository {
     try {
       return await this.apiSource.signup(request);
     } catch (error) {
-      console.error('회원가입 실패:', error);
+      logError('UserRepository', '회원가입 실패:', error);
       throw error;
     }
   }
@@ -49,7 +50,7 @@ export class UserRepository {
     try {
       return await this.apiSource.getMe(signal);
     } catch (error) {
-      console.error('내 정보 조회 실패:', error);
+      logError('UserRepository', '내 정보 조회 실패:', error);
       throw error;
     }
   }

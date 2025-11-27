@@ -13,6 +13,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import type { UserType, ProfileData, MenuItemData } from '@/types/mypage';
+import { debug } from '@/shared/utils/logger';
 
 /**
  * 마이페이지 데이터를 생성하는 커스텀 훅
@@ -69,13 +70,13 @@ export const useMyPageData = (userType: UserType) => {
         icon: User,
         label: '개인정보 관리',
         description: '비밀번호 변경 및 인증',
-        onClick: () => console.log('개인정보 관리 클릭'),
+        onClick: () => debug('useMyPageData', '개인정보 관리 클릭'),
       },
       {
         icon: Bell,
         label: '알림 설정',
         description: '알림 수신 설정 관리',
-        onClick: () => console.log('알림 설정 클릭'),
+        onClick: () => debug('useMyPageData', '알림 설정 클릭'),
       },
       {
         icon: MessageSquare,
@@ -93,25 +94,25 @@ export const useMyPageData = (userType: UserType) => {
               icon: Briefcase,
               label: '캠페인 목록',
               description: '등록한 캠페인 관리',
-              onClick: () => console.log('캠페인 목록 클릭'),
+              onClick: () => debug('useMyPageData', '캠페인 목록 클릭'),
             },
             {
               icon: Users,
               label: '지원자 현황',
               description: '지원자 확인 및 관리',
-              onClick: () => console.log('지원자 현황 클릭'),
+              onClick: () => debug('useMyPageData', '지원자 현황 클릭'),
             },
             {
               icon: Send,
               label: '보낸 제안',
               description: '보낸 제안 내역',
-              onClick: () => console.log('보낸 제안 클릭'),
+              onClick: () => debug('useMyPageData', '보낸 제안 클릭'),
             },
             {
               icon: CreditCard,
               label: '계약 및 정산',
               description: '계약서 및 정산 내역',
-              onClick: () => console.log('계약 및 정산 클릭'),
+              onClick: () => debug('useMyPageData', '계약 및 정산 클릭'),
             },
           ],
           commonMenu,
@@ -143,13 +144,13 @@ export const useMyPageData = (userType: UserType) => {
               icon: Mail,
               label: '받은 제안',
               description: '받은 제안 확인',
-              onClick: () => console.log('받은 제안 클릭'),
+              onClick: () => debug('useMyPageData', '받은 제안 클릭'),
             },
             {
               icon: CreditCard,
               label: '계약 정산',
               description: '계약서 및 정산 내역',
-              onClick: () => console.log('계약 정산 클릭'),
+              onClick: () => debug('useMyPageData', '계약 정산 클릭'),
             },
           ],
           commonMenu,

@@ -1,11 +1,11 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Plus } from 'lucide-react';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { Portfolio } from '@/domain/entities/Portfolio';
 import { useRepository } from '@/presentation/hooks/useRepository';
-import { useListData } from '@/presentation/hooks/useListData';
+import { useListFetcher } from '@/presentation/hooks/useListFetcher';
 import { useListFilters } from '@/presentation/hooks/useListFilters';
 import { useListSearch } from '@/presentation/hooks/useListSearch';
 import { useScrapToggle } from '@/presentation/hooks/useScrapToggle';
@@ -33,34 +33,29 @@ const PortfolioPage: React.FC = () => {
     [currentPage, searchQuery]
   );
 
-  // fetchFunction 메모이제이션
-  const fetchPortfolios = useCallback(
-    (query: { page: number; limit: number; search?: string }, signal?: AbortSignal) => {
-      return portfolioRepository.getPortfolioList(query, signal);
-    },
-    [portfolioRepository]
-  );
-
   const {
     data: portfolios,
     loading,
     error,
     totalPages,
-  } = useListData<
+  } = useListFetcher<
     Portfolio,
     { page: number; limit: number; search?: string },
+    PortfolioRepository,
     { items: Portfolio[]; currentPage?: number; totalPages?: number; totalItems?: number }
-  >(
-    fetchPortfolios,
+  >({
+    repository: portfolioRepository,
+    method: 'getPortfolioList',
     query,
-    [currentPage, searchQuery],
-    '포트폴리오 목록을 불러오는 중 오류가 발생했습니다.'
-  );
+    dependencies: [currentPage, searchQuery],
+    errorMessage: '포트폴리오 목록을 불러오는 중 오류가 발생했습니다.',
+    cacheKey: `portfolio-list-${JSON.stringify(query)}`,
+  });
 
   const filteredPortfolios = useMemo(() => {
     // TODO: 필터 기능은 추후 카테고리 데이터 추가 시 구현
     return portfolios;
-  }, [portfolios, activeFilter]);
+  }, [portfolios]);
 
   const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     handleSearchSubmit(event);

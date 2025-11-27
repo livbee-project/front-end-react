@@ -9,6 +9,7 @@ import type { Campaign } from '@/domain/entities/Campaign';
 import { htmlToText } from '@/shared/utils/htmlUtils';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListData } from '@/presentation/hooks/useListData';
+import { useAuth } from '@/presentation/hooks/useAuth';
 import { CaptionMedium } from '@/presentation/components/styled/Typography';
 import { Badge } from '@/presentation/components/styled/CommonStyles';
 import { HomeCard } from '@/presentation/components/cards/HomeCard';
@@ -33,6 +34,7 @@ const StyledBadge = styled(Badge)`
 
 const RecommendedLiveSection: React.FC = React.memo(() => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
   const [selectedCampaign, setSelectedCampaign] = React.useState<Campaign | null>(null);
   const campaignRepository = useRepository(CampaignRepository);
 
@@ -47,6 +49,8 @@ const RecommendedLiveSection: React.FC = React.memo(() => {
     [campaignRepository]
   );
 
+  const cacheKey = useMemo(() => `recommended-live-${JSON.stringify(query)}`, [query]);
+
   const { data: campaigns, loading, error } = useListData<
     Campaign,
     { page: number; limit: number; sort?: 'latest' | 'deadline' },
@@ -55,7 +59,8 @@ const RecommendedLiveSection: React.FC = React.memo(() => {
     fetchCampaigns,
     query,
     [],
-    '라이브 추천 목록을 불러오는 중 오류가 발생했습니다.'
+    '라이브 추천 목록을 불러오는 중 오류가 발생했습니다.',
+    { cacheKey }
   );
 
   const sectionTitle = (
@@ -123,6 +128,11 @@ const RecommendedLiveSection: React.FC = React.memo(() => {
                   type="button"
                   onClick={(event) => {
                     event.stopPropagation();
+                    // 비로그인 상태면 로그인 페이지로 이동
+                    if (!isLoggedIn) {
+                      navigate('/login', { replace: true });
+                      return;
+                    }
                     setSelectedCampaign(campaign);
                   }}
                 >

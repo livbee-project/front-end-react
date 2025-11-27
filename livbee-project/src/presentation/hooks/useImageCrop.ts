@@ -1,20 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import type { CropRatio, CropArea, ImageSize } from '@/types/imageCrop';
+import { getRatioValue, calculateMaxCropSize, clampCropPosition, scaleCropArea } from './utils/imageCropUtils';
 
-/**
- * 비율 값을 숫자로 변환
- */
-const getRatioValue = (ratio: CropRatio, imgWidth: number, imgHeight: number): number => {
-  if (ratio === 'original') {
-    return imgWidth > 0 && imgHeight > 0 ? imgWidth / imgHeight : 1;
-  }
-  const [w, h] = ratio.split(':').map(Number);
-  return w / h;
-};
-
-/**
- * 이미지 크롭 관련 로직을 관리하는 커스텀 훅
- */
 export const useImageCrop = (
   imageSrc: string,
   selectedRatio: CropRatio,
@@ -75,21 +62,15 @@ export const useImageCrop = (
     const imgAspect = img.naturalWidth / img.naturalHeight;
     
     // 초기 크롭 영역 설정 (최대 크기, 중앙에 위치)
-    const ratio = selectedRatio === 'original' 
-      ? imgAspect 
+    const ratio = selectedRatio === 'original'
+      ? imgAspect
       : getRatioValue(selectedRatio, actualDisplayWidth, actualDisplayHeight);
-    
-    // 최대 크기 계산
-    let maxCropWidth: number;
-    let maxCropHeight: number;
-    
-    if (ratio > actualDisplayWidth / actualDisplayHeight) {
-      maxCropWidth = actualDisplayWidth;
-      maxCropHeight = maxCropWidth / ratio;
-    } else {
-      maxCropHeight = actualDisplayHeight;
-      maxCropWidth = maxCropHeight * ratio;
-    }
+
+    const { cropWidth: maxCropWidth, cropHeight: maxCropHeight } = calculateMaxCropSize(
+      ratio,
+      actualDisplayWidth,
+      actualDisplayHeight
+    );
     
     const cropWidth = maxCropWidth;
     const cropHeight = maxCropHeight;
@@ -144,32 +125,30 @@ export const useImageCrop = (
 
     const img = imageRef.current;
     const imgAspect = img.naturalWidth / img.naturalHeight;
-    const ratio = selectedRatio === 'original' 
-      ? imgAspect 
+    const ratio = selectedRatio === 'original'
+      ? imgAspect
       : getRatioValue(selectedRatio, imageSize.width, imageSize.height);
-    
-    let maxCropWidth: number;
-    let maxCropHeight: number;
-    
-    if (ratio > imageSize.width / imageSize.height) {
-      maxCropWidth = imageSize.width;
-      maxCropHeight = maxCropWidth / ratio;
-    } else {
-      maxCropHeight = imageSize.height;
-      maxCropWidth = maxCropHeight * ratio;
-    }
+
+    const { cropWidth: maxCropWidth, cropHeight: maxCropHeight } = calculateMaxCropSize(
+      ratio,
+      imageSize.width,
+      imageSize.height
+    );
     
     const newWidth = maxCropWidth;
     const newHeight = maxCropHeight;
-    const maxX = imageSize.width - newWidth;
-    const maxY = imageSize.height - newHeight;
 
     setCropArea((prev) => {
       const centerX = prev.x + prev.width / 2;
       const centerY = prev.y + prev.height / 2;
-      
-      const newX = Math.max(0, Math.min(centerX - newWidth / 2, maxX));
-      const newY = Math.max(0, Math.min(centerY - newHeight / 2, maxY));
+
+      const { x: newX, y: newY } = clampCropPosition(
+        centerX - newWidth / 2,
+        centerY - newHeight / 2,
+        newWidth,
+        newHeight,
+        imageSize
+      );
 
       return {
         x: newX,
@@ -243,10 +222,10 @@ export const useImageCrop = (
 
     // 리사이즈 중
     if (isResizing) {
-      const ratio = selectedRatio === 'original' 
-        ? imageSize.width / imageSize.height 
+      const ratio = selectedRatio === 'original'
+        ? imageSize.width / imageSize.height
         : getRatioValue(selectedRatio, imageSize.width, imageSize.height);
-      
+
       const centerX = cropArea.x + cropArea.width / 2;
       const centerY = cropArea.y + cropArea.height / 2;
       
@@ -300,14 +279,14 @@ export const useImageCrop = (
     if (isDragging) {
       const x = currentX - dragStart.x;
       const y = currentY - dragStart.y;
-      const maxX = imageSize.width - cropArea.width;
-      const maxY = imageSize.height - cropArea.height;
-
-      setCropArea((prev) => ({
-        ...prev,
-        x: Math.max(0, Math.min(x, maxX)),
-        y: Math.max(0, Math.min(y, maxY)),
-      }));
+      setCropArea((prev) => {
+        const { x: clampedX, y: clampedY } = clampCropPosition(x, y, prev.width, prev.height, imageSize);
+        return {
+          ...prev,
+          x: clampedX,
+          y: clampedY,
+        };
+      });
     }
   };
 
@@ -332,13 +311,11 @@ export const useImageCrop = (
       const img = imageRef.current;
       const canvas = canvasRef.current;
 
-      const scaleX = img.naturalWidth / imageSize.width;
-      const scaleY = img.naturalHeight / imageSize.height;
-
-      const cropX = cropArea.x * scaleX;
-      const cropY = cropArea.y * scaleY;
-      const cropWidth = cropArea.width * scaleX;
-      const cropHeight = cropArea.height * scaleY;
+      const scaled = scaleCropArea(cropArea, imageSize, img);
+      const cropX = scaled.x;
+      const cropY = scaled.y;
+      const cropWidth = scaled.width;
+      const cropHeight = scaled.height;
 
       canvas.width = cropWidth;
       canvas.height = cropHeight;

@@ -7,6 +7,7 @@ import { CropHeader } from '@/presentation/components/imageCrop/CropHeader';
 import { CropViewport } from '@/presentation/components/imageCrop/CropViewport';
 import { CropControls } from '@/presentation/components/imageCrop/CropControls';
 import type { CropRatio } from '@/types/imageCrop';
+import { error as logError } from '@/shared/utils/logger';
 
 /**
  * 전역 타입 확장
@@ -79,11 +80,11 @@ const ImageCropPage: React.FC = () => {
         try {
           const result: unknown = callback(croppedFile);
           // Promise인 경우 완료될 때까지 대기
-          if (result != null && typeof result === 'object' && 'then' in result && typeof (result as any).then === 'function') {
-            await (result as Promise<any>);
+          if (result != null && typeof result === 'object' && 'then' in result && typeof (result as { then: unknown }).then === 'function') {
+            await (result as Promise<unknown>);
           }
         } catch (callbackError) {
-          console.error('이미지 업로드 콜백 실패:', callbackError);
+          logError('ImageCropPage', '이미지 업로드 콜백 실패:', callbackError);
           // 콜백 실패해도 페이지는 이동 (사용자가 다시 시도할 수 있도록)
         }
         
@@ -93,7 +94,7 @@ const ImageCropPage: React.FC = () => {
       
       navigate(returnPath);
     } catch (error) {
-      console.error('이미지 크롭 실패:', error);
+      logError('ImageCropPage', '이미지 크롭 실패:', error);
       alert('이미지 크롭에 실패했습니다.');
     }
   };

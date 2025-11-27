@@ -97,8 +97,9 @@ const OverviewDoc = () => (
   </div>
 );
 
-const meta: Meta = {
+const meta: Meta<typeof OverviewDoc> = {
   title: 'Overview/Introduction',
+  component: OverviewDoc,
   parameters: {
     layout: 'fullscreen',
     viewMode: 'docs',
@@ -111,7 +112,7 @@ const meta: Meta = {
 
 export default meta;
 
-type Story = StoryObj;
+type Story = StoryObj<typeof OverviewDoc>;
 
 export const Introduction: Story = {};
 

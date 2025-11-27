@@ -5,7 +5,9 @@ import type {
   SendChatMessageRequest,
   ChatRole,
 } from '@/domain/entities/Chat';
-import { chatApiSource } from '@/data/sources/ChatApiSource';
+import { ChatRepository } from '@/data/repositories/ChatRepository';
+import { useRepository } from '@/presentation/hooks/useRepository';
+import { debug, error as logError } from '@/shared/utils/logger';
 
 interface ChatRoomState {
   detail: ChatRoomDetail | null;
@@ -14,6 +16,7 @@ interface ChatRoomState {
 }
 
 export const useChatRoomDetail = (roomId?: string) => {
+  const chatRepository = useRepository(ChatRepository);
   const [state, setState] = useState<ChatRoomState>({
     detail: null,
     loading: Boolean(roomId),
@@ -24,14 +27,12 @@ export const useChatRoomDetail = (roomId?: string) => {
     if (!roomId) return;
     setState((prev) => ({ ...prev, loading: true, error: null }));
     try {
-      const detail = await chatApiSource.getRoomDetail(roomId);
+      const detail = await chatRepository.getRoomDetail(roomId);
       
       // 디버깅: 받아온 채팅방 상세 정보 확인
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[useChatRoomDetail] fetchRoom 받아온 detail:', detail);
-        console.log('[useChatRoomDetail] fetchRoom messages:', detail?.messages);
-        console.log('[useChatRoomDetail] fetchRoom messages 개수:', detail?.messages?.length);
-      }
+      debug('useChatRoomDetail', 'fetchRoom 받아온 detail:', detail);
+      debug('useChatRoomDetail', 'fetchRoom messages:', detail?.messages);
+      debug('useChatRoomDetail', 'fetchRoom messages 개수:', detail?.messages?.length);
       
       setState({ detail, loading: false, error: null });
     } catch (error) {
@@ -41,22 +42,20 @@ export const useChatRoomDetail = (roomId?: string) => {
         error: error instanceof Error ? error.message : '채팅방을 불러오지 못했습니다.',
       });
     }
-  }, [roomId]);
+  }, [roomId, chatRepository]);
 
   const sendMessage = useCallback(
     async (payload: SendChatMessageRequest): Promise<ChatMessage | null> => {
       if (!roomId) return null;
       try {
-        const response = await chatApiSource.sendMessage(roomId, payload);
+        const response = await chatRepository.sendMessage(roomId, payload);
         
         // 디버깅: 응답 구조 확인
-        if (process.env.NODE_ENV === 'development') {
-          console.log('[useChatRoomDetail] sendMessage 응답:', response);
-        }
+        debug('useChatRoomDetail', 'sendMessage 응답:', response);
         
         // response.message가 없는 경우 처리
         if (!response || !response.message) {
-          console.error('[useChatRoomDetail] 응답에 message가 없습니다:', response);
+          logError('useChatRoomDetail', '응답에 message가 없습니다:', response);
           throw new Error('메시지 전송 응답 형식이 올바르지 않습니다.');
         }
         
@@ -93,14 +92,14 @@ export const useChatRoomDetail = (roomId?: string) => {
         );
       }
     },
-    [roomId]
+    [roomId, chatRepository]
   );
 
   const markAsRead = useCallback(
     async (messageId: string) => {
       if (!roomId) return;
       try {
-        await chatApiSource.markAsRead(roomId, { lastMessageId: messageId });
+        await chatRepository.markAsRead(roomId, { lastMessageId: messageId });
         setState((prev) => {
           if (!prev.detail) {
             return prev;
@@ -123,15 +122,15 @@ export const useChatRoomDetail = (roomId?: string) => {
         });
       } catch (error) {
         // 읽음 처리 실패는 치명적이지 않으므로 콘솔만 남김
-        console.error(error);
+        logError('useChatRoomDetail', 'markAsRead 실패:', error);
       }
     },
-    [roomId]
+    [roomId, chatRepository]
   );
 
   const appendMessage = useCallback((message: ChatMessage) => {
     if (!message || !message.id) {
-      console.error('[useChatRoomDetail] appendMessage: 유효하지 않은 메시지:', message);
+      logError('useChatRoomDetail', 'appendMessage: 유효하지 않은 메시지:', message);
       return;
     }
     

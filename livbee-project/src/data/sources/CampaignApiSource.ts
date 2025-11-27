@@ -3,14 +3,19 @@ import type {
   CampaignListQuery,
   CreateCampaignRequest,
   CreateCampaignResponse,
-  CampaignApiErrorResponse,
-  CampaignDetailResponse,
   CampaignDetail,
   CampaignApplyRequest,
   CampaignApplyResponse,
+  ApplicationActionRequest,
+  ApplicationActionResponse,
+  CampaignDetailResponse,
 } from '@/domain/entities/Campaign';
 import { buildApiUrl, getAuthHeaders } from '@/shared/config/apiConfig';
-import { isSuccessResponse, extractData, extractErrorMessage } from '@/shared/utils/apiResponseHandler';
+import { ApiError, fetchApi } from '@/shared/utils/apiClient';
+import { extractErrorMessage, isSuccessResponse } from '@/shared/utils/apiResponseHandler';
+import { debug } from '@/shared/utils/logger';
+import { normalizeCampaignApplyResponse, normalizeApplicationActionResponse } from '@/shared/utils/apiNormalizer';
+import { transformCampaignDetailResponse } from './utils/campaignResponseTransformer';
 
 /**
  * 캠페인 API 소스
@@ -44,27 +49,15 @@ export class CampaignApiSource {
     // TODO: 인증 토큰이 필요한 경우 getAuthHeaders(token) 사용
     const headers = getAuthHeaders();
     
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      signal,
-    });
-
-    const result = await response.json();
-
-    if (!response.ok || !isSuccessResponse(result)) {
-      const errorMessage = extractErrorMessage(result);
-      throw new Error(errorMessage || `API 요청 실패: ${response.status} ${response.statusText}`);
-    }
-
-    // FastAPI 응답 형식: { ok: true, data: {...} } 또는 { success: true, data: {...} }
-    const data = extractData<CampaignListResponse>(result);
-    if (data) {
-      return data;
-    }
-
-    // 기존 응답 형식: { ok: true, items: [...], ... }
-    return result as CampaignListResponse;
+    return fetchApi<CampaignListResponse>(
+      url,
+      {
+        method: 'GET',
+        headers,
+        signal,
+      },
+      '캠페인 목록 조회'
+    );
   }
 
   /**
@@ -77,38 +70,15 @@ export class CampaignApiSource {
     const url = buildApiUrl('/campaigns');
     const headers = getAuthHeaders();
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(request),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok || !isSuccessResponse(result)) {
-      // 인증 오류 처리
-      if (response.status === 401) {
-        throw new Error('인증이 필요합니다. 브랜드 계정으로 다시 로그인해주세요.');
-      }
-      
-      const error = result as CampaignApiErrorResponse;
-      
-      // 유효성 검사 실패 시 상세 에러 메시지 처리
-      if (error.errors && Array.isArray(error.errors)) {
-        const errorMessages = error.errors.map((err) => err.msg).join(', ');
-        throw new Error(errorMessages);
-      }
-
-      const errorMessage = extractErrorMessage(result);
-      throw new Error(errorMessage || '모집 공고 등록에 실패했습니다.');
-    }
-
-    const data = extractData<CreateCampaignResponse>(result);
-    if (data) {
-      return data;
-    }
-
-    return result as CreateCampaignResponse;
+    return fetchApi<CreateCampaignResponse>(
+      url,
+      {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(request),
+      },
+      '모집 공고 등록'
+    );
   }
 
   /**
@@ -120,141 +90,71 @@ export class CampaignApiSource {
    */
   async getCampaignById(id: string, signal?: AbortSignal): Promise<CampaignDetail> {
     const url = buildApiUrl(`/campaigns/${id}`);
-    const headers = getAuthHeaders();
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      signal,
-    });
+    const result = await fetchApi<CampaignDetailResponse['data']>(
+      url,
+      {
+        method: 'GET',
+        headers: getAuthHeaders(),
+        signal,
+      },
+      '모집 공고 상세 조회'
+    );
 
-    const result = await response.json();
-
-    if (!response.ok || !isSuccessResponse(result)) {
-      const errorMessage = extractErrorMessage(result);
-      throw new Error(errorMessage || '모집 공고 상세 조회에 실패했습니다.');
-    }
-
-    // FastAPI 응답 형식: { ok: true, data: {...} } 또는 { success: true, data: {...} }
-    const data = extractData<CampaignDetailResponse>(result);
-    const responseData = data || (result as CampaignDetailResponse);
-
-    // API 응답을 프론트엔드 타입으로 변환
-    const responseDataObj = (responseData as any).data || responseData;
-    const campaignDetail: CampaignDetail = {
-      id: responseDataObj.id || responseDataObj._id || id,
-      brandName: responseDataObj.brandName,
-      prefix: this.mapPrefixToKorean(responseDataObj.prefix),
-      prefixName: responseDataObj.prefixName,
-      title: responseDataObj.title,
-      content: responseDataObj.content,
-      detailedContent: responseDataObj.detailedContent,
-      category: this.mapCategoryToKorean(responseDataObj.category),
-      categoryName: responseDataObj.categoryName,
-      location: responseDataObj.location,
-      shootDate: responseDataObj.shootDate,
-      closeAt: responseDataObj.closeAt,
-      durationHours: responseDataObj.durationHours,
-      startTime: responseDataObj.startTime,
-      endTime: responseDataObj.endTime,
-      fee: responseDataObj.fee,
-      feeNegotiable: responseDataObj.feeNegotiable,
-      coverImageUrl: responseDataObj.coverImageUrl,
-      imageUrl: responseDataObj.imageUrl,
-      thumbnailUrl: responseDataObj.thumbnailUrl,
-      liveVerticalCoverUrl: responseDataObj.liveVerticalCoverUrl,
-      liveStreamUrl: responseDataObj.liveStreamUrl,
-      productThumbnailUrl: responseDataObj.productThumbnailUrl,
-      productImageUrl: responseDataObj.productImageUrl,
-      productName: responseDataObj.productName,
-      productUrl: responseDataObj.productUrl,
-      brandIntroduction: responseDataObj.brandIntroduction,
-      recruitmentSection: responseDataObj.recruitmentSection,
-      qualifications: responseDataObj.qualifications,
-      preferredQualifications: responseDataObj.preferredQualifications,
-      isPublic: responseDataObj.isPublic,
-      createdAt: responseDataObj.createdAt,
-      updatedAt: responseDataObj.updatedAt,
-      createdBy: responseDataObj.createdBy,
-      metrics: responseDataObj.metrics,
-      isApplied: responseDataObj.isApplied,
-    };
-
-    return campaignDetail;
+    return transformCampaignDetailResponse(result, id);
   }
 
-  /**
-   * 모집구분 영문 코드를 한글명으로 변환
-   */
-  private mapPrefixToKorean(
-    prefix: 'showhost' | 'staff' | 'model' | 'other' | null
-  ): '쇼호스트모집' | '촬영스태프' | '모델모집' | '기타모집' | null {
-    const prefixMap: Record<string, '쇼호스트모집' | '촬영스태프' | '모델모집' | '기타모집'> = {
-      showhost: '쇼호스트모집',
-      staff: '촬영스태프',
-      model: '모델모집',
-      other: '기타모집',
-    };
-    return prefix ? prefixMap[prefix] || null : null;
-  }
-
-  /**
-   * 카테고리 영문 코드를 한글명으로 변환
-   */
-  private mapCategoryToKorean(
-    category: 'beauty' | 'fashion' | 'food' | 'electronics' | 'lifestyle' | null
-  ): '뷰티' | '패션' | '식품' | '가전' | '생활/리빙' | null {
-    const categoryMap: Record<string, '뷰티' | '패션' | '식품' | '가전' | '생활/리빙'> = {
-      beauty: '뷰티',
-      fashion: '패션',
-      food: '식품',
-      electronics: '가전',
-      lifestyle: '생활/리빙',
-    };
-    return category ? categoryMap[category] || null : null;
-  }
 
   /**
    * 캠페인 지원
    */
   async applyToCampaign(request: CampaignApplyRequest): Promise<CampaignApplyResponse> {
     const url = buildApiUrl('/applications');
-    const headers = getAuthHeaders();
-
+    
     const response = await fetch(url, {
       method: 'POST',
-      headers,
+      headers: getAuthHeaders(),
       body: JSON.stringify(request),
     });
 
     const result = await response.json();
 
     // 디버깅: 원본 응답 로그
-    console.log('[CampaignApiSource] 원본 응답:', result);
+    debug('CampaignApiSource', 'applyCampaign 원본 응답:', result);
 
     if (!response.ok || !isSuccessResponse(result)) {
       const errorMessage = extractErrorMessage(result);
       throw new Error(errorMessage || '캠페인 지원에 실패했습니다.');
     }
 
-    const data = extractData<CampaignApplyResponse>(result);
-    if (data) {
-      // 백엔드가 snake_case를 사용할 수 있으므로 필드명 정규화
-      const normalizedData: CampaignApplyResponse = {
-        applicationId: data.applicationId || (data as any).application_id || '',
-        chatRoomId: data.chatRoomId || (data as any).chat_room_id || (data as any).roomId || '',
-      };
-      console.log('[CampaignApiSource] 정규화된 응답:', normalizedData);
-      return normalizedData;
-    }
+    const normalizedData = normalizeCampaignApplyResponse(result);
+    debug('CampaignApiSource', 'applyCampaign 정규화된 응답:', normalizedData);
+    return normalizedData;
+  }
 
-    // extractData가 null을 반환한 경우 원본 결과에서 필드명 정규화 시도
-    const fallbackData: CampaignApplyResponse = {
-      applicationId: (result as any).applicationId || (result as any).application_id || '',
-      chatRoomId: (result as any).chatRoomId || (result as any).chat_room_id || (result as any).roomId || '',
-    };
-    console.log('[CampaignApiSource] 폴백 응답:', fallbackData);
-    return fallbackData;
+  /**
+   * 지원서 수락/거절
+   */
+  async updateApplicationStatus(request: ApplicationActionRequest): Promise<ApplicationActionResponse> {
+    const url = buildApiUrl(`/applications/${request.applicationId}/${request.action}`);
+
+    try {
+      const result = await fetchApi<ApplicationActionResponse>(
+        url,
+        {
+          method: 'POST',
+          headers: getAuthHeaders(),
+        },
+        '지원서 상태 업데이트'
+      );
+
+      return normalizeApplicationActionResponse(result, request.applicationId, request.action);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) {
+        throw new Error('지원서 수락/거절 API 엔드포인트를 찾을 수 없습니다. 백엔드 배포 상태를 확인해주세요.');
+      }
+      throw error;
+    }
   }
 }
 

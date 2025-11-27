@@ -4,6 +4,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import BottomNavItem from './BottomNavItem';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { useAuth } from '@/presentation/hooks/useAuth';
+import { ROUTE_PATHS } from '@/app/routes/routeMeta';
+import { setAuthRedirectPath } from '@/shared/utils/authRedirect';
 // (추가) react-icons/ri (Remix Icon) 라이브러리에서 아이콘들을 임포트합니다.
 import {
   RiHomeLine,
@@ -19,18 +21,18 @@ import {
  * Flutter의 RemixIcons 이름과 거의 동일합니다.
  */
 const TABS = [
-  { label: '홈', path: '/', icon: RiHomeLine },
-  { label: '모집공고', path: '/campaigns', icon: RiArchiveDrawerLine },
-  { label: '모델', path: '/models', icon: RiUserStarLine },
-  { label: '포트폴리오', path: '/portfolios', icon: RiUser3Line },
-  { label: '마이페이지', path: '/mypage', icon: RiUserSettingsLine },
+  { label: '홈', path: ROUTE_PATHS.home, icon: RiHomeLine },
+  { label: '모집공고', path: ROUTE_PATHS.campaigns, icon: RiArchiveDrawerLine },
+  { label: '모델', path: ROUTE_PATHS.models, icon: RiUserStarLine },
+  { label: '포트폴리오', path: ROUTE_PATHS.portfolios, icon: RiUser3Line },
+  { label: '마이페이지', path: ROUTE_PATHS.myPage, icon: RiUserSettingsLine },
 ];
 /**
  * 로그인이 필요한 경로
  * Flutter의 authRequiredRoutes
  * (현재는 비활성화 - 필요시 다시 활성화)
  */
-const AUTH_REQUIRED_PATHS: string[] = [];
+const AUTH_REQUIRED_PATHS = new Set<string>([ROUTE_PATHS.myPage]);
 
 /**
  * 화면 하단에 고정되는 공통 네비게이션 바 컴포넌트
@@ -49,22 +51,20 @@ const BottomNavBar: React.FC = () => {
     // 1. 현재 경로와 같으면 아무것도 하지 않음
     if (location.pathname === path) return;
 
-    // 2. 마이페이지 클릭 시 로그인 페이지로 이동
-    if (path === '/mypage' && !isLoggedIn) {
-      navigate('/login', { replace: true });
+    const redirectToLogin = () => {
+      setAuthRedirectPath(path);
+      showToast('로그인이 필요합니다.\n회원 전용 서비스입니다.');
+      navigate(ROUTE_PATHS.login, { replace: true });
+    };
+
+    // 2. 로그인이 필요한 경로인지 확인
+    if (AUTH_REQUIRED_PATHS.has(path) && !isLoggedIn) {
+      redirectToLogin();
       return;
     }
 
-    // 3. 로그인이 필요한 경로인지 확인
-    if (AUTH_REQUIRED_PATHS.includes(path) && !isLoggedIn) {
-      // Flutter의 showCommonPromptDialog 로직
-      showToast('로그인이 필요합니다.\n회원 전용 서비스입니다.');
-      navigate('/login', { replace: true });
-    } else {
-      // 4. 페이지 이동
-      // Flutter의 context.replace와 동일하게 { replace: true } 옵션 사용
-      navigate(path, { replace: true });
-    }
+    // 3. 페이지 이동
+    navigate(path);
   };
 
   return (

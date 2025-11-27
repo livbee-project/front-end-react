@@ -1,14 +1,15 @@
 import type {
-  Model,
   ModelListResponse,
   ModelListQuery,
-  ModelDetailResponse,
   ModelDetail,
+  ModelDetailResponse,
   CreateModelRequest,
   CreateModelResponse,
 } from '@/domain/entities/Model';
 import { buildApiUrl, getAuthHeaders } from '@/shared/config/apiConfig';
-import { isSuccessResponse, extractData, extractErrorMessage } from '@/shared/utils/apiResponseHandler';
+import { ApiError, fetchApi } from '@/shared/utils/apiClient';
+import { transformModelDetailResponse } from './utils/modelResponseTransformer';
+import { handleShowhostEntityError } from './utils/showhostEntityErrorHandler';
 
 /**
  * 모델 API 소스
@@ -32,33 +33,28 @@ export class ModelApiSource {
     const url = buildApiUrl('/models', params);
     const headers = getAuthHeaders();
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      signal,
-    });
+    const result = await fetchApi<ModelListResponse>(
+      url,
+      {
+        method: 'GET',
+        headers,
+        signal,
+      },
+      '모델 목록 조회'
+    );
 
-    const result = await response.json();
-
-    if (!response.ok || !isSuccessResponse(result)) {
-      const errorMessage = extractErrorMessage(result);
-      throw new Error(errorMessage || `API 요청 실패: ${response.status} ${response.statusText}`);
-    }
-
-    // FastAPI 응답 형식: { ok: true, data: { items: [...], currentPage, totalPages, totalItems } }
-    const data = extractData<{ items: Model[]; currentPage: number; totalPages: number; totalItems: number }>(result);
-    if (data) {
+    // 응답 형식 정규화
+    if (result && typeof result === 'object' && 'items' in result) {
       return {
         ok: true,
-        items: data.items || [],
-        currentPage: data.currentPage || 1,
-        totalPages: data.totalPages || 1,
-        totalItems: data.totalItems || 0,
+        items: result.items || [],
+        currentPage: result.currentPage || 1,
+        totalPages: result.totalPages || 1,
+        totalItems: result.totalItems || 0,
       };
     }
 
-    // 기존 응답 형식: { ok: true, items: [...], ... }
-    return result as ModelListResponse;
+    return result;
   }
 
   /**
@@ -71,59 +67,17 @@ export class ModelApiSource {
   async getModelById(id: string, signal?: AbortSignal): Promise<ModelDetail> {
     const url = buildApiUrl(`/models/${id}`);
     const headers = getAuthHeaders();
+    const result = await fetchApi<ModelDetailResponse['data']>(
+      url,
+      {
+        method: 'GET',
+        headers,
+        signal,
+      },
+      '모델 상세 조회'
+    );
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      signal,
-    });
-
-    const result = await response.json();
-
-    if (!response.ok || !isSuccessResponse(result)) {
-      const errorMessage = extractErrorMessage(result);
-      throw new Error(errorMessage || '모델 상세 조회에 실패했습니다.');
-    }
-
-    // FastAPI 응답 형식: { ok: true, data: {...} } 또는 { success: true, data: {...} }
-    const data = extractData<ModelDetailResponse>(result);
-    const responseData = (data as any)?.data || data || (result as ModelDetailResponse);
-
-    // API 응답을 프론트엔드 타입으로 변환 (PostgreSQL은 UUID 사용하므로 _id 변환 불필요)
-    const responseDataObj = (responseData as any).data || responseData;
-    const modelDetail: ModelDetail = {
-      id: responseDataObj.id || responseDataObj._id || id,
-      user: responseDataObj.user,
-      nickname: responseDataObj.nickname,
-      oneLineIntro: responseDataObj.oneLineIntro,
-      detailedIntro: responseDataObj.detailedIntro,
-      experienceYears: responseDataObj.experienceYears,
-      age: responseDataObj.age,
-      isAgePublic: responseDataObj.isAgePublic,
-      mainThumbnailUrl: responseDataObj.mainThumbnailUrl,
-      backgroundImageUrl: responseDataObj.backgroundImageUrl,
-      subThumbnailUrls: responseDataObj.subThumbnailUrls,
-      status: responseDataObj.status,
-      detailedRegion: responseDataObj.detailedRegion,
-      gender: responseDataObj.gender,
-      height: responseDataObj.height,
-      weight: responseDataObj.weight,
-      topSize: responseDataObj.topSize,
-      bottomSize: responseDataObj.bottomSize,
-      shoeSize: responseDataObj.shoeSize,
-      isSizingPublic: responseDataObj.isSizingPublic,
-      websiteUrl: responseDataObj.websiteUrl,
-      instagramUrl: responseDataObj.instagramUrl,
-      youtubeUrl: responseDataObj.youtubeUrl,
-      tiktokUrl: responseDataObj.tiktokUrl,
-      publicScope: responseDataObj.publicScope,
-      isReceivingOffers: responseDataObj.isReceivingOffers,
-      attachedFileUrl: responseDataObj.attachedFileUrl,
-      createdAt: responseDataObj.createdAt,
-      updatedAt: responseDataObj.updatedAt,
-    };
-
-    return modelDetail;
+    return transformModelDetailResponse({ ok: true, data: result }, id);
   }
 
   /**
@@ -135,34 +89,22 @@ export class ModelApiSource {
   async createModel(request: CreateModelRequest): Promise<CreateModelResponse> {
     const url = buildApiUrl('/models');
     const headers = getAuthHeaders();
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(request),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok || !isSuccessResponse(result)) {
-      // 인증 오류 처리
-      if (response.status === 401) {
-        throw new Error('인증이 필요합니다.');
+    try {
+      return await fetchApi<CreateModelResponse>(
+        url,
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(request),
+        },
+        '모델 등록'
+      );
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw handleShowhostEntityError({ status: error.status }, error.payload, '모델 등록에 실패했습니다.');
       }
-      if (response.status === 403) {
-        throw new Error('권한이 없습니다. 쇼호스트 역할만 등록 가능합니다.');
-      }
-
-      const errorMessage = extractErrorMessage(result);
-      throw new Error(errorMessage || '모델 등록에 실패했습니다.');
+      throw error;
     }
-
-    const data = extractData<CreateModelResponse>(result);
-    if (data) {
-      return data;
-    }
-
-    return result as CreateModelResponse;
   }
 }
 

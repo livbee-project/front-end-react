@@ -13,8 +13,8 @@ import {
   PortfolioFilesSection,
   TagsSection,
   GallerySection,
-  SubmitSection,
 } from '@/presentation/components/forms/portfolio/sections';
+import { FormSubmitSection } from '@/presentation/components/forms/common/FormSubmitSection';
 import { usePortfolioRegisterForm } from '@/presentation/components/forms/portfolio/usePortfolioRegisterForm';
 
 const PortfolioRegisterPage: React.FC = () => {
@@ -88,7 +88,11 @@ const PortfolioRegisterPage: React.FC = () => {
             onSelectImage={handleGalleryImageSelect}
             onRemoveImage={handleGalleryImageRemove}
           />
-          <SubmitSection disabled={isSubmitting || isImageUploading} isSubmitting={isSubmitting} />
+          <FormSubmitSection
+            disabled={isSubmitting || isImageUploading}
+            isSubmitting={isSubmitting}
+            submitType="submit"
+          />
         </RegisterForm>
       </FormContainer>
     </PageWrapper>

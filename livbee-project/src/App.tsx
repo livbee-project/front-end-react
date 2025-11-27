@@ -3,12 +3,15 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import AppRouter from './app/Router';
 import { theme } from '@/presentation/styles/theme';
 import { GlobalStyle } from '@/presentation/styles/GlobalStyle';
+import { GlobalErrorBoundary } from '@/presentation/components/error/GlobalErrorBoundary';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <AppRouter />
+      <GlobalErrorBoundary>
+        <AppRouter />
+      </GlobalErrorBoundary>
       <SpeedInsights />
     </ThemeProvider>
   );

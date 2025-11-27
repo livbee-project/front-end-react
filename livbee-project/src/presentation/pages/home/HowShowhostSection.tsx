@@ -68,6 +68,8 @@ const HowShowhostSection: React.FC = React.memo(() => {
     [portfolioRepository]
   );
 
+  const cacheKey = useMemo(() => `how-showhost-${JSON.stringify(query)}`, [query]);
+
   const { data: portfolios, loading } = useListData<
     Portfolio,
     { page: number; limit: number },
@@ -76,7 +78,8 @@ const HowShowhostSection: React.FC = React.memo(() => {
     fetchPortfolios,
     query,
     [],
-    '쇼호스트 목록을 불러오는 중 오류가 발생했습니다.'
+    '쇼호스트 목록을 불러오는 중 오류가 발생했습니다.',
+    { cacheKey }
   );
 
   if (loading) {

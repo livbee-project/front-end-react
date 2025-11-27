@@ -6,13 +6,13 @@ import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { useFormState } from '@/presentation/hooks/useFormState';
 import { useFormUpload } from '@/presentation/hooks/useFormUpload';
-import type { CreateModelRequest } from '@/domain/entities/Model';
 import type { ModelFormData, ModelToggleState } from './types';
-import { isValidPhoneNumber, isValidUrl } from '@/shared/utils/validation';
+import { getStoredImageUrls, saveImageUrls, clearImageUrls } from './utils/modelImageStorage';
+import { validateModelForm } from './utils/modelValidation';
+import { buildModelRequest } from './utils/modelRequestBuilder';
 
 const FORM_STORAGE_KEY = 'model-register-form';
 const TOGGLE_STORAGE_KEY = 'model-register-toggles';
-const IMAGE_STORAGE_KEY = 'model-register-images';
 
 const INITIAL_FORM_DATA: ModelFormData = {
   name: '',
@@ -58,22 +58,6 @@ export const useModelRegisterForm = () => {
     clearStorage: clearToggleStorage,
   } = useFormState<ModelToggleState>(INITIAL_TOGGLE_STATE, TOGGLE_STORAGE_KEY);
 
-  // 이미지 URL 복원
-  const getStoredImageUrls = (): { mainThumbnail: string; gallery: string[]; portfolio: string } => {
-    if (typeof window === 'undefined') {
-      return { mainThumbnail: '', gallery: [], portfolio: '' };
-    }
-    try {
-      const stored = sessionStorage.getItem(IMAGE_STORAGE_KEY);
-      if (stored) {
-        return JSON.parse(stored);
-      }
-    } catch (error) {
-      console.warn('Failed to restore image URLs from sessionStorage:', error);
-    }
-    return { mainThumbnail: '', gallery: [], portfolio: '' };
-  };
-
   const storedImages = getStoredImageUrls();
   const {
     profileFile: mainThumbnailFile,
@@ -98,32 +82,20 @@ export const useModelRegisterForm = () => {
     if (mainThumbnailUrl && mainThumbnailUrl !== mainThumbnailUrlState) {
       setMainThumbnailUrlState(mainThumbnailUrl);
     }
-  }, [mainThumbnailUrl]);
+  }, [mainThumbnailUrl, mainThumbnailUrlState]);
 
   useEffect(() => {
     if (galleryImageUrls.length > 0 && JSON.stringify(galleryImageUrls) !== JSON.stringify(galleryImageUrlsState)) {
       setGalleryImageUrlsState(galleryImageUrls);
     }
-  }, [galleryImageUrls]);
+  }, [galleryImageUrls, galleryImageUrlsState]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    try {
-      const currentStored = sessionStorage.getItem(IMAGE_STORAGE_KEY);
-      const newValue = JSON.stringify({
-        mainThumbnail: mainThumbnailUrlState,
-        gallery: galleryImageUrlsState,
-        portfolio: portfolioFileUrl,
-      });
-      
-      // 이전 값과 다를 때만 저장 (불필요한 저장 방지)
-      if (currentStored !== newValue) {
-        sessionStorage.setItem(IMAGE_STORAGE_KEY, newValue);
-      }
-    } catch (error) {
-      console.warn('Failed to save image URLs to sessionStorage:', error);
-    }
+    saveImageUrls({
+      mainThumbnail: mainThumbnailUrlState,
+      gallery: galleryImageUrlsState,
+      portfolio: portfolioFileUrl,
+    });
   }, [mainThumbnailUrlState, galleryImageUrlsState, portfolioFileUrl]);
 
   const handleInputChange = useCallback(
@@ -186,31 +158,13 @@ export const useModelRegisterForm = () => {
     setPortfolioFileUrl('');
   }, []);
 
-  const parseNumber = (value: string): number | undefined => {
-    const num = parseFloat(value.trim());
-    return Number.isNaN(num) ? undefined : num;
-  };
-
   const handleSubmit = useCallback(async () => {
     setIsSubmitting(true);
 
-    const trimmedContact = formData.contact.trim();
-    if (trimmedContact && !isValidPhoneNumber(trimmedContact)) {
-      showToast('연락처 형식이 올바르지 않습니다.', undefined, 'error');
-      setIsSubmitting(false);
-      return;
-    }
-
-    const hasInvalidWebsite = formData.websites.some((website, index) => {
-      const trimmed = website.content.trim();
-      if (!trimmed || !toggles.websites[index]) {
-        return false;
-      }
-      return !isValidUrl(trimmed);
-    });
-
-    if (hasInvalidWebsite) {
-      showToast('SNS 링크를 올바르게 입력해주세요.', undefined, 'error');
+    // 유효성 검사
+    const validation = validateModelForm(formData, toggles);
+    if (!validation.isValid) {
+      showToast(validation.errorMessage || '입력 정보를 확인해주세요.', undefined, 'error');
       setIsSubmitting(false);
       return;
     }
@@ -250,37 +204,12 @@ export const useModelRegisterForm = () => {
         uploadedPortfolioFileUrl = url;
       }
 
-      const websiteUrl = formData.websites[0]?.content.trim() || undefined;
-      const instagramUrl = formData.websites[1]?.content.trim() || undefined;
-      const youtubeUrl = formData.websites[2]?.content.trim() || undefined;
-
-      const height = parseNumber(formData.tags[0]?.value || '');
-      const weight = parseNumber(formData.tags[1]?.value || '');
-      const topSize = formData.tags[2]?.value.trim() || undefined;
-      const experienceYears = parseNumber(formData.tags[3]?.value || '');
-      const age = parseNumber(formData.tags[4]?.value || '');
-
-      const request: CreateModelRequest = {
-        nickname: formData.name.trim() || undefined,
-        oneLineIntro: formData.oneLineIntro.trim() || undefined,
-        detailedIntro: formData.detailedIntro.trim() || undefined,
-        mainThumbnailUrl: uploadedMainThumbnailUrl,
-        subThumbnailUrls: uploadedGalleryUrls.length > 0 ? uploadedGalleryUrls : undefined,
-        websiteUrl,
-        instagramUrl,
-        youtubeUrl,
-        attachedFileUrl: uploadedPortfolioFileUrl,
-        height,
-        weight,
-        topSize,
-        experienceYears,
-        age,
-        status: 'published',
-        publicScope: '전체공개',
-        isAgePublic: true,
-        isSizingPublic: true,
-        isReceivingOffers: true,
-      };
+      const request = buildModelRequest(
+        formData,
+        uploadedMainThumbnailUrl,
+        uploadedGalleryUrls,
+        uploadedPortfolioFileUrl
+      );
 
       const response = await modelRepository.createModel(request);
 
@@ -288,13 +217,7 @@ export const useModelRegisterForm = () => {
         // 제출 성공 시 sessionStorage 삭제
         clearFormStorage();
         clearToggleStorage();
-        if (typeof window !== 'undefined') {
-          try {
-            sessionStorage.removeItem(IMAGE_STORAGE_KEY);
-          } catch (error) {
-            console.warn('Failed to remove image URLs from sessionStorage:', error);
-          }
-        }
+        clearImageUrls();
         showToast('모델이 등록되었습니다.');
         navigate('/models', { replace: true });
       }
@@ -305,6 +228,8 @@ export const useModelRegisterForm = () => {
       setIsSubmitting(false);
     }
   }, [
+    clearFormStorage,
+    clearToggleStorage,
     formData,
     galleryImageFiles,
     mainThumbnailFile,

@@ -1,0 +1,142 @@
+/**
+ * 공통 API 클라이언트 유틸리티
+ * 네트워크 에러, JSON 파싱, 에러 처리를 통합한 공통 함수 제공
+ */
+
+import { extractErrorMessage, isSuccessResponse, extractData, type ApiResponse } from './apiResponseHandler';
+import { emitApiErrorEvent } from './apiEvents';
+
+export class ApiError extends Error {
+  status?: number;
+  payload?: unknown;
+
+  constructor(message: string, status?: number, payload?: unknown) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.payload = payload;
+  }
+}
+
+/**
+ * 네트워크 에러인지 확인
+ */
+const isNetworkError = (error: unknown): boolean => {
+  return error instanceof TypeError && error.message.includes('fetch');
+};
+
+/**
+ * 네트워크 에러를 사용자 친화적 메시지로 변환
+ */
+const handleNetworkError = (error: unknown, defaultMessage: string): Error => {
+  if (isNetworkError(error)) {
+    return new Error('네트워크 연결에 실패했습니다. 인터넷 연결을 확인해주세요.');
+  }
+  return new Error(defaultMessage);
+};
+
+const notifyApiError = (message: string, status?: number, context?: string) => {
+  emitApiErrorEvent({ message, status, context });
+};
+
+/**
+ * API 요청 옵션
+ */
+export interface ApiRequestOptions {
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  headers?: HeadersInit;
+  body?: BodyInit;
+  signal?: AbortSignal;
+}
+
+/**
+ * API 요청 실행 및 응답 처리
+ * 
+ * @param url - 요청 URL
+ * @param options - 요청 옵션
+ * @param errorContext - 에러 발생 시 사용할 컨텍스트 메시지
+ * @returns 파싱된 응답 데이터
+ * @throws {Error} 요청 실패 시
+ */
+export async function fetchApi<T>(
+  url: string,
+  options: ApiRequestOptions = {},
+  errorContext: string = '요청'
+): Promise<T> {
+  const { method = 'GET', headers, body, signal } = options;
+
+  // 1. 네트워크 요청 실행
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method,
+      headers,
+      body,
+      signal,
+    });
+  } catch (error) {
+    const networkError = handleNetworkError(error, `${errorContext} 요청 중 오류가 발생했습니다.`);
+    notifyApiError(networkError.message, undefined, errorContext);
+    throw networkError;
+  }
+
+  // 2. JSON 파싱
+  let result: ApiResponse<T> | { detail?: string };
+  try {
+    result = await response.json();
+  } catch {
+    // JSON 파싱 실패 시
+    if (!response.ok) {
+      const parsingError = new Error(`${errorContext}에 실패했습니다. (${response.status})`);
+      notifyApiError(parsingError.message, response.status, errorContext);
+      throw parsingError;
+    }
+    const unknownFormatError = new Error('예상치 못한 응답 형식입니다.');
+    notifyApiError(unknownFormatError.message, response.status, errorContext);
+    throw unknownFormatError;
+  }
+
+  // 3. 에러 응답 처리
+  if (!response.ok || !isSuccessResponse(result as ApiResponse<T>)) {
+    const errorMessage = extractErrorMessage(result);
+    const apiError = new ApiError(errorMessage || `${errorContext}에 실패했습니다.`, response.status, result);
+    notifyApiError(apiError.message, apiError.status, errorContext);
+    throw apiError;
+  }
+
+  // 4. 성공 응답 데이터 추출
+  const data = extractData<T>(result as ApiResponse<T>);
+  if (data !== null) {
+    return data;
+  }
+
+  // 5. data 필드가 없는 경우 (기존 응답 형식)
+  return result as unknown as T;
+}
+
+/**
+ * 인증 관련 특수 에러 처리
+ * 토큰 만료 등의 인증 에러를 감지하고 적절한 메시지 반환
+ */
+export function handleAuthError(error: unknown, defaultMessage: string): Error {
+  if (error instanceof Error) {
+    const errorMessage = error.message.toLowerCase();
+    if (
+      errorMessage.includes('unauthorized') ||
+      errorMessage.includes('invalid_token') ||
+      errorMessage.includes('auth_required') ||
+      errorMessage.includes('인증이 만료')
+    ) {
+      return new Error('인증이 만료되었습니다. 다시 로그인해주세요.');
+    }
+  }
+  return error instanceof Error ? error : new Error(defaultMessage);
+}
+
+/**
+ * AbortError인지 확인 (요청 취소)
+ */
+export function isAbortError(error: unknown): boolean {
+  return error instanceof Error && error.name === 'AbortError';
+}
+

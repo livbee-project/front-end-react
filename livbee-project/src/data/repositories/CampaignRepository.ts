@@ -6,8 +6,11 @@ import type {
   CampaignDetail,
   CampaignApplyRequest,
   CampaignApplyResponse,
+  ApplicationActionRequest,
+  ApplicationActionResponse,
 } from '@/domain/entities/Campaign';
 import { CampaignApiSource } from '@/data/sources/CampaignApiSource';
+import { error as logError } from '@/shared/utils/logger';
 
 /**
  * 캠페인 리포지토리
@@ -27,7 +30,7 @@ export class CampaignRepository {
     try {
       return await this.apiSource.getCampaignList(query, signal);
     } catch (error) {
-      console.error('캠페인 목록 조회 실패:', error);
+      logError('CampaignRepository', '캠페인 목록 조회 실패:', error);
       throw error;
     }
   }
@@ -39,7 +42,7 @@ export class CampaignRepository {
     try {
       return await this.apiSource.createCampaign(request);
     } catch (error) {
-      console.error('캠페인 등록 실패:', error);
+      logError('CampaignRepository', '캠페인 등록 실패:', error);
       throw error;
     }
   }
@@ -51,7 +54,7 @@ export class CampaignRepository {
     try {
       return await this.apiSource.getCampaignById(id, signal);
     } catch (error) {
-      console.error('캠페인 상세 조회 실패:', error);
+      logError('CampaignRepository', '캠페인 상세 조회 실패:', error);
       throw error;
     }
   }
@@ -60,7 +63,16 @@ export class CampaignRepository {
     try {
       return await this.apiSource.applyToCampaign(request);
     } catch (error) {
-      console.error('캠페인 지원 실패:', error);
+      logError('CampaignRepository', '캠페인 지원 실패:', error);
+      throw error;
+    }
+  }
+
+  async updateApplicationStatus(request: ApplicationActionRequest): Promise<ApplicationActionResponse> {
+    try {
+      return await this.apiSource.updateApplicationStatus(request);
+    } catch (error) {
+      logError('CampaignRepository', '지원서 상태 업데이트 실패:', error);
       throw error;
     }
   }

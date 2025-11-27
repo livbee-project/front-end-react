@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserRepository } from '@/data/repositories/UserRepository';
 import { setToken, removeToken, getToken } from '@/shared/utils/storage';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import type { LoginRequest, SignupRequest, User } from '@/domain/entities/User';
+import { consumeAuthRedirectPath } from '@/shared/utils/authRedirect';
 
 /**
  * 인증 상태 타입
@@ -17,18 +18,24 @@ interface AuthState {
 /**
  * useAuth Hook 반환 타입
  */
-interface UseAuthReturn extends AuthState {
-  login: (request: LoginRequest) => Promise<void>;
+interface LoginOptions {
+  redirectTo?: string;
+}
+
+export interface UseAuthReturn extends AuthState {
+  login: (request: LoginRequest, options?: LoginOptions) => Promise<void>;
   signup: (request: SignupRequest) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
 
+export const AuthContext = createContext<UseAuthReturn | undefined>(undefined);
+
 /**
  * 인증 관련 React Hook
  * 로그인, 로그아웃, 사용자 정보 관리
  */
-export const useAuth = (): UseAuthReturn => {
+const useAuthValue = (): UseAuthReturn => {
   const navigate = useNavigate();
   const [authState, setAuthState] = useState<AuthState>({
     isLoggedIn: false,
@@ -64,7 +71,7 @@ export const useAuth = (): UseAuthReturn => {
         },
         isLoading: false,
       });
-    } catch (error) {
+    } catch {
       // 토큰이 유효하지 않은 경우
       removeToken();
       setAuthState({
@@ -140,7 +147,7 @@ export const useAuth = (): UseAuthReturn => {
    * 로그인
    */
   const login = useCallback(
-    async (request: LoginRequest) => {
+    async (request: LoginRequest, options?: LoginOptions) => {
       try {
         const loginResponse = await userRepository.login(request);
         
@@ -158,8 +165,9 @@ export const useAuth = (): UseAuthReturn => {
           isLoading: false,
         });
 
-        // 마이페이지로 이동
-        navigate('/mypage', { replace: true });
+        // 로그인 전 접근하려던 경로가 있으면 우선 이동
+        const redirectPath = options?.redirectTo || consumeAuthRedirectPath() || '/mypage';
+        navigate(redirectPath, { replace: true });
       } catch (error) {
         setAuthState((prev) => ({ ...prev, isLoading: false }));
         throw error;
@@ -173,12 +181,8 @@ export const useAuth = (): UseAuthReturn => {
    */
   const signup = useCallback(
     async (request: SignupRequest) => {
-      try {
-        await userRepository.signup(request);
-        // 회원가입 성공 후 자동 로그인은 하지 않음 (사용자가 직접 로그인해야 함)
-      } catch (error) {
-        throw error;
-      }
+      await userRepository.signup(request);
+      // 회원가입 성공 후 자동 로그인은 하지 않음 (사용자가 직접 로그인해야 함)
     },
     [userRepository]
   );
@@ -203,5 +207,18 @@ export const useAuth = (): UseAuthReturn => {
     logout,
     refreshUser,
   };
+};
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const value = useAuthValue();
+  return React.createElement(AuthContext.Provider, { value }, children);
+};
+
+export const useAuth = (): UseAuthReturn => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth 훅은 AuthProvider 내부에서만 사용할 수 있습니다.');
+  }
+  return context;
 };
 

@@ -1,11 +1,48 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
-import styled from 'styled-components';
+import React, { useCallback, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, Paperclip, Smile, Info, RefreshCcw } from 'lucide-react';
+import { Info } from 'lucide-react';
 import { useChatRoomDetail } from '@/presentation/hooks/useChatRoomDetail';
 import { useChatWebSocket } from '@/presentation/hooks/useChatWebSocket';
+import { useToast } from '@/presentation/contexts/ToastContext';
+import { useRepository } from '@/presentation/hooks/useRepository';
+import { CampaignRepository } from '@/data/repositories/CampaignRepository';
+import type { ChatMessage } from '@/domain/entities/Chat';
+import type {
+  MessageNewPayload,
+  MessageReadPayload,
+  ApplicationStatusUpdatedPayload,
+  RoomDeletedPayload,
+} from '@/domain/entities/WebSocket';
+import {
+  isMessageNewPayload,
+  isMessageReadPayload,
+  isApplicationStatusUpdatedPayload,
+  isRoomDeletedPayload,
+} from '@/domain/entities/WebSocket';
+import ContactHeader from '@/presentation/components/chat/ContactHeader';
+import MessageGroup from '@/presentation/components/chat/MessageGroup';
+import ComposerBar from '@/presentation/components/chat/ComposerBar';
+import {
+  normalizeApplicationPayload,
+  extractApplicationData,
+} from '@/shared/utils/chatUtils';
+import { debug, warn, error as logError } from '@/shared/utils/logger';
+import { useChatCounterpart } from '@/presentation/hooks/chat/useChatCounterpart';
+import { useDisplayedMessages } from '@/presentation/hooks/chat/useDisplayedMessages';
+import { useAutoScroll } from '@/presentation/hooks/chat/useAutoScroll';
+import {
+  PageWrapper,
+  ChatColumn,
+  FixedPanel,
+  ScrollArea,
+  ChatCard,
+  Messages,
+  MessageValue,
+  ScrollHintButton,
+} from '@/presentation/components/chat/styled/ChatRoomStyles';
 
 interface ChatRoomState {
+  campaignTitle?: string;
   portfolioTitle?: string;
   message?: string;
   availableDate?: string;
@@ -28,41 +65,38 @@ const ChatRoomPage: React.FC = () => {
     markAsRead,
     appendMessage,
     updateReadStatus,
+    refresh: refreshRoomDetail,
   } = useChatRoomDetail(activeRoomId);
   const [composer, setComposer] = useState('');
   const [sendError, setSendError] = useState<string | null>(null);
-  const scrollRef = useRef<HTMLDivElement | null>(null);
-  const [autoScroll, setAutoScroll] = useState(true);
+  const { showToast } = useToast();
 
-  const formatTimestamp = (iso?: string) => {
-    if (!iso) return '';
-    const date = new Date(iso);
-    if (Number.isNaN(date.getTime())) return '';
-    // 시간만 표시 (오후/오전 형식)
-    return new Intl.DateTimeFormat('ko-KR', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    }).format(date);
-  };
+  const myRole = roomDetail?.room.me.role;
+  const isBrandUser = myRole === 'brand';
+  const campaignRepository = useRepository(CampaignRepository);
 
-  const counterpart = useMemo(() => {
-    if (!roomDetail) return undefined;
-    const myId = roomDetail.room.me.userId;
-    if (roomDetail.room.brandUser && roomDetail.room.brandUser.id !== myId) {
-      return roomDetail.room.brandUser;
-    }
-    if (roomDetail.room.showhostUser && roomDetail.room.showhostUser.id !== myId) {
-      return roomDetail.room.showhostUser;
-    }
-    return roomDetail.room.brandUser ?? roomDetail.room.showhostUser;
-  }, [roomDetail]);
+  const { counterpart, displayName, displayRole } = useChatCounterpart(roomDetail || undefined);
 
-  // 브랜드명/사용자명: counterpart의 name 또는 nickname 사용 (fallback 제거)
-  const displayName = counterpart?.name || counterpart?.nickname || '대화상대';
-  
-  // Role 표시: counterpart의 role에 따라
-  const displayRole = counterpart?.role === 'brand' ? '브랜드' : counterpart?.role === 'showhost' ? '쇼호스트' : '';
+  // 메시지 정규화 함수 메모이제이션
+  const normalizeFn = useCallback(normalizeApplicationPayload, []);
+
+  // 지원서 데이터 추출 함수 메모이제이션
+  const extractFn = useCallback(
+    (message: ChatMessage) => extractApplicationData(message, normalizeFn),
+    [normalizeFn]
+  );
+
+  const displayedMessages = useDisplayedMessages({
+    messages,
+    roomDetail,
+    fallbackState,
+    activeRoomId,
+    extractApplicationData: extractFn,
+  });
+
+  const { scrollRef, autoScroll, setAutoScroll, handleScroll } = useAutoScroll({
+    observe: displayedMessages,
+  });
 
   const handleSend = async () => {
     if (!composer.trim() || !activeRoomId) return;
@@ -75,6 +109,40 @@ const ChatRoomPage: React.FC = () => {
       setSendError(err instanceof Error ? err.message : '메시지를 전송하지 못했습니다.');
     }
   };
+
+  const handleApplicationAction = useCallback(async (action: 'accept' | 'reject', applicationId?: string) => {
+    if (!applicationId) {
+      showToast('지원서 정보를 확인할 수 없습니다.', undefined, 'error');
+      return;
+    }
+
+    const actionLabel = action === 'accept' ? '수락' : '거절';
+    
+    try {
+      debug('ChatRoomPage', '지원서 상태 업데이트 요청:', { applicationId, action });
+      
+      const response = await campaignRepository.updateApplicationStatus({
+        applicationId,
+        action,
+      });
+
+      debug('ChatRoomPage', '지원서 상태 업데이트 응답:', response);
+
+      showToast(`지원서를 ${actionLabel}했습니다.`);
+      
+      // 소켓을 통해 실시간 업데이트가 오므로, 여기서는 즉시 새로고침하지 않음
+      // 백엔드에서 application.status.updated 이벤트를 보내면 handleSocketEvent에서 처리
+      // 다만, 소켓 연결이 끊어진 경우를 대비해 약간의 지연 후 새로고침 (폴백)
+      setTimeout(() => {
+        debug('ChatRoomPage', '폴백: refreshRoomDetail 호출');
+        refreshRoomDetail();
+      }, 1000);
+    } catch (error) {
+      logError('ChatRoomPage', '지원서 상태 업데이트 실패:', error);
+      const errorMessage = error instanceof Error ? error.message : `지원서 ${actionLabel}에 실패했습니다.`;
+      showToast(errorMessage, undefined, 'error');
+    }
+  }, [campaignRepository, refreshRoomDetail, showToast]);
 
   const handleMarkAsRead = () => {
     if (!roomDetail || messages.length === 0) return;
@@ -97,7 +165,7 @@ const ChatRoomPage: React.FC = () => {
     if (autoScroll && scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, autoScroll]);
+  }, [messages, autoScroll, scrollRef]);
 
   const handleScroll = () => {
     if (!scrollRef.current) return;
@@ -106,26 +174,50 @@ const ChatRoomPage: React.FC = () => {
     setAutoScroll(isBottom);
   };
 
-  const dateLabel = (iso: string) => {
-    const date = new Date(iso);
-    return new Intl.DateTimeFormat('ko-KR', {
-      month: 'long',
-      day: 'numeric',
-      weekday: 'short',
-    }).format(date);
-  };
-
   const handleSocketEvent = useCallback(
-    (event: { type: string; payload?: any }) => {
-      if (event.type === 'message.new' && event.payload?.message) {
-        appendMessage(event.payload.message);
+    (event: { type: string; payload?: unknown }) => {
+      debug('ChatRoomPage', '소켓 이벤트 수신:', event.type, event.payload);
+
+      // 새 메시지 수신
+      if (event.type === 'message.new' && event.payload && isMessageNewPayload(event.payload)) {
+        const payload = event.payload as MessageNewPayload;
+        debug('ChatRoomPage', '새 메시지 수신:', payload.message);
+        appendMessage(payload.message);
         return;
       }
-      if (event.type === 'message.read' && event.payload) {
-        updateReadStatus(event.payload);
+
+      // 메시지 읽음 상태 업데이트
+      if (event.type === 'message.read' && event.payload && isMessageReadPayload(event.payload)) {
+        const payload = event.payload as MessageReadPayload;
+        updateReadStatus(payload);
+        return;
       }
+
+      // 지원서 상태 업데이트 (수락/거절)
+      if (event.type === 'application.status.updated' && event.payload && isApplicationStatusUpdatedPayload(event.payload)) {
+        const payload = event.payload as ApplicationStatusUpdatedPayload;
+        debug('ChatRoomPage', '지원서 상태 업데이트 이벤트 수신:', payload.application);
+        // 채팅방 정보 새로고침하여 업데이트된 지원서 상태 반영
+        // 즉시 반영을 위해 refreshRoomDetail 호출
+        refreshRoomDetail();
+        return;
+      }
+
+      // 채팅방 삭제 이벤트
+      if (event.type === 'room.deleted' && event.payload && isRoomDeletedPayload(event.payload)) {
+        const payload = event.payload as RoomDeletedPayload;
+        debug('ChatRoomPage', '채팅방 삭제 이벤트 수신:', payload);
+        // 삭제된 채팅방이 현재 열려있는 채팅방이면 목록으로 이동
+        if (payload.roomId === activeRoomId) {
+          showToast('채팅방이 삭제되었습니다.');
+          navigate('/mypage/messages', { replace: true });
+        }
+        return;
+      }
+
+      // 결제 요청 메시지는 message.new로 처리됨 (백엔드에서 메시지로 전송)
     },
-    [appendMessage, updateReadStatus]
+    [appendMessage, updateReadStatus, refreshRoomDetail, activeRoomId, navigate, showToast]
   );
 
   useChatWebSocket({
@@ -137,7 +229,7 @@ const ChatRoomPage: React.FC = () => {
   // activeRoomId가 없으면 채팅 목록으로 리다이렉트
   React.useEffect(() => {
     if (!activeRoomId) {
-      console.warn('[ChatRoomPage] activeRoomId가 없어 채팅 목록으로 이동');
+      warn('ChatRoomPage', 'activeRoomId가 없어 채팅 목록으로 이동');
       navigate('/mypage/messages', { replace: true });
     }
   }, [activeRoomId, navigate]);
@@ -154,64 +246,62 @@ const ChatRoomPage: React.FC = () => {
     <PageWrapper>
       <ChatColumn>
         <FixedPanel>
-          <ContactHeader>
-            <ProfileGroup>
-              <BackButton onClick={() => navigate(-1)} aria-label="이전 페이지로 이동">
-                <ChevronLeft size={18} />
-              </BackButton>
-              <AvatarWrapper>
-                <Avatar
-                  src={
-                    counterpart?.avatarUrl ||
-                    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=160&q=80'
-                  }
-                  alt={displayName}
-                />
-                <StatusDot />
-              </AvatarWrapper>
-              <NameRoleGroup>
-                <HeaderName>{displayName}</HeaderName>
-                {displayRole && <HeaderRole>{displayRole}</HeaderRole>}
-              </NameRoleGroup>
-            </ProfileGroup>
-          </ContactHeader>
+          <ContactHeader
+            counterpart={counterpart}
+            displayName={displayName}
+            displayRole={displayRole}
+            onBack={() => navigate(-1)}
+          />
         </FixedPanel>
 
         <ScrollArea ref={scrollRef} onScroll={handleScroll}>
           <ChatCard>
             {loading && <MessageValue>채팅을 불러오는 중입니다...</MessageValue>}
             {error && <MessageValue>{error}</MessageValue>}
-            {!loading && !error && messages.length === 0 && (
+            {!loading && !error && displayedMessages.length === 0 && (
               <MessageValue>아직 주고받은 메시지가 없습니다.</MessageValue>
             )}
             <Messages>
-              {messages.map((chatMessage, index) => {
-                const previous = messages[index - 1];
-                const showDivider =
-                  !previous ||
-                  new Date(previous.createdAt).toDateString() !==
-                    new Date(chatMessage.createdAt).toDateString();
-                const isMyMessage = chatMessage.senderId === roomDetail?.room.me.userId;
-                const isSystem = chatMessage.messageType === 'system';
+              {displayedMessages.map((chatMessage, index) => {
+                const previous = displayedMessages[index - 1];
+                const applicationData = extractFn(chatMessage);
+                const isPaymentRequest = chatMessage.metadata?.type === 'payment_request';
+                // 지원서 카드는 항상 쇼호스트가 보낸 것으로 표시 (왼쪽 정렬)
+                // 결제 요청 메시지는 브랜드가 보낸 것이므로 브랜드 계정에서는 오른쪽 정렬
+                const isMyMessage = applicationData 
+                  ? false 
+                  : chatMessage.senderId === roomDetail?.room.me.userId;
+                const isSystem = chatMessage.messageType === 'system' && !isPaymentRequest;
+                
+                // 디버깅: 결제 요청 메시지 렌더링 확인
+                if (isPaymentRequest) {
+                  debug('ChatRoomPage', '결제 요청 메시지 렌더링:', {
+                    messageId: chatMessage.id,
+                    senderId: chatMessage.senderId,
+                    myUserId: roomDetail?.room.me.userId,
+                    isMyMessage,
+                    metadata: chatMessage.metadata,
+                  });
+                }
+                
                 return (
-                  <React.Fragment key={chatMessage.id}>
-                    {showDivider && <DateDivider>{dateLabel(chatMessage.createdAt)}</DateDivider>}
-                    <MessageGroup $align={isMyMessage ? 'end' : 'start'}>
-                      {isSystem ? (
-                        <SystemMessage>{chatMessage.content}</SystemMessage>
-                      ) : (
-                        <MessageBubble $variant={isMyMessage ? 'sent' : 'received'}>
-                          {chatMessage.content}
-                        </MessageBubble>
-                      )}
-                      <MessageMeta>
-                        <MessageTime>{formatTimestamp(chatMessage.createdAt)}</MessageTime>
-                        {isMyMessage && roomDetail?.room.unreadCount === 0 && (
-                          <MessageStatus>읽음</MessageStatus>
-                        )}
-                      </MessageMeta>
-                    </MessageGroup>
-                  </React.Fragment>
+                  <MessageGroup
+                    key={chatMessage.id}
+                    message={chatMessage}
+                    previousMessage={previous}
+                    applicationData={applicationData}
+                    isPaymentRequest={isPaymentRequest}
+                    isMyMessage={isMyMessage}
+                    isSystem={isSystem}
+                    roomDetail={roomDetail}
+                    isBrandUser={isBrandUser}
+                    onApplicationAccept={(applicationId) => handleApplicationAction('accept', applicationId)}
+                    onApplicationReject={(applicationId) => handleApplicationAction('reject', applicationId)}
+                    onPaymentClick={() => {
+                      // TODO: 결제 페이지로 이동
+                      showToast('결제 기능은 준비 중입니다.', undefined, 'info');
+                    }}
+                  />
                 );
               })}
             </Messages>
@@ -225,346 +315,16 @@ const ChatRoomPage: React.FC = () => {
         </ScrollArea>
       </ChatColumn>
 
-      <ComposerBar>
-        <ComposerInner>
-          <InputField
-            placeholder="메시지를 입력하세요"
-            value={composer}
-            onChange={(event) => setComposer(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
-                event.preventDefault();
-                handleSend();
-              }
-            }}
-            disabled={loading || Boolean(error)}
-          />
-          <ComposerActions>
-            <ComposerActionButton type="button">
-              <Paperclip size={16} />
-              파일
-            </ComposerActionButton>
-            <ComposerActionButton type="button">
-              <Smile size={16} />
-              이모지
-            </ComposerActionButton>
-          </ComposerActions>
-          <SendButton
-            type="button"
-            aria-label="메시지 전송"
-            onClick={handleSend}
-            disabled={loading || Boolean(error) || !composer.trim()}
-          >
-            ➤
-          </SendButton>
-        </ComposerInner>
-        {sendError && <SendError>{sendError}</SendError>}
-        <ComposerFooter>
-          <span>Shift + Enter 로 줄바꿈 • Enter 로 전송</span>
-          <FooterRefresh
-            type="button"
-            onClick={() => {
-              if (messages.length > 0) {
-                const latest = messages[messages.length - 1];
-                markAsRead(latest.id);
-              } else {
-                handleMarkAsRead();
-              }
-            }}
-          >
-            <RefreshCcw size={14} />
-            새로고침
-          </FooterRefresh>
-        </ComposerFooter>
-      </ComposerBar>
+      <ComposerBar
+        value={composer}
+        error={sendError}
+        loading={loading}
+        disabled={Boolean(error)}
+        onChange={setComposer}
+        onSend={handleSend}
+      />
     </PageWrapper>
   );
 };
 
-const PageWrapper = styled.div`
-  min-height: 100vh;
-  padding: 0 0 120px;
-  background: #F5F6FF1A;
-  position: relative;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-`;
-
-const ChatColumn = styled.div`
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-`;
-
-const FixedPanel = styled.div`
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 0;
-  z-index: 50;
-  width: 100%;
-  max-width: 1200px;
-  background: #ffffff;
-  padding: 12px 16px;
-  box-sizing: border-box;
-  border-bottom: 1px solid #e1e4f2;
-`;
-
-const ScrollArea = styled.div`
-  padding-top: 80px;
-  padding-bottom: 150px;
-  overflow-y: auto;
-  max-height: calc(100vh - 80px - 150px);
-`;
-
-const ContactHeader = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 0;
-`;
-
-const ProfileGroup = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
-
-const BackButton = styled.button`
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid #eceff7;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #1b1c2e;
-`;
-
-const AvatarWrapper = styled.div`
-  position: relative;
-`;
-
-const ChatCard = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  background: transparent;
-  padding: 24px 20px;
-  box-sizing: border-box;
-`;
-
-const Avatar = styled.img`
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  object-fit: cover;
-`;
-
-const StatusDot = styled.span`
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #3cd25a;
-  border: 2px solid #fff;
-`;
-
-const NameRoleGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-`;
-
-const HeaderName = styled.div`
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1f1f25;
-  line-height: 1.2;
-`;
-
-const HeaderRole = styled.div`
-  font-size: 0.75rem;
-  color: #7d8299;
-  line-height: 1.2;
-`;
-
-const Messages = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-`;
-
-const MessageGroup = styled.div<{ $align: 'start' | 'end' }>`
-  display: flex;
-  flex-direction: column;
-  align-items: ${({ $align }) => ($align === 'end' ? 'flex-end' : 'flex-start')};
-  gap: 4px;
-`;
-
-const MessageBubble = styled.div<{ $variant: 'sent' | 'received' }>`
-  background: ${({ $variant }) => ($variant === 'sent' ? '#687CF4' : '#FFFFFF')};
-  color: ${({ $variant }) => ($variant === 'sent' ? '#FFFFFF' : '#030213')};
-  padding: 12px 16px;
-  border-radius: 10px;
-  border: ${({ $variant }) => ($variant === 'sent' ? 'none' : '1px solid rgba(0, 0, 0, 0.1)')};
-  max-width: 90%;
-  font-size: 14px;
-  font-weight: 300;
-  line-height: 1.5;
-  word-wrap: break-word;
-  word-break: break-word;
-`;
-
-const MessageTime = styled.span`
-  font-size: 12px;
-  font-weight: 300;
-  color: #717182;
-`;
-
-const MessageValue = styled.div`
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: #f5f6fc;
-  color: #434659;
-  margin: 8px 0;
-`;
-
-const MessageMeta = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-`;
-
-const MessageStatus = styled.span`
-  font-size: 0.75rem;
-  color: #5a64ff;
-  font-weight: 600;
-`;
-
-const SystemMessage = styled.div`
-  font-size: 0.85rem;
-  color: #7d8299;
-  background: #f4f5fb;
-  border-radius: 999px;
-  padding: 6px 14px;
-`;
-
-const DateDivider = styled.div`
-  align-self: center;
-  font-size: 0.75rem;
-  color: #7d8299;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(125, 130, 153, 0.12);
-`;
-
-const ScrollHintButton = styled.button`
-  align-self: center;
-  margin-top: 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  border: 1px solid #e1e4f2;
-  border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 0.75rem;
-  color: #7d8299;
-  background: #fff;
-`;
-
-const InputField = styled.input`
-  flex: 1;
-  border-radius: 999px;
-  border: 1px solid #dfe3f3;
-  padding: 12px 18px;
-  font-size: 0.95rem;
-  background: #fff;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
-`;
-
-const SendButton = styled.button`
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  border: none;
-  background: #5a64ff;
-  color: #fff;
-  font-size: 1rem;
-  box-shadow: 0 10px 22px rgba(90, 100, 255, 0.35);
-  opacity: ${({ disabled }) => (disabled ? 0.6 : 1)};
-`;
-
-const ComposerBar = styled.div`
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 56px;
-  z-index: 60;
-  width: 100%;
-  max-width: 1200px;
-  padding: 12px 16px;
-  background: #ffffff;
-  border-top: 1px solid #e1e4f2;
-  box-sizing: border-box;
-`;
-
-const ComposerInner = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-`;
-
-const SendError = styled.p`
-  margin-top: 8px;
-  color: #e64444;
-`;
-
-const ComposerActions = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-`;
-
-const ComposerActionButton = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  border-radius: 12px;
-  border: 1px solid #e1e4f2;
-  background: #fff;
-  padding: 10px 12px;
-  font-size: 0.85rem;
-  color: #5a64ff;
-`;
-
-const ComposerFooter = styled.div`
-  margin-top: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 0.75rem;
-  color: #9a9fb9;
-  gap: 12px;
-  flex-wrap: wrap;
-`;
-
-const FooterRefresh = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border: none;
-  background: transparent;
-  color: #5a64ff;
-  font-size: 0.75rem;
-`;
-
 export default ChatRoomPage;
-
-

@@ -19,6 +19,7 @@ export interface ChatRoomSummary {
   campaign?: ChatCampaignInfo | null;
   brandUser?: ChatUserInfo | null;
   showhostUser?: ChatUserInfo | null;
+  createdAt?: string; // 채팅방 생성 시점
   updatedAt: string;
   unreadCount: number;
   status?: 'active' | 'archived';
@@ -49,9 +50,21 @@ export interface ChatMessage {
   sender?: ChatUserInfo;
 }
 
+export interface ChatRoomApplication {
+  applicationId: string;
+  campaignTitle: string | null;
+  portfolioTitle: string | null;
+  availableDate: string | null;
+  availableTime: string | null;
+  message: string | null;
+  status: 'pending' | 'accepted' | 'rejected';
+  createdAt?: string; // 지원서 생성 시점 (채팅방 생성 시점과 동일)
+}
+
 export interface ChatRoomDetail {
   room: ChatRoomSummary;
   messages: ChatMessage[];
+  application?: ChatRoomApplication;
   pagination?: {
     hasMore: boolean;
     nextCursor?: string;

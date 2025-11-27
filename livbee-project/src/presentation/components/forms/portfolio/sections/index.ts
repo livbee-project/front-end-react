@@ -6,5 +6,4 @@ export { SnsSection } from './SnsSection';
 export { PortfolioFilesSection } from './PortfolioFilesSection';
 export { TagsSection } from './TagsSection';
 export { GallerySection } from './GallerySection';
-export { SubmitSection } from './SubmitSection';
 

@@ -1,16 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { buildWebSocketUrl } from '@/shared/config/apiConfig';
 import { getToken } from '@/shared/utils/storage';
-
-interface ChatSocketEvent {
-  type: string;
-  payload?: any;
-}
+import type { WebSocketEvent } from '@/domain/entities/WebSocket';
+import { debug, warn, error as logError } from '@/shared/utils/logger';
 
 interface UseChatWebSocketOptions {
   roomId?: string;
   enabled?: boolean;
-  onEvent?: (event: ChatSocketEvent) => void;
+  onEvent?: (event: WebSocketEvent) => void;
 }
 
 type SocketStatus = 'idle' | 'connecting' | 'open' | 'closed' | 'error';
@@ -41,9 +38,7 @@ export const useChatWebSocket = ({ roomId, enabled = true, onEvent }: UseChatWeb
     const connect = () => {
       // 최대 재연결 시도 횟수 초과 시 재연결 중단
       if (reconnectAttempts.current >= maxReconnectAttempts) {
-        if (process.env.NODE_ENV === 'development') {
-          console.warn('[useChatWebSocket] 최대 재연결 시도 횟수 초과. WebSocket 연결을 중단합니다.');
-        }
+        warn('useChatWebSocket', '최대 재연결 시도 횟수 초과. WebSocket 연결을 중단합니다.');
         setStatus('error');
         return;
       }
@@ -58,16 +53,14 @@ export const useChatWebSocket = ({ roomId, enabled = true, onEvent }: UseChatWeb
       setStatus('connecting');
       
       // 디버깅: 연결 정보 출력
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[useChatWebSocket] 연결 시도:', {
-          url: url.replace(/token=[^&]+/, 'token=***'), // 토큰 마스킹
-          roomId,
-          tokenExists: !!token,
-          tokenLength: token?.length,
-          reconnectAttempt: reconnectAttempts.current + 1,
-          maxAttempts: maxReconnectAttempts,
-        });
-      }
+      debug('useChatWebSocket', '연결 시도:', {
+        url: url.replace(/token=[^&]+/, 'token=***'), // 토큰 마스킹
+        roomId,
+        tokenExists: !!token,
+        tokenLength: token?.length,
+        reconnectAttempt: reconnectAttempts.current + 1,
+        maxAttempts: maxReconnectAttempts,
+      });
       
       try {
         const socket = new WebSocket(url);
@@ -76,42 +69,38 @@ export const useChatWebSocket = ({ roomId, enabled = true, onEvent }: UseChatWeb
         socket.onopen = () => {
           setStatus('open');
           reconnectAttempts.current = 0; // 연결 성공 시 재시도 횟수 리셋
-          if (process.env.NODE_ENV === 'development') {
-            console.log('[useChatWebSocket] 연결 성공:', {
-              url: url.replace(/token=[^&]+/, 'token=***'),
-              readyState: socket.readyState,
-              protocol: socket.protocol,
-            });
-          }
+          debug('useChatWebSocket', '연결 성공:', {
+            url: url.replace(/token=[^&]+/, 'token=***'),
+            readyState: socket.readyState,
+            protocol: socket.protocol,
+          });
         };
 
         socket.onclose = (event) => {
           setStatus('closed');
           
           // 디버깅: 종료 정보 출력
-          if (process.env.NODE_ENV === 'development') {
-            const closeReasons: Record<number, string> = {
-              1000: '정상 종료',
-              1001: '엔드포인트가 사라짐 (서버 종료 또는 네트워크 문제)',
-              1002: '프로토콜 오류',
-              1003: '지원하지 않는 데이터 타입',
-              1006: '비정상 종료 (연결 실패)',
-              1007: '데이터 형식 오류',
-              1008: '정책 위반',
-              1009: '메시지가 너무 큼',
-              1010: '확장 협상 실패',
-              1011: '서버 오류',
-            };
-            
-            console.warn('[useChatWebSocket] 연결 종료:', {
-              code: event.code,
-              reason: event.reason || closeReasons[event.code] || '알 수 없는 이유',
-              wasClean: event.wasClean,
-              url: url.replace(/token=[^&]+/, 'token=***'),
-              readyState: socket.readyState,
-              reconnectAttempt: reconnectAttempts.current + 1,
-            });
-          }
+          const closeReasons: Record<number, string> = {
+            1000: '정상 종료',
+            1001: '엔드포인트가 사라짐 (서버 종료 또는 네트워크 문제)',
+            1002: '프로토콜 오류',
+            1003: '지원하지 않는 데이터 타입',
+            1006: '비정상 종료 (연결 실패)',
+            1007: '데이터 형식 오류',
+            1008: '정책 위반',
+            1009: '메시지가 너무 큼',
+            1010: '확장 협상 실패',
+            1011: '서버 오류',
+          };
+          
+          warn('useChatWebSocket', '연결 종료:', {
+            code: event.code,
+            reason: event.reason || closeReasons[event.code] || '알 수 없는 이유',
+            wasClean: event.wasClean,
+            url: url.replace(/token=[^&]+/, 'token=***'),
+            readyState: socket.readyState,
+            reconnectAttempt: reconnectAttempts.current + 1,
+          });
           
           // 정상 종료가 아니고, 컴포넌트가 언마운트되지 않았을 때만 재연결 시도
           if (!isUnmounting.current && event.code !== 1000) {
@@ -123,54 +112,49 @@ export const useChatWebSocket = ({ roomId, enabled = true, onEvent }: UseChatWeb
         socket.onerror = (error) => {
           setStatus('error');
           // 개발 모드에서만 에러 로그 출력
-          if (process.env.NODE_ENV === 'development') {
-            const socket = error.target as WebSocket;
-            console.error('[useChatWebSocket] WebSocket 연결 오류:', {
-              error,
-              url: socket.url?.replace(/token=[^&]+/, 'token=***'),
-              readyState: socket.readyState,
-              readyStateText: socket.readyState === WebSocket.CONNECTING ? 'CONNECTING' :
-                             socket.readyState === WebSocket.OPEN ? 'OPEN' :
-                             socket.readyState === WebSocket.CLOSING ? 'CLOSING' :
-                             socket.readyState === WebSocket.CLOSED ? 'CLOSED' : 'UNKNOWN',
-              protocol: socket.protocol,
-              extensions: socket.extensions,
-            });
-            
-            // 가능한 원인 분석
-            if (socket.readyState === WebSocket.CLOSED) {
-              console.error('[useChatWebSocket] 가능한 원인:');
-              console.error('  1. 백엔드 WebSocket 서버가 실행되지 않음');
-              console.error('  2. URL 형식이 잘못됨');
-              console.error('  3. 인증 토큰이 유효하지 않음');
-              console.error('  4. 네트워크 연결 문제');
-              console.error('  5. CORS/프록시 설정 문제');
-              console.error('  6. 백엔드 서버가 WebSocket을 지원하지 않음');
-            }
+          const socket = error.target as WebSocket;
+          logError('useChatWebSocket', 'WebSocket 연결 오류:', {
+            error,
+            url: socket.url?.replace(/token=[^&]+/, 'token=***'),
+            readyState: socket.readyState,
+            readyStateText: socket.readyState === WebSocket.CONNECTING ? 'CONNECTING' :
+                           socket.readyState === WebSocket.OPEN ? 'OPEN' :
+                           socket.readyState === WebSocket.CLOSING ? 'CLOSING' :
+                           socket.readyState === WebSocket.CLOSED ? 'CLOSED' : 'UNKNOWN',
+            protocol: socket.protocol,
+            extensions: socket.extensions,
+          });
+          
+          // 가능한 원인 분석
+          if (socket.readyState === WebSocket.CLOSED) {
+            logError('useChatWebSocket', '가능한 원인:', [
+              '1. 백엔드 WebSocket 서버가 실행되지 않음',
+              '2. URL 형식이 잘못됨',
+              '3. 인증 토큰이 유효하지 않음',
+              '4. 네트워크 연결 문제',
+              '5. CORS/프록시 설정 문제',
+              '6. 백엔드 서버가 WebSocket을 지원하지 않음',
+            ]);
           }
           // onerror에서 close를 호출하지 않음 (이미 close 상태일 수 있음)
         };
 
         socket.onmessage = (event) => {
           try {
-            const data: ChatSocketEvent = JSON.parse(event.data);
+            const data = JSON.parse(event.data) as WebSocketEvent;
             if (data.type === 'ping') {
               socket.send(JSON.stringify({ type: 'pong' }));
               return;
             }
             onEvent?.(data);
           } catch (error) {
-            if (process.env.NODE_ENV === 'development') {
-              console.error('[useChatWebSocket] 메시지 파싱 실패:', error);
-            }
+            logError('useChatWebSocket', '메시지 파싱 실패:', error);
           }
         };
-      } catch (error) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error('[useChatWebSocket] WebSocket 생성 실패:', error);
+        } catch (error) {
+          logError('useChatWebSocket', 'WebSocket 생성 실패:', error);
+          setStatus('error');
         }
-        setStatus('error');
-      }
     };
 
     connect();
@@ -196,7 +180,7 @@ export const useChatWebSocket = ({ roomId, enabled = true, onEvent }: UseChatWeb
     };
   }, [roomId, enabled, onEvent]);
 
-  const send = (payload: ChatSocketEvent) => {
+  const send = (payload: WebSocketEvent) => {
     if (socketRef.current?.readyState === WebSocket.OPEN) {
       socketRef.current.send(JSON.stringify(payload));
     }

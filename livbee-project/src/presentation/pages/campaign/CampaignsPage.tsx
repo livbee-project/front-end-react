@@ -1,11 +1,11 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Plus } from 'lucide-react';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { Campaign } from '@/domain/entities/Campaign';
 import { useRepository } from '@/presentation/hooks/useRepository';
-import { useListData } from '@/presentation/hooks/useListData';
+import { useListFetcher } from '@/presentation/hooks/useListFetcher';
 import { useListFilters } from '@/presentation/hooks/useListFilters';
 import { useListSearch } from '@/presentation/hooks/useListSearch';
 import { useScrapToggle } from '@/presentation/hooks/useScrapToggle';
@@ -37,31 +37,24 @@ const CampaignsPage: React.FC = () => {
   );
 
   // fetchFunction 메모이제이션
-  const fetchCampaigns = useCallback(
-    (
-      query: { page: number; limit: number; search?: string; sort?: 'latest' | 'deadline' },
-      signal?: AbortSignal
-    ) => {
-      return campaignRepository.getCampaignList(query, signal);
-    },
-    [campaignRepository]
-  );
-
   const {
     data: campaigns,
     loading,
     error,
     totalPages,
-  } = useListData<
+  } = useListFetcher<
     Campaign,
     { page: number; limit: number; search?: string; sort?: 'latest' | 'deadline' },
+    CampaignRepository,
     { items: Campaign[]; currentPage?: number; totalPages?: number; totalItems?: number }
-  >(
-    fetchCampaigns,
+  >({
+    repository: campaignRepository,
+    method: 'getCampaignList',
     query,
-    [currentPage, searchQuery],
-    '캠페인 목록을 불러오는 중 오류가 발생했습니다.'
-  );
+    dependencies: [currentPage, searchQuery],
+    errorMessage: '캠페인 목록을 불러오는 중 오류가 발생했습니다.',
+    cacheKey: `campaign-list-${JSON.stringify(query)}`,
+  });
 
   const filteredCampaigns = useMemo(() => {
     if (activeFilter === '전체') {

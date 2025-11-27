@@ -6,13 +6,13 @@ import { useToast } from '@/presentation/contexts/ToastContext';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useFormState } from '@/presentation/hooks/useFormState';
 import { useFormUpload } from '@/presentation/hooks/useFormUpload';
-import type { CreatePortfolioRequest } from '@/domain/entities/Portfolio';
-import { isValidPhoneNumber, isValidUrl } from '@/shared/utils/validation';
 import type { PortfolioFormData, PortfolioToggleState } from './types';
+import { getStoredImageUrls, saveImageUrls, clearImageUrls } from './utils/portfolioImageStorage';
+import { validatePortfolioForm } from './utils/portfolioValidation';
+import { buildPortfolioRequest } from './utils/portfolioRequestBuilder';
 
 const FORM_STORAGE_KEY = 'portfolio-register-form';
 const TOGGLE_STORAGE_KEY = 'portfolio-register-toggles';
-const IMAGE_STORAGE_KEY = 'portfolio-register-images';
 
 const INITIAL_FORM_DATA: PortfolioFormData = {
   registrationType: '',
@@ -47,22 +47,6 @@ export const usePortfolioRegisterForm = () => {
     clearStorage: clearToggleStorage,
   } = useFormState<PortfolioToggleState>(INITIAL_TOGGLE_STATE, TOGGLE_STORAGE_KEY);
 
-  // 이미지 URL 복원
-  const getStoredImageUrls = (): { mainThumbnail: string; gallery: string[]; resume: string; portfolio: string } => {
-    if (typeof window === 'undefined') {
-      return { mainThumbnail: '', gallery: [], resume: '', portfolio: '' };
-    }
-    try {
-      const stored = sessionStorage.getItem(IMAGE_STORAGE_KEY);
-      if (stored) {
-        return JSON.parse(stored);
-      }
-    } catch (error) {
-      console.warn('Failed to restore image URLs from sessionStorage:', error);
-    }
-    return { mainThumbnail: '', gallery: [], resume: '', portfolio: '' };
-  };
-
   const storedImages = getStoredImageUrls();
   const {
     profileFile: mainThumbnailFile,
@@ -88,33 +72,21 @@ export const usePortfolioRegisterForm = () => {
     if (mainThumbnailUrl && mainThumbnailUrl !== mainThumbnailUrlState) {
       setMainThumbnailUrlState(mainThumbnailUrl);
     }
-  }, [mainThumbnailUrl]);
+  }, [mainThumbnailUrl, mainThumbnailUrlState]);
 
   useEffect(() => {
     if (galleryImageUrls.length > 0 && JSON.stringify(galleryImageUrls) !== JSON.stringify(galleryImageUrlsState)) {
       setGalleryImageUrlsState(galleryImageUrls);
     }
-  }, [galleryImageUrls]);
+  }, [galleryImageUrls, galleryImageUrlsState]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    try {
-      const currentStored = sessionStorage.getItem(IMAGE_STORAGE_KEY);
-      const newValue = JSON.stringify({
-        mainThumbnail: mainThumbnailUrlState,
-        gallery: galleryImageUrlsState,
-        resume: resumeFileUrl,
-        portfolio: portfolioFileUrl,
-      });
-      
-      // 이전 값과 다를 때만 저장 (불필요한 저장 방지)
-      if (currentStored !== newValue) {
-        sessionStorage.setItem(IMAGE_STORAGE_KEY, newValue);
-      }
-    } catch (error) {
-      console.warn('Failed to save image URLs to sessionStorage:', error);
-    }
+    saveImageUrls({
+      mainThumbnail: mainThumbnailUrlState,
+      gallery: galleryImageUrlsState,
+      resume: resumeFileUrl,
+      portfolio: portfolioFileUrl,
+    });
   }, [mainThumbnailUrlState, galleryImageUrlsState, resumeFileUrl, portfolioFileUrl]);
 
   const handleInputChange = useCallback(
@@ -184,30 +156,10 @@ export const usePortfolioRegisterForm = () => {
   const handleSubmit = useCallback(async () => {
     setIsSubmitting(true);
 
-    const trimmedContact = formData.contact.trim();
-    if (trimmedContact && !isValidPhoneNumber(trimmedContact)) {
-      showToast('연락처 형식이 올바르지 않습니다.', undefined, 'error');
-      setIsSubmitting(false);
-      return;
-    }
-
-    const trimmedRecentLive = formData.recentLiveLink.trim();
-    if (trimmedRecentLive && !isValidUrl(trimmedRecentLive)) {
-      showToast('최근 라이브 링크가 올바르지 않습니다.', undefined, 'error');
-      setIsSubmitting(false);
-      return;
-    }
-
-    const hasInvalidWebsite = formData.websites.some((url, index) => {
-      const trimmed = url.trim();
-      if (!trimmed || !toggles.websites[index]) {
-        return false;
-      }
-      return !isValidUrl(trimmed);
-    });
-
-    if (hasInvalidWebsite) {
-      showToast('SNS / 사이트 링크를 올바르게 입력해주세요.', undefined, 'error');
+    // 유효성 검사
+    const validation = validatePortfolioForm(formData, toggles);
+    if (!validation.isValid) {
+      showToast(validation.errorMessage || '입력 정보를 확인해주세요.', undefined, 'error');
       setIsSubmitting(false);
       return;
     }
@@ -255,37 +207,12 @@ export const usePortfolioRegisterForm = () => {
         uploadedAttachedFileUrl = url;
       }
 
-      const websiteUrl = formData.websites[0]?.trim() || undefined;
-      const instagramUrl = formData.websites[1]?.trim() || undefined;
-      const youtubeUrl = formData.websites[2]?.trim() || undefined;
-
-      const recentLives = trimmedRecentLive
-        ? [
-            {
-              url: trimmedRecentLive,
-              title: undefined,
-              date: undefined,
-            },
-          ]
-        : undefined;
-
-      const request: CreatePortfolioRequest = {
-        nickname: formData.name.trim() || undefined,
-        oneLineIntro: formData.oneLineIntro.trim() || undefined,
-        detailedIntro: formData.detailedIntro.trim() || undefined,
-        mainThumbnailUrl: uploadedMainThumbnailUrl,
-        subThumbnailUrls: uploadedGalleryUrls.length > 0 ? uploadedGalleryUrls : undefined,
-        websiteUrl,
-        instagramUrl,
-        youtubeUrl,
-        recentLives,
-        attachedFileUrl: uploadedAttachedFileUrl,
-        status: 'published',
-        publicScope: '전체공개',
-        isAgePublic: true,
-        isSizingPublic: true,
-        isReceivingOffers: true,
-      };
+      const request = buildPortfolioRequest(
+        formData,
+        uploadedMainThumbnailUrl,
+        uploadedGalleryUrls,
+        uploadedAttachedFileUrl
+      );
 
       const response = await portfolioRepository.createPortfolio(request);
 
@@ -293,13 +220,7 @@ export const usePortfolioRegisterForm = () => {
         // 제출 성공 시 sessionStorage 삭제
         clearFormStorage();
         clearToggleStorage();
-        if (typeof window !== 'undefined') {
-          try {
-            sessionStorage.removeItem(IMAGE_STORAGE_KEY);
-          } catch (error) {
-            console.warn('Failed to remove image URLs from sessionStorage:', error);
-          }
-        }
+        clearImageUrls();
         showToast('포트폴리오가 등록되었습니다.');
         navigate('/portfolios', { replace: true });
       }
@@ -310,6 +231,8 @@ export const usePortfolioRegisterForm = () => {
       setIsSubmitting(false);
     }
   }, [
+    clearFormStorage,
+    clearToggleStorage,
     formData,
     galleryImageFiles,
     mainThumbnailFile,

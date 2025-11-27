@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import SearchInput from '@/presentation/components/search/SearchInput';
 import ListPageHint from '@/presentation/components/list/ListPageHint';
 import FloatingActionButton from '@/presentation/components/ui/FloatingActionButton';
+import { debug } from '@/shared/utils/logger';
 
 /**
  * ListPageLayout 컴포넌트가 받을 props 타입을 정의합니다.
@@ -42,7 +43,7 @@ const ListPageLayout: React.FC<ListPageLayoutProps> = ({
    * 검색 실행 핸들러
    */
   const handleSearchSubmit = (query: string) => {
-    console.log('검색 실행:', query);
+    debug('ListPageLayout', '검색 실행:', query);
     if (onSearch) {
       onSearch(query);
     }

@@ -15,23 +15,6 @@ const meta: Meta<typeof TopTabBar> = {
     },
   },
   tags: ['autodocs'],
-  decorators: [
-    (Story, context) => {
-      return (
-        <MemoryRouter initialEntries={[context.args.initialPath || '/clips']}>
-          <ToastProvider>
-            <div>
-              <Story />
-              <div style={{ padding: '20px' }}>
-                <p>페이지 내용이 여기에 표시됩니다.</p>
-                <p>현재 경로: {context.args.initialPath || '/clips'}</p>
-              </div>
-            </div>
-          </ToastProvider>
-        </MemoryRouter>
-      );
-    },
-  ],
   argTypes: {
     initialPath: {
       control: 'select',
@@ -49,6 +32,19 @@ export const Default: Story = {
   args: {
     initialPath: '/clips',
   },
+  render: (args) => (
+    <MemoryRouter initialEntries={[args.initialPath || '/clips']}>
+      <ToastProvider>
+        <div>
+          <TopTabBar />
+          <div style={{ padding: '20px' }}>
+            <p>페이지 내용이 여기에 표시됩니다.</p>
+            <p>현재 경로: {args.initialPath || '/clips'}</p>
+          </div>
+        </div>
+      </ToastProvider>
+    </MemoryRouter>
+  ),
 };
 
 // ===== 다양한 경로 =====

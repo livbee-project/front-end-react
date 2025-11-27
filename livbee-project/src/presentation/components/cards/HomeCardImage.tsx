@@ -31,7 +31,7 @@ export interface HomeCardImageProps {
 export const HomeCardImage: React.FC<HomeCardImageProps> = ({ src, alt, aspectRatio = '1 / 1', children }) => {
   return (
     <ImageWrapper $aspectRatio={aspectRatio}>
-      {src ? <ImageElement src={src} alt={alt} /> : <PlaceholderImage size={48} />}
+      {src ? <ImageElement src={src} alt={alt} loading="lazy" decoding="async" /> : <PlaceholderImage size={48} />}
       {children}
     </ImageWrapper>
   );

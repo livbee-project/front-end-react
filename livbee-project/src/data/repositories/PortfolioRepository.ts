@@ -6,6 +6,7 @@ import type {
   CreatePortfolioResponse,
 } from '@/domain/entities/Portfolio';
 import { PortfolioApiSource } from '@/data/sources/PortfolioApiSource';
+import { error as logError } from '@/shared/utils/logger';
 
 /**
  * 포트폴리오 리포지토리
@@ -25,7 +26,7 @@ export class PortfolioRepository {
     try {
       return await this.apiSource.getPortfolioList(query, signal);
     } catch (error) {
-      console.error('포트폴리오 목록 조회 실패:', error);
+      logError('PortfolioRepository', '포트폴리오 목록 조회 실패:', error);
       throw error;
     }
   }
@@ -37,7 +38,7 @@ export class PortfolioRepository {
     try {
       return await this.apiSource.getPortfolioById(id, signal);
     } catch (error) {
-      console.error('포트폴리오 상세 조회 실패:', error);
+      logError('PortfolioRepository', '포트폴리오 상세 조회 실패:', error);
       throw error;
     }
   }
@@ -49,7 +50,7 @@ export class PortfolioRepository {
     try {
       return await this.apiSource.createPortfolio(request);
     } catch (error) {
-      console.error('포트폴리오 등록 실패:', error);
+      logError('PortfolioRepository', '포트폴리오 등록 실패:', error);
       throw error;
     }
   }

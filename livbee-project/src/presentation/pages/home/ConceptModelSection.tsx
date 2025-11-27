@@ -41,6 +41,8 @@ const ConceptModelSection: React.FC = React.memo(() => {
     [modelRepository]
   );
 
+  const cacheKey = useMemo(() => `concept-models-${JSON.stringify(query)}`, [query]);
+
   const { data: models, loading } = useListData<
     Model,
     { page: number; limit: number },
@@ -49,7 +51,8 @@ const ConceptModelSection: React.FC = React.memo(() => {
     fetchModels,
     query,
     [],
-    '모델 목록을 불러오는 중 오류가 발생했습니다.'
+    '모델 목록을 불러오는 중 오류가 발생했습니다.',
+    { cacheKey }
   );
 
   if (loading) {

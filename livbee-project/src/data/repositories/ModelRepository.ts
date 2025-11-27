@@ -6,6 +6,7 @@ import type {
   CreateModelResponse,
 } from '@/domain/entities/Model';
 import { ModelApiSource } from '@/data/sources/ModelApiSource';
+import { error as logError } from '@/shared/utils/logger';
 
 /**
  * 모델 리포지토리
@@ -25,7 +26,7 @@ export class ModelRepository {
     try {
       return await this.apiSource.getModelList(query, signal);
     } catch (error) {
-      console.error('모델 목록 조회 실패:', error);
+      logError('ModelRepository', '모델 목록 조회 실패:', error);
       throw error;
     }
   }
@@ -37,7 +38,7 @@ export class ModelRepository {
     try {
       return await this.apiSource.getModelById(id, signal);
     } catch (error) {
-      console.error('모델 상세 조회 실패:', error);
+      logError('ModelRepository', '모델 상세 조회 실패:', error);
       throw error;
     }
   }
@@ -49,7 +50,7 @@ export class ModelRepository {
     try {
       return await this.apiSource.createModel(request);
     } catch (error) {
-      console.error('모델 등록 실패:', error);
+      logError('ModelRepository', '모델 등록 실패:', error);
       throw error;
     }
   }

@@ -35,7 +35,7 @@ export interface CloudinaryUploadResponse {
   width?: number;
   height?: number;
   bytes?: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**

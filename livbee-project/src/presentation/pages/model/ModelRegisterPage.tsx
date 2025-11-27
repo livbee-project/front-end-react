@@ -10,8 +10,8 @@ import {
   ContactSection as ContactGroup,
   TagsSection,
   GallerySection,
-  SubmitSection,
 } from '@/presentation/components/forms/model/sections';
+import { FormSubmitSection } from '@/presentation/components/forms/common/FormSubmitSection';
 import { useModelRegisterForm } from '@/presentation/components/forms/model/useModelRegisterForm';
 
 const ModelRegisterPage: React.FC = () => {
@@ -114,10 +114,10 @@ const ModelRegisterPage: React.FC = () => {
         onRemoveImage={handleGalleryImageRemove}
       />
 
-      <SubmitSection
+      <FormSubmitSection
         disabled={isSubmitting || isImageUploading}
-        onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
+        onSubmit={handleSubmit}
       />
     </RegisterPageLayout>
   );

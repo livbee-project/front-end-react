@@ -231,3 +231,17 @@ export interface CampaignApplyResponse {
   applicationId: string;
   chatRoomId: string;
 }
+
+export interface ApplicationActionRequest {
+  applicationId: string;
+  action: 'accept' | 'reject';
+}
+
+export interface ApplicationActionResponse {
+  applicationId: string;
+  status: 'accepted' | 'rejected';
+  paymentRequest?: {
+    amount: number;
+    currency?: string;
+  };
+}

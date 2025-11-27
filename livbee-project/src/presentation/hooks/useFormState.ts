@@ -1,4 +1,5 @@
 import { useCallback, useState, useEffect } from 'react';
+import { warn } from '@/shared/utils/logger';
 
 /**
  * 범용 폼 상태를 관리하는 훅
@@ -18,7 +19,7 @@ export const useFormState = <T>(initialState: T, storageKey?: string) => {
         return JSON.parse(stored) as T;
       }
     } catch (error) {
-      console.warn(`Failed to restore form state from sessionStorage (${storageKey}):`, error);
+      warn('useFormState', `Failed to restore form state from sessionStorage (${storageKey}):`, error);
     }
     
     return initialState;
@@ -47,7 +48,7 @@ export const useFormState = <T>(initialState: T, storageKey?: string) => {
         sessionStorage.setItem(storageKey, newValue);
       }
     } catch (error) {
-      console.warn(`Failed to save form state to sessionStorage (${storageKey}):`, error);
+      warn('useFormState', `Failed to save form state to sessionStorage (${storageKey}):`, error);
     }
   }, [formData, storageKey, isInitialMount]);
 
@@ -106,7 +107,7 @@ export const useFormState = <T>(initialState: T, storageKey?: string) => {
       try {
         sessionStorage.removeItem(storageKey);
       } catch (error) {
-        console.warn(`Failed to remove form state from sessionStorage (${storageKey}):`, error);
+        warn('useFormState', `Failed to remove form state from sessionStorage (${storageKey}):`, error);
       }
     }
   }, [initialState, storageKey]);
@@ -119,7 +120,7 @@ export const useFormState = <T>(initialState: T, storageKey?: string) => {
       try {
         sessionStorage.removeItem(storageKey);
       } catch (error) {
-        console.warn(`Failed to clear form state from sessionStorage (${storageKey}):`, error);
+        warn('useFormState', `Failed to clear form state from sessionStorage (${storageKey}):`, error);
       }
     }
   }, [storageKey]);
