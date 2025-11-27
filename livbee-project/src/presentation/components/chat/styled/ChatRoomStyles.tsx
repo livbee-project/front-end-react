@@ -5,41 +5,52 @@ import styled from 'styled-components';
  */
 
 export const PageWrapper = styled.div`
-  min-height: 100vh;
-  padding: 0 0 120px;
-  background: #F5F6FF1A;
+  min-height: 100dvh;
+  padding: 0 0 160px;
+  background: #f5f6ff1a;
   position: relative;
   width: 100%;
-  max-width: 1200px;
+  max-width: 960px;
   margin: 0 auto;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+    padding: 0 0 200px;
+  }
 `;
 
 export const ChatColumn = styled.div`
   width: 100%;
-  max-width: 1200px;
+  max-width: 960px;
   margin: 0 auto;
+  padding: 0 16px;
+
+  @media (min-width: 1024px) {
+    padding: 0 24px;
+  }
 `;
 
 export const FixedPanel = styled.div`
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 0;
+  position: sticky;
+  top: calc(env(safe-area-inset-top) + 0px);
   z-index: 50;
   width: 100%;
-  max-width: 1200px;
   background: #ffffff;
   padding: 12px 16px;
   box-sizing: border-box;
   border-bottom: 1px solid #e1e4f2;
+
+  @media (min-width: 768px) {
+    border-radius: 0;
+  }
 `;
 
 export const ScrollArea = styled.div`
-  padding-top: 80px;
-  padding-bottom: 120px; /* ComposerBar 높이 + 여유 공간 */
+  padding-top: 72px;
+  padding-bottom: 160px; /* ComposerBar 높이 + 여유 공간 */
   overflow-y: auto;
   overflow-x: hidden;
-  height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
 `;
@@ -52,6 +63,11 @@ export const ChatCard = styled.div`
   background: transparent;
   padding: 24px 20px;
   box-sizing: border-box;
+
+  @media (max-width: 600px) {
+    padding: 16px 12px;
+    gap: 12px;
+  }
 `;
 
 export const Messages = styled.div`

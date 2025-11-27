@@ -109,7 +109,7 @@ const ClipCard: React.FC<ClipCardProps> = ({
         {/* 프로필 이미지 */}
         <ProfileImageContainer $hasImage={!!profileImageUrl}>
           {profileImageUrl ? (
-            <ProfileImage src={profileImageUrl} alt="프로필" />
+            <ProfileImage src={profileImageUrl} alt="프로필" loading="lazy" decoding="async" />
           ) : (
             <ProfilePlaceholder>P</ProfilePlaceholder>
           )}

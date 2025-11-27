@@ -28,7 +28,7 @@ export const MyPortfolioCard: React.FC<MyPortfolioCardProps> = ({
       <CardHeader>
         <Thumbnail $hasImage={Boolean(item.imageUrl)}>
           {item.imageUrl ? (
-            <img src={item.imageUrl} alt={item.title} />
+            <img src={item.imageUrl} alt={item.title} loading="lazy" decoding="async" />
           ) : (
             <span>?</span>
           )}

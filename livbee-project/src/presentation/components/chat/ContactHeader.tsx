@@ -29,6 +29,8 @@ const ContactHeader: React.FC<ContactHeaderProps> = ({
               'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=160&q=80'
             }
             alt={displayName}
+            loading="eager"
+            decoding="async"
           />
           <StatusDot />
         </AvatarWrapper>

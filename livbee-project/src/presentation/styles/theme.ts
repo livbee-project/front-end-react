@@ -73,7 +73,7 @@ export const theme = {
     padding: '12px 16px',
     backgroundColor: '#f9fafb',
     focusBorderColor: '#687CF4',
-    fontSize: '15px',
+    fontSize: '16px',
   },
   section: {
     paddingY: '36px',

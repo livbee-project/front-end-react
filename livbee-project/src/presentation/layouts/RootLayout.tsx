@@ -26,13 +26,19 @@ const RootLayout: React.FC = () => {
 const RootContainer = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 100dvh;
+  background: ${({ theme }) => theme.colors.background};
 `;
 
 const MainContent = styled.main`
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  padding-bottom: 32px;
+
+  @media (max-width: 768px) {
+    padding-bottom: calc(120px + env(safe-area-inset-bottom));
+  }
 `;
 
 const Footer = styled.footer`

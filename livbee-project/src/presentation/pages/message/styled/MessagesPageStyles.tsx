@@ -8,6 +8,11 @@ export const PageContainer = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
+
+  @media (max-width: 600px) {
+    padding: 20px 16px 80px;
+    min-height: 100dvh;
+  }
 `;
 
 export const Title = styled.h1`
@@ -125,6 +130,11 @@ export const MessageItemWrapper = styled.div`
   gap: 8px;
   padding: 14px 0;
   border-bottom: 1px solid #f2f2f5;
+
+  @media (max-width: 600px) {
+    padding: 12px 0;
+    gap: 12px;
+  }
 `;
 
 export const MessageItemContent = styled.div`

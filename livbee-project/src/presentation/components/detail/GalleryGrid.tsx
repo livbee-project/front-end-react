@@ -61,7 +61,7 @@ const GalleryGrid: React.FC<GalleryGridProps> = ({
           $hasClick={!!onImageClick}
           onClick={() => onImageClick && onImageClick(index)}
         >
-          <Image src={imageUrl} alt={`갤러리 이미지 ${index + 1}`} />
+          <Image src={imageUrl} alt={`갤러리 이미지 ${index + 1}`} loading="lazy" decoding="async" />
         </ImageItem>
       ))}
     </GridContainer>

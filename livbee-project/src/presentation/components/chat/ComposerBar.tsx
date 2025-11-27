@@ -53,14 +53,24 @@ const ComposerBarContainer = styled.div`
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 56px;
+  bottom: 72px;
   z-index: 60;
   width: 100%;
-  max-width: 1200px;
+  max-width: 960px;
   padding: 12px 16px;
   background: #ffffff;
   border-top: 1px solid #e1e4f2;
   box-sizing: border-box;
+  box-shadow: 0 -6px 16px rgba(0, 0, 0, 0.04);
+
+  @media (max-width: 768px) {
+    left: 0;
+    right: 0;
+    transform: none;
+    max-width: none;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    bottom: calc(64px + env(safe-area-inset-bottom));
+  }
 `;
 
 const ComposerInner = styled.div`
@@ -75,7 +85,7 @@ const InputField = styled.input`
   border-radius: 12px;
   border: 1px solid #dfe3f3;
   padding: 12px 18px;
-  font-size: 14px;
+  font-size: 16px;
   background: #fff;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
   outline: none;
@@ -87,6 +97,10 @@ const InputField = styled.input`
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 16px;
   }
 `;
 

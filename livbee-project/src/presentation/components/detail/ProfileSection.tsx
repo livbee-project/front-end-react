@@ -153,7 +153,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       <ProfileHeader>
         <ProfileImageContainer $hasClick={!!onImageClick} onClick={onImageClick}>
           {profileImageUrl ? (
-            <ProfileImage src={profileImageUrl} alt={name} />
+            <ProfileImage src={profileImageUrl} alt={name} loading="lazy" decoding="async" />
           ) : (
             <PlaceholderImage size={40} />
           )}

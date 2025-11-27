@@ -202,7 +202,6 @@ const ModelsPage: React.FC = () => {
               key={model.id}
               id={model.id}
               nickname={model.nickname || ''}
-              oneLineIntro={model.oneLineIntro || ''}
               mainThumbnailUrl={model.mainThumbnailUrl || ''}
               height={model.height || 0}
               concept={model.concept || null}

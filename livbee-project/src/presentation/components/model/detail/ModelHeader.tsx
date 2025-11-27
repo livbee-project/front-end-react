@@ -19,7 +19,7 @@ export const ModelHeader: React.FC<ModelHeaderProps> = ({ brandName, title, tags
       </BackButton>
 
       <HeaderImage>
-        {imageUrl && <HeaderImageContent src={imageUrl} alt={title} />}
+        {imageUrl && <HeaderImageContent src={imageUrl} alt={title} loading="eager" decoding="async" />}
       </HeaderImage>
 
       <HeaderInfo>

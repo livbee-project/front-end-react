@@ -5,6 +5,10 @@ export const PageContainer = styled.div`
   min-height: 100vh;
   background: #f4f5fb;
   padding-bottom: 80px;
+
+  @media (max-width: 600px) {
+    padding-bottom: calc(120px + env(safe-area-inset-bottom));
+  }
 `;
 
 export const HeaderSection = styled.div`
@@ -101,6 +105,14 @@ export const ModelsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 520px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 export const FloatingActionButton = styled.button`
@@ -126,6 +138,11 @@ export const FloatingActionButton = styled.button`
   &:hover {
     transform: scale(1.05);
     box-shadow: 0 6px 16px rgba(90, 100, 255, 0.5);
+  }
+
+  @media (max-width: 600px) {
+    right: 12px;
+    bottom: calc(96px + env(safe-area-inset-bottom));
   }
 `;
 

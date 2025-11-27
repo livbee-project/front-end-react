@@ -104,7 +104,6 @@ const CastingButton = styled(Button)`
 interface ModelCardProps {
   id: string;
   nickname: string;
-  oneLineIntro: string;
   mainThumbnailUrl: string;
   height: number;
   concept: string | null;
@@ -126,7 +125,7 @@ export const ModelCard: React.FC<ModelCardProps> = ({
   return (
     <ModelCardContainer onClick={() => onCardClick(id)}>
       <ModelImageContainer>
-        <ModelImage src={mainThumbnailUrl || ''} alt={nickname || '모델'} />
+        <ModelImage src={mainThumbnailUrl || ''} alt={nickname || '모델'} loading="lazy" decoding="async" />
         <HeartButton onClick={(e) => e.stopPropagation()}>
           <Heart size={18} fill="currentColor" />
         </HeartButton>

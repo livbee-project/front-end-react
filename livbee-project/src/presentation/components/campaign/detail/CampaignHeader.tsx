@@ -27,7 +27,7 @@ export const CampaignHeader: React.FC<CampaignHeaderProps> = ({
       </BackButton>
 
       <HeaderImage>
-        {imageUrl && <HeaderImageContent src={imageUrl} alt={title} />}
+        {imageUrl && <HeaderImageContent src={imageUrl} alt={title} loading="eager" decoding="async" />}
         {dDay && <DDayBadge>{dDay}</DDayBadge>}
       </HeaderImage>
 

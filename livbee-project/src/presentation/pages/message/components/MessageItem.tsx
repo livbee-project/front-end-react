@@ -38,7 +38,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
     <MessageItemWrapper>
       <MessageItemContent onClick={(e) => onMessageClick(room.roomId, e)}>
         <AvatarContainer>
-          <Avatar src={avatarUrl} alt={displayName} />
+          <Avatar src={avatarUrl} alt={displayName} loading="lazy" decoding="async" />
         </AvatarContainer>
         <MessageContent>
           <MessageHeader>
