@@ -17,11 +17,17 @@ const PaymentRequestCard: React.FC<PaymentRequestCardProps> = ({
   isMyMessage,
   onPaymentClick,
 }) => {
-  const campaignTitle = (messageMetadata.campaignTitle as string) || roomDetail?.room.campaign?.title || '정보 없음';
+  const getString = (value: unknown): string | undefined => (typeof value === 'string' ? value : undefined);
+  const getNumber = (value: unknown): number | undefined => (typeof value === 'number' ? value : undefined);
+
+  const campaignTitle =
+    getString(messageMetadata.campaignTitle) ||
+    roomDetail?.room.campaign?.title ||
+    '정보 없음';
   const brandName = roomDetail?.room.campaign?.brandName || '정보 없음';
-  const availableDate = messageMetadata.availableDate as string | null | undefined;
-  const availableTime = messageMetadata.availableTime as string | null | undefined;
-  const amount = messageMetadata.amount as number | undefined;
+  const availableDate = getString(messageMetadata.availableDate);
+  const availableTime = getString(messageMetadata.availableTime);
+  const amount = getNumber(messageMetadata.amount);
 
   return (
     <PaymentRequestCardWrapper $align={isMyMessage ? 'end' : 'start'}>

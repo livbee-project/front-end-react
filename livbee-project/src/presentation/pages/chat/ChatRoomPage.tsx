@@ -167,13 +167,6 @@ const ChatRoomPage: React.FC = () => {
     }
   }, [messages, autoScroll, scrollRef]);
 
-  const handleScroll = () => {
-    if (!scrollRef.current) return;
-    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-    const isBottom = scrollHeight - (scrollTop + clientHeight) < 60;
-    setAutoScroll(isBottom);
-  };
-
   const handleSocketEvent = useCallback(
     (event: { type: string; payload?: unknown }) => {
       debug('ChatRoomPage', '소켓 이벤트 수신:', event.type, event.payload);
@@ -293,7 +286,7 @@ const ChatRoomPage: React.FC = () => {
                     isPaymentRequest={isPaymentRequest}
                     isMyMessage={isMyMessage}
                     isSystem={isSystem}
-                    roomDetail={roomDetail}
+                    roomDetail={roomDetail ?? undefined}
                     isBrandUser={isBrandUser}
                     onApplicationAccept={(applicationId) => handleApplicationAction('accept', applicationId)}
                     onApplicationReject={(applicationId) => handleApplicationAction('reject', applicationId)}

@@ -7,25 +7,30 @@ import type { CampaignFormData } from '../types';
 export const validateCampaignForm = (
   formData: CampaignFormData
 ): { isValid: boolean; errorMessage?: string } => {
-  // 필수 필드 검사
-  const requiredFields = {
-    brandName: formData.brandName,
-    title: formData.title,
-    content: formData.content,
-    filmingDate: formData.filmingDate,
-    deadline: formData.deadline,
-  };
+  let errorMessage: string | undefined;
 
-  const requiredValidation = validateRequiredFields(requiredFields);
-  if (!requiredValidation.isValid) {
-    return { isValid: false, errorMessage: requiredValidation.errorMessage };
+  const requiredFields = [
+    { value: formData.brandName, message: '브랜드명을 입력해주세요.' },
+    { value: formData.title, message: '공고 제목을 입력해주세요.' },
+    { value: formData.content, message: '공고 내용을 입력해주세요.' },
+    { value: formData.filmingDate, message: '촬영 일정을 입력해주세요.' },
+    { value: formData.deadline, message: '마감일을 입력해주세요.' },
+  ];
+
+  const requiredValid = validateRequiredFields(requiredFields, (message) => {
+    errorMessage = message;
+  });
+
+  if (!requiredValid) {
+    return { isValid: false, errorMessage };
   }
 
-  // 시간 범위 검사
   if (formData.startTime && formData.endTime) {
-    const timeValidation = validateTimeRange(formData.startTime, formData.endTime);
-    if (!timeValidation.isValid) {
-      return { isValid: false, errorMessage: timeValidation.errorMessage };
+    const timeValid = validateTimeRange(formData.startTime, formData.endTime, (message) => {
+      errorMessage = message;
+    });
+    if (!timeValid) {
+      return { isValid: false, errorMessage };
     }
   }
 

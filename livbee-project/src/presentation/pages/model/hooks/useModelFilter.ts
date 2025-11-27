@@ -1,47 +1,45 @@
 import { useState, useMemo } from 'react';
 
-interface Model {
+interface FilterableModel {
   id: string;
-  nickname?: string;
-  oneLineIntro?: string;
+  nickname?: string | null;
+  oneLineIntro?: string | null;
   concept?: string | null;
-  categories?: string[];
+  categories?: string[] | null;
 }
 
-interface UseModelFilterOptions {
-  models: Model[];
+interface UseModelFilterOptions<T extends FilterableModel> {
+  models: T[];
   filters: string[];
   initialFilter?: string;
 }
 
-export const useModelFilter = ({ models, filters, initialFilter = '전체' }: UseModelFilterOptions) => {
+export const useModelFilter = <T extends FilterableModel>({
+  models,
+  filters,
+  initialFilter = '전체',
+}: UseModelFilterOptions<T>) => {
   const [selectedFilter, setSelectedFilter] = useState<string>(initialFilter);
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredModels = useMemo(() => {
     return models.filter((model) => {
-      // 필터링
       if (selectedFilter !== '전체') {
-        // concept가 없으면 필터링에서 제외 (모든 필터에 표시)
-        if (!model.concept) {
-          return true;
-        }
-        if (model.concept !== selectedFilter) {
+        if (model.concept && model.concept !== selectedFilter) {
           return false;
         }
       }
-      
-      // 검색
-      if (searchQuery && model.nickname && model.oneLineIntro) {
+
+      if (searchQuery) {
+        const nickname = (model.nickname ?? '').toLowerCase();
+        const intro = (model.oneLineIntro ?? '').toLowerCase();
         const query = searchQuery.toLowerCase();
-        if (
-          !model.nickname.toLowerCase().includes(query) &&
-          !model.oneLineIntro.toLowerCase().includes(query)
-        ) {
+
+        if (!nickname.includes(query) && !intro.includes(query)) {
           return false;
         }
       }
-      
+
       return true;
     });
   }, [models, selectedFilter, searchQuery]);

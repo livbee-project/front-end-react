@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useListData } from './useListData';
 
-interface UseListFetcherOptions<Q, R extends Record<string, unknown>> {
+interface UseListFetcherOptions<Q, R extends object> {
   repository: R;
   method: keyof R;
   query: Q;
@@ -17,7 +17,7 @@ interface UseListFetcherOptions<Q, R extends Record<string, unknown>> {
 export function useListFetcher<
   T,
   Q,
-  R extends Record<string, unknown>,
+  R extends object,
   Response extends { items: T[]; currentPage?: number; totalPages?: number }
 >({
   repository,

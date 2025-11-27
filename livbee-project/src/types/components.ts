@@ -85,7 +85,9 @@ export interface BaseInputProps {
   onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
 }
 
-export interface SelectInputProps extends BaseInputProps {
+export interface SelectInputProps
+  extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'value' | 'onChange'>,
+    BaseInputProps {
   options: { value: string; label: string }[];
 }
 

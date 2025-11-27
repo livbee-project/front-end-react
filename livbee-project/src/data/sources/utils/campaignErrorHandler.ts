@@ -3,6 +3,8 @@
  */
 
 import type { CampaignApiErrorResponse } from '@/domain/entities/Campaign';
+import type { ApiResponse } from '@/shared/utils/apiResponseHandler';
+import type { FastApiErrorResponse } from '@/shared/types/api';
 import { extractErrorMessage } from '@/shared/utils/apiResponseHandler';
 
 /**
@@ -25,7 +27,7 @@ export const handleCampaignApiError = (
     return new Error(errorMessages);
   }
 
-  const errorMessage = extractErrorMessage(result);
+  const errorMessage = extractErrorMessage(result as FastApiErrorResponse | ApiResponse<unknown>);
   return new Error(errorMessage || '모집 공고 등록에 실패했습니다.');
 };
 

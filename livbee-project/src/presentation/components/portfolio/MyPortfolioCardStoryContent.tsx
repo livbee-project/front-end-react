@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { MouseEvent } from 'react';
+import React, { type MouseEvent } from 'react';
 import { MyPortfolioCard } from './MyPortfolioCard';
 import type { MyPortfolioItem } from '@/types/portfolio';
 import styled from 'styled-components';
@@ -24,16 +24,13 @@ const commonHandlers = {
     event.stopPropagation();
     alert('핀 버튼을 클릭했습니다.');
   },
-  onDefaultClick: (event: MouseEvent) => {
-    event.stopPropagation();
+  onDefaultClick: () => {
     alert('기본 설정 버튼을 클릭했습니다.');
   },
-  onEditClick: (event: MouseEvent) => {
-    event.stopPropagation();
+  onEditClick: () => {
     alert('편집 버튼을 클릭했습니다.');
   },
-  onDeleteClick: (event: MouseEvent) => {
-    event.stopPropagation();
+  onDeleteClick: () => {
     alert('삭제 버튼을 클릭했습니다.');
   },
 };
@@ -97,16 +94,13 @@ export const MyPortfolioShowcase: React.FC = () => {
             event.stopPropagation();
             alert(`${item.title} 즐겨찾기 클릭`);
           }}
-          onDefaultClick={(event) => {
-            event.stopPropagation();
+          onDefaultClick={() => {
             alert(`${item.title} 기본 설정 클릭`);
           }}
-          onEditClick={(event) => {
-            event.stopPropagation();
+          onEditClick={() => {
             alert(`${item.title} 편집 클릭`);
           }}
-          onDeleteClick={(event) => {
-            event.stopPropagation();
+          onDeleteClick={() => {
             alert(`${item.title} 삭제 클릭`);
           }}
         />

@@ -55,7 +55,7 @@ const MessagesPage: React.FC = () => {
       </PageContainer>
       {showDeleteDialog && (
         <DeleteRoomDialog
-          roomName={deletingRoomName}
+          roomName={deletingRoomName ?? ''}
           onConfirm={confirmDelete}
           onCancel={cancelDelete}
         />

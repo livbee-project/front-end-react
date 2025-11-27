@@ -76,17 +76,29 @@ export const formatDateLabel = (iso: string): string => {
 /**
  * 메시지 페이로드에서 지원서 데이터 정규화
  */
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
+const getString = (obj: Record<string, unknown>, key: string): string | undefined => {
+  const value = obj[key];
+  return typeof value === 'string' ? value : undefined;
+};
+
+const getNestedRecord = (obj: Record<string, unknown>, key: string): Record<string, unknown> | undefined => {
+  const value = obj[key];
+  return isRecord(value) ? (value as Record<string, unknown>) : undefined;
+};
+
 export const normalizeApplicationPayload = (
   payload: Record<string, unknown> | null | undefined
 ): ApplicationCardData | null => {
-  if (!payload || typeof payload !== 'object') {
+  if (!payload || !isRecord(payload)) {
     return null;
   }
 
-  const source = (payload.application && typeof payload.application === 'object') 
-    ? payload.application 
-    : payload;
-  const type = (payload.type ?? source.type ?? payload.kind ?? source.kind) as string | undefined;
+  const sourceRecord = getNestedRecord(payload, 'application') ?? payload;
+  const type =
+    getString(payload, 'type') ?? getString(sourceRecord, 'type') ?? getString(payload, 'kind') ?? getString(sourceRecord, 'kind');
   
   // 결제 요청 메시지는 지원서 카드로 처리하지 않음
   if (type === 'payment_request') {
@@ -97,20 +109,32 @@ export const normalizeApplicationPayload = (
 
   const hasExplicitType = type ? allowedTypes.includes(type) : false;
   const hasEssentialField =
-    Boolean(source.campaignTitle || source.portfolioTitle || source.availableDate || source.availableTime || source.message);
+    Boolean(
+      getString(sourceRecord, 'campaignTitle') ||
+        getString(sourceRecord, 'portfolioTitle') ||
+        getString(sourceRecord, 'availableDate') ||
+        getString(sourceRecord, 'availableTime') ||
+        getString(sourceRecord, 'message')
+    );
 
   if (!hasExplicitType && !hasEssentialField) {
     return null;
   }
 
   return {
-    applicationId: source.applicationId || source.id,
-    campaignTitle: source.campaignTitle || source.campaign?.title || source.campaignName,
-    portfolioTitle: source.portfolioTitle || source.portfolio?.title || source.portfolioName,
-    availableDate: source.availableDate || source.available_date,
-    availableTime: source.availableTime || source.available_time,
-    message: source.message || source.comment,
-    status: source.status,
+    applicationId: getString(sourceRecord, 'applicationId') || getString(sourceRecord, 'id'),
+    campaignTitle:
+      getString(sourceRecord, 'campaignTitle') ||
+      getString(getNestedRecord(sourceRecord, 'campaign') ?? {}, 'title') ||
+      getString(sourceRecord, 'campaignName'),
+    portfolioTitle:
+      getString(sourceRecord, 'portfolioTitle') ||
+      getString(getNestedRecord(sourceRecord, 'portfolio') ?? {}, 'title') ||
+      getString(sourceRecord, 'portfolioName'),
+    availableDate: getString(sourceRecord, 'availableDate') || getString(sourceRecord, 'available_date'),
+    availableTime: getString(sourceRecord, 'availableTime') || getString(sourceRecord, 'available_time'),
+    message: getString(sourceRecord, 'message') || getString(sourceRecord, 'comment'),
+    status: getString(sourceRecord, 'status'),
   };
 };
 
@@ -123,11 +147,11 @@ export const extractApplicationData = (
 ): ApplicationCardData | null => {
   const candidates: Array<Record<string, unknown>> = [];
 
-  if (message.metadata && typeof message.metadata === 'object') {
-    candidates.push(message.metadata as Record<string, unknown>);
-    const metaApplication = (message.metadata as Record<string, unknown>).application;
-    if (metaApplication && typeof metaApplication === 'object') {
-      candidates.push(metaApplication as Record<string, unknown>);
+  if (isRecord(message.metadata)) {
+    candidates.push(message.metadata);
+    const metaApplication = getNestedRecord(message.metadata, 'application');
+    if (metaApplication) {
+      candidates.push(metaApplication);
     }
   }
 
@@ -136,7 +160,7 @@ export const extractApplicationData = (
     if (trimmed.startsWith('{')) {
       try {
         const parsed = JSON.parse(trimmed);
-        if (parsed && typeof parsed === 'object') {
+        if (isRecord(parsed)) {
           candidates.push(parsed);
         }
       } catch {

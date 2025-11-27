@@ -133,9 +133,14 @@ export const useCampaignApplyForm = ({
       const response = await campaignRepository.applyToCampaign(requestPayload);
       debug('CampaignApplyModal', '지원 응답:', response);
 
-      const snakeCaseResponse = response as SnakeCaseResponse & { chatRoomId?: string; roomId?: string };
+      const snakeCaseResponse = (response as unknown) as Partial<
+        SnakeCaseResponse & { chat_room_id?: string; room_id?: string; chatRoomId?: string; roomId?: string }
+      >;
       const chatRoomId =
-        response.chatRoomId || snakeCaseResponse.chat_room_id || snakeCaseResponse.room_id || snakeCaseResponse.roomId;
+        response.chatRoomId ||
+        snakeCaseResponse.chat_room_id ||
+        snakeCaseResponse.room_id ||
+        snakeCaseResponse.roomId;
 
       debug('CampaignApplyModal', 'chatRoomId:', chatRoomId);
 

@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { MouseEvent } from 'react';
+import React, { type MouseEvent } from 'react';
 import styled from 'styled-components';
 import { PortfolioCard } from './PortfolioCard';
 import type { Portfolio } from '@/domain/entities/Portfolio';

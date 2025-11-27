@@ -7,16 +7,6 @@
 const isDevelopment = import.meta.env.DEV;
 
 /**
- * 로그 레벨
- */
-export enum LogLevel {
-  DEBUG = 'debug',
-  INFO = 'info',
-  WARN = 'warn',
-  ERROR = 'error',
-}
-
-/**
  * 로그 메시지 포맷터
  */
 const formatMessage = (prefix: string, ...args: unknown[]): unknown[] => {

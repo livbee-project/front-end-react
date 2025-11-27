@@ -4,7 +4,7 @@
  */
 
 import type { SnakeCaseResponse, NestedDataResponse } from '@/shared/types/api';
-import { extractData } from './apiResponseHandler';
+import { extractData, type ApiResponse } from './apiResponseHandler';
 
 /**
  * ApplicationActionResponse 정규화
@@ -28,16 +28,20 @@ export const normalizeApplicationActionResponse = (
   fallbackApplicationId: string,
   fallbackAction: 'accept' | 'reject'
 ): ApplicationActionResponse => {
-  const data = extractData<ApplicationActionResponse | SnakeCaseResponse>(result);
+  const response = result as ApiResponse<ApplicationActionResponse | SnakeCaseResponse>;
+  const data = extractData<ApplicationActionResponse | SnakeCaseResponse>(response);
   
   if (data) {
     const snakeCaseData = data as SnakeCaseResponse;
     const camelCaseData = data as ApplicationActionResponse;
+    const paymentRequest =
+      (camelCaseData.paymentRequest ??
+        snakeCaseData.payment_request) as ApplicationActionResponse['paymentRequest'];
     
     return {
       applicationId: camelCaseData.applicationId || fallbackApplicationId,
       status: camelCaseData.status || (fallbackAction === 'accept' ? 'accepted' : 'rejected'),
-      paymentRequest: camelCaseData.paymentRequest || snakeCaseData.payment_request,
+      paymentRequest,
     };
   }
 
@@ -49,15 +53,18 @@ export const normalizeApplicationActionResponse = (
   const nestedData = (fallbackResult.data && typeof fallbackResult.data === 'object') 
     ? (fallbackResult.data as ApplicationActionResponse | SnakeCaseResponse)
     : null;
+
+  const fallbackPaymentRequest =
+    (nestedData && 'paymentRequest' in nestedData
+      ? (nestedData as ApplicationActionResponse).paymentRequest
+      : nestedData && 'payment_request' in nestedData
+        ? (nestedData as SnakeCaseResponse).payment_request
+        : (fallbackResult.paymentRequest ?? fallbackResult.payment_request)) as ApplicationActionResponse['paymentRequest'];
   
   return {
     applicationId: fallbackApplicationId,
     status: fallbackAction === 'accept' ? 'accepted' : 'rejected',
-    paymentRequest: (nestedData && 'paymentRequest' in nestedData) 
-      ? nestedData.paymentRequest 
-      : (nestedData && 'payment_request' in nestedData)
-        ? nestedData.payment_request
-        : (fallbackResult.paymentRequest || fallbackResult.payment_request),
+    paymentRequest: fallbackPaymentRequest,
   };
 };
 
@@ -67,7 +74,8 @@ export const normalizeApplicationActionResponse = (
 export const normalizeCampaignApplyResponse = (
   result: unknown
 ): NormalizedCampaignApplyResponse => {
-  const data = extractData<NormalizedCampaignApplyResponse | SnakeCaseResponse>(result);
+  const response = result as ApiResponse<NormalizedCampaignApplyResponse | SnakeCaseResponse>;
+  const data = extractData<NormalizedCampaignApplyResponse | SnakeCaseResponse>(response);
   
   if (data) {
     const snakeCaseData = data as SnakeCaseResponse;

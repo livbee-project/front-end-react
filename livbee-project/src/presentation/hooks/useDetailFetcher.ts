@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useDetailData } from './useDetailData';
 import { useToast } from '@/presentation/contexts/ToastContext';
 
-interface UseDetailFetcherOptions<R extends Record<string, unknown>> {
+interface UseDetailFetcherOptions<R extends object> {
   repository: R;
   method: keyof R;
   id: string | undefined;
@@ -14,7 +14,7 @@ interface UseDetailFetcherOptions<R extends Record<string, unknown>> {
 /**
  * Repository 메서드를 이용해 상세 데이터를 조회하는 공통 훅
  */
-export function useDetailFetcher<T, R extends Record<string, unknown>>({
+export function useDetailFetcher<T, R extends object>({
   repository,
   method,
   id,

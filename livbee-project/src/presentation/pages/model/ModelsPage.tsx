@@ -24,21 +24,16 @@ import { ModelCard } from './components/ModelCard';
 import { useModelFilter } from './hooks/useModelFilter';
 
 // 하드코딩된 모델 데이터 (백엔드 데이터가 없을 때 사용)
-const mockModels: Array<{
-  id: string;
-  nickname: string;
-  oneLineIntro: string;
-  mainThumbnailUrl: string;
-  height: number;
-  concept: string;
-  categories: string[];
-}> = [
+const mockModels: Model[] = [
   {
     id: '1',
     nickname: '한지우',
     oneLineIntro: '청순하고 자연스러운 이미지의 모델',
     mainThumbnailUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+    experienceYears: 3,
+    detailedRegion: '서울',
     height: 168,
+    gender: null,
     concept: '청순/내추럴',
     categories: ['패션', '뷰티'],
   },
@@ -47,7 +42,10 @@ const mockModels: Array<{
     nickname: '강민서',
     oneLineIntro: '시크하고 모던한 스타일의 모델',
     mainThumbnailUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
+    experienceYears: 4,
+    detailedRegion: '서울',
     height: 172,
+    gender: null,
     concept: '시크/모던',
     categories: ['패션'],
   },
@@ -56,7 +54,10 @@ const mockModels: Array<{
     nickname: '최유정',
     oneLineIntro: '옷 잘입는 모델',
     mainThumbnailUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80',
+    experienceYears: 2,
+    detailedRegion: '부산',
     height: 170,
+    gender: null,
     concept: '엘레강스',
     categories: ['패션', '뷰티'],
   },
@@ -65,7 +66,10 @@ const mockModels: Array<{
     nickname: '이수아',
     oneLineIntro: '깔끔한 이미지의 모델',
     mainThumbnailUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=400&q=80',
+    experienceYears: 1,
+    detailedRegion: '서울',
     height: 165,
+    gender: null,
     concept: '청순/내추럴',
     categories: ['패션'],
   },
@@ -102,35 +106,33 @@ const ModelsPage: React.FC = () => {
     showEmptyState: false,
   });
 
-  const modelsList = useMemo(() => {
+  const modelsList = useMemo<Model[]>(() => {
     if (models && Array.isArray(models) && models.length > 0) {
       return models;
     }
     return mockModels;
   }, [models]);
 
-  const displayModels = useMemo(() => {
-    return modelsList.map((model) => {
-      if ('height' in model && typeof model.height === 'number') {
-        return {
-          ...model,
-          concept: model.concept || null,
-          categories: Array.isArray(model.categories) ? model.categories : [],
-        };
-      }
-      return {
-        id: model.id,
-        nickname: model.nickname || '',
-        oneLineIntro: model.oneLineIntro || '',
-        mainThumbnailUrl: model.mainThumbnailUrl || '',
-        height: 'height' in model && typeof model.height === 'number' ? model.height : 0,
-        concept: 'concept' in model && typeof model.concept === 'string' ? model.concept : null,
-        categories: 'categories' in model && Array.isArray(model.categories) ? model.categories : [],
-      };
-    });
+  const displayModels = useMemo<Model[]>(() => {
+    return modelsList.map((model) => ({
+      id: model.id,
+      nickname: model.nickname ?? null,
+      oneLineIntro: model.oneLineIntro ?? null,
+      mainThumbnailUrl: model.mainThumbnailUrl ?? null,
+      experienceYears: model.experienceYears ?? null,
+      detailedRegion: model.detailedRegion ?? null,
+      height: model.height ?? null,
+      gender: model.gender ?? null,
+      concept: model.concept ?? null,
+      categories: Array.isArray(model.categories)
+        ? model.categories
+        : model.categories
+          ? [model.categories as string]
+          : [],
+    }));
   }, [modelsList]);
 
-  const { selectedFilter, setSelectedFilter, searchQuery, setSearchQuery, filteredModels } = useModelFilter({
+  const { selectedFilter, setSelectedFilter, searchQuery, setSearchQuery, filteredModels } = useModelFilter<Model>({
     models: displayModels,
     filters,
   });

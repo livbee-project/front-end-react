@@ -8,66 +8,88 @@ import { error as logError } from '@/shared/utils/logger';
 /**
  * roomId 필드명 오타를 포함할 수 있는 Room 객체 타입
  */
-interface RoomWithTypo {
-  roomId?: string;
-  roomld?: string;
-  room_id?: string;
-  [key: string]: unknown;
-}
+type RoomWithTypo =
+  | (ChatRoomSummary & {
+      roomld?: string;
+      room_id?: string;
+    })
+  | ({
+      roomId?: string;
+      roomld?: string;
+      room_id?: string;
+      [key: string]: unknown;
+    } & Partial<ChatRoomSummary>);
 
 /**
  * Room 객체의 필드명을 정규화 (roomld 오타 대비)
  */
 export const normalizeRoom = (room: RoomWithTypo): ChatRoomSummary => {
-  // roomId가 이미 있으면 그대로 사용, 없으면 fallback 처리 (roomld 오타 대비)
-  if (!room.roomId && (room.roomld || room.room_id)) {
-    return {
-      ...room,
-      roomId: room.roomld || room.room_id || '',
-    } as ChatRoomSummary;
+  const candidate = room as RoomWithTypo & {
+    roomId?: string;
+    roomld?: string;
+    room_id?: string;
+  };
+
+  if (!candidate.roomId) {
+    const fallbackId = candidate.roomld || candidate.room_id;
+    if (fallbackId) {
+      return {
+        ...(candidate as Record<string, unknown>),
+        roomId: fallbackId,
+      } as ChatRoomSummary;
+    }
   }
-  
-  // roomId가 정상적으로 있으면 그대로 반환
-  return room as ChatRoomSummary;
+
+  return candidate as ChatRoomSummary;
 };
 
 /**
  * RawRoomsResponse 타입
  */
 type RawRoomsResponse =
-  | ChatRoomSummary[]
+  | RoomWithTypo[]
   | {
-      rooms?: ChatRoomSummary[];
-      items?: ChatRoomSummary[];
-      list?: ChatRoomSummary[];
-      data?: ChatRoomSummary[] | { rooms?: ChatRoomSummary[]; items?: ChatRoomSummary[]; list?: ChatRoomSummary[] };
+      rooms?: RoomWithTypo[];
+      items?: RoomWithTypo[];
+      list?: RoomWithTypo[];
+      data?: RoomWithTypo[] | { rooms?: RoomWithTypo[]; items?: RoomWithTypo[]; list?: RoomWithTypo[] };
     };
 
 /**
  * 다양한 형식의 응답에서 채팅방 목록 추출
  */
 export const extractRooms = (payload: RawRoomsResponse): ChatRoomSummary[] => {
-  let rooms: RoomWithTypo[] = [];
-  
-  if (Array.isArray(payload)) {
-    rooms = payload;
-  } else if (Array.isArray(payload.rooms)) {
-    rooms = payload.rooms;
-  } else if (Array.isArray(payload.items)) {
-    rooms = payload.items;
-  } else if (Array.isArray(payload.list)) {
-    rooms = payload.list;
-  } else if (payload.data) {
-    if (Array.isArray(payload.data)) {
-      rooms = payload.data;
-    } else if (Array.isArray(payload.data.rooms)) {
-      rooms = payload.data.rooms;
-    } else if (Array.isArray(payload.data.items)) {
-      rooms = payload.data.items;
-    } else if (Array.isArray(payload.data.list)) {
-      rooms = payload.data.list;
+  const collectRooms = (): RoomWithTypo[] => {
+    if (Array.isArray(payload)) {
+      return payload;
     }
-  }
+    if (Array.isArray(payload.rooms)) {
+      return payload.rooms;
+    }
+    if (Array.isArray(payload.items)) {
+      return payload.items;
+    }
+    if (Array.isArray(payload.list)) {
+      return payload.list;
+    }
+    if (payload.data) {
+      if (Array.isArray(payload.data)) {
+        return payload.data;
+      }
+      if (Array.isArray(payload.data.rooms)) {
+        return payload.data.rooms;
+      }
+      if (Array.isArray(payload.data.items)) {
+        return payload.data.items;
+      }
+      if (Array.isArray(payload.data.list)) {
+        return payload.data.list;
+      }
+    }
+    return [];
+  };
+  
+  const rooms = collectRooms();
 
   // 각 room 객체의 필드명 정규화
   return rooms.map(normalizeRoom);

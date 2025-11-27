@@ -4,7 +4,7 @@ import { ChevronLeft } from 'lucide-react';
 import type { ChatUserInfo } from '@/domain/entities/Chat';
 
 interface ContactHeaderProps {
-  counterpart?: ChatUserInfo;
+  counterpart?: ChatUserInfo | null;
   displayName: string;
   displayRole: string;
   onBack: () => void;
