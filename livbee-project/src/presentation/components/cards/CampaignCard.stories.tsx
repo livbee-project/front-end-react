@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { action } from '@storybook/addon-actions';
 import { CampaignCard } from '@/presentation/components/campaign/CampaignCard';
 import {
   CampaignCardExamples,
@@ -12,8 +11,8 @@ const meta: Meta<typeof CampaignCard> = {
   title: 'Cards/CampaignCard',
   component: CampaignCard,
   args: {
-    onCardClick: action('cardClick'),
-    onScrapClick: action('scrapClick'),
+    onCardClick: () => {},
+    onScrapClick: () => {},
   },
   parameters: {
     layout: 'padded',
