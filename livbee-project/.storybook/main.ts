@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const config: StorybookConfig = {
   "stories": [
     // Overview를 먼저 로드하여 기본 진입 페이지로 설정
-    "../src/stories/Overview.stories.tsx",
+    "../src/presentation/stories/Overview.stories.tsx",
     "../src/**/*.mdx",
     "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"
   ],
