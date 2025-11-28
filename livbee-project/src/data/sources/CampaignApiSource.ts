@@ -15,7 +15,7 @@ import { ApiError, fetchApi } from '@/shared/utils/apiClient';
 import { extractErrorMessage, isSuccessResponse } from '@/shared/utils/apiResponseHandler';
 import { debug } from '@/shared/utils/logger';
 import { normalizeCampaignApplyResponse, normalizeApplicationActionResponse } from '@/shared/utils/apiNormalizer';
-import { transformCampaignDetailResponse } from './utils/campaignResponseTransformer';
+import { transformCampaignDetailResponse } from '@/data/mappers/CampaignMapper';
 
 /**
  * 캠페인 API 소스

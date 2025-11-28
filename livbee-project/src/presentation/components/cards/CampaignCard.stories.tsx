@@ -1,14 +1,20 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import CampaignCard from './CampaignCard';
+import { action } from '@storybook/addon-actions';
+import { CampaignCard } from '@/presentation/components/campaign/CampaignCard';
 import {
   CampaignCardExamples,
   CampaignCardListExample,
   CampaignCardLongText,
 } from './CampaignCardStoryContent';
+import { createMockCampaign } from '@/presentation/stories/mocks/campaign';
 
 const meta: Meta<typeof CampaignCard> = {
   title: 'Cards/CampaignCard',
   component: CampaignCard,
+  args: {
+    onCardClick: action('cardClick'),
+    onScrapClick: action('scrapClick'),
+  },
   parameters: {
     layout: 'padded',
     docs: {
@@ -19,21 +25,15 @@ const meta: Meta<typeof CampaignCard> = {
   },
   tags: ['autodocs'],
   argTypes: {
-    brandName: {
-      control: 'text',
-      description: '브랜드명 (파란색 텍스트)',
+    campaign: {
+      control: false,
+      table: {
+        disable: true,
+      },
     },
-    title: {
-      control: 'text',
-      description: '공고 제목',
-    },
-    content: {
-      control: 'text',
-      description: '공고 내용',
-    },
-    onPress: {
-      action: 'clicked',
-      description: '카드 클릭 시 실행될 함수',
+    isScrapped: {
+      control: 'boolean',
+      description: '스크랩 상태',
     },
   },
 };
@@ -44,9 +44,12 @@ type Story = StoryObj<typeof CampaignCard>;
 // ===== 기본 카드 =====
 export const Default: Story = {
   args: {
-    brandName: '브랜드명',
-    title: '공고 제목',
-    content: '공고 내용이 여기에 표시됩니다.',
+    campaign: createMockCampaign({
+      brandName: '브랜드명',
+      title: '공고 제목',
+      content: '공고 내용이 여기에 표시됩니다.',
+    }),
+    isScrapped: false,
   },
 };
 

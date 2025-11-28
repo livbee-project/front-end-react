@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import ListPageLayout from './ListPageLayout';
-import CampaignCard from '@/presentation/components/cards/CampaignCard';
+import { CampaignCard } from '@/presentation/components/campaign/CampaignCard';
 import Pagination from '@/presentation/components/list/Pagination';
+import { createMockCampaign } from '@/presentation/stories/mocks/campaign';
 
 export const ListContentWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <ListContent>{children}</ListContent>
@@ -19,21 +20,36 @@ export const CampaignPageDemo: React.FC = () => {
       onSearch={(query) => alert(`검색: ${query}`)}
     >
       <ListContent>
-        <CampaignCard
-          brandName="패션 브랜드"
-          title="2024 봄/여름 컬렉션 모델 모집"
-          content="패션 쇼와 광고 촬영에 참여할 모델을 모집합니다."
-        />
-        <CampaignCard
-          brandName="뷰티 브랜드"
-          title="화장품 광고 모델 모집"
-          content="신제품 런칭 광고에 출연할 모델을 찾고 있습니다."
-        />
-        <CampaignCard
-          brandName="라이프스타일 브랜드"
-          title="인플루언서 협업 모집"
-          content="제품 리뷰 및 콘텐츠 제작에 참여할 인플루언서를 모집합니다."
-        />
+        {[
+          createMockCampaign({
+            id: 'cmp-demo-1',
+            brandName: '패션 브랜드',
+            title: '2024 봄/여름 컬렉션 모델 모집',
+            content: '패션 쇼와 광고 촬영에 참여할 모델을 모집합니다.',
+          }),
+          createMockCampaign({
+            id: 'cmp-demo-2',
+            brandName: '뷰티 브랜드',
+            title: '화장품 광고 모델 모집',
+            content: '신제품 런칭 광고에 출연할 모델을 찾고 있습니다.',
+            category: '뷰티',
+          }),
+          createMockCampaign({
+            id: 'cmp-demo-3',
+            brandName: '라이프스타일 브랜드',
+            title: '인플루언서 협업 모집',
+            content: '제품 리뷰 및 콘텐츠 제작에 참여할 인플루언서를 모집합니다.',
+            category: '생활/리빙',
+          }),
+        ].map((campaign, index) => (
+          <CampaignCard
+            key={campaign.id}
+            campaign={campaign}
+            isScrapped={index === 1}
+            onCardClick={() => {}}
+            onScrapClick={(event) => event.stopPropagation()}
+          />
+        ))}
       </ListContent>
       <Pagination currentPage={page} totalPages={5} onPageChange={setPage} />
     </ListPageLayout>

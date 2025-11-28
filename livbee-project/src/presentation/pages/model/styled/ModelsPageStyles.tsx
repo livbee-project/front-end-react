@@ -105,14 +105,6 @@ export const ModelsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  @media (max-width: 520px) {
-    grid-template-columns: 1fr;
-  }
 `;
 
 export const FloatingActionButton = styled.button`

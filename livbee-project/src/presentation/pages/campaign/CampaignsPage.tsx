@@ -9,7 +9,9 @@ import { useListFetcher } from '@/presentation/hooks/useListFetcher';
 import { useListFilters } from '@/presentation/hooks/useListFilters';
 import { useListSearch } from '@/presentation/hooks/useListSearch';
 import { useScrapToggle } from '@/presentation/hooks/useScrapToggle';
-import { CampaignHeader } from '@/presentation/components/campaign/CampaignHeader';
+import { useAuth } from '@/presentation/hooks/useAuth';
+import { useToast } from '@/presentation/contexts/ToastContext';
+import { CampaignListHeader } from '@/presentation/components/campaign/CampaignListHeader';
 import { CampaignSearchSection } from '@/presentation/components/campaign/CampaignSearchSection';
 import { CampaignFilterRow } from '@/presentation/components/campaign/CampaignFilterRow';
 import { CampaignListContent } from '@/presentation/components/campaign/CampaignListContent';
@@ -18,6 +20,8 @@ type FilterValue = '전체' | Campaign['category'];
 
 const CampaignsPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { showToast } = useToast();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { searchInputValue, setSearchInputValue, searchQuery, handleSearchSubmit, clearSearch } = useListSearch();
   const { activeFilter, setActiveFilter } = useListFilters<FilterValue>('전체');
@@ -90,7 +94,7 @@ const CampaignsPage: React.FC = () => {
   return (
     <PageWrapper>
       <PageInner>
-        <CampaignHeader
+        <CampaignListHeader
           title="진행중인 캠페인"
           description="브랜드가 찾고 있는 쇼호스트에 지원해보세요"
           highlightText="캠페인"
@@ -119,7 +123,18 @@ const CampaignsPage: React.FC = () => {
         />
       </PageInner>
 
-      <RegisterFab type="button" onClick={() => navigate('/campaigns/register')} aria-label="모집공고 등록">
+      <RegisterFab
+        type="button"
+        onClick={() => {
+          if (user?.role !== 'brand') {
+            showToast('브랜드 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
+            navigate('/', { replace: true });
+            return;
+          }
+          navigate('/campaigns/register');
+        }}
+        aria-label="모집공고 등록"
+      >
         <Plus size={24} strokeWidth={2.5} />
       </RegisterFab>
     </PageWrapper>

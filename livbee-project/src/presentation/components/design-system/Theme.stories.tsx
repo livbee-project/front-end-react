@@ -1,11 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import {
-  BreakpointSection,
-  ColorsSection,
-  RadiusSection,
-  SpacingSection,
-  TypographySection,
-} from './ThemeTokens';
+import { ColorsSection } from './sections/ColorsSection';
+import { SpacingSection } from './sections/SpacingSection';
+import { RadiusSection } from './sections/RadiusSection';
+import { TypographySection } from './sections/TypographySection';
+import { BreakpointSection } from './sections/BreakpointSection';
 
 const meta: Meta = {
   title: 'Design System/Theme',

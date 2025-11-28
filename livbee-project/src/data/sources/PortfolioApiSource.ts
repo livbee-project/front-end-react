@@ -8,8 +8,8 @@ import type {
 } from '@/domain/entities/Portfolio';
 import { buildApiUrl, getAuthHeaders } from '@/shared/config/apiConfig';
 import { ApiError, fetchApi } from '@/shared/utils/apiClient';
-import { transformPortfolioDetailResponse } from './utils/portfolioResponseTransformer';
-import { handleShowhostEntityError } from './utils/showhostEntityErrorHandler';
+import { transformPortfolioDetailResponse } from '@/data/mappers/PortfolioMapper';
+import { handleShowhostEntityError } from '@/data/errorHandlers/showhostEntityErrorHandler';
 
 /**
  * 포트폴리오 API 소스

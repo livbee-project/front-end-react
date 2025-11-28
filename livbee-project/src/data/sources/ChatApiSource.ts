@@ -10,7 +10,7 @@ import type {
   SendChatMessageResponse,
   ReadChatMessageRequest,
 } from '@/domain/entities/Chat';
-import { extractRooms, transformChatRoomDetailResponse, transformSendMessageResponse } from './utils/chatResponseTransformer';
+import { extractRooms, transformChatRoomDetailResponse, transformSendMessageResponse } from '@/data/mappers/ChatMapper';
 
 /**
  * RawRoomsResponse 타입 (extractRooms에서 사용)

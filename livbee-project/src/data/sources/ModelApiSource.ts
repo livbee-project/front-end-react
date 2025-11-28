@@ -8,8 +8,8 @@ import type {
 } from '@/domain/entities/Model';
 import { buildApiUrl, getAuthHeaders } from '@/shared/config/apiConfig';
 import { ApiError, fetchApi } from '@/shared/utils/apiClient';
-import { transformModelDetailResponse } from './utils/modelResponseTransformer';
-import { handleShowhostEntityError } from './utils/showhostEntityErrorHandler';
+import { transformModelDetailResponse } from '@/data/mappers/ModelMapper';
+import { handleShowhostEntityError } from '@/data/errorHandlers/showhostEntityErrorHandler';
 
 /**
  * 모델 API 소스

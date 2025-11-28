@@ -6,6 +6,8 @@ import type { Model } from '@/domain/entities/Model';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useListFetcher } from '@/presentation/hooks/useListFetcher';
 import { useListPageState } from '@/presentation/hooks/useListPageState';
+import { useAuth } from '@/presentation/hooks/useAuth';
+import { useToast } from '@/presentation/contexts/ToastContext';
 import {
   PageContainer,
   HeaderSection,
@@ -79,6 +81,8 @@ const filters = ['전체', '청순/내추럴', '시크/모던', '엘레강스'];
 
 const ModelsPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { showToast } = useToast();
   const modelRepository = useRepository(ModelRepository);
 
   // query 객체 메모이제이션
@@ -213,7 +217,16 @@ const ModelsPage: React.FC = () => {
         </ModelsGrid>
       </ContentSection>
 
-      <FloatingActionButton onClick={() => navigate('/models/register')}>
+      <FloatingActionButton
+        onClick={() => {
+          if (user?.role !== 'showhost') {
+            showToast('브랜드 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
+            navigate('/', { replace: true });
+            return;
+          }
+          navigate('/models/register');
+        }}
+      >
         +
       </FloatingActionButton>
     </PageContainer>

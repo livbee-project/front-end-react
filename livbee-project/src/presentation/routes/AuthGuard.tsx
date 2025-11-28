@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { useAuth } from '@/presentation/hooks/useAuth';
+import { useToast } from '@/presentation/contexts/ToastContext';
 import type { UserRole } from '@/domain/entities/User';
 import { setAuthRedirectPath } from '@/shared/utils/authRedirect';
 
@@ -22,6 +23,17 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 }) => {
   const location = useLocation();
   const { isLoggedIn, isLoading, user } = useAuth();
+  const { showToast } = useToast();
+
+  // Role mismatch 체크
+  const hasRoleMismatch = allowedRoles && allowedRoles.length > 0 && (!user || !allowedRoles.includes(user.role));
+
+  // Role mismatch 시 Toast 메시지 표시
+  useEffect(() => {
+    if (hasRoleMismatch) {
+      showToast('브랜드 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
+    }
+  }, [hasRoleMismatch, showToast]);
 
   if (isLoading) {
     return <LoadingState padding="32px" />;
@@ -37,10 +49,8 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
     return <Navigate to={redirectTo} replace />;
   }
 
-  if (allowedRoles && allowedRoles.length > 0) {
-    if (!user || !allowedRoles.includes(user.role)) {
-      return <Navigate to={redirectTo} replace />;
-    }
+  if (hasRoleMismatch) {
+    return <Navigate to="/" replace />;
   }
 
   return children;

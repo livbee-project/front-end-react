@@ -3,9 +3,9 @@ import { warn } from '@/shared/utils/logger';
 const IMAGE_STORAGE_KEY = 'model-register-images';
 
 interface StoredImageUrls {
-  mainThumbnail: string;
+  mainThumbnail: string | null;
   gallery: string[];
-  portfolio: string;
+  portfolio: string | null;
 }
 
 /**
@@ -13,7 +13,7 @@ interface StoredImageUrls {
  */
 export const getStoredImageUrls = (): StoredImageUrls => {
   if (typeof window === 'undefined') {
-    return { mainThumbnail: '', gallery: [], portfolio: '' };
+    return { mainThumbnail: null, gallery: [], portfolio: null };
   }
   try {
     const stored = sessionStorage.getItem(IMAGE_STORAGE_KEY);
@@ -23,7 +23,7 @@ export const getStoredImageUrls = (): StoredImageUrls => {
   } catch (error) {
     warn('modelImageStorage', 'Failed to restore image URLs from sessionStorage:', error);
   }
-  return { mainThumbnail: '', gallery: [], portfolio: '' };
+  return { mainThumbnail: null, gallery: [], portfolio: null };
 };
 
 /**

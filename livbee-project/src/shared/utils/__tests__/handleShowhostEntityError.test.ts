@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { handleShowhostEntityError } from '@/data/sources/utils/showhostEntityErrorHandler';
+import { handleShowhostEntityError } from '@/data/errorHandlers/showhostEntityErrorHandler';
 
 describe('handleShowhostEntityError', () => {
   it('returns auth message for 401 status', () => {

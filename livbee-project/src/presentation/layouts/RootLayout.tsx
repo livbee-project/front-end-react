@@ -15,9 +15,7 @@ const RootLayout: React.FC = () => {
           <Outlet />
           <AppFooter />
         </MainContent>
-        <Footer>
-          <BottomNavBar />
-        </Footer>
+        <BottomNavBar />
       </RootContainer>
     </ToastProvider>
   );
@@ -37,14 +35,8 @@ const MainContent = styled.main`
   padding-bottom: 32px;
 
   @media (max-width: 768px) {
-    padding-bottom: calc(120px + env(safe-area-inset-bottom));
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
   }
-`;
-
-const Footer = styled.footer`
-  flex-shrink: 0;
-  border-top: 1px solid ${({ theme }) => theme.colors.border};
-  background: ${({ theme }) => theme.colors.card};
 `;
 
 export default RootLayout;

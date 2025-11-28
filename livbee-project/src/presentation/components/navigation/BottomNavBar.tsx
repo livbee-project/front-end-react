@@ -93,12 +93,17 @@ const BottomNavBar: React.FC = () => {
 };
 
 const Nav = styled.nav`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background-color: ${({ theme }) => theme.colors.background};
   width: 100%;
   border-top: 1px solid ${({ theme }) => theme.colors.border};
   box-shadow: 0 -8px 22px rgba(0, 0, 0, 0.06);
   padding-bottom: env(safe-area-inset-bottom, 0);
   box-sizing: border-box;
+  z-index: 100;
 `;
 
 const Wrapper = styled.div`

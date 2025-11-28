@@ -156,11 +156,7 @@ const AppRouter = () => (
           <Route path={ROUTE_PATHS.modelDetail} element={<ModelDetailPage />} />
           <Route path={ROUTE_PATHS.portfolioDetail} element={<PortfolioDetailPage />} />
 
-          {/*
-            (참고) 3. TopNavLayout 밖에, RootLayout 안에
-            경로를 선언하면(예: /login), 상단 탭바는 없지만
-            하단 탭바는 있는 페이지를 만들 수 있습니다.
-          */}
+          {/* 로그인 페이지 - 하단 네비게이션 표시 */}
           <Route
             path={ROUTE_PATHS.login}
             element={
@@ -171,7 +167,7 @@ const AppRouter = () => (
           />
         </Route>
 
-        {/* 이미지 크롭 페이지 - 레이아웃 없이 전체 화면 */}
+        {/* 이미지 크롭 페이지 - 레이아웃 없이 전체 화면 (하단 네비게이션 없음) */}
         <Route
           path={ROUTE_PATHS.imageCrop}
           element={

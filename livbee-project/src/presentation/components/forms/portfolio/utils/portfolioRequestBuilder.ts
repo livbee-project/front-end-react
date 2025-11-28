@@ -12,7 +12,7 @@ export const buildPortfolioRequest = (
 ): CreatePortfolioRequest => {
   const websiteUrl = formData.websites[0]?.trim() || undefined;
   const instagramUrl = formData.websites[1]?.trim() || undefined;
-  const youtubeUrl = formData.websites[2]?.trim() || undefined;
+  const tiktokUrl = formData.websites[2]?.trim() || undefined;
 
   const trimmedRecentLive = formData.recentLiveLink.trim();
   const recentLives = trimmedRecentLive
@@ -33,7 +33,10 @@ export const buildPortfolioRequest = (
     subThumbnailUrls: uploadedGalleryUrls.length > 0 ? uploadedGalleryUrls : undefined,
     websiteUrl,
     instagramUrl,
-    youtubeUrl,
+    tiktokUrl,
+    contact: formData.contact.trim() || undefined,
+    openChat: formData.openChat.trim() || undefined,
+    registrationType: formData.registrationType.trim() || undefined,
     recentLives,
     attachedFileUrl: uploadedAttachedFileUrl,
     status: 'published',

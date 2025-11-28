@@ -71,8 +71,8 @@ const PortfolioRegisterPage: React.FC = () => {
             onToggleChange={(index) => handleToggleChange('websites', index)}
           />
           <PortfolioFilesSection
-            resumeFileInfo={resumeFileUrl}
-            portfolioFileInfo={portfolioFileUrl}
+            resumeFileInfo={resumeFileUrl || null}
+            portfolioFileInfo={portfolioFileUrl || null}
             onFileAdd={handlePortfolioFileAdd}
             onResumeRemove={handleResumeFileRemove}
             onPortfolioRemove={handlePortfolioFileRemove}

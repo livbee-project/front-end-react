@@ -7,7 +7,8 @@ import {
   ListContentWrapper,
   PortfolioPageDemo,
 } from './ListPageLayoutStoryContent';
-import CampaignCard from '@/presentation/components/cards/CampaignCard';
+import { CampaignCard } from '@/presentation/components/campaign/CampaignCard';
+import { createMockCampaign } from '@/presentation/stories/mocks/campaign';
 
 const meta: Meta<typeof ListPageLayout> = {
   title: 'Layouts/ListPageLayout',
@@ -55,9 +56,20 @@ export const Default: Story = {
     floatingActionButtonPath: '/campaigns/register',
     children: (
       <ListContentWrapper>
-        <CampaignCard brandName="브랜드 1" title="공고 제목 1" content="공고 내용 1" />
-        <CampaignCard brandName="브랜드 2" title="공고 제목 2" content="공고 내용 2" />
-        <CampaignCard brandName="브랜드 3" title="공고 제목 3" content="공고 내용 3" />
+        {[1, 2, 3].map((index) => (
+          <CampaignCard
+            key={index}
+            campaign={createMockCampaign({
+              id: `cmp-default-${index}`,
+              brandName: `브랜드 ${index}`,
+              title: `공고 제목 ${index}`,
+              content: `공고 내용 ${index}`,
+            })}
+            isScrapped={index === 2}
+            onCardClick={() => {}}
+            onScrapClick={(event) => event.stopPropagation()}
+          />
+        ))}
       </ListContentWrapper>
     ),
   },

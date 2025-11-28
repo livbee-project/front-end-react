@@ -23,7 +23,7 @@ import {
   CTAButton,
 } from '@/presentation/components/cards/HomeCardBody';
 import { calculateDDay } from '@/shared/utils/dateUtils';
-import CampaignApplyModal from '@/presentation/components/detail/CampaignApplyModal';
+import CampaignApplyModal from '@/presentation/components/campaign/detail/apply/CampaignApplyModal';
 
 const StyledBadge = styled(Badge)`
   position: absolute;

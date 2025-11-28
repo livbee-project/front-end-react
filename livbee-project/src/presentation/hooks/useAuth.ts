@@ -1,10 +1,13 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserRepository } from '@/data/repositories/UserRepository';
-import { setToken, removeToken, getToken } from '@/shared/utils/storage';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import type { LoginRequest, SignupRequest, User } from '@/domain/entities/User';
 import { consumeAuthRedirectPath } from '@/shared/utils/authRedirect';
+import { LoginUseCase } from '@/domain/usecases/auth/LoginUseCase';
+import { SignupUseCase } from '@/domain/usecases/auth/SignupUseCase';
+import { LogoutUseCase } from '@/domain/usecases/auth/LogoutUseCase';
+import { GetCurrentUserUseCase } from '@/domain/usecases/auth/GetCurrentUserUseCase';
 
 /**
  * 인증 상태 타입
@@ -46,42 +49,24 @@ const useAuthValue = (): UseAuthReturn => {
   // userRepository를 useRepository 훅으로 관리
   const userRepository = useRepository(UserRepository);
 
+  // UseCase 인스턴스 생성 (메모이제이션)
+  const loginUseCase = useMemo(() => new LoginUseCase(userRepository), [userRepository]);
+  const signupUseCase = useMemo(() => new SignupUseCase(userRepository), [userRepository]);
+  const logoutUseCase = useMemo(() => new LogoutUseCase(), []);
+  const getCurrentUserUseCase = useMemo(() => new GetCurrentUserUseCase(userRepository), [userRepository]);
+
   /**
    * 내 정보 조회하여 사용자 상태 업데이트
    */
   const refreshUser = useCallback(async () => {
-    const token = getToken();
-    if (!token) {
-      setAuthState({
-        isLoggedIn: false,
-        user: null,
-        isLoading: false,
-      });
-      return;
-    }
-
-    try {
-      const meResponse = await userRepository.getMe();
-      setAuthState({
-        isLoggedIn: true,
-        user: {
-          id: meResponse.id,
-          name: meResponse.name,
-          role: meResponse.role,
-        },
-        isLoading: false,
-      });
-    } catch {
-      // 토큰이 유효하지 않은 경우
-      removeToken();
-      setAuthState({
-        isLoggedIn: false,
-        user: null,
-        isLoading: false,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // userRepository는 ref로 관리되므로 의존성 배열에서 제외
+    const result = await getCurrentUserUseCase.execute();
+    
+    setAuthState({
+      isLoggedIn: result.isAuthenticated,
+      user: result.user,
+      isLoading: false,
+    });
+  }, [getCurrentUserUseCase]);
 
   /**
    * 초기 로드 시 토큰 확인 및 사용자 정보 조회
@@ -91,28 +76,12 @@ const useAuthValue = (): UseAuthReturn => {
     let isCancelled = false;
 
     const loadUser = async () => {
-      const token = getToken();
-      if (!token) {
-        if (!isCancelled) {
-          setAuthState({
-            isLoggedIn: false,
-            user: null,
-            isLoading: false,
-          });
-        }
-        return;
-      }
-
       try {
-        const meResponse = await userRepository.getMe(abortController.signal);
+        const result = await getCurrentUserUseCase.execute(abortController.signal);
         if (!isCancelled && !abortController.signal.aborted) {
           setAuthState({
-            isLoggedIn: true,
-            user: {
-              id: meResponse.id,
-              name: meResponse.name,
-              role: meResponse.role,
-            },
+            isLoggedIn: result.isAuthenticated,
+            user: result.user,
             isLoading: false,
           });
         }
@@ -123,7 +92,6 @@ const useAuthValue = (): UseAuthReturn => {
         }
         // 토큰이 유효하지 않은 경우
         if (!isCancelled && !abortController.signal.aborted) {
-          removeToken();
           setAuthState({
             isLoggedIn: false,
             user: null,
@@ -140,8 +108,7 @@ const useAuthValue = (): UseAuthReturn => {
       isCancelled = true;
       abortController.abort();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // userRepository는 ref로 관리되므로 의존성 배열에서 제외
+  }, [getCurrentUserUseCase]);
 
   /**
    * 로그인
@@ -149,19 +116,12 @@ const useAuthValue = (): UseAuthReturn => {
   const login = useCallback(
     async (request: LoginRequest, options?: LoginOptions) => {
       try {
-        const loginResponse = await userRepository.login(request);
-        
-        // 토큰 저장
-        setToken(loginResponse.token);
+        const result = await loginUseCase.execute(request);
 
         // 사용자 정보 업데이트
         setAuthState({
           isLoggedIn: true,
-          user: {
-            id: loginResponse.userId || '', // 백엔드 응답의 user.id 사용
-            name: loginResponse.name,
-            role: loginResponse.role,
-          },
+          user: result.user,
           isLoading: false,
         });
 
@@ -173,7 +133,7 @@ const useAuthValue = (): UseAuthReturn => {
         throw error;
       }
     },
-    [userRepository, navigate]
+    [loginUseCase, navigate]
   );
 
   /**
@@ -181,24 +141,24 @@ const useAuthValue = (): UseAuthReturn => {
    */
   const signup = useCallback(
     async (request: SignupRequest) => {
-      await userRepository.signup(request);
+      await signupUseCase.execute(request);
       // 회원가입 성공 후 자동 로그인은 하지 않음 (사용자가 직접 로그인해야 함)
     },
-    [userRepository]
+    [signupUseCase]
   );
 
   /**
    * 로그아웃
    */
   const logout = useCallback(() => {
-    removeToken();
+    logoutUseCase.execute();
     setAuthState({
       isLoggedIn: false,
       user: null,
       isLoading: false,
     });
     navigate('/login', { replace: true });
-  }, [navigate]);
+  }, [logoutUseCase, navigate]);
 
   return {
     ...authState,

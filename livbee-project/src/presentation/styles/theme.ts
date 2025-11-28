@@ -63,9 +63,10 @@ export const theme = {
   fonts: {
     family: `'NexonLv2Gothic', -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", sans-serif`,
     h1: '700 16px/1.4 "NexonLv2Gothic"',
-    h2: '700 14px/1.4 "NexonLv2Gothic"',
-    body: '300 14px/1.6 "NexonLv2Gothic"',
-    button: '500 12px/1.4 "NexonLv2Gothic"',
+    h2: '700 16px/1.4 "NexonLv2Gothic"',
+    h3: '700 15px/1.4 "NexonLv2Gothic"',
+    body: '400 14px/1.6 "NexonLv2Gothic"',
+    button: '500 13px/1.4 "NexonLv2Gothic"',
     caption: '300 12px/1.4 "NexonLv2Gothic"',
   },
   input: {

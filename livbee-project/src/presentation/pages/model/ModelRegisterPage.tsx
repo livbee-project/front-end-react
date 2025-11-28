@@ -1,16 +1,19 @@
 import React from 'react';
-import RegisterPageLayout from '@/presentation/layouts/RegisterPageLayout';
-import FormSection from '@/presentation/components/forms/sections/FormSection';
-import TextInput from '@/presentation/components/forms/inputs/TextInput';
-import SectionTitle from '@/presentation/components/ui/SectionTitle';
 import {
-  NameSection,
-  WebsitesSection,
-  PortfolioUploadSection,
-  ContactSection as ContactGroup,
+  PageWrapper,
+  FormContainer,
+  RegisterForm,
+} from '@/presentation/components/forms/portfolio/PortfolioRegisterStyles';
+import {
+  ProfileImageSection,
+  RegistrationTypeSection,
+  BasicInfoSection,
+  ContactSection,
+  SnsSection,
+  PortfolioFilesSection,
   TagsSection,
   GallerySection,
-} from '@/presentation/components/forms/model/sections';
+} from '@/presentation/components/forms/portfolio/sections';
 import { FormSubmitSection } from '@/presentation/components/forms/common/FormSubmitSection';
 import { useModelRegisterForm } from '@/presentation/components/forms/model/useModelRegisterForm';
 
@@ -26,7 +29,6 @@ const ModelRegisterPage: React.FC = () => {
     handleInputChange,
     handleToggleChange,
     handleProfileImageSelect,
-    handleProfileImageRemove,
     handleGalleryImageSelect,
     handleGalleryImageRemove,
     handlePortfolioFileSelect,
@@ -34,92 +36,76 @@ const ModelRegisterPage: React.FC = () => {
     handleSubmit,
   } = useModelRegisterForm();
 
+  // 포트폴리오 폼과 호환되도록 websites 배열 변환
+  const websitesArray = formData.websites.map((w) => w.content || '');
+
   return (
-    <RegisterPageLayout>
-      <NameSection
-        name={formData.name}
-        mainThumbnailUrl={mainThumbnailUrl}
-        onNameChange={(value) => handleInputChange('name', value)}
-        onImageSelect={handleProfileImageSelect}
-        onImageRemove={handleProfileImageRemove}
-      />
-
-      <FormSection>
-        <SectionTitle variant="default" marginBottom="12px">
-          등록구분
-        </SectionTitle>
-        <TextInput
-          placeholder="내용을 입력해주세요"
-          value={formData.registrationType}
-          onChange={(e) => handleInputChange('registrationType', e.target.value)}
-        />
-      </FormSection>
-
-      <FormSection>
-        <SectionTitle variant="default" marginBottom="12px">
-          한 줄 소개
-        </SectionTitle>
-        <TextInput
-          placeholder="내용을 입력해주세요"
-          value={formData.oneLineIntro}
-          onChange={(e) => handleInputChange('oneLineIntro', e.target.value)}
-        />
-      </FormSection>
-
-      <FormSection>
-        <SectionTitle variant="default" marginBottom="12px">
-          상세 소개
-        </SectionTitle>
-        <TextInput
-          placeholder="내용을 입력해주세요"
-          value={formData.detailedIntro}
-          onChange={(e) => handleInputChange('detailedIntro', e.target.value)}
-        />
-      </FormSection>
-
-      <WebsitesSection
-        websites={formData.websites}
-        websiteToggles={toggles.websites}
-        onWebsiteChange={(index, field, value) => handleInputChange('websites', value, index, field)}
-        onToggleChange={(index) => handleToggleChange('websites', index)}
-      />
-
-      <PortfolioUploadSection
-        fileInfo={portfolioFileUrl}
-        onFileSelect={handlePortfolioFileSelect}
-        onFileRemove={handlePortfolioFileRemove}
-      />
-
-      <ContactGroup
-        contact={formData.contact}
-        openChat={formData.openChat}
-        contactEnabled={toggles.contact}
-        openChatEnabled={toggles.openChat}
-        onContactChange={(value) => handleInputChange('contact', value)}
-        onOpenChatChange={(value) => handleInputChange('openChat', value)}
-        onContactToggle={() => handleToggleChange('contact')}
-        onOpenChatToggle={() => handleToggleChange('openChat')}
-      />
-
-      <TagsSection
-        tags={formData.tags}
-        tagToggles={toggles.tags}
-        onTagChange={(index, value) => handleInputChange('tags', value, index)}
-        onToggleChange={(index) => handleToggleChange('tags', index)}
-      />
-
-      <GallerySection
-        images={galleryImageUrls}
-        onSelectImage={handleGalleryImageSelect}
-        onRemoveImage={handleGalleryImageRemove}
-      />
-
-      <FormSubmitSection
-        disabled={isSubmitting || isImageUploading}
-        isSubmitting={isSubmitting}
-        onSubmit={handleSubmit}
-      />
-    </RegisterPageLayout>
+    <PageWrapper>
+      <FormContainer>
+        <RegisterForm
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+        >
+          <ProfileImageSection
+            thumbnailUrl={mainThumbnailUrl}
+            onSelectImage={handleProfileImageSelect}
+          />
+          <RegistrationTypeSection
+            value={formData.registrationType}
+            onChange={(value) => handleInputChange('registrationType', value)}
+          />
+          <BasicInfoSection
+            name={formData.name}
+            oneLineIntro={formData.oneLineIntro}
+            detailedIntro={formData.detailedIntro}
+            onChange={(field, value) => handleInputChange(field, value)}
+          />
+          <ContactSection
+            contact={formData.contact}
+            openChat={formData.openChat}
+            contactEnabled={toggles.contact}
+            openChatEnabled={toggles.openChat}
+            onInputChange={(field, value) => handleInputChange(field, value)}
+            onToggleChange={(field) => handleToggleChange(field)}
+          />
+          <SnsSection
+            websites={websitesArray}
+            websiteToggles={toggles.websites}
+            onInputChange={(value, index) => {
+              handleInputChange('websites', value, index, 'content');
+            }}
+            onToggleChange={(index) => handleToggleChange('websites', index)}
+          />
+          <PortfolioFilesSection
+            resumeFileInfo={null}
+            portfolioFileInfo={portfolioFileUrl || null}
+            onFileAdd={handlePortfolioFileSelect}
+            onResumeRemove={() => {}}
+            onPortfolioRemove={handlePortfolioFileRemove}
+          />
+          <TagsSection
+            tags={formData.tags.map((t) => (typeof t === 'object' ? t.value || '' : t))}
+            tagToggles={toggles.tags}
+            onInputChange={(value, index) => {
+              handleInputChange('tags', value, index);
+            }}
+            onToggleChange={(index) => handleToggleChange('tags', index)}
+          />
+          <GallerySection
+            images={galleryImageUrls}
+            onSelectImage={handleGalleryImageSelect}
+            onRemoveImage={handleGalleryImageRemove}
+          />
+          <FormSubmitSection
+            disabled={isSubmitting || isImageUploading}
+            isSubmitting={isSubmitting}
+            submitType="submit"
+          />
+        </RegisterForm>
+      </FormContainer>
+    </PageWrapper>
   );
 };
 

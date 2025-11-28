@@ -7,9 +7,10 @@ import { useRepository } from '@/presentation/hooks/useRepository';
 import { useFormState } from '@/presentation/hooks/useFormState';
 import { useFormUpload } from '@/presentation/hooks/useFormUpload';
 import type { PortfolioFormData, PortfolioToggleState } from './types';
-import { getStoredImageUrls, saveImageUrls, clearImageUrls } from './utils/portfolioImageStorage';
+import { clearImageUrls, getStoredImageUrls, saveImageUrls } from './utils/portfolioImageStorage';
 import { validatePortfolioForm } from './utils/portfolioValidation';
 import { buildPortfolioRequest } from './utils/portfolioRequestBuilder';
+import { useFormImageSync } from '@/presentation/components/forms/shared/hooks/useFormImageSync';
 
 const FORM_STORAGE_KEY = 'portfolio-register-form';
 const TOGGLE_STORAGE_KEY = 'portfolio-register-toggles';
@@ -48,6 +49,7 @@ export const usePortfolioRegisterForm = () => {
   } = useFormState<PortfolioToggleState>(INITIAL_TOGGLE_STATE, TOGGLE_STORAGE_KEY);
 
   const storedImages = getStoredImageUrls();
+
   const {
     profileFile: mainThumbnailFile,
     profileUrl: mainThumbnailUrl,
@@ -58,27 +60,17 @@ export const usePortfolioRegisterForm = () => {
     removeGalleryImage,
   } = useFormUpload({ maxGalleryImages: 9 });
 
-  // 복원된 이미지 URL로 초기화
-  const [mainThumbnailUrlState, setMainThumbnailUrlState] = useState(storedImages.mainThumbnail || mainThumbnailUrl);
-  const [galleryImageUrlsState, setGalleryImageUrlsState] = useState<string[]>(storedImages.gallery.length > 0 ? storedImages.gallery : galleryImageUrls);
-  const [resumeFileUrl, setResumeFileUrl] = useState(storedImages.resume);
-  const [portfolioFileUrl, setPortfolioFileUrl] = useState(storedImages.portfolio);
+  const { mainThumbnailUrlState, galleryImageUrlsState } = useFormImageSync({
+    initialMainThumbnailUrl: mainThumbnailUrl || null,
+    galleryImageUrls,
+    storedMainThumbnail: storedImages.mainThumbnail,
+    storedGallery: storedImages.gallery,
+  });
+
+  const [resumeFileUrl, setResumeFileUrl] = useState(storedImages.resume || null);
+  const [portfolioFileUrl, setPortfolioFileUrl] = useState(storedImages.portfolio || null);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // 이미지 URL 동기화 및 저장
-  useEffect(() => {
-    if (mainThumbnailUrl && mainThumbnailUrl !== mainThumbnailUrlState) {
-      setMainThumbnailUrlState(mainThumbnailUrl);
-    }
-  }, [mainThumbnailUrl, mainThumbnailUrlState]);
-
-  useEffect(() => {
-    if (galleryImageUrls.length > 0 && JSON.stringify(galleryImageUrls) !== JSON.stringify(galleryImageUrlsState)) {
-      setGalleryImageUrlsState(galleryImageUrls);
-    }
-  }, [galleryImageUrls, galleryImageUrlsState]);
 
   useEffect(() => {
     saveImageUrls({
@@ -87,7 +79,8 @@ export const usePortfolioRegisterForm = () => {
       resume: resumeFileUrl,
       portfolio: portfolioFileUrl,
     });
-  }, [mainThumbnailUrlState, galleryImageUrlsState, resumeFileUrl, portfolioFileUrl]);
+  }, [galleryImageUrlsState, mainThumbnailUrlState, portfolioFileUrl, resumeFileUrl]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = useCallback(
     (field: keyof PortfolioFormData, value: string, index?: number) => {

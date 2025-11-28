@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Caption } from '@/presentation/components/styled/Typography';
 
 /**
  * BottomNavItem이 받을 props 타입을 정의합니다.
@@ -27,11 +26,10 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({
   onClick,
 }) => {
   return (
-    <TabButton onClick={onClick}>
+    <TabButton onClick={onClick} aria-label={label}>
       <IconWrapper $isActive={isActive}>
         <Icon size={20} />
       </IconWrapper>
-      <LabelText $isActive={isActive}>{label}</LabelText>
     </TabButton>
   );
 };
@@ -43,7 +41,6 @@ const TabButton = styled.button`
   justify-content: center;
   align-items: center;
   padding: ${({ theme }) => theme.spacing.sm} 0;
-  gap: ${({ theme }) => theme.spacing.sm};
   background: none;
   border: none;
   cursor: pointer;
@@ -55,14 +52,6 @@ const IconWrapper = styled.div<{ $isActive: boolean }>`
   transition: color 0.1s ease;
   display: flex;
   align-items: center;
-`;
-
-const LabelText = styled(Caption)<{ $isActive: boolean }>`
-  color: ${({ $isActive, theme }) =>
-    $isActive ? theme.colors.primary : theme.colors.muted};
-  transition: color 0.1s ease;
-  font-weight: 700;
-  margin: 0;
 `;
 
 export default BottomNavItem;

@@ -20,7 +20,7 @@ export const buildModelRequest = (
 ): CreateModelRequest => {
   const websiteUrl = formData.websites[0]?.content.trim() || undefined;
   const instagramUrl = formData.websites[1]?.content.trim() || undefined;
-  const youtubeUrl = formData.websites[2]?.content.trim() || undefined;
+  const tiktokUrl = formData.websites[2]?.content.trim() || undefined;
 
   const height = parseNumber(formData.tags[0]?.value || '');
   const weight = parseNumber(formData.tags[1]?.value || '');
@@ -36,7 +36,10 @@ export const buildModelRequest = (
     subThumbnailUrls: uploadedGalleryUrls.length > 0 ? uploadedGalleryUrls : undefined,
     websiteUrl,
     instagramUrl,
-    youtubeUrl,
+    tiktokUrl,
+    contact: formData.contact.trim() || undefined,
+    openChat: formData.openChat.trim() || undefined,
+    registrationType: formData.registrationType.trim() || undefined,
     attachedFileUrl: uploadedPortfolioFileUrl,
     height,
     weight,

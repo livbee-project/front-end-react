@@ -8,8 +8,8 @@ import { useDetailFetcher } from '@/presentation/hooks/useDetailFetcher';
 import { useDetailPageState } from '@/presentation/hooks/useDetailPageState';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { useRoleAccess } from '@/presentation/hooks/useRoleAccess';
-import CampaignApplyModal from '@/presentation/components/detail/CampaignApplyModal';
-import { CampaignHeader } from '@/presentation/components/campaign/detail/CampaignHeader';
+import CampaignApplyModal from '@/presentation/components/campaign/detail/apply/CampaignApplyModal';
+import { CampaignDetailHeader } from '@/presentation/components/campaign/detail/CampaignDetailHeader';
 import { CampaignInfoSection } from '@/presentation/components/campaign/detail/CampaignInfoSection';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import {
@@ -128,7 +128,7 @@ const CampaignDetailPage: React.FC = () => {
     <>
       <DetailPageLayout>
         <DetailWrapper>
-          <CampaignHeader
+          <CampaignDetailHeader
             brandName={displayData.brandName}
             title={displayData.title}
             tags={displayData.tags}

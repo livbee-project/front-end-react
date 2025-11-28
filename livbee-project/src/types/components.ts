@@ -105,16 +105,6 @@ export interface BaseButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLBut
   children: React.ReactNode;
 }
 
-// ===== 상세 페이지 관련 =====
-
-export interface DetailHeaderProps {
-  imageUrl?: string;
-  brandName: string;
-  deadlineDay?: string;
-  title: string;
-  content: string;
-}
-
 export interface ProfileSectionProps {
   name: string;
   description?: string | null;

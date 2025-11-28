@@ -9,6 +9,8 @@ import { useListFetcher } from '@/presentation/hooks/useListFetcher';
 import { useListFilters } from '@/presentation/hooks/useListFilters';
 import { useListSearch } from '@/presentation/hooks/useListSearch';
 import { useScrapToggle } from '@/presentation/hooks/useScrapToggle';
+import { useAuth } from '@/presentation/hooks/useAuth';
+import { useToast } from '@/presentation/contexts/ToastContext';
 import { PortfolioHeader } from '@/presentation/components/portfolio/PortfolioHeader';
 import { PortfolioSearchSection } from '@/presentation/components/portfolio/PortfolioSearchSection';
 import { PortfolioFilterRow } from '@/presentation/components/portfolio/PortfolioFilterRow';
@@ -16,6 +18,8 @@ import { PortfolioListContent } from '@/presentation/components/portfolio/Portfo
 
 const PortfolioPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { showToast } = useToast();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { searchInputValue, setSearchInputValue, searchQuery, handleSearchSubmit, clearSearch } = useListSearch();
   const { activeFilter, setActiveFilter } = useListFilters<string>('전체');
@@ -113,7 +117,18 @@ const PortfolioPage: React.FC = () => {
         />
       </PageInner>
 
-      <RegisterFab type="button" onClick={() => navigate('/portfolios/register')} aria-label="쇼호스트 등록">
+      <RegisterFab
+        type="button"
+        onClick={() => {
+          if (user?.role !== 'showhost') {
+            showToast('브랜드 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
+            navigate('/', { replace: true });
+            return;
+          }
+          navigate('/portfolios/register');
+        }}
+        aria-label="쇼호스트 등록"
+      >
         <Plus size={24} strokeWidth={2.5} />
       </RegisterFab>
     </PageWrapper>

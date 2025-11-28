@@ -3,10 +3,10 @@ import { warn } from '@/shared/utils/logger';
 const IMAGE_STORAGE_KEY = 'portfolio-register-images';
 
 interface StoredImageUrls {
-  mainThumbnail: string;
+  mainThumbnail: string | null;
   gallery: string[];
-  resume: string;
-  portfolio: string;
+  resume: string | null;
+  portfolio: string | null;
 }
 
 /**
@@ -14,7 +14,7 @@ interface StoredImageUrls {
  */
 export const getStoredImageUrls = (): StoredImageUrls => {
   if (typeof window === 'undefined') {
-    return { mainThumbnail: '', gallery: [], resume: '', portfolio: '' };
+    return { mainThumbnail: null, gallery: [], resume: null, portfolio: null };
   }
   try {
     const stored = sessionStorage.getItem(IMAGE_STORAGE_KEY);
@@ -24,7 +24,7 @@ export const getStoredImageUrls = (): StoredImageUrls => {
   } catch (error) {
     warn('portfolioImageStorage', 'Failed to restore image URLs from sessionStorage:', error);
   }
-  return { mainThumbnail: '', gallery: [], resume: '', portfolio: '' };
+  return { mainThumbnail: null, gallery: [], resume: null, portfolio: null };
 };
 
 /**

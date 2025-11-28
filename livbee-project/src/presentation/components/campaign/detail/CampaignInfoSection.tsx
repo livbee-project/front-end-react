@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FileText, CheckCircle, Briefcase, MapPin, Calendar, Clock, DollarSign, Tag } from 'lucide-react';
-import { DetailKeyValueList } from '@/presentation/components/detail/DetailKeyValueList';
+import { DetailKeyValueList } from '@/presentation/components/detail/common/DetailKeyValueList';
 
 interface CampaignInfoSectionProps {
   campaignIntro: string;

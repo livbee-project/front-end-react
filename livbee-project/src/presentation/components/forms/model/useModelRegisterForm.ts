@@ -7,9 +7,10 @@ import { useToast } from '@/presentation/contexts/ToastContext';
 import { useFormState } from '@/presentation/hooks/useFormState';
 import { useFormUpload } from '@/presentation/hooks/useFormUpload';
 import type { ModelFormData, ModelToggleState } from './types';
-import { getStoredImageUrls, saveImageUrls, clearImageUrls } from './utils/modelImageStorage';
+import { clearImageUrls, getStoredImageUrls, saveImageUrls } from './utils/modelImageStorage';
 import { validateModelForm } from './utils/modelValidation';
 import { buildModelRequest } from './utils/modelRequestBuilder';
+import { useFormImageSync } from '@/presentation/components/forms/shared/hooks/useFormImageSync';
 
 const FORM_STORAGE_KEY = 'model-register-form';
 const TOGGLE_STORAGE_KEY = 'model-register-toggles';
@@ -59,6 +60,7 @@ export const useModelRegisterForm = () => {
   } = useFormState<ModelToggleState>(INITIAL_TOGGLE_STATE, TOGGLE_STORAGE_KEY);
 
   const storedImages = getStoredImageUrls();
+
   const {
     profileFile: mainThumbnailFile,
     profileUrl: mainThumbnailUrl,
@@ -70,25 +72,15 @@ export const useModelRegisterForm = () => {
     removeGalleryImage,
   } = useFormUpload({ maxGalleryImages: MAX_GALLERY_IMAGES });
 
-  // 복원된 이미지 URL로 초기화
-  const [mainThumbnailUrlState, setMainThumbnailUrlState] = useState(storedImages.mainThumbnail || mainThumbnailUrl);
-  const [galleryImageUrlsState, setGalleryImageUrlsState] = useState<string[]>(storedImages.gallery.length > 0 ? storedImages.gallery : galleryImageUrls);
-  const [portfolioFileUrl, setPortfolioFileUrl] = useState(storedImages.portfolio);
+  const { mainThumbnailUrlState, galleryImageUrlsState } = useFormImageSync({
+    initialMainThumbnailUrl: mainThumbnailUrl || null,
+    galleryImageUrls,
+    storedMainThumbnail: storedImages.mainThumbnail,
+    storedGallery: storedImages.gallery,
+  });
+
+  const [portfolioFileUrl, setPortfolioFileUrl] = useState(storedImages.portfolio || null);
   const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // 이미지 URL 동기화 및 저장
-  useEffect(() => {
-    if (mainThumbnailUrl && mainThumbnailUrl !== mainThumbnailUrlState) {
-      setMainThumbnailUrlState(mainThumbnailUrl);
-    }
-  }, [mainThumbnailUrl, mainThumbnailUrlState]);
-
-  useEffect(() => {
-    if (galleryImageUrls.length > 0 && JSON.stringify(galleryImageUrls) !== JSON.stringify(galleryImageUrlsState)) {
-      setGalleryImageUrlsState(galleryImageUrls);
-    }
-  }, [galleryImageUrls, galleryImageUrlsState]);
 
   useEffect(() => {
     saveImageUrls({
@@ -96,7 +88,8 @@ export const useModelRegisterForm = () => {
       gallery: galleryImageUrlsState,
       portfolio: portfolioFileUrl,
     });
-  }, [mainThumbnailUrlState, galleryImageUrlsState, portfolioFileUrl]);
+  }, [galleryImageUrlsState, mainThumbnailUrlState, portfolioFileUrl]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = useCallback(
     (field: keyof ModelFormData, value: string, index?: number, subField?: keyof (ModelFormData['websites'][number]) ) => {

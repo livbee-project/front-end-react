@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import StickyHeader from '@/presentation/components/detail/StickyHeader';
-import ProfileSection from '@/presentation/components/detail/ProfileSection';
-import HomeSectionHeader from '@/presentation/components/section/HomeSectionHeader';
-import GalleryGrid from '@/presentation/components/detail/GalleryGrid';
-import ActionSection from '@/presentation/components/detail/ActionSection';
+import StickyHeader from '@/presentation/components/detail/common/StickyHeader';
+import ProfileSection from '@/presentation/components/detail/common/ProfileSection';
+import HomeSectionHeader from '@/presentation/components/home/sections/HomeSectionHeader';
+import GalleryGrid from '@/presentation/components/detail/common/GalleryGrid';
+import ActionSection from '@/presentation/components/detail/common/ActionSection';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import DetailSection from '@/presentation/layouts/DetailSection';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
@@ -14,7 +14,7 @@ import { useRepository } from '@/presentation/hooks/useRepository';
 import { useDetailFetcher } from '@/presentation/hooks/useDetailFetcher';
 import { useDetailPageState } from '@/presentation/hooks/useDetailPageState';
 import { useImageGallery } from '@/presentation/hooks/useImageGallery';
-import GalleryLightbox from '@/presentation/components/detail/GalleryLightbox';
+import GalleryLightbox from '@/presentation/components/detail/common/GalleryLightbox';
 import { extractCategories, generateProfileTags } from '@/shared/utils/detailPageUtils';
 
 const GallerySection = styled(DetailSection)`

@@ -7,8 +7,8 @@ import { HiddenInput, SmallText } from '../PortfolioRegisterStyles';
 import { Small } from '@/presentation/components/styled/Typography';
 
 interface PortfolioFilesSectionProps {
-  resumeFileInfo: string;
-  portfolioFileInfo: string;
+  resumeFileInfo: string | null;
+  portfolioFileInfo: string | null;
   onFileAdd: (file: File) => void;
   onResumeRemove: () => void;
   onPortfolioRemove: () => void;
@@ -171,8 +171,8 @@ export const PortfolioFilesSection: React.FC<PortfolioFilesSectionProps> = ({
               <Small>추가된 파일이 없습니다</Small>
             </EmptyStateButton>
           )}
-          {renderFileItem('resume', resumeFileInfo)}
-          {renderFileItem('portfolio', portfolioFileInfo)}
+          {resumeFileInfo && renderFileItem('resume', resumeFileInfo)}
+          {portfolioFileInfo && renderFileItem('portfolio', portfolioFileInfo)}
         </PortfolioList>
       </FormField>
     </FormSection>
