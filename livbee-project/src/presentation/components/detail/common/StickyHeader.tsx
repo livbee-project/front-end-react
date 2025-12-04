@@ -73,7 +73,7 @@ const ShareButton = styled.button`
  * 상세 페이지의 고정 헤더 컴포넌트입니다.
  * 스크롤 시에도 상단에 고정되며, 뒤로가기, 제목, 공유 버튼을 포함합니다.
  */
-const StickyHeader: React.FC<StickyHeaderProps> = ({ title, onShare }) => {
+const StickyHeader: React.FC<StickyHeaderProps> = ({ title, onShare, showShare = false }) => {
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -108,9 +108,12 @@ const StickyHeader: React.FC<StickyHeaderProps> = ({ title, onShare }) => {
           <ArrowLeft size={20} />
         </BackButton>
         <Title>{title}</Title>
-        <ShareButton onClick={handleShare} aria-label="공유">
-          <Share2 size={20} />
-        </ShareButton>
+        {showShare && (
+          <ShareButton onClick={handleShare} aria-label="공유">
+            <Share2 size={20} />
+          </ShareButton>
+        )}
+        {!showShare && <div style={{ width: '40px' }} />}
       </HeaderInner>
     </HeaderContainer>
   );

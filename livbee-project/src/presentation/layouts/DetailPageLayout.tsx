@@ -10,13 +10,15 @@ interface DetailPageLayoutProps {
 }
 
 const PageContainer = styled.div`
-  width: 100%;
   background-color: ${({ theme }) => theme.colors.background};
+  min-height: 100vh;
+  padding-bottom: 6rem;
 `;
 
 const ContentContainer = styled.div`
   max-width: 672px;
   margin: 0 auto;
+  padding: 0 16px 1rem;
   width: 100%;
 `;
 

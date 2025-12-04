@@ -129,5 +129,6 @@ export interface ActionSectionProps {
 export interface StickyHeaderProps {
   title: string;
   onShare?: () => void;
+  showShare?: boolean;
 }
 

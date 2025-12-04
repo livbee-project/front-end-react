@@ -11,7 +11,6 @@ import { useListSearch } from '@/presentation/hooks/useListSearch';
 import { useScrapToggle } from '@/presentation/hooks/useScrapToggle';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';
-import { PortfolioHeader } from '@/presentation/components/portfolio/PortfolioHeader';
 import { PortfolioSearchSection } from '@/presentation/components/portfolio/PortfolioSearchSection';
 import { PortfolioFilterRow } from '@/presentation/components/portfolio/PortfolioFilterRow';
 import { PortfolioListContent } from '@/presentation/components/portfolio/PortfolioListContent';
@@ -88,12 +87,6 @@ const PortfolioPage: React.FC = () => {
   return (
     <PageWrapper>
       <PageInner>
-        <PortfolioHeader
-          title="쇼호스트 찾기"
-          description="브랜드에 맞는 쇼호스트를 찾아보세요"
-          highlightText="찾기"
-        />
-
         <PortfolioSearchSection
           value={searchInputValue}
           onChange={setSearchInputValue}

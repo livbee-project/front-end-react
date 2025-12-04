@@ -1,19 +1,42 @@
 import React, { useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import Button from '@/presentation/components/ui/Button';
+import { useParams } from 'react-router-dom';
+import styled from 'styled-components';
+import StickyHeader from '@/presentation/components/detail/common/StickyHeader';
+import ProfileSection from '@/presentation/components/detail/common/ProfileSection';
+import HomeSectionHeader from '@/presentation/components/home/sections/HomeSectionHeader';
+import GalleryGrid from '@/presentation/components/detail/common/GalleryGrid';
+import ActionSection from '@/presentation/components/detail/common/ActionSection';
+import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
 import type { ModelDetail } from '@/domain/entities/Model';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useDetailFetcher } from '@/presentation/hooks/useDetailFetcher';
 import { useDetailPageState } from '@/presentation/hooks/useDetailPageState';
+import { useImageGallery } from '@/presentation/hooks/useImageGallery';
+import GalleryLightbox from '@/presentation/components/detail/common/GalleryLightbox';
 import { extractCategories, generateProfileTags } from '@/shared/utils/detailPageUtils';
-import { ModelHeader } from '@/presentation/components/model/detail/ModelHeader';
-import { ModelInfoSection } from '@/presentation/components/model/detail/ModelInfoSection';
-import { ActionButtons, PageContainer } from './styled/ModelDetailPageStyles';
+
+const GallerySection = styled.div`
+  padding: ${({ theme }) => theme.spacing.xl} 0;
+`;
+
+const GalleryHeaderWrapper = styled.div`
+  padding: 0 16px;
+  
+  /* HomeSectionHeader 내부 HeaderWrapper의 margin 오버라이드 */
+  > * {
+    margin: ${({ theme }) => `${theme.spacing['2xl']} 0 ${theme.spacing.xl}`} !important;
+  }
+`;
+
+const GalleryWrapper = styled.div`
+  margin-top: ${({ theme }) => theme.spacing.lg};
+  margin-left: -16px;
+  margin-right: -16px;
+`;
 
 const ModelDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const modelRepository = useRepository(ModelRepository);
 
   const {
@@ -34,113 +57,143 @@ const ModelDetailPage: React.FC = () => {
     error,
     notFoundMessage: '모델을 찾을 수 없습니다.',
     listPath: '/models',
-    LayoutComponent: PageContainer,
+    LayoutComponent: DetailPageLayout,
   });
 
+  // 하드코딩된 기본 데이터 (데이터가 없을 때 사용)
+  const defaultModel: ModelDetail = {
+    id: id || '',
+    user: '',
+    nickname: '한지우',
+    oneLineIntro: '청순/내추럴 컨셉 전문 모델',
+    detailedIntro: '안녕하세요! 패션과 뷰티 분야에서 활동하고 있는 모델 한지우입니다.\n청순하고 자연스러운 이미지로 다양한 브랜드와 협업하고 있으며, 카메라 앞에서 자연스러운 포즈와 표현력을 자랑합니다.\n함께 성장할 수 있는 브랜드와의 협업을 기대합니다!',
+    experienceYears: 3,
+    age: null,
+    isAgePublic: false,
+    mainThumbnailUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+    backgroundImageUrl: null,
+    subThumbnailUrls: [
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
+    ],
+    status: 'active',
+    detailedRegion: null,
+    gender: null,
+    height: 168,
+    weight: null,
+    topSize: '55(S)',
+    bottomSize: null,
+    shoeSize: null,
+    isSizingPublic: true,
+    websiteUrl: 'https://www.instagram.com/jiwoo_model',
+    instagramUrl: null,
+    youtubeUrl: null,
+    tiktokUrl: null,
+    publicScope: 'public',
+    isReceivingOffers: true,
+    attachedFileUrl: null,
+    createdAt: '',
+    updatedAt: '',
+  };
+
+  // 데이터가 준비되지 않았으면 기본 데이터 사용
+  const displayModel = model || defaultModel;
+
+  const gallery = useImageGallery(displayModel.subThumbnailUrls ?? []);
+
   const categories = useMemo(() => {
-    if (!model?.oneLineIntro) {
-      return [];
+    if (!displayModel.oneLineIntro) {
+      return ['패션', '뷰티'];
     }
-    return extractCategories({ description: model.oneLineIntro });
-  }, [model?.oneLineIntro]);
+    const extracted = extractCategories({ description: displayModel.oneLineIntro });
+    return extracted.length > 0 ? extracted : ['패션', '뷰티'];
+  }, [displayModel.oneLineIntro]);
 
   const tags = useMemo(() => {
-    if (!model) {
-      return [];
-    }
     return generateProfileTags({
-      height: model.height,
-      weight: model.weight,
-      topSize: model.topSize,
-      experienceYears: model.experienceYears,
-      isSizingPublic: model.isSizingPublic,
+      height: displayModel.height,
+      weight: displayModel.weight,
+      topSize: displayModel.topSize,
+      experienceYears: displayModel.experienceYears,
+      isSizingPublic: displayModel.isSizingPublic,
     });
-  }, [model]);
+  }, [displayModel]);
 
-  // 로딩/에러 상태일 경우 UI 반환
-  if (renderState) {
-    return <>{renderState}</>;
-  }
-
-  // 데이터가 준비되지 않았으면 아무것도 렌더링하지 않음 (방어 코드)
-  if (!isReady || !model) {
-    return null;
-  }
-
-  // 하드코딩된 데이터 (API 데이터가 없을 때 사용)
-  const mockData = {
-    imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
-    brandName: '이수아',
-    title: '프로페셔널 패션 모델',
-    tags: ['패션', '뷰티', '라이프스타일'],
-    modelIntro: '다양한 패션 브랜드와 협업 경험이 풍부한 프로페셔널 모델입니다. 패션, 뷰티, 라이프스타일 분야에서 활발히 활동하고 있으며, 카메라 앞에서 자연스러운 포즈와 표현력을 자랑합니다.',
-    qualifications: [
-      '패션 모델 경력 3년 이상',
-      '카메라 앞에서 자연스러운 표현력',
-      '다양한 스타일 소화 가능',
-      '트렌드에 대한 높은 이해도',
-    ],
-    location: '서울 강남구',
-    shootDate: '2024.12.25',
-    shootTime: '오후 2:00 ~ 오후 4:00',
-    deadline: '2024.12.20',
-    fee: '100,000원',
-    productInfo: '패션 화보 및 광고 촬영',
+  const handleProfileImageClick = () => {
+    // TODO: 이미지 확대 또는 갤러리 열기 기능 구현
   };
 
-  const displayData = {
-    imageUrl: model.mainThumbnailUrl || model.backgroundImageUrl || mockData.imageUrl,
-    brandName: model.nickname || mockData.brandName,
-    title: model.oneLineIntro || mockData.title,
-    tags: categories.length > 0 ? categories : mockData.tags,
-    modelIntro: model.detailedIntro || model.oneLineIntro || mockData.modelIntro,
-    qualifications: tags.length > 0 ? tags : mockData.qualifications,
-    location: model.detailedRegion || mockData.location,
-    shootDate: mockData.shootDate,
-    shootTime: mockData.shootTime,
-    deadline: mockData.deadline,
-    fee: mockData.fee,
-    productInfo: mockData.productInfo,
+  const handleGalleryImageClick = (index: number) => {
+    gallery.open(index);
   };
 
-  const handleBack = () => {
-    navigate(-1);
+  const handleScrap = () => {
+    // TODO: 찜하기 기능 구현
   };
 
   const handleOffer = () => {
     // TODO: 제안하기 기능 구현
   };
 
+  const handleShare = () => {
+    // TODO: 공유 기능 구현
+  };
+
+  // websiteUrl 우선순위: websiteUrl > instagramUrl
+  const websiteUrl = displayModel.websiteUrl || displayModel.instagramUrl || null;
+
   return (
-    <PageContainer>
-      <ModelHeader
-        brandName={displayData.brandName}
-        title={displayData.title}
-        tags={displayData.tags}
-        imageUrl={displayData.imageUrl}
-        onBack={handleBack}
+    <DetailPageLayout>
+      <StickyHeader title={displayModel.nickname || '모델'} onShare={handleShare} />
+
+      <ProfileSection
+        name={displayModel.nickname || '한지우'}
+        description={displayModel.oneLineIntro || '청순/내추럴 컨셉 전문 모델'}
+        detailedIntro={displayModel.detailedIntro || '안녕하세요! 패션과 뷰티 분야에서 활동하고 있는 모델 한지우입니다.\n청순하고 자연스러운 이미지로 다양한 브랜드와 협업하고 있으며, 카메라 앞에서 자연스러운 포즈와 표현력을 자랑합니다.\n함께 성장할 수 있는 브랜드와의 협업을 기대합니다!'}
+        profileImageUrl={displayModel.mainThumbnailUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+        type="model"
+        categories={categories.length > 0 ? categories : ['패션', '뷰티']}
+        tags={tags.length > 0 ? tags : ['키 168cm', '사이즈 55(S)', '경력 3년']}
+        websiteUrl={websiteUrl || 'https://www.instagram.com/jiwoo_model'}
+        onImageClick={handleProfileImageClick}
       />
 
-      <ModelInfoSection
-        modelIntro={displayData.modelIntro}
-        qualifications={displayData.qualifications}
-        location={displayData.location}
-        shootDate={displayData.shootDate}
-        shootTime={displayData.shootTime}
-        deadline={displayData.deadline}
-        fee={displayData.fee}
-        productInfo={displayData.productInfo}
-      />
+      <GallerySection>
+        <GalleryHeaderWrapper>
+          <HomeSectionHeader title="갤러리" />
+        </GalleryHeaderWrapper>
+        <GalleryWrapper>
+          <GalleryGrid
+            images={
+              displayModel.subThumbnailUrls && displayModel.subThumbnailUrls.length > 0
+                ? displayModel.subThumbnailUrls
+                : defaultModel.subThumbnailUrls
+            }
+            columns={3}
+            onImageClick={handleGalleryImageClick}
+          />
+        </GalleryWrapper>
+      </GallerySection>
 
-      <ActionButtons>
-        <Button variant="secondary" fullWidth onClick={handleBack}>
-          목록으로
-        </Button>
-        <Button variant="primary" fullWidth onClick={handleOffer}>
-          제안하기
-        </Button>
-      </ActionButtons>
-    </PageContainer>
+      <ActionSection
+        isScraped={false}
+        isReceivingOffers={displayModel.isReceivingOffers}
+        onScrap={handleScrap}
+        onOffer={handleOffer}
+      />
+      <GalleryLightbox
+        image={gallery.currentImage}
+        isOpen={gallery.isOpen}
+        onClose={gallery.close}
+        onPrev={gallery.showPrev}
+        onNext={gallery.showNext}
+        showControls={gallery.images.length > 1}
+      />
+    </DetailPageLayout>
   );
 };
 

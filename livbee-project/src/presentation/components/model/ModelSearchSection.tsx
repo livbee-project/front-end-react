@@ -3,14 +3,14 @@ import styled from 'styled-components';
 import { Search as SearchIcon } from 'lucide-react';
 import { Input } from '@/presentation/components/styled/CommonStyles';
 
-interface PortfolioSearchSectionProps {
+interface ModelSearchSectionProps {
   value: string;
   onChange: (value: string) => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   placeholder?: string;
 }
 
-export const PortfolioSearchSection: React.FC<PortfolioSearchSectionProps> = ({
+export const ModelSearchSection: React.FC<ModelSearchSectionProps> = ({
   value,
   onChange,
   onSubmit,

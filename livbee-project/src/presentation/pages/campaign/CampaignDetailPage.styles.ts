@@ -1,74 +1,62 @@
 import styled from 'styled-components';
+import Button from '@/presentation/components/ui/Button';
 
 export const DetailWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.lg};
-  padding-bottom: ${({ theme }) => theme.spacing['2xl']};
+  padding-bottom: ${({ theme }) => theme.spacing.sm};
 `;
 
 export const ActionSection = styled.section`
-  margin: 0 ${({ theme }) => theme.spacing.lg} ${({ theme }) => theme.spacing.xl};
-  padding: ${({ theme }) => theme.spacing.xl};
-  background: ${({ theme }) => theme.colors.card};
-  border-radius: ${({ theme }) => theme.radii.xl};
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.06);
+  position: sticky;
+  bottom: 0;
+  margin-top: 1.5rem;
+  padding-bottom: ${({ theme }) => theme.spacing.sm};
+  padding-top: 1rem;
+  background: linear-gradient(
+    to top,
+    ${({ theme }) => theme.colors.secondary}33,
+    ${({ theme }) => theme.colors.secondary}33,
+    transparent
+  );
+  margin-left: 12px;
+  margin-right: 12px;
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.lg};
-
-  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    margin: 0 auto ${({ theme }) => theme.spacing.xl};
-    width: calc(100% - ${({ theme }) => theme.spacing.xl} * 2);
-  }
-`;
-
-export const ActionMetaGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: ${({ theme }) => theme.spacing.md};
-`;
-
-export const ActionMetaItem = styled.div`
-  padding: ${({ theme }) => theme.spacing.md};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  background: ${({ theme }) => theme.colors.background};
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.xs};
-`;
-
-export const ActionMetaLabel = styled.span`
-  font-size: 0.85rem;
-  color: ${({ theme }) => theme.colors.muted};
-  font-weight: 500;
-`;
-
-export const ActionMetaValue = styled.span`
-  font-size: 1rem;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.foreground};
-  line-height: 1.4;
-`;
-
-export const SupportText = styled.p`
-  margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: ${({ theme }) => theme.colors.muted};
 `;
 
 export const ContentActions = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.sm};
+  gap: 0.75rem;
 
-  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    flex-direction: row;
+  & > button {
+    flex: 1;
+  }
+`;
 
-    & > button {
-      flex: 1;
-    }
+export const OutlineButton = styled(Button)`
+  background-color: transparent;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  color: ${({ theme }) => theme.colors.foreground};
+
+  &:hover:not(:disabled) {
+    background-color: ${({ theme }) => theme.colors.inputBackground};
+  }
+`;
+
+export const PrimaryButton = styled(Button)`
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primaryForeground};
+
+  &:hover:not(:disabled) {
+    background-color: ${({ theme }) => theme.colors.primaryHover};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
 

@@ -1,26 +1,27 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { PORTFOLIO_FILTERS } from '@/shared/constants/portfolio';
 
-interface PortfolioFilterRowProps {
+interface ModelFilterRowProps {
+  filters: string[];
   activeFilter: string;
   onFilterChange: (value: string) => void;
 }
 
-export const PortfolioFilterRow: React.FC<PortfolioFilterRowProps> = ({
+export const ModelFilterRow: React.FC<ModelFilterRowProps> = ({
+  filters,
   activeFilter,
   onFilterChange,
 }) => {
   return (
     <FilterContainer>
-      {PORTFOLIO_FILTERS.map((filter) => (
+      {filters.map((filter) => (
         <FilterBadge
-          key={filter.value}
+          key={filter}
           type="button"
-          $isActive={activeFilter === filter.value}
-          onClick={() => onFilterChange(filter.value)}
+          $isActive={activeFilter === filter}
+          onClick={() => onFilterChange(filter)}
         >
-          {filter.label}
+          {filter}
         </FilterBadge>
       ))}
     </FilterContainer>

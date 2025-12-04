@@ -6,26 +6,25 @@ import { useToast } from '@/presentation/contexts/ToastContext';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { ROUTE_PATHS } from '@/app/routes/routeMeta';
 import { setAuthRedirectPath } from '@/shared/utils/authRedirect';
-// (추가) react-icons/ri (Remix Icon) 라이브러리에서 아이콘들을 임포트합니다.
+// 커스텀 네비게이션 아이콘 컴포넌트
 import {
-  RiHomeLine,
-  RiArchiveDrawerLine,
-  RiUserStarLine,
-  RiUser3Line,
-  RiUserSettingsLine,
-} from 'react-icons/ri';
+  IconHome,
+  IconSearch,
+  IconMic,
+  IconCamera,
+  IconSmile,
+} from '@/presentation/components/icons/NavigationIcons';
 
 /**
- * (수정) 탭 메뉴의 데이터
- * icon 속성을 텍스트('[H]')에서 임포트한 아이콘 컴포넌트(RiHomeLine)로 변경합니다.
- * Flutter의 RemixIcons 이름과 거의 동일합니다.
+ * 하단 네비게이션 탭 메뉴 데이터
+ * 디자인 스펙에 따라 커스텀 SVG 아이콘 사용
  */
 const TABS = [
-  { label: '홈', path: ROUTE_PATHS.home, icon: RiHomeLine },
-  { label: '모집공고', path: ROUTE_PATHS.campaigns, icon: RiArchiveDrawerLine },
-  { label: '모델', path: ROUTE_PATHS.models, icon: RiUserStarLine },
-  { label: '포트폴리오', path: ROUTE_PATHS.portfolios, icon: RiUser3Line },
-  { label: '마이페이지', path: ROUTE_PATHS.myPage, icon: RiUserSettingsLine },
+  { label: '홈', path: ROUTE_PATHS.home, icon: IconHome },
+  { label: '캠페인', path: ROUTE_PATHS.campaigns, icon: IconSearch },
+  { label: '쇼호스트', path: ROUTE_PATHS.portfolios, icon: IconMic },
+  { label: '모델', path: ROUTE_PATHS.models, icon: IconCamera },
+  { label: 'MY', path: ROUTE_PATHS.myPage, icon: IconSmile },
 ];
 /**
  * 로그인이 필요한 경로
@@ -109,8 +108,8 @@ const Nav = styled.nav`
 const Wrapper = styled.div`
   display: flex;
   justify-content: space-around;
-  align-items: stretch;
-  height: 100%;
+  align-items: center;
+  padding: ${({ theme }) => theme.spacing.sm} 0;
 `;
 
 export default BottomNavBar;

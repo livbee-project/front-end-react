@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import Button from '@/presentation/components/ui/Button';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { CampaignDetail } from '@/domain/entities/Campaign';
 import { useRepository } from '@/presentation/hooks/useRepository';
@@ -8,26 +7,28 @@ import { useDetailFetcher } from '@/presentation/hooks/useDetailFetcher';
 import { useDetailPageState } from '@/presentation/hooks/useDetailPageState';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { useRoleAccess } from '@/presentation/hooks/useRoleAccess';
+import { useToast } from '@/presentation/contexts/ToastContext';
+import { setAuthRedirectPath } from '@/shared/utils/authRedirect';
 import CampaignApplyModal from '@/presentation/components/campaign/detail/apply/CampaignApplyModal';
 import { CampaignDetailHeader } from '@/presentation/components/campaign/detail/CampaignDetailHeader';
 import { CampaignInfoSection } from '@/presentation/components/campaign/detail/CampaignInfoSection';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
+import StickyHeader from '@/presentation/components/detail/common/StickyHeader';
 import {
   DetailWrapper,
   ActionSection,
-  ActionMetaGrid,
-  ActionMetaItem,
-  ActionMetaLabel,
-  ActionMetaValue,
-  SupportText,
   ContentActions,
+  OutlineButton,
+  PrimaryButton,
 } from './CampaignDetailPage.styles';
 
 const CampaignDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { isLoggedIn } = useAuth();
   const { hasRole } = useRoleAccess();
+  const { showToast } = useToast();
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
 
   const campaignRepository = useRepository(CampaignRepository);
@@ -107,10 +108,20 @@ const CampaignDetailPage: React.FC = () => {
   };
 
   const handleApply = () => {
+    // 비로그인 상태면 로그인 페이지로 이동 (현재 경로 저장)
     if (!isLoggedIn) {
+      const currentPath = location.pathname + location.search + location.hash;
+      setAuthRedirectPath(currentPath);
       navigate('/login', { replace: true });
       return;
     }
+    
+    // 로그인했지만 쇼호스트가 아닌 경우
+    if (!hasRole(['showhost'])) {
+      showToast('쇼호스트 권한이 필요합니다.', undefined, 'error');
+      return;
+    }
+    
     setIsApplyModalOpen(true);
   };
 
@@ -122,11 +133,12 @@ const CampaignDetailPage: React.FC = () => {
     setCampaign((prev) => (prev ? { ...prev, isApplied: true } : prev));
   };
 
-  const canApply = hasRole(['showhost']);
+  const canShowModal = isLoggedIn && hasRole(['showhost']);
 
   return (
     <>
       <DetailPageLayout>
+        <StickyHeader title="캠페인" />
         <DetailWrapper>
           <CampaignDetailHeader
             brandName={displayData.brandName}
@@ -134,64 +146,39 @@ const CampaignDetailPage: React.FC = () => {
             tags={displayData.tags}
             dDay={displayData.dDay}
             imageUrl={displayData.imageUrl}
-            onBack={handleBack}
-          />
-
-          <CampaignInfoSection
-            campaignIntro={displayData.campaignIntro}
-            qualifications={displayData.qualifications}
-            location={displayData.location}
-            shootDate={displayData.shootDate}
-            shootTime={displayData.shootTime}
-            deadline={displayData.deadline}
-            fee={displayData.fee}
-            productInfo={displayData.productInfo}
-          />
+          >
+            <CampaignInfoSection
+              campaignIntro={displayData.campaignIntro}
+              qualifications={displayData.qualifications}
+              location={displayData.location}
+              shootDate={displayData.shootDate}
+              shootTime={displayData.shootTime}
+              deadline={displayData.deadline}
+              fee={displayData.fee}
+              productInfo={displayData.productInfo}
+            />
+          </CampaignDetailHeader>
 
           <ActionSection>
-            <ActionMetaGrid>
-              <ActionMetaItem>
-                <ActionMetaLabel>지원 마감일</ActionMetaLabel>
-                <ActionMetaValue>{displayData.deadline}</ActionMetaValue>
-              </ActionMetaItem>
-              <ActionMetaItem>
-                <ActionMetaLabel>출연료</ActionMetaLabel>
-                <ActionMetaValue>{displayData.fee}</ActionMetaValue>
-              </ActionMetaItem>
-              <ActionMetaItem>
-                <ActionMetaLabel>촬영 일정</ActionMetaLabel>
-                <ActionMetaValue>
-                  {displayData.shootDate}
-                  <br />
-                  {displayData.shootTime}
-                </ActionMetaValue>
-              </ActionMetaItem>
-              <ActionMetaItem>
-                <ActionMetaLabel>촬영 장소</ActionMetaLabel>
-                <ActionMetaValue>{displayData.location}</ActionMetaValue>
-              </ActionMetaItem>
-            </ActionMetaGrid>
-
-            <SupportText>
-              지원 완료 후 브랜드와 메시지로 세부 일정을 조율하게 됩니다. 지원 현황은 메시지 페이지에서
-              확인할 수 있어요.
-            </SupportText>
-
             <ContentActions>
-              <Button variant="secondary" fullWidth onClick={handleBack}>
+              <OutlineButton fullWidth onClick={handleBack}>
                 목록으로
-              </Button>
-              {canApply && (
-                <Button variant="primary" fullWidth onClick={handleApply} disabled={campaign.isApplied}>
-                  {campaign.isApplied ? '이미 지원한 공고입니다' : '지원하기'}
-                </Button>
-              )}
+              </OutlineButton>
+              <PrimaryButton 
+                fullWidth 
+                onClick={handleApply} 
+                disabled={isLoggedIn && hasRole(['showhost']) && campaign.isApplied}
+              >
+                {isLoggedIn && hasRole(['showhost']) && campaign.isApplied 
+                  ? '이미 지원한 공고입니다' 
+                  : '지원하기'}
+              </PrimaryButton>
             </ContentActions>
           </ActionSection>
         </DetailWrapper>
       </DetailPageLayout>
 
-      {canApply && (
+      {canShowModal && (
         <CampaignApplyModal
           isOpen={isApplyModalOpen}
           campaignId={campaign.id}

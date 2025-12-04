@@ -35,7 +35,7 @@ export const HeaderSubtitle = styled.p`
 
 export const SearchBar = styled.div`
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: ${({ theme }) => theme.spacing.md};
 `;
 
 export const SearchInput = styled.input`
@@ -69,7 +69,8 @@ export const FilterSection = styled.div`
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding-bottom: ${({ theme }) => theme.spacing.xs};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
   
   &::-webkit-scrollbar {
     display: none;

@@ -32,7 +32,7 @@ export const CampaignSearchSection: React.FC<CampaignSearchSectionProps> = ({
 const SearchForm = styled.form`
   position: relative;
   width: 100%;
-  margin-bottom: ${({ theme }) => theme.spacing.xl};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
 `;
 
 const StyledInput = styled(Input)`

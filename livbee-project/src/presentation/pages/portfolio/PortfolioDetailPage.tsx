@@ -7,7 +7,6 @@ import HomeSectionHeader from '@/presentation/components/home/sections/HomeSecti
 import GalleryGrid from '@/presentation/components/detail/common/GalleryGrid';
 import ActionSection from '@/presentation/components/detail/common/ActionSection';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
-import DetailSection from '@/presentation/layouts/DetailSection';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { PortfolioDetail } from '@/domain/entities/Portfolio';
 import { useRepository } from '@/presentation/hooks/useRepository';
@@ -17,12 +16,23 @@ import { useImageGallery } from '@/presentation/hooks/useImageGallery';
 import GalleryLightbox from '@/presentation/components/detail/common/GalleryLightbox';
 import { extractCategories, generateProfileTags } from '@/shared/utils/detailPageUtils';
 
-const GallerySection = styled(DetailSection)`
-  padding: ${({ theme }) => theme.spacing.xl} ${({ theme }) => theme.spacing.lg};
+const GallerySection = styled.div`
+  padding: ${({ theme }) => theme.spacing.xl} 0;
+`;
+
+const GalleryHeaderWrapper = styled.div`
+  padding: 0 16px;
+  
+  /* HomeSectionHeader 내부 HeaderWrapper의 margin 오버라이드 */
+  > * {
+    margin: ${({ theme }) => `${theme.spacing['2xl']} 0 ${theme.spacing.xl}`} !important;
+  }
 `;
 
 const GalleryWrapper = styled.div`
   margin-top: ${({ theme }) => theme.spacing.lg};
+  margin-left: -16px;
+  margin-right: -16px;
 `;
 
 const PortfolioDetailPage: React.FC = () => {
@@ -51,37 +61,68 @@ const PortfolioDetailPage: React.FC = () => {
     LayoutComponent: DetailPageLayout,
   });
 
-  const gallery = useImageGallery(portfolio?.subThumbnailUrls ?? []);
+  // 하드코딩된 기본 데이터 (데이터가 없을 때 사용)
+  const defaultPortfolio: PortfolioDetail = {
+    id: id || '',
+    user: '',
+    nickname: '김지현',
+    oneLineIntro: '패션 전문 쇼호스트, 5년 경력',
+    detailedIntro: '안녕하세요! 패션과 뷰티 분야에서 5년간 활동한 쇼호스트 김지현입니다.\n라이브 커머스를 통해 고객과 소통하며 브랜드 가치를 전달하는 것을 즐깁니다. 진정성 있는 소통과 전문적인 제품 설명으로 높은 구매 전환율을 자랑합니다.\n함께 성장할 수 있는 브랜드와의 협업을 기대합니다!',
+    experienceYears: 5,
+    age: null,
+    isAgePublic: false,
+    mainThumbnailUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
+    backgroundImageUrl: null,
+    subThumbnailUrls: [
+      'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
+    ],
+    status: 'active',
+    detailedRegion: null,
+    gender: null,
+    height: 168,
+    weight: null,
+    topSize: '55(S)',
+    bottomSize: null,
+    shoeSize: null,
+    isSizingPublic: true,
+    websiteUrl: 'https://www.instagram.com/jihyun_host',
+    instagramUrl: null,
+    youtubeUrl: null,
+    tiktokUrl: null,
+    publicScope: 'public',
+    isReceivingOffers: true,
+    attachedFileUrl: null,
+    createdAt: '',
+    updatedAt: '',
+  };
+
+  // 데이터가 준비되지 않았으면 기본 데이터 사용
+  const displayPortfolio = portfolio || defaultPortfolio;
+
+  const gallery = useImageGallery(displayPortfolio.subThumbnailUrls ?? []);
 
   const categories = useMemo(() => {
-    if (!portfolio?.oneLineIntro) {
-      return [];
+    if (!displayPortfolio.oneLineIntro) {
+      return ['패션', '뷰티'];
     }
-    return extractCategories({ description: portfolio.oneLineIntro });
-  }, [portfolio?.oneLineIntro]);
+    const extracted = extractCategories({ description: displayPortfolio.oneLineIntro });
+    return extracted.length > 0 ? extracted : ['패션', '뷰티'];
+  }, [displayPortfolio.oneLineIntro]);
 
   const tags = useMemo(() => {
-    if (!portfolio) {
-      return [];
-    }
     return generateProfileTags({
-      height: portfolio.height,
-      weight: portfolio.weight,
-      topSize: portfolio.topSize,
-      experienceYears: portfolio.experienceYears,
-      isSizingPublic: true,
+      height: displayPortfolio.height,
+      weight: displayPortfolio.weight,
+      topSize: displayPortfolio.topSize,
+      experienceYears: displayPortfolio.experienceYears,
+      isSizingPublic: displayPortfolio.isSizingPublic,
     });
-  }, [portfolio]);
-
-  // 로딩/에러 상태일 경우 UI 반환
-  if (renderState) {
-    return <>{renderState}</>;
-  }
-
-  // 데이터가 준비되지 않았으면 아무것도 렌더링하지 않음 (방어 코드)
-  if (!isReady || !portfolio) {
-    return null;
-  }
+  }, [displayPortfolio]);
 
   const handleProfileImageClick = () => {
     // TODO: 이미지 확대 또는 갤러리 열기 기능 구현
@@ -105,36 +146,40 @@ const PortfolioDetailPage: React.FC = () => {
 
   return (
     <DetailPageLayout>
-      <StickyHeader title={portfolio.nickname || '쇼호스트'} onShare={handleShare} />
+      <StickyHeader title={displayPortfolio.nickname || '쇼호스트'} onShare={handleShare} />
 
       <ProfileSection
-        name={portfolio.nickname || '이름 없음'}
-        description={portfolio.oneLineIntro}
-        detailedIntro={portfolio.detailedIntro}
-        profileImageUrl={portfolio.mainThumbnailUrl || undefined}
+        name={displayPortfolio.nickname || '김지현'}
+        description={displayPortfolio.oneLineIntro || '패션 전문 쇼호스트, 5년 경력'}
+        detailedIntro={displayPortfolio.detailedIntro || '안녕하세요! 패션과 뷰티 분야에서 5년간 활동한 쇼호스트 김지현입니다.\n라이브 커머스를 통해 고객과 소통하며 브랜드 가치를 전달하는 것을 즐깁니다. 진정성 있는 소통과 전문적인 제품 설명으로 높은 구매 전환율을 자랑합니다.\n함께 성장할 수 있는 브랜드와의 협업을 기대합니다!'}
+        profileImageUrl={displayPortfolio.mainThumbnailUrl || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80'}
         type="showhost"
-        categories={categories}
-        tags={tags}
-        websiteUrl={portfolio.websiteUrl}
+        categories={categories.length > 0 ? categories : ['패션', '뷰티']}
+        tags={tags.length > 0 ? tags : ['키 168cm', '사이즈 55(S)', '경력 5년']}
+        websiteUrl={displayPortfolio.websiteUrl || 'https://www.instagram.com/jihyun_host'}
         onImageClick={handleProfileImageClick}
       />
 
-      {portfolio.subThumbnailUrls && portfolio.subThumbnailUrls.length > 0 && (
-        <GallerySection>
+      <GallerySection>
+        <GalleryHeaderWrapper>
           <HomeSectionHeader title="갤러리" />
-          <GalleryWrapper>
-            <GalleryGrid
-              images={portfolio.subThumbnailUrls}
-              columns={3}
-              onImageClick={handleGalleryImageClick}
-            />
-          </GalleryWrapper>
-        </GallerySection>
-      )}
+        </GalleryHeaderWrapper>
+        <GalleryWrapper>
+          <GalleryGrid
+            images={
+              displayPortfolio.subThumbnailUrls && displayPortfolio.subThumbnailUrls.length > 0
+                ? displayPortfolio.subThumbnailUrls
+                : defaultPortfolio.subThumbnailUrls
+            }
+            columns={3}
+            onImageClick={handleGalleryImageClick}
+          />
+        </GalleryWrapper>
+      </GallerySection>
 
       <ActionSection
         isScraped={false}
-        isReceivingOffers={portfolio.isReceivingOffers}
+        isReceivingOffers={displayPortfolio.isReceivingOffers}
         onScrap={handleScrap}
         onOffer={handleOffer}
       />

@@ -25,7 +25,7 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
   return (
     <CardContainer onClick={onCardClick}>
       <StyledCardHeader>
-        <BrandName>{campaign.brandName}</BrandName>
+        <BrandName>{campaign.brandName || '브랜드명'}</BrandName>
         <ScrapButton
           type="button"
           aria-label="스크랩"

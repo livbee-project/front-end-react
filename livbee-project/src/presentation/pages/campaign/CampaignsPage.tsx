@@ -11,7 +11,6 @@ import { useListSearch } from '@/presentation/hooks/useListSearch';
 import { useScrapToggle } from '@/presentation/hooks/useScrapToggle';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';
-import { CampaignListHeader } from '@/presentation/components/campaign/CampaignListHeader';
 import { CampaignSearchSection } from '@/presentation/components/campaign/CampaignSearchSection';
 import { CampaignFilterRow } from '@/presentation/components/campaign/CampaignFilterRow';
 import { CampaignListContent } from '@/presentation/components/campaign/CampaignListContent';
@@ -94,12 +93,6 @@ const CampaignsPage: React.FC = () => {
   return (
     <PageWrapper>
       <PageInner>
-        <CampaignListHeader
-          title="진행중인 캠페인"
-          description="브랜드가 찾고 있는 쇼호스트에 지원해보세요"
-          highlightText="캠페인"
-        />
-
         <CampaignSearchSection
           value={searchInputValue}
           onChange={setSearchInputValue}

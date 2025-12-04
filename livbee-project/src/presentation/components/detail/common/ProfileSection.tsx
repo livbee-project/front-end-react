@@ -24,7 +24,7 @@ interface ProfileSectionProps extends BaseProfileSectionProps {
 const Section = styled.section`
   max-width: 672px;
   margin: 0 auto;
-  padding: ${({ theme }) => theme.spacing.xl} ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => theme.spacing.xl} 0;
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.lg};
@@ -77,15 +77,16 @@ const BadgeContainer = styled.div`
 `;
 
 const TypeBadge = styled(Badge)`
-  border: 1px solid ${({ theme }) => theme.colors.primary};
-  background-color: transparent;
-  color: ${({ theme }) => theme.colors.primary};
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primaryForeground};
+  border: none;
   padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
 `;
 
 const CategoryBadge = styled(Badge)`
-  background-color: ${({ theme }) => theme.colors.secondary};
+  background-color: ${({ theme }) => theme.colors.background};
   color: ${({ theme }) => theme.colors.foreground};
+  border: 1px solid ${({ theme }) => theme.colors.border};
   padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
 `;
 

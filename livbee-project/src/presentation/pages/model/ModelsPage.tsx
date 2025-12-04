@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import styled from 'styled-components';
+import { Plus } from 'lucide-react';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
 import type { Model } from '@/domain/entities/Model';
 import { useRepository } from '@/presentation/hooks/useRepository';
@@ -8,20 +9,8 @@ import { useListFetcher } from '@/presentation/hooks/useListFetcher';
 import { useListPageState } from '@/presentation/hooks/useListPageState';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';
-import {
-  PageContainer,
-  HeaderSection,
-  HeaderTitle,
-  HeaderSubtitle,
-  SearchBar,
-  SearchInput,
-  SearchIcon,
-  FilterSection,
-  FilterButton,
-  ContentSection,
-  ModelsGrid,
-  FloatingActionButton,
-} from './styled/ModelsPageStyles';
+import { ModelSearchSection } from '@/presentation/components/model/ModelSearchSection';
+import { ModelFilterRow } from '@/presentation/components/model/ModelFilterRow';
 import { ModelCard } from './components/ModelCard';
 import { useModelFilter } from './hooks/useModelFilter';
 
@@ -106,7 +95,7 @@ const ModelsPage: React.FC = () => {
     data: models || [],
     loading,
     error,
-    LayoutComponent: PageContainer,
+    LayoutComponent: PageWrapper,
     showEmptyState: false,
   });
 
@@ -141,6 +130,11 @@ const ModelsPage: React.FC = () => {
     filters,
   });
 
+  const handleFormSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    // 검색은 실시간으로 처리되므로 여기서는 preventDefault만 수행
+  }, []);
+
   const handleModelClick = useCallback((modelId: string) => {
     navigate(`/models/${modelId}`);
   }, [navigate]);
@@ -160,46 +154,28 @@ const ModelsPage: React.FC = () => {
 
   if (error && (!models || models.length === 0)) {
     return (
-      <PageContainer>
+      <PageWrapper>
         <p>{error}</p>
-      </PageContainer>
+      </PageWrapper>
     );
   }
 
   return (
-    <PageContainer>
-      <HeaderSection>
-        <HeaderTitle>
-          컨셉에 맞는 <span>모델 찾기</span>
-        </HeaderTitle>
-        <HeaderSubtitle>브랜드 이미지에 맞는 모델을 찾아보세요</HeaderSubtitle>
-        
-        <SearchBar>
-          <SearchIcon>
-            <Search size={20} />
-          </SearchIcon>
-          <SearchInput
-            type="text"
-            placeholder="모델 이름 검색"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </SearchBar>
+    <PageWrapper>
+      <PageInner>
+        <ModelSearchSection
+          value={searchQuery}
+          onChange={setSearchQuery}
+          onSubmit={handleFormSubmit}
+          placeholder="이름, 카테고리로 검색"
+        />
 
-        <FilterSection>
-          {filters.map((filter) => (
-            <FilterButton
-              key={filter}
-              $active={selectedFilter === filter}
-              onClick={() => setSelectedFilter(filter)}
-            >
-              {filter}
-            </FilterButton>
-          ))}
-        </FilterSection>
-      </HeaderSection>
+        <ModelFilterRow
+          filters={filters}
+          activeFilter={selectedFilter}
+          onFilterChange={setSelectedFilter}
+        />
 
-      <ContentSection>
         <ModelsGrid>
           {filteredModels.map((model) => (
             <ModelCard
@@ -215,9 +191,10 @@ const ModelsPage: React.FC = () => {
             />
           ))}
         </ModelsGrid>
-      </ContentSection>
+      </PageInner>
 
-      <FloatingActionButton
+      <RegisterFab
+        type="button"
         onClick={() => {
           if (user?.role !== 'showhost') {
             showToast('브랜드 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
@@ -226,11 +203,64 @@ const ModelsPage: React.FC = () => {
           }
           navigate('/models/register');
         }}
+        aria-label="모델 등록"
       >
-        +
-      </FloatingActionButton>
-    </PageContainer>
+        <Plus size={24} strokeWidth={2.5} />
+      </RegisterFab>
+    </PageWrapper>
   );
 };
+
+const PageWrapper = styled.div`
+  min-height: 100vh;
+  background: ${({ theme }) => theme.colors.background};
+  padding: 2rem 1rem 6rem;
+  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    padding: 2.5rem 1.5rem 6rem;
+  }
+  @media (min-width: ${({ theme }) => theme.breakpoints.desktop}) {
+    padding: 3rem 2rem 6rem;
+  }
+`;
+
+const PageInner = styled.div`
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.xl};
+`;
+
+const ModelsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+`;
+
+const RegisterFab = styled.button`
+  position: fixed;
+  right: ${({ theme }) => theme.spacing.xl};
+  bottom: 6rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: ${({ theme }) => theme.radii.full};
+  border: none;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primaryForeground};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 24px ${({ theme }) => theme.primaryOpacity['35']};
+  cursor: pointer;
+  z-index: 50;
+  transition: transform 0.2s, background 0.2s;
+  &:hover {
+    background: ${({ theme }) => theme.colors.primaryHover};
+    transform: scale(1.05);
+  }
+  &:active {
+    transform: scale(0.98);
+  }
+`;
 
 export default ModelsPage;
