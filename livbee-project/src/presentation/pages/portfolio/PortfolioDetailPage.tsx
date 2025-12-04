@@ -61,6 +61,14 @@ const PortfolioDetailPage: React.FC = () => {
     LayoutComponent: DetailPageLayout,
   });
 
+  if (renderState) {
+    return <>{renderState}</>;
+  }
+
+  if (!isReady) {
+    return null;
+  }
+
   // 하드코딩된 기본 데이터 (데이터가 없을 때 사용)
   const defaultPortfolio: PortfolioDetail = {
     id: id || '',
@@ -96,6 +104,7 @@ const PortfolioDetailPage: React.FC = () => {
     tiktokUrl: null,
     publicScope: 'public',
     isReceivingOffers: true,
+    recentLives: [],
     attachedFileUrl: null,
     createdAt: '',
     updatedAt: '',

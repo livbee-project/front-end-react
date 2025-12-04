@@ -60,6 +60,14 @@ const ModelDetailPage: React.FC = () => {
     LayoutComponent: DetailPageLayout,
   });
 
+  if (renderState) {
+    return <>{renderState}</>;
+  }
+
+  if (!isReady) {
+    return null;
+  }
+
   // 하드코딩된 기본 데이터 (데이터가 없을 때 사용)
   const defaultModel: ModelDetail = {
     id: id || '',
