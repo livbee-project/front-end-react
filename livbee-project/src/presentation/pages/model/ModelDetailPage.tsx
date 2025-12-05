@@ -1,39 +1,13 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
-import styled from 'styled-components';
-import StickyHeader from '@/presentation/components/detail/common/StickyHeader';
-import ProfileSection from '@/presentation/components/detail/common/ProfileSection';
-import HomeSectionHeader from '@/presentation/components/home/sections/HomeSectionHeader';
-import GalleryGrid from '@/presentation/components/detail/common/GalleryGrid';
-import ActionSection from '@/presentation/components/detail/common/ActionSection';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
 import type { ModelDetail } from '@/domain/entities/Model';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useDetailFetcher } from '@/presentation/hooks/useDetailFetcher';
 import { useDetailPageState } from '@/presentation/hooks/useDetailPageState';
-import { useImageGallery } from '@/presentation/hooks/useImageGallery';
-import GalleryLightbox from '@/presentation/components/detail/common/GalleryLightbox';
-import { extractCategories, generateProfileTags } from '@/shared/utils/detailPageUtils';
-
-const GallerySection = styled.div`
-  padding: ${({ theme }) => theme.spacing.xl} 0;
-`;
-
-const GalleryHeaderWrapper = styled.div`
-  padding: 0 16px;
-  
-  /* HomeSectionHeader 내부 HeaderWrapper의 margin 오버라이드 */
-  > * {
-    margin: ${({ theme }) => `${theme.spacing['2xl']} 0 ${theme.spacing.xl}`} !important;
-  }
-`;
-
-const GalleryWrapper = styled.div`
-  margin-top: ${({ theme }) => theme.spacing.lg};
-  margin-left: -16px;
-  margin-right: -16px;
-`;
+import { useProfileDetailPage } from '@/presentation/pages/detail/shared/useProfileDetailPage';
+import { ProfileDetailContent } from '@/presentation/pages/detail/shared/ProfileDetailContent';
 
 const ModelDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -90,29 +64,11 @@ const ModelDetailPage: React.FC = () => {
     updatedAt: '',
   };
 
-  // 데이터가 준비되지 않았으면 기본 데이터 사용
-  const displayModel = model || defaultModel;
-
   // 모든 Hook은 early return 이전에 호출되어야 합니다
-  const gallery = useImageGallery(displayModel.subThumbnailUrls ?? []);
-
-  const categories = useMemo(() => {
-    if (!displayModel.oneLineIntro) {
-      return ['패션', '뷰티'];
-    }
-    const extracted = extractCategories({ description: displayModel.oneLineIntro });
-    return extracted.length > 0 ? extracted : ['패션', '뷰티'];
-  }, [displayModel.oneLineIntro]);
-
-  const tags = useMemo(() => {
-    return generateProfileTags({
-      height: displayModel.height,
-      weight: displayModel.weight,
-      topSize: displayModel.topSize,
-      experienceYears: displayModel.experienceYears,
-      isSizingPublic: displayModel.isSizingPublic,
-    });
-  }, [displayModel]);
+  const { displayData: displayModel, gallery, categories, tags, websiteUrl } = useProfileDetailPage({
+    data: model,
+    defaultData: defaultModel,
+  });
 
   // 로딩/에러 상태 처리
   const { renderState, isReady } = useDetailPageState({
@@ -136,10 +92,6 @@ const ModelDetailPage: React.FC = () => {
     // TODO: 이미지 확대 또는 갤러리 열기 기능 구현
   };
 
-  const handleGalleryImageClick = (index: number) => {
-    gallery.open(index);
-  };
-
   const handleScrap = () => {
     // TODO: 찜하기 기능 구현
   };
@@ -152,55 +104,33 @@ const ModelDetailPage: React.FC = () => {
     // TODO: 공유 기능 구현
   };
 
-  // websiteUrl 우선순위: websiteUrl > instagramUrl
-  const websiteUrl = displayModel.websiteUrl || displayModel.instagramUrl || null;
-
   return (
     <DetailPageLayout>
-      <StickyHeader title={displayModel.nickname || '모델'} onShare={handleShare} />
-
-      <ProfileSection
-        name={displayModel.nickname || '한지우'}
-        description={displayModel.oneLineIntro || '청순/내추럴 컨셉 전문 모델'}
-        detailedIntro={displayModel.detailedIntro || '안녕하세요! 패션과 뷰티 분야에서 활동하고 있는 모델 한지우입니다.\n청순하고 자연스러운 이미지로 다양한 브랜드와 협업하고 있으며, 카메라 앞에서 자연스러운 포즈와 표현력을 자랑합니다.\n함께 성장할 수 있는 브랜드와의 협업을 기대합니다!'}
-        profileImageUrl={displayModel.mainThumbnailUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+      <ProfileDetailContent
+        title={displayModel.nickname || '모델'}
+        name={displayModel.nickname || ''}
+        description={displayModel.oneLineIntro || ''}
+        detailedIntro={displayModel.detailedIntro || ''}
+        profileImageUrl={displayModel.mainThumbnailUrl || ''}
         type="model"
-        categories={categories.length > 0 ? categories : ['패션', '뷰티']}
-        tags={tags.length > 0 ? tags : ['키 168cm', '사이즈 55(S)', '경력 3년']}
-        websiteUrl={websiteUrl || 'https://www.instagram.com/jiwoo_model'}
-        onImageClick={handleProfileImageClick}
-      />
-
-      <GallerySection>
-        <GalleryHeaderWrapper>
-          <HomeSectionHeader title="갤러리" />
-        </GalleryHeaderWrapper>
-        <GalleryWrapper>
-          <GalleryGrid
-            images={
-              displayModel.subThumbnailUrls && displayModel.subThumbnailUrls.length > 0
-                ? displayModel.subThumbnailUrls
-                : defaultModel.subThumbnailUrls
-            }
-            columns={3}
-            onImageClick={handleGalleryImageClick}
-          />
-        </GalleryWrapper>
-      </GallerySection>
-
-      <ActionSection
-        isScraped={false}
-        isReceivingOffers={displayModel.isReceivingOffers}
+        categories={categories}
+        tags={tags}
+        websiteUrl={websiteUrl || ''}
+        galleryImages={displayModel.subThumbnailUrls || []}
+        defaultGalleryImages={defaultModel.subThumbnailUrls}
+        isReceivingOffers={displayModel.isReceivingOffers ?? true}
+        gallery={gallery}
+        onProfileImageClick={handleProfileImageClick}
         onScrap={handleScrap}
         onOffer={handleOffer}
-      />
-      <GalleryLightbox
-        image={gallery.currentImage}
-        isOpen={gallery.isOpen}
-        onClose={gallery.close}
-        onPrev={gallery.showPrev}
-        onNext={gallery.showNext}
-        showControls={gallery.images.length > 1}
+        onShare={handleShare}
+        defaultName="한지우"
+        defaultDescription="청순/내추럴 컨셉 전문 모델"
+        defaultDetailedIntro="안녕하세요! 패션과 뷰티 분야에서 활동하고 있는 모델 한지우입니다.\n청순하고 자연스러운 이미지로 다양한 브랜드와 협업하고 있으며, 카메라 앞에서 자연스러운 포즈와 표현력을 자랑합니다.\n함께 성장할 수 있는 브랜드와의 협업을 기대합니다!"
+        defaultProfileImageUrl="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"
+        defaultWebsiteUrl="https://www.instagram.com/jiwoo_model"
+        defaultCategories={['패션', '뷰티']}
+        defaultTags={['키 168cm', '사이즈 55(S)', '경력 3년']}
       />
     </DetailPageLayout>
   );

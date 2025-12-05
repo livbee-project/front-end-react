@@ -1,6 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-export const useImageGallery = (initialImages: string[] = []) => {
+export interface ImageGallery {
+  images: string[];
+  setImages: (images: string[]) => void;
+  activeIndex: number | null;
+  currentImage: string | undefined;
+  isOpen: boolean;
+  open: (index: number) => void;
+  close: () => void;
+  showNext: () => void;
+  showPrev: () => void;
+}
+
+export const useImageGallery = (initialImages: string[] = []): ImageGallery => {
   const [images, setImages] = useState<string[]>(initialImages);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 

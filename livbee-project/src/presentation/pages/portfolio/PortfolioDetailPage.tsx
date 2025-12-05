@@ -1,39 +1,13 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
-import styled from 'styled-components';
-import StickyHeader from '@/presentation/components/detail/common/StickyHeader';
-import ProfileSection from '@/presentation/components/detail/common/ProfileSection';
-import HomeSectionHeader from '@/presentation/components/home/sections/HomeSectionHeader';
-import GalleryGrid from '@/presentation/components/detail/common/GalleryGrid';
-import ActionSection from '@/presentation/components/detail/common/ActionSection';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { PortfolioDetail } from '@/domain/entities/Portfolio';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import { useDetailFetcher } from '@/presentation/hooks/useDetailFetcher';
 import { useDetailPageState } from '@/presentation/hooks/useDetailPageState';
-import { useImageGallery } from '@/presentation/hooks/useImageGallery';
-import GalleryLightbox from '@/presentation/components/detail/common/GalleryLightbox';
-import { extractCategories, generateProfileTags } from '@/shared/utils/detailPageUtils';
-
-const GallerySection = styled.div`
-  padding: ${({ theme }) => theme.spacing.xl} 0;
-`;
-
-const GalleryHeaderWrapper = styled.div`
-  padding: 0 16px;
-  
-  /* HomeSectionHeader 내부 HeaderWrapper의 margin 오버라이드 */
-  > * {
-    margin: ${({ theme }) => `${theme.spacing['2xl']} 0 ${theme.spacing.xl}`} !important;
-  }
-`;
-
-const GalleryWrapper = styled.div`
-  margin-top: ${({ theme }) => theme.spacing.lg};
-  margin-left: -16px;
-  margin-right: -16px;
-`;
+import { useProfileDetailPage } from '@/presentation/pages/detail/shared/useProfileDetailPage';
+import { ProfileDetailContent } from '@/presentation/pages/detail/shared/ProfileDetailContent';
 
 const PortfolioDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -92,29 +66,11 @@ const PortfolioDetailPage: React.FC = () => {
     updatedAt: '',
   };
 
-  // 데이터가 준비되지 않았으면 기본 데이터 사용
-  const displayPortfolio = portfolio || defaultPortfolio;
-
   // 모든 Hook은 early return 이전에 호출되어야 합니다
-  const gallery = useImageGallery(displayPortfolio.subThumbnailUrls ?? []);
-
-  const categories = useMemo(() => {
-    if (!displayPortfolio.oneLineIntro) {
-      return ['패션', '뷰티'];
-    }
-    const extracted = extractCategories({ description: displayPortfolio.oneLineIntro });
-    return extracted.length > 0 ? extracted : ['패션', '뷰티'];
-  }, [displayPortfolio.oneLineIntro]);
-
-  const tags = useMemo(() => {
-    return generateProfileTags({
-      height: displayPortfolio.height,
-      weight: displayPortfolio.weight,
-      topSize: displayPortfolio.topSize,
-      experienceYears: displayPortfolio.experienceYears,
-      isSizingPublic: displayPortfolio.isSizingPublic,
-    });
-  }, [displayPortfolio]);
+  const { displayData: displayPortfolio, gallery, categories, tags, websiteUrl } = useProfileDetailPage({
+    data: portfolio,
+    defaultData: defaultPortfolio,
+  });
 
   // 로딩/에러 상태 처리
   const { renderState, isReady } = useDetailPageState({
@@ -138,10 +94,6 @@ const PortfolioDetailPage: React.FC = () => {
     // TODO: 이미지 확대 또는 갤러리 열기 기능 구현
   };
 
-  const handleGalleryImageClick = (index: number) => {
-    gallery.open(index);
-  };
-
   const handleScrap = () => {
     // TODO: 찜하기 기능 구현
   };
@@ -156,50 +108,31 @@ const PortfolioDetailPage: React.FC = () => {
 
   return (
     <DetailPageLayout>
-      <StickyHeader title={displayPortfolio.nickname || '쇼호스트'} onShare={handleShare} />
-
-      <ProfileSection
-        name={displayPortfolio.nickname || '김지현'}
-        description={displayPortfolio.oneLineIntro || '패션 전문 쇼호스트, 5년 경력'}
-        detailedIntro={displayPortfolio.detailedIntro || '안녕하세요! 패션과 뷰티 분야에서 5년간 활동한 쇼호스트 김지현입니다.\n라이브 커머스를 통해 고객과 소통하며 브랜드 가치를 전달하는 것을 즐깁니다. 진정성 있는 소통과 전문적인 제품 설명으로 높은 구매 전환율을 자랑합니다.\n함께 성장할 수 있는 브랜드와의 협업을 기대합니다!'}
-        profileImageUrl={displayPortfolio.mainThumbnailUrl || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80'}
+      <ProfileDetailContent
+        title={displayPortfolio.nickname || '쇼호스트'}
+        name={displayPortfolio.nickname || ''}
+        description={displayPortfolio.oneLineIntro || ''}
+        detailedIntro={displayPortfolio.detailedIntro || ''}
+        profileImageUrl={displayPortfolio.mainThumbnailUrl || ''}
         type="showhost"
-        categories={categories.length > 0 ? categories : ['패션', '뷰티']}
-        tags={tags.length > 0 ? tags : ['키 168cm', '사이즈 55(S)', '경력 5년']}
-        websiteUrl={displayPortfolio.websiteUrl || 'https://www.instagram.com/jihyun_host'}
-        onImageClick={handleProfileImageClick}
-      />
-
-      <GallerySection>
-        <GalleryHeaderWrapper>
-          <HomeSectionHeader title="갤러리" />
-        </GalleryHeaderWrapper>
-        <GalleryWrapper>
-          <GalleryGrid
-            images={
-              displayPortfolio.subThumbnailUrls && displayPortfolio.subThumbnailUrls.length > 0
-                ? displayPortfolio.subThumbnailUrls
-                : defaultPortfolio.subThumbnailUrls
-            }
-            columns={3}
-            onImageClick={handleGalleryImageClick}
-          />
-        </GalleryWrapper>
-      </GallerySection>
-
-      <ActionSection
-        isScraped={false}
-        isReceivingOffers={displayPortfolio.isReceivingOffers}
+        categories={categories}
+        tags={tags}
+        websiteUrl={websiteUrl || ''}
+        galleryImages={displayPortfolio.subThumbnailUrls || []}
+        defaultGalleryImages={defaultPortfolio.subThumbnailUrls}
+        isReceivingOffers={displayPortfolio.isReceivingOffers ?? true}
+        gallery={gallery}
+        onProfileImageClick={handleProfileImageClick}
         onScrap={handleScrap}
         onOffer={handleOffer}
-      />
-      <GalleryLightbox
-        image={gallery.currentImage}
-        isOpen={gallery.isOpen}
-        onClose={gallery.close}
-        onPrev={gallery.showPrev}
-        onNext={gallery.showNext}
-        showControls={gallery.images.length > 1}
+        onShare={handleShare}
+        defaultName="김지현"
+        defaultDescription="패션 전문 쇼호스트, 5년 경력"
+        defaultDetailedIntro="안녕하세요! 패션과 뷰티 분야에서 5년간 활동한 쇼호스트 김지현입니다.\n라이브 커머스를 통해 고객과 소통하며 브랜드 가치를 전달하는 것을 즐깁니다. 진정성 있는 소통과 전문적인 제품 설명으로 높은 구매 전환율을 자랑합니다.\n함께 성장할 수 있는 브랜드와의 협업을 기대합니다!"
+        defaultProfileImageUrl="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80"
+        defaultWebsiteUrl="https://www.instagram.com/jihyun_host"
+        defaultCategories={['패션', '뷰티']}
+        defaultTags={['키 168cm', '사이즈 55(S)', '경력 5년']}
       />
     </DetailPageLayout>
   );

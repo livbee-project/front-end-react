@@ -1,8 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
 import { useRepository } from '@/presentation/hooks/useRepository';
-import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { useFormState } from '@/presentation/hooks/useFormState';
 import { useFormUpload } from '@/presentation/hooks/useFormUpload';
@@ -11,6 +9,7 @@ import { clearImageUrls, getStoredImageUrls, saveImageUrls } from './utils/model
 import { validateModelForm } from './utils/modelValidation';
 import { buildModelRequest } from './utils/modelRequestBuilder';
 import { useFormImageSync } from '@/presentation/components/forms/shared/hooks/useFormImageSync';
+import { useFormSubmit } from '@/presentation/components/forms/shared/hooks/useFormSubmit';
 
 const FORM_STORAGE_KEY = 'model-register-form';
 const TOGGLE_STORAGE_KEY = 'model-register-toggles';
@@ -46,8 +45,6 @@ const INITIAL_TOGGLE_STATE: ModelToggleState = {
 export const MAX_GALLERY_IMAGES = 5;
 
 export const useModelRegisterForm = () => {
-  const navigate = useNavigate();
-  const { uploadFile, isUploading: isImageUploading } = useCloudinaryUpload();
   const { showToast } = useToast();
   const modelRepository = useRepository(ModelRepository);
 
@@ -89,7 +86,6 @@ export const useModelRegisterForm = () => {
       portfolio: portfolioFileUrl,
     });
   }, [galleryImageUrlsState, mainThumbnailUrlState, portfolioFileUrl]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = useCallback(
     (field: keyof ModelFormData, value: string, index?: number, subField?: keyof (ModelFormData['websites'][number]) ) => {
@@ -151,88 +147,22 @@ export const useModelRegisterForm = () => {
     setPortfolioFileUrl('');
   }, []);
 
-  const handleSubmit = useCallback(async () => {
-    setIsSubmitting(true);
-
-    // 유효성 검사
-    const validation = validateModelForm(formData, toggles);
-    if (!validation.isValid) {
-      showToast(validation.errorMessage || '입력 정보를 확인해주세요.', undefined, 'error');
-      setIsSubmitting(false);
-      return;
-    }
-
-    try {
-      let uploadedMainThumbnailUrl: string | undefined;
-      const uploadedGalleryUrls: string[] = [];
-      let uploadedPortfolioFileUrl: string | undefined;
-
-      if (mainThumbnailFile) {
-        const url = await uploadFile(mainThumbnailFile, { type: 'image' });
-        if (!url) {
-          showToast('프로필 이미지 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
-          setIsSubmitting(false);
-          return;
-        }
-        uploadedMainThumbnailUrl = url;
-      }
-
-      for (const file of galleryImageFiles) {
-        const url = await uploadFile(file, { type: 'image' });
-        if (!url) {
-          showToast('갤러리 이미지 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
-          setIsSubmitting(false);
-          return;
-        }
-        uploadedGalleryUrls.push(url);
-      }
-
-      if (portfolioFile) {
-        const url = await uploadFile(portfolioFile, { type: 'raw' });
-        if (!url) {
-          showToast('포트폴리오 파일 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
-          setIsSubmitting(false);
-          return;
-        }
-        uploadedPortfolioFileUrl = url;
-      }
-
-      const request = buildModelRequest(
-        formData,
-        uploadedMainThumbnailUrl,
-        uploadedGalleryUrls,
-        uploadedPortfolioFileUrl
-      );
-
-      const response = await modelRepository.createModel(request);
-
-      if (response.ok) {
-        // 제출 성공 시 sessionStorage 삭제
-        clearFormStorage();
-        clearToggleStorage();
-        clearImageUrls();
-        showToast('모델이 등록되었습니다.');
-        navigate('/models', { replace: true });
-      }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : '모델 등록에 실패했습니다.';
-      showToast(message, undefined, 'error');
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [
-    clearFormStorage,
-    clearToggleStorage,
+  const { handleSubmit, isSubmitting, isUploading: isImageUploading } = useFormSubmit({
     formData,
-    galleryImageFiles,
-    mainThumbnailFile,
-    modelRepository,
-    navigate,
-    portfolioFile,
     toggles,
-    showToast,
-    uploadFile,
-  ]);
+    mainThumbnailFile,
+    galleryImageFiles,
+    portfolioFile,
+    validateForm: validateModelForm,
+    buildRequest: buildModelRequest,
+    createEntity: (request) => modelRepository.createModel(request as Parameters<typeof modelRepository.createModel>[0]),
+    clearStorage: clearFormStorage,
+    clearToggleStorage: clearToggleStorage,
+    clearImageUrls: clearImageUrls,
+    successMessage: '모델이 등록되었습니다.',
+    successNavigatePath: '/models',
+    portfolioFileErrorMessage: '포트폴리오 파일 업로드에 실패했습니다. 로그인 상태를 확인해주세요.',
+  });
 
   return {
     formData,
