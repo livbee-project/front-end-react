@@ -50,24 +50,6 @@ const ModelDetailPage: React.FC = () => {
     errorMessage: '모델을 불러오는데 실패했습니다.',
   });
 
-  // 로딩/에러 상태 처리
-  const { renderState, isReady } = useDetailPageState({
-    data: model,
-    loading: isLoading,
-    error,
-    notFoundMessage: '모델을 찾을 수 없습니다.',
-    listPath: '/models',
-    LayoutComponent: DetailPageLayout,
-  });
-
-  if (renderState) {
-    return <>{renderState}</>;
-  }
-
-  if (!isReady) {
-    return null;
-  }
-
   // 하드코딩된 기본 데이터 (데이터가 없을 때 사용)
   const defaultModel: ModelDetail = {
     id: id || '',
@@ -111,6 +93,7 @@ const ModelDetailPage: React.FC = () => {
   // 데이터가 준비되지 않았으면 기본 데이터 사용
   const displayModel = model || defaultModel;
 
+  // 모든 Hook은 early return 이전에 호출되어야 합니다
   const gallery = useImageGallery(displayModel.subThumbnailUrls ?? []);
 
   const categories = useMemo(() => {
@@ -130,6 +113,24 @@ const ModelDetailPage: React.FC = () => {
       isSizingPublic: displayModel.isSizingPublic,
     });
   }, [displayModel]);
+
+  // 로딩/에러 상태 처리
+  const { renderState, isReady } = useDetailPageState({
+    data: model,
+    loading: isLoading,
+    error,
+    notFoundMessage: '모델을 찾을 수 없습니다.',
+    listPath: '/models',
+    LayoutComponent: DetailPageLayout,
+  });
+
+  if (renderState) {
+    return <>{renderState}</>;
+  }
+
+  if (!isReady) {
+    return null;
+  }
 
   const handleProfileImageClick = () => {
     // TODO: 이미지 확대 또는 갤러리 열기 기능 구현

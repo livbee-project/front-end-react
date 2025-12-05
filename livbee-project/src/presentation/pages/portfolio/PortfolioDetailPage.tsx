@@ -51,24 +51,6 @@ const PortfolioDetailPage: React.FC = () => {
     errorMessage: '포트폴리오를 불러오는데 실패했습니다.',
   });
 
-  // 로딩/에러 상태 처리
-  const { renderState, isReady } = useDetailPageState({
-    data: portfolio,
-    loading: isLoading,
-    error,
-    notFoundMessage: '포트폴리오를 찾을 수 없습니다.',
-    listPath: '/portfolios',
-    LayoutComponent: DetailPageLayout,
-  });
-
-  if (renderState) {
-    return <>{renderState}</>;
-  }
-
-  if (!isReady) {
-    return null;
-  }
-
   // 하드코딩된 기본 데이터 (데이터가 없을 때 사용)
   const defaultPortfolio: PortfolioDetail = {
     id: id || '',
@@ -113,6 +95,7 @@ const PortfolioDetailPage: React.FC = () => {
   // 데이터가 준비되지 않았으면 기본 데이터 사용
   const displayPortfolio = portfolio || defaultPortfolio;
 
+  // 모든 Hook은 early return 이전에 호출되어야 합니다
   const gallery = useImageGallery(displayPortfolio.subThumbnailUrls ?? []);
 
   const categories = useMemo(() => {
@@ -132,6 +115,24 @@ const PortfolioDetailPage: React.FC = () => {
       isSizingPublic: displayPortfolio.isSizingPublic,
     });
   }, [displayPortfolio]);
+
+  // 로딩/에러 상태 처리
+  const { renderState, isReady } = useDetailPageState({
+    data: portfolio,
+    loading: isLoading,
+    error,
+    notFoundMessage: '포트폴리오를 찾을 수 없습니다.',
+    listPath: '/portfolios',
+    LayoutComponent: DetailPageLayout,
+  });
+
+  if (renderState) {
+    return <>{renderState}</>;
+  }
+
+  if (!isReady) {
+    return null;
+  }
 
   const handleProfileImageClick = () => {
     // TODO: 이미지 확대 또는 갤러리 열기 기능 구현
