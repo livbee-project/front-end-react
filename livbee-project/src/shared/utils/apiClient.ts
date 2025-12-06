@@ -3,8 +3,8 @@
  * 네트워크 에러, JSON 파싱, 에러 처리를 통합한 공통 함수 제공
  */
 
-import { extractErrorMessage, isSuccessResponse, extractData, type ApiResponse } from './apiResponseHandler';
-import { emitApiErrorEvent } from './apiEvents';
+import { extractErrorMessage, isSuccessResponse, extractData, type ApiResponse } from '@/shared/utils/apiResponseHandler';
+import { emitApiErrorEvent } from '@/shared/utils/apiEvents';
 
 export class ApiError extends Error {
   status?: number;

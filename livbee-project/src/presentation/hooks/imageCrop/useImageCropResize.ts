@@ -4,7 +4,7 @@
 
 import { useState, useCallback } from 'react';
 import type { CropArea, CropRatio, ImageSize } from '@/types/imageCrop';
-import { getRatioValue } from '../utils/imageCropUtils';
+import { getRatioValue } from '@/presentation/hooks/utils/imageCropUtils';
 
 interface UseImageCropResizeParams {
   cropArea: CropArea;

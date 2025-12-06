@@ -2,9 +2,9 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import type { AppliedCampaign } from '@/domain/entities/AppliedCampaign';
-import { useListPageState } from '@/presentation/hooks/useListPageState';
-import AppliedCampaignFilters from './components/AppliedCampaignFilters';
-import AppliedCampaignCard from './components/AppliedCampaignCard';
+import { useListPageState } from '@/presentation/hooks/list/useListPageState';
+import AppliedCampaignFilters from '@/presentation/pages/mypage/components/AppliedCampaignFilters';
+import AppliedCampaignCard from '@/presentation/pages/mypage/components/AppliedCampaignCard';
 import {
   BackButton,
   ContentSection,
@@ -12,7 +12,7 @@ import {
   PageContainer,
   PageSubtitle,
   PageTitle,
-} from './styled/MyAppliedCampaignsStyles';
+} from '@/presentation/pages/mypage/styled/MyAppliedCampaignsStyles';
 
 const mockAppliedCampaigns: AppliedCampaign[] = [
   {

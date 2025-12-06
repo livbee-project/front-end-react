@@ -1,9 +1,9 @@
 import { useRef } from 'react';
 import type { CropRatio } from '@/types/imageCrop';
-import { useImageCropSize } from './imageCrop/useImageCropSize';
-import { useImageCropDrag } from './imageCrop/useImageCropDrag';
-import { useImageCropResize } from './imageCrop/useImageCropResize';
-import { useImageCropCanvas } from './imageCrop/useImageCropCanvas';
+import { useImageCropSize } from '@/presentation/hooks/imageCrop/useImageCropSize';
+import { useImageCropDrag } from '@/presentation/hooks/imageCrop/useImageCropDrag';
+import { useImageCropResize } from '@/presentation/hooks/imageCrop/useImageCropResize';
+import { useImageCropCanvas } from '@/presentation/hooks/imageCrop/useImageCropCanvas';
 
 export const useImageCrop = (
   imageSrc: string,

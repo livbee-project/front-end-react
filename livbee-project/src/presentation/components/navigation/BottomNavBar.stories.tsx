@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import BottomNavBar from './BottomNavBar';
 import { ToastProvider } from '@/presentation/contexts/ToastContext';
-import { AuthContext, type UseAuthReturn } from '@/presentation/hooks/useAuth';
+import { AuthContext, type UseAuthReturn } from '@/presentation/hooks/auth/useAuth';
 
 const createMockAuthValue = (overrides?: Partial<UseAuthReturn>): UseAuthReturn => ({
   isLoggedIn: false,

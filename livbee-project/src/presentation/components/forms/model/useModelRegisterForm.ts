@@ -1,13 +1,13 @@
 import { useState, useCallback, useEffect } from 'react';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
-import { useRepository } from '@/presentation/hooks/useRepository';
+import { useRepository } from '@/presentation/hooks/common/useRepository';
 import { useToast } from '@/presentation/contexts/ToastContext';
-import { useFormState } from '@/presentation/hooks/useFormState';
-import { useFormUpload } from '@/presentation/hooks/useFormUpload';
-import type { ModelFormData, ModelToggleState } from './types';
-import { clearImageUrls, getStoredImageUrls, saveImageUrls } from './utils/modelImageStorage';
-import { validateModelForm } from './utils/modelValidation';
-import { buildModelRequest } from './utils/modelRequestBuilder';
+import { useFormState } from '@/presentation/hooks/form/useFormState';
+import { useFormUpload } from '@/presentation/hooks/form/useFormUpload';
+import type { ModelFormData, ModelToggleState } from '@/presentation/components/forms/model/types';
+import { clearImageUrls, getStoredImageUrls, saveImageUrls } from '@/presentation/components/forms/model/utils/modelImageStorage';
+import { validateModelForm } from '@/presentation/components/forms/model/utils/modelValidation';
+import { buildModelRequest } from '@/presentation/components/forms/model/utils/modelRequestBuilder';
 import { useFormImageSync } from '@/presentation/components/forms/shared/hooks/useFormImageSync';
 import { useFormSubmit } from '@/presentation/components/forms/shared/hooks/useFormSubmit';
 

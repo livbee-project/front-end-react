@@ -1,5 +1,5 @@
 import type { UserRole } from '@/domain/entities/User';
-import { useAuth } from './useAuth';
+import { useAuth } from '@/presentation/hooks/auth/useAuth';
 
 export const useRoleAccess = () => {
   const { user } = useAuth();

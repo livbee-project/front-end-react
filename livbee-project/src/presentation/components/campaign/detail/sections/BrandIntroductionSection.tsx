@@ -1,6 +1,6 @@
 import React from 'react';
 import { Building2 } from 'lucide-react';
-import { Section, SectionHeader, IconCircle, SectionTitle, SectionContent } from '../styles/CampaignInfoSection.styles';
+import { Section, SectionHeader, IconCircle, SectionTitle, SectionContent } from '@/presentation/components/campaign/detail/styles/CampaignInfoSection.styles';
 
 interface BrandIntroductionSectionProps {
   brandIntroduction: string;

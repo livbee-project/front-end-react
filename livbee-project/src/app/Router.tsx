@@ -3,9 +3,9 @@ import { Suspense, lazy } from 'react';
 import '@/presentation/styles/global.css';
 import TopNavLayout from '@/presentation/layouts/TopNavLayout';
 import RootLayout from '@/presentation/layouts/RootLayout';
-import { AuthProvider } from '@/presentation/hooks/useAuth';
+import { AuthProvider } from '@/presentation/hooks/auth/useAuth';
 import { AuthGuard } from '@/presentation/routes/AuthGuard';
-import { ROUTE_PATHS, ROUTE_ROLE_PERMISSIONS } from './routes/routeMeta';
+import { ROUTE_PATHS, ROUTE_ROLE_PERMISSIONS } from '@/app/routes/routeMeta';
 import { RouteFallback } from '@/presentation/components/states/RouteFallback';
 
 const Home = lazy(() => import('@/presentation/pages/home/Home'));

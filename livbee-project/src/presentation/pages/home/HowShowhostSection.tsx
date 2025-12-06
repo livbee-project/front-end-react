@@ -1,14 +1,14 @@
 import React, { useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import HomeSection, { Highlight } from './components/HomeSection';
+import HomeSection, { Highlight } from '@/presentation/pages/home/components/HomeSection';
 import Button from '@/presentation/components/ui/Button';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { EmptyState } from '@/presentation/components/states/EmptyState';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { Portfolio } from '@/domain/entities/Portfolio';
-import { useRepository } from '@/presentation/hooks/useRepository';
-import { useListData } from '@/presentation/hooks/useListData';
+import { useRepository } from '@/presentation/hooks/common/useRepository';
+import { useListData } from '@/presentation/hooks/list/useListData';
 import { H3, PMuted } from '@/presentation/components/styled/Typography';
 
 const List = styled.div`

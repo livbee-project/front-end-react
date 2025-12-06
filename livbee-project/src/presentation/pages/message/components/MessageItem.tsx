@@ -12,7 +12,7 @@ import {
   Timestamp,
   MessageText,
   DeleteButton,
-} from '../styled/MessagesPageStyles';
+} from '@/presentation/pages/message/styled/MessagesPageStyles';
 
 interface MessageItemProps {
   room: ChatRoomSummary;

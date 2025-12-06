@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useImageGallery } from '@/presentation/hooks/useImageGallery';
+import { useImageGallery } from '@/presentation/hooks/imageCrop/useImageGallery';
 import { extractCategories, generateProfileTags } from '@/shared/utils/detailPageUtils';
 
 interface ProfileDetailData {

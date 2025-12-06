@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserRepository } from '@/data/repositories/UserRepository';
-import { useRepository } from '@/presentation/hooks/useRepository';
+import { useRepository } from '@/presentation/hooks/common/useRepository';
 import type { LoginRequest, SignupRequest, User } from '@/domain/entities/User';
 import { consumeAuthRedirectPath, setAuthRedirectPath } from '@/shared/utils/authRedirect';
 import { LoginUseCase } from '@/domain/usecases/auth/LoginUseCase';

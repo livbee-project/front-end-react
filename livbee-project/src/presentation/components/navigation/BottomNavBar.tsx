@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useLocation, useNavigate } from 'react-router-dom';
-import BottomNavItem from './BottomNavItem';
-import { useAuth } from '@/presentation/hooks/useAuth';
+import BottomNavItem from '@/presentation/components/navigation/BottomNavItem';
+import { useAuth } from '@/presentation/hooks/auth/useAuth';
 import { ROUTE_PATHS } from '@/app/routes/routeMeta';
 import { setAuthRedirectPath } from '@/shared/utils/authRedirect';
-import LoginRequiredModal from './LoginRequiredModal';
+import LoginRequiredModal from '@/presentation/components/navigation/LoginRequiredModal';
 // 커스텀 네비게이션 아이콘 컴포넌트
 import {
   IconHome,
@@ -21,7 +21,7 @@ import {
  */
 const TABS = [
   { label: '홈', path: ROUTE_PATHS.home, icon: IconHome },
-  { label: '캠페인', path: ROUTE_PATHS.campaigns, icon: IconSearch },
+  { label: '모집공고', path: ROUTE_PATHS.campaigns, icon: IconSearch },
   { label: '쇼호스트', path: ROUTE_PATHS.portfolios, icon: IconMic },
   { label: '모델', path: ROUTE_PATHS.models, icon: IconCamera },
   { label: 'MY', path: ROUTE_PATHS.myPage, icon: IconSmile },

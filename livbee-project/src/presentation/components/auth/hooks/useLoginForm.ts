@@ -1,10 +1,10 @@
 import { useState, useCallback } from 'react';
 import type { UserType } from '@/types/auth';
-import { useAuth } from '@/presentation/hooks/useAuth';
+import { useAuth } from '@/presentation/hooks/auth/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { getAuthRedirectPath } from '@/shared/utils/authRedirect';
 import { ROUTE_ROLE_PERMISSIONS } from '@/app/routes/routeMeta';
-import { validateLoginForm, loginMessages } from '../utils/loginValidation';
+import { validateLoginForm, loginMessages } from '@/presentation/components/auth/utils/loginValidation';
 
 interface UseLoginFormOptions {
   defaultUserType?: UserType;

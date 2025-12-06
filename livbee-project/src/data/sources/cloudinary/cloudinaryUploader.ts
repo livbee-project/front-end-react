@@ -5,7 +5,7 @@ import type {
   UploadSignatureResponse,
   CloudinaryUploadResponse,
   UploadOptions,
-} from './types';
+} from '@/data/sources/cloudinary/types';
 
 /**
  * Cloudinary API 설정

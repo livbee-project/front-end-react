@@ -1,10 +1,10 @@
 import React, { useRef } from 'react';
-import { useLoginBubblePosition } from '@/presentation/hooks/useLoginBubblePosition';
+import { useLoginBubblePosition } from '@/presentation/hooks/common/useLoginBubblePosition';
 import { LoginLogo } from '@/presentation/components/auth/LoginLogo';
 import { UserTypeTabs } from '@/presentation/components/auth/UserTypeTabs';
 import { LoginForm } from '@/presentation/components/auth/LoginForm';
 import { useLoginForm } from '@/presentation/components/auth/hooks/useLoginForm';
-import { PageWrapper } from './styled/LoginPageStyles';
+import { PageWrapper } from '@/presentation/pages/auth/styled/LoginPageStyles';
 
 const LoginPage: React.FC = () => {
   const showhostButtonRef = useRef<HTMLButtonElement>(null);

@@ -1,7 +1,7 @@
 import type { Campaign } from '@/domain/entities/Campaign';
 import type { Portfolio } from '@/domain/entities/Portfolio';
 import type { Model } from '@/domain/entities/Model';
-import { formatDate } from './dateUtils';
+import { formatDate } from '@/shared/utils/dateUtils';
 
 /**
  * 캠페인의 배지 아이템을 생성합니다.

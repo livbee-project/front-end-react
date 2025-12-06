@@ -6,7 +6,7 @@ import type {
   ChatRole,
 } from '@/domain/entities/Chat';
 import { ChatRepository } from '@/data/repositories/ChatRepository';
-import { useRepository } from '@/presentation/hooks/useRepository';
+import { useRepository } from '@/presentation/hooks/common/useRepository';
 import { debug, error as logError } from '@/shared/utils/logger';
 
 interface ChatRoomState {

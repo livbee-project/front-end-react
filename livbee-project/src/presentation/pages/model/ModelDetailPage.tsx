@@ -3,9 +3,9 @@ import { useParams } from 'react-router-dom';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
 import type { ModelDetail } from '@/domain/entities/Model';
-import { useRepository } from '@/presentation/hooks/useRepository';
-import { useDetailFetcher } from '@/presentation/hooks/useDetailFetcher';
-import { useDetailPageState } from '@/presentation/hooks/useDetailPageState';
+import { useRepository } from '@/presentation/hooks/common/useRepository';
+import { useDetailFetcher } from '@/presentation/hooks/detail/useDetailFetcher';
+import { useDetailPageState } from '@/presentation/hooks/detail/useDetailPageState';
 import { useProfileDetailPage } from '@/presentation/pages/detail/shared/useProfileDetailPage';
 import { ProfileDetailContent } from '@/presentation/pages/detail/shared/ProfileDetailContent';
 

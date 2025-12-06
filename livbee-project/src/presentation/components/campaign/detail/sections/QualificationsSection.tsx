@@ -8,7 +8,7 @@ import {
   BulletList,
   BulletItem,
   BulletDot,
-} from '../styles/CampaignInfoSection.styles';
+} from '@/presentation/components/campaign/detail/styles/CampaignInfoSection.styles';
 
 interface QualificationsSectionProps {
   qualifications: string[];

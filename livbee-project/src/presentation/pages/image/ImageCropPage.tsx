@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { P } from '@/presentation/components/styled/Typography';
-import { useImageCrop } from '@/presentation/hooks/useImageCrop';
+import { useImageCrop } from '@/presentation/hooks/imageCrop/useImageCrop';
 import { CropHeader } from '@/presentation/components/imageCrop/CropHeader';
 import { CropViewport } from '@/presentation/components/imageCrop/CropViewport';
 import { CropControls } from '@/presentation/components/imageCrop/CropControls';

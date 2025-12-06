@@ -1,14 +1,14 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
-import { useRepository } from '@/presentation/hooks/useRepository';
-import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
+import { useRepository } from '@/presentation/hooks/common/useRepository';
+import { useCloudinaryUpload } from '@/presentation/hooks/common/useCloudinaryUpload';
 import { useToast } from '@/presentation/contexts/ToastContext';
-import { useFormState } from '@/presentation/hooks/useFormState';
-import type { CampaignFormData } from './types';
-import { getStoredImageUrls, saveImageUrls, clearImageUrls } from './utils/campaignImageStorage';
-import { validateCampaignForm } from './utils/campaignValidation';
-import { buildCampaignRequest } from './utils/campaignRequestBuilder';
+import { useFormState } from '@/presentation/hooks/form/useFormState';
+import type { CampaignFormData } from '@/presentation/components/forms/campaign/types';
+import { getStoredImageUrls, saveImageUrls, clearImageUrls } from '@/presentation/components/forms/campaign/utils/campaignImageStorage';
+import { validateCampaignForm } from '@/presentation/components/forms/campaign/utils/campaignValidation';
+import { buildCampaignRequest } from '@/presentation/components/forms/campaign/utils/campaignRequestBuilder';
 import { debug } from '@/shared/utils/logger';
 
 const STORAGE_KEY = 'campaign-register-form';

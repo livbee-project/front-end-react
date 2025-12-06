@@ -5,7 +5,7 @@ import Pagination from '@/presentation/components/list/Pagination';
 import FloatingActionButton from '@/presentation/components/ui/FloatingActionButton';
 import { EmptyState } from '@/presentation/components/states/EmptyState';
 import { MOCK_PORTFOLIOS, ITEMS_PER_PAGE } from '@/shared/constants/portfolio';
-import { useMyPortfolio } from '@/presentation/hooks/useMyPortfolio';
+import { useMyPortfolio } from '@/presentation/hooks/mypage/useMyPortfolio';
 import { MyPortfolioHeader } from '@/presentation/components/portfolio/MyPortfolioHeader';
 import { MyPortfolioCard } from '@/presentation/components/portfolio/MyPortfolioCard';
 import type { PortfolioRole } from '@/types/portfolio';

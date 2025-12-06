@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useListData } from './useListData';
+import { useListData } from '@/presentation/hooks/list/useListData';
 
 interface UseListFetcherOptions<Q, R extends object> {
   repository: R;

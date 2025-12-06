@@ -4,7 +4,7 @@
 
 import { useState, useCallback } from 'react';
 import type { CropArea, ImageSize } from '@/types/imageCrop';
-import { clampCropPosition } from '../utils/imageCropUtils';
+import { clampCropPosition } from '@/presentation/hooks/utils/imageCropUtils';
 
 interface UseImageCropDragParams {
   cropArea: CropArea;

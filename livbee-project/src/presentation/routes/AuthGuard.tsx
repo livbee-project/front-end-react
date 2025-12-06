@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
-import { useAuth } from '@/presentation/hooks/useAuth';
+import { useAuth } from '@/presentation/hooks/auth/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import type { UserRole } from '@/domain/entities/User';
 import { setAuthRedirectPath, consumeOriginPage, hasAuthRedirectPath } from '@/shared/utils/authRedirect';

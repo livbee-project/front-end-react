@@ -1,6 +1,6 @@
 import React from 'react';
 import { Sparkles } from 'lucide-react';
-import { Section, SectionHeader, IconCircle, SectionTitle, SectionContent } from '../styles/CampaignInfoSection.styles';
+import { Section, SectionHeader, IconCircle, SectionTitle, SectionContent } from '@/presentation/components/campaign/detail/styles/CampaignInfoSection.styles';
 
 interface CampaignIntroSectionProps {
   campaignIntro: string;

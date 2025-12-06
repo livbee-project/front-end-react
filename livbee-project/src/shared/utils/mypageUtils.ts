@@ -1,4 +1,4 @@
-import { formatNumberCompact } from './formatUtils';
+import { formatNumberCompact } from '@/shared/utils/formatUtils';
 import type { ProfileStat } from '@/types/mypage';
 
 /**

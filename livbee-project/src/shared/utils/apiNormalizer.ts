@@ -4,7 +4,7 @@
  */
 
 import type { SnakeCaseResponse, NestedDataResponse } from '@/shared/types/api';
-import { extractData, type ApiResponse } from './apiResponseHandler';
+import { extractData, type ApiResponse } from '@/shared/utils/apiResponseHandler';
 
 /**
  * ApplicationActionResponse 정규화

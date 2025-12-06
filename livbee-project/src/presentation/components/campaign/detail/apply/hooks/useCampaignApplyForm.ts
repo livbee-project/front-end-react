@@ -2,13 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import { ChatRepository } from '@/data/repositories/ChatRepository';
-import { useRepository } from '@/presentation/hooks/useRepository';
+import { useRepository } from '@/presentation/hooks/common/useRepository';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { debug, warn, error as logError } from '@/shared/utils/logger';
 import type { SnakeCaseResponse } from '@/shared/types/api';
 import { MOCK_PORTFOLIOS } from '@/shared/constants/portfolio';
-import { validateCampaignApplyForm } from '../utils/campaignApplyValidation';
-import { buildCampaignApplyRequest } from '../utils/campaignApplyRequestBuilder';
+import { validateCampaignApplyForm } from '@/presentation/components/campaign/detail/apply/utils/campaignApplyValidation';
+import { buildCampaignApplyRequest } from '@/presentation/components/campaign/detail/apply/utils/campaignApplyRequestBuilder';
 
 export interface PortfolioOption {
   id: number;

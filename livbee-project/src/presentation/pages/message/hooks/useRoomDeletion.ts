@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from 'react';
 import type { ChatRoomSummary } from '@/domain/entities/Chat';
 import { chatApiSource } from '@/data/sources/ChatApiSource';
 import { useToast } from '@/presentation/contexts/ToastContext';
-import { getCounterpart } from '../utils/messageUtils';
+import { getCounterpart } from '@/presentation/pages/message/utils/messageUtils';
 
 interface UseRoomDeletionOptions {
   rooms: ChatRoomSummary[];

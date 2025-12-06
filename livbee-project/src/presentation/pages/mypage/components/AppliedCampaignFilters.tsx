@@ -1,5 +1,5 @@
 import React from 'react';
-import { FilterButton, FilterSection } from '../styled/MyAppliedCampaignsStyles';
+import { FilterButton, FilterSection } from '@/presentation/pages/mypage/styled/MyAppliedCampaignsStyles';
 
 interface AppliedCampaignFiltersProps {
   filters: string[];

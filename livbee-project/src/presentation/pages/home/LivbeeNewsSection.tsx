@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Calendar } from 'lucide-react';
-import HomeSection from './components/HomeSection';
+import HomeSection from '@/presentation/pages/home/components/HomeSection';
 import { H3, PMuted, Caption } from '@/presentation/components/styled/Typography';
 import { debug } from '@/shared/utils/logger';
 

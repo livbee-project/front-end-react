@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
+import { useCloudinaryUpload } from '@/presentation/hooks/common/useCloudinaryUpload';
 import { useToast } from '@/presentation/contexts/ToastContext';
 
 interface UseFormFileUploadReturn {

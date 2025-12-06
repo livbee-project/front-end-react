@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useListPageState } from '@/presentation/hooks/useListPageState';
+import { useListPageState } from '@/presentation/hooks/list/useListPageState';
 
 export interface ListStatePlaceholderProps<T> {
   data: T[];

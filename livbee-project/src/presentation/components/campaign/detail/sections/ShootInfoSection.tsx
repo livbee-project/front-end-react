@@ -10,7 +10,7 @@ import {
   InfoContent,
   InfoLabel,
   InfoValue,
-} from '../styles/CampaignInfoSection.styles';
+} from '@/presentation/components/campaign/detail/styles/CampaignInfoSection.styles';
 
 interface ShootInfoSectionProps {
   location: string;

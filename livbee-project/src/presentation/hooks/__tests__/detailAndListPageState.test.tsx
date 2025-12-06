@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
-import { useDetailPageState } from '../useDetailPageState';
-import { useListPageState } from '../useListPageState';
+import { useDetailPageState } from '@/presentation/hooks/detail/useDetailPageState';
+import { useListPageState } from '@/presentation/hooks/list/useListPageState';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { ErrorState } from '@/presentation/components/states/ErrorState';
 import { EmptyState } from '@/presentation/components/states/EmptyState';

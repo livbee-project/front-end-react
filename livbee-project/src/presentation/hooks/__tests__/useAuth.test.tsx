@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import React from 'react';
-import { AuthProvider, useAuth } from '../useAuth';
+import { AuthProvider, useAuth } from '@/presentation/hooks/auth/useAuth';
 
 const mockUserRepository = {
   login: vi.fn(),
@@ -15,7 +15,7 @@ const mockGetToken = vi.fn(() => null);
 const mockNavigate = vi.fn();
 const mockConsumeRedirect = vi.fn(() => null);
 
-vi.mock('@/presentation/hooks/useRepository', () => ({
+vi.mock('@/presentation/hooks/common/useRepository', () => ({
   useRepository: () => mockUserRepository,
 }));
 

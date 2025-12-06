@@ -1,13 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import StoryHighlightsSection from './StoryHighlightsSection';
-import ShoppingLiveSection from './ShoppingLiveSection';
-import HowShowhostSection from './HowShowhostSection';
-import RecommendedLiveSection from './RecommendedLiveSection';
-import ConceptModelSection from './ConceptModelSection';
-import HotClipSection from './HotClipSection';
-import LivbeeNewsSection from './LivbeeNewsSection';
-import BannerSliderSection from './BannerSliderSection';
+import StoryHighlightsSection from '@/presentation/pages/home/StoryHighlightsSection';
+import ShoppingLiveSection from '@/presentation/pages/home/ShoppingLiveSection';
+import HowShowhostSection from '@/presentation/pages/home/HowShowhostSection';
+import RecommendedLiveSection from '@/presentation/pages/home/RecommendedLiveSection';
+import ConceptModelSection from '@/presentation/pages/home/ConceptModelSection';
+import HotClipSection from '@/presentation/pages/home/HotClipSection';
+import LivbeeNewsSection from '@/presentation/pages/home/LivbeeNewsSection';
+import BannerSliderSection from '@/presentation/pages/home/BannerSliderSection';
 
 const Page = styled.div`
   background-color: ${({ theme }) => theme.colors.background};

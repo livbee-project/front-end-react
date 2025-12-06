@@ -1,7 +1,7 @@
 import React from 'react';
 import { Calendar, MapPin, DollarSign } from 'lucide-react';
 import type { AppliedCampaign } from '@/domain/entities/AppliedCampaign';
-import { getStatusLabel } from '../utils/appliedCampaignUtils';
+import { getStatusLabel } from '@/presentation/pages/mypage/utils/appliedCampaignUtils';
 import {
   ApplicationDate,
   CampaignCard,
@@ -16,7 +16,7 @@ import {
   Requirement,
   StatusBadge,
   StatusBadges,
-} from '../styled/MyAppliedCampaignsStyles';
+} from '@/presentation/pages/mypage/styled/MyAppliedCampaignsStyles';
 
 interface AppliedCampaignCardProps {
   campaign: AppliedCampaign;

@@ -1,13 +1,13 @@
 import React, { useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import HomeSection, { Highlight, HorizontalScroll } from './components/HomeSection';
+import HomeSection, { Highlight, HorizontalScroll } from '@/presentation/pages/home/components/HomeSection';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { EmptyState } from '@/presentation/components/states/EmptyState';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
 import type { Model } from '@/domain/entities/Model';
-import { useRepository } from '@/presentation/hooks/useRepository';
-import { useListData } from '@/presentation/hooks/useListData';
+import { useRepository } from '@/presentation/hooks/common/useRepository';
+import { useListData } from '@/presentation/hooks/list/useListData';
 import { HomeCard } from '@/presentation/components/cards/HomeCard';
 import { HomeCardImage } from '@/presentation/components/cards/HomeCardImage';
 import { HomeCardBody, HomeCardTitle, HomeCardDescription } from '@/presentation/components/cards/HomeCardBody';

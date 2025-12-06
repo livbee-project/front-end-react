@@ -2,7 +2,7 @@
  * WebSocket 이벤트 타입 정의
  */
 
-import type { ChatMessage, ChatRoomApplication } from './Chat';
+import type { ChatMessage, ChatRoomApplication } from '@/domain/entities/Chat';
 
 /**
  * WebSocket 이벤트 타입

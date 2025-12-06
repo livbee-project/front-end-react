@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useDetailData } from './useDetailData';
+import { useDetailData } from '@/presentation/hooks/detail/useDetailData';
 import { useToast } from '@/presentation/contexts/ToastContext';
 
 interface UseDetailFetcherOptions<R extends object> {

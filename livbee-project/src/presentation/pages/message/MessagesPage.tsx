@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useChatRooms } from '@/presentation/hooks/useChatRooms';
+import { useChatRooms } from '@/presentation/hooks/chat/useChatRooms';
 import { debug } from '@/shared/utils/logger';
-import { PageContainer, Title, MessageList } from './styled/MessagesPageStyles';
-import { DeleteRoomDialog } from './components/DeleteRoomDialog';
-import { MessageListContent } from './components/MessageListContent';
-import { useRoomDeletion } from './hooks/useRoomDeletion';
+import { PageContainer, Title, MessageList } from '@/presentation/pages/message/styled/MessagesPageStyles';
+import { DeleteRoomDialog } from '@/presentation/pages/message/components/DeleteRoomDialog';
+import { MessageListContent } from '@/presentation/pages/message/components/MessageListContent';
+import { useRoomDeletion } from '@/presentation/pages/message/hooks/useRoomDeletion';
 
 const MessagesPage: React.FC = () => {
   const navigate = useNavigate();

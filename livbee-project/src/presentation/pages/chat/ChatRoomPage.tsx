@@ -1,10 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Info } from 'lucide-react';
-import { useChatRoomDetail } from '@/presentation/hooks/useChatRoomDetail';
-import { useChatWebSocket } from '@/presentation/hooks/useChatWebSocket';
+import { useChatRoomDetail } from '@/presentation/hooks/chat/useChatRoomDetail';
+import { useChatWebSocket } from '@/presentation/hooks/chat/useChatWebSocket';
 import { useToast } from '@/presentation/contexts/ToastContext';
-import { useRepository } from '@/presentation/hooks/useRepository';
+import { useRepository } from '@/presentation/hooks/common/useRepository';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { ChatMessage } from '@/domain/entities/Chat';
 import ContactHeader from '@/presentation/components/chat/ContactHeader';

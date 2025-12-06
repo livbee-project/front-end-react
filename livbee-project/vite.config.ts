@@ -30,28 +30,32 @@ const openExternalBrowser = () => {
           
           const serverUrl = `http://localhost:${port}`;
           
-          // Windows에서 외부 기본 브라우저로 열기
+          // 플랫폼별 외부 기본 브라우저로 열기
           const isWindows = process.platform === 'win32';
-          if (isWindows) {
-            try {
+          const isMacOS = process.platform === 'darwin';
+          
+          try {
+            if (isWindows) {
               const child = spawn('cmd.exe', ['/c', 'start', '""', serverUrl], {
                 detached: true,
                 stdio: 'ignore',
                 shell: false,
               });
               child.unref();
-            } catch (error) {
-              console.error('브라우저를 열 수 없습니다:', error);
-            }
-          } else {
-            try {
+            } else if (isMacOS) {
+              spawn('open', [serverUrl], {
+                detached: true,
+                stdio: 'ignore',
+              }).unref();
+            } else {
+              // Linux
               spawn('xdg-open', [serverUrl], {
                 detached: true,
                 stdio: 'ignore',
               }).unref();
-            } catch (error) {
-              console.error('브라우저를 열 수 없습니다:', error);
             }
+          } catch (error) {
+            console.error('브라우저를 열 수 없습니다:', error);
           }
         }, 500);
       });
@@ -69,6 +73,8 @@ export default defineConfig({
     },
   },
   server: {
+    host: 'localhost', // IPv4만 사용하도록 설정
+    port: 5173,
     open: false, // 기본 브라우저 열기 비활성화 (하이퍼링크 클릭 시 내부 브라우저로 열리는 것 방지)
   },
   build: {

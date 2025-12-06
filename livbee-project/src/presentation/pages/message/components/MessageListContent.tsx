@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
 import { RefreshCcw } from 'lucide-react';
 import type { ChatRoomSummary } from '@/domain/entities/Chat';
-import { MessageItemSkeleton } from './MessageItemSkeleton';
-import { MessageItem } from './MessageItem';
-import { formatTimestamp, getCounterpart } from '../utils/messageUtils';
-import { EmptyState, RetryButton } from '../styled/MessagesPageStyles';
+import { MessageItemSkeleton } from '@/presentation/pages/message/components/MessageItemSkeleton';
+import { MessageItem } from '@/presentation/pages/message/components/MessageItem';
+import { formatTimestamp, getCounterpart } from '@/presentation/pages/message/utils/messageUtils';
+import { EmptyState, RetryButton } from '@/presentation/pages/message/styled/MessagesPageStyles';
 
 interface MessageListContentProps {
   rooms: ChatRoomSummary[];

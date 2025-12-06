@@ -6,7 +6,7 @@ import HomeSectionHeader from '@/presentation/components/home/sections/HomeSecti
 import GalleryGrid from '@/presentation/components/detail/common/GalleryGrid';
 import ActionSection from '@/presentation/components/detail/common/ActionSection';
 import GalleryLightbox from '@/presentation/components/detail/common/GalleryLightbox';
-import type { ImageGallery } from '@/presentation/hooks/useImageGallery';
+import type { ImageGallery } from '@/presentation/hooks/imageCrop/useImageGallery';
 
 const GallerySection = styled.div`
   padding: ${({ theme }) => theme.spacing.xl} 0;

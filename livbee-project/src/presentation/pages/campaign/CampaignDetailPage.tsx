@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { CampaignDetail } from '@/domain/entities/Campaign';
-import { useRepository } from '@/presentation/hooks/useRepository';
-import { useDetailFetcher } from '@/presentation/hooks/useDetailFetcher';
-import { useDetailPageState } from '@/presentation/hooks/useDetailPageState';
-import { useAuth } from '@/presentation/hooks/useAuth';
-import { useRoleAccess } from '@/presentation/hooks/useRoleAccess';
+import { useRepository } from '@/presentation/hooks/common/useRepository';
+import { useDetailFetcher } from '@/presentation/hooks/detail/useDetailFetcher';
+import { useDetailPageState } from '@/presentation/hooks/detail/useDetailPageState';
+import { useAuth } from '@/presentation/hooks/auth/useAuth';
+import { useRoleAccess } from '@/presentation/hooks/common/useRoleAccess';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { setAuthRedirectPath } from '@/shared/utils/authRedirect';
 import CampaignApplyModal from '@/presentation/components/campaign/detail/apply/CampaignApplyModal';
@@ -20,7 +20,7 @@ import {
   ContentActions,
   OutlineButton,
   PrimaryButton,
-} from './CampaignDetailPage.styles';
+} from '@/presentation/pages/campaign/CampaignDetailPage.styles';
 
 const CampaignDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();

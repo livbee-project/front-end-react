@@ -1,13 +1,13 @@
 import { useCallback, useState, useEffect } from 'react';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import { useToast } from '@/presentation/contexts/ToastContext';
-import { useRepository } from '@/presentation/hooks/useRepository';
-import { useFormState } from '@/presentation/hooks/useFormState';
-import { useFormUpload } from '@/presentation/hooks/useFormUpload';
-import type { PortfolioFormData, PortfolioToggleState } from './types';
-import { clearImageUrls, getStoredImageUrls, saveImageUrls } from './utils/portfolioImageStorage';
-import { validatePortfolioForm } from './utils/portfolioValidation';
-import { buildPortfolioRequest } from './utils/portfolioRequestBuilder';
+import { useRepository } from '@/presentation/hooks/common/useRepository';
+import { useFormState } from '@/presentation/hooks/form/useFormState';
+import { useFormUpload } from '@/presentation/hooks/form/useFormUpload';
+import type { PortfolioFormData, PortfolioToggleState } from '@/presentation/components/forms/portfolio/types';
+import { clearImageUrls, getStoredImageUrls, saveImageUrls } from '@/presentation/components/forms/portfolio/utils/portfolioImageStorage';
+import { validatePortfolioForm } from '@/presentation/components/forms/portfolio/utils/portfolioValidation';
+import { buildPortfolioRequest } from '@/presentation/components/forms/portfolio/utils/portfolioRequestBuilder';
 import { useFormImageSync } from '@/presentation/components/forms/shared/hooks/useFormImageSync';
 import { useFormSubmit } from '@/presentation/components/forms/shared/hooks/useFormSubmit';
 

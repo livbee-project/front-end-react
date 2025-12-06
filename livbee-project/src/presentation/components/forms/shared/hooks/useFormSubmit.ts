@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/presentation/contexts/ToastContext';
-import { useFormImageUpload } from './useFormImageUpload';
-import { useFormFileUpload } from './useFormFileUpload';
+import { useFormImageUpload } from '@/presentation/components/forms/shared/hooks/useFormImageUpload';
+import { useFormFileUpload } from '@/presentation/components/forms/shared/hooks/useFormFileUpload';
 
 interface ValidationResult {
   isValid: boolean;
