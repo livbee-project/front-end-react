@@ -94,10 +94,11 @@ const BottomNavBar: React.FC = () => {
 const Nav = styled.nav`
   position: fixed;
   bottom: 0;
-  left: 0;
-  right: 0;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: ${({ theme }) => theme.colors.background};
   width: 100%;
+  max-width: 1200px;
   border-top: 1px solid ${({ theme }) => theme.colors.border};
   box-shadow: 0 -8px 22px rgba(0, 0, 0, 0.06);
   padding-bottom: env(safe-area-inset-bottom, 0);
@@ -110,6 +111,7 @@ const Wrapper = styled.div`
   justify-content: space-around;
   align-items: center;
   padding: ${({ theme }) => theme.spacing.sm} 0;
+  width: 100%;
 `;
 
 export default BottomNavBar;
