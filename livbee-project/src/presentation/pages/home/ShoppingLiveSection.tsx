@@ -130,7 +130,9 @@ const ShoppingLiveSection: React.FC = React.memo(() => {
       <HorizontalScroll>
         {campaigns.map((campaign) => {
           const imageUrl = campaign.imageUrl || campaign.thumbnailUrl || undefined;
-          const summary = htmlToText(campaign.content).slice(0, 60);
+          // 백엔드에서 최적화된 summary 필드 우선 사용, 없으면 detailedContent 또는 content 사용
+          const summary = campaign.summary || campaign.detailedContent || campaign.content || '';
+          const displaySummary = summary ? htmlToText(summary).slice(0, 60) : '';
           const dday = campaign.closeAt ? calculateDDay(campaign.closeAt) : '';
           const price = campaign.fee != null ? formatCurrency(campaign.fee) : '가격 미정';
 
@@ -142,7 +144,7 @@ const ShoppingLiveSection: React.FC = React.memo(() => {
               <HomeCardBody>
                 <HomeCardBrand>{campaign.brandName}</HomeCardBrand>
                 <HomeCardTitle>{campaign.title}</HomeCardTitle>
-                <HomeCardDescription>{summary}</HomeCardDescription>
+                <HomeCardDescription>{displaySummary}</HomeCardDescription>
                 <ProductInfo>
                   <ProductThumb>
                     {campaign.thumbnailUrl && (
