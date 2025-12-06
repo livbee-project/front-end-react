@@ -16,6 +16,7 @@ import {
 } from '@/presentation/components/forms/portfolio/sections';
 import { FormSubmitSection } from '@/presentation/components/forms/common/FormSubmitSection';
 import { useModelRegisterForm } from '@/presentation/components/forms/model/useModelRegisterForm';
+import StickyHeader from '@/presentation/components/detail/common/StickyHeader';
 
 const ModelRegisterPage: React.FC = () => {
   const {
@@ -40,14 +41,16 @@ const ModelRegisterPage: React.FC = () => {
   const websitesArray = formData.websites.map((w) => w.content || '');
 
   return (
-    <PageWrapper>
-      <FormContainer>
-        <RegisterForm
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit();
-          }}
-        >
+    <>
+      <StickyHeader title="모델 등록" />
+      <PageWrapper>
+        <FormContainer>
+          <RegisterForm
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
+          >
           <ProfileImageSection
             thumbnailUrl={mainThumbnailUrl}
             onSelectImage={handleProfileImageSelect}
@@ -103,9 +106,10 @@ const ModelRegisterPage: React.FC = () => {
             isSubmitting={isSubmitting}
             submitType="submit"
           />
-        </RegisterForm>
-      </FormContainer>
-    </PageWrapper>
+          </RegisterForm>
+        </FormContainer>
+      </PageWrapper>
+    </>
   );
 };
 

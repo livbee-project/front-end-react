@@ -16,6 +16,7 @@ import {
 } from '@/presentation/components/forms/portfolio/sections';
 import { FormSubmitSection } from '@/presentation/components/forms/common/FormSubmitSection';
 import { usePortfolioRegisterForm } from '@/presentation/components/forms/portfolio/usePortfolioRegisterForm';
+import StickyHeader from '@/presentation/components/detail/common/StickyHeader';
 
 const PortfolioRegisterPage: React.FC = () => {
   const {
@@ -39,9 +40,11 @@ const PortfolioRegisterPage: React.FC = () => {
   } = usePortfolioRegisterForm();
 
   return (
-    <PageWrapper>
-      <FormContainer>
-        <RegisterForm onSubmit={handleSubmitForm}>
+    <>
+      <StickyHeader title="쇼호스트 등록" />
+      <PageWrapper>
+        <FormContainer>
+          <RegisterForm onSubmit={handleSubmitForm}>
           <ProfileImageSection
             thumbnailUrl={mainThumbnailUrl}
             onSelectImage={handleProfileImageSelect}
@@ -93,9 +96,10 @@ const PortfolioRegisterPage: React.FC = () => {
             isSubmitting={isSubmitting}
             submitType="submit"
           />
-        </RegisterForm>
-      </FormContainer>
-    </PageWrapper>
+          </RegisterForm>
+        </FormContainer>
+      </PageWrapper>
+    </>
   );
 };
 
