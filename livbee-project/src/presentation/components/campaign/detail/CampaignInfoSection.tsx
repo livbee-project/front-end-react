@@ -1,11 +1,13 @@
 import React from 'react';
 import { DetailContent, Separator } from './styles/CampaignInfoSection.styles';
+import { BrandIntroductionSection } from './sections/BrandIntroductionSection';
 import { CampaignIntroSection } from './sections/CampaignIntroSection';
 import { QualificationsSection } from './sections/QualificationsSection';
 import { ShootInfoSection } from './sections/ShootInfoSection';
 import { ProductInfoSection } from './sections/ProductInfoSection';
 
 interface CampaignInfoSectionProps {
+  brandIntroduction?: string;
   campaignIntro: string;
   qualifications: string[];
   location: string;
@@ -17,6 +19,7 @@ interface CampaignInfoSectionProps {
 }
 
 export const CampaignInfoSection: React.FC<CampaignInfoSectionProps> = ({
+  brandIntroduction,
   campaignIntro,
   qualifications,
   location,
@@ -28,6 +31,13 @@ export const CampaignInfoSection: React.FC<CampaignInfoSectionProps> = ({
 }) => {
   return (
     <DetailContent>
+      {brandIntroduction && (
+        <>
+          <Separator />
+          <BrandIntroductionSection brandIntroduction={brandIntroduction} />
+        </>
+      )}
+
       <Separator />
       <CampaignIntroSection campaignIntro={campaignIntro} />
 

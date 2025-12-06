@@ -93,7 +93,8 @@ const CampaignDetailPage: React.FC = () => {
       ? `D-${Math.ceil((new Date(campaign.closeAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))}`
       : mockData.dDay,
     tags: campaign.categoryName ? [campaign.categoryName, ...mockData.tags.slice(1)] : mockData.tags,
-    campaignIntro: campaign.content || campaign.detailedContent || mockData.campaignIntro,
+    campaignIntro: campaign.detailedContent || campaign.content || mockData.campaignIntro,
+    brandIntroduction: campaign.brandIntroduction || '',
     qualifications:
       campaign.qualifications && campaign.qualifications.length > 0
         ? campaign.qualifications
@@ -148,6 +149,7 @@ const CampaignDetailPage: React.FC = () => {
             imageUrl={displayData.imageUrl}
           >
             <CampaignInfoSection
+              brandIntroduction={displayData.brandIntroduction}
               campaignIntro={displayData.campaignIntro}
               qualifications={displayData.qualifications}
               location={displayData.location}

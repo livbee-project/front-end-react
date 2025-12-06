@@ -20,6 +20,8 @@ export interface Campaign {
   feeNegotiable?: boolean;
   isAd?: boolean;
   isApplied?: boolean; // 로그인 시에만 포함
+  brandIntroduction?: string; // 브랜드 소개 (목록 조회 시 선택 필드)
+  detailedContent?: string; // 상세 내용 (목록 조회 시 선택 필드)
   createdAt: string; // ISO 8601 형식
   updatedAt: string; // ISO 8601 형식
 }
