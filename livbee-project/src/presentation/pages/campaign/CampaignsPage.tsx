@@ -11,6 +11,8 @@ import { useListSearch } from '@/presentation/hooks/useListSearch';
 import { useScrapToggle } from '@/presentation/hooks/useScrapToggle';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';
+import { setAuthRedirectPath, setOriginPage } from '@/shared/utils/authRedirect';
+import LoginRequiredModal from '@/presentation/components/navigation/LoginRequiredModal';
 import { CampaignSearchSection } from '@/presentation/components/campaign/CampaignSearchSection';
 import { CampaignFilterRow } from '@/presentation/components/campaign/CampaignFilterRow';
 import { CampaignListContent } from '@/presentation/components/campaign/CampaignListContent';
@@ -19,9 +21,10 @@ type FilterValue = '전체' | Campaign['category'];
 
 const CampaignsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isLoggedIn } = useAuth();
   const { showToast } = useToast();
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const { searchInputValue, setSearchInputValue, searchQuery, handleSearchSubmit, clearSearch } = useListSearch();
   const { activeFilter, setActiveFilter } = useListFilters<FilterValue>('전체');
   const { handleScrapToggle, isScrapped } = useScrapToggle();
@@ -119,9 +122,14 @@ const CampaignsPage: React.FC = () => {
       <RegisterFab
         type="button"
         onClick={() => {
+          // 비회원인 경우 로그인 모달 표시
+          if (!isLoggedIn) {
+            setIsLoginModalOpen(true);
+            return;
+          }
+          // 브랜드 권한이 아닌 경우 권한 오류 토스트
           if (user?.role !== 'brand') {
             showToast('브랜드 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
-            navigate('/', { replace: true });
             return;
           }
           navigate('/campaigns/register');
@@ -130,6 +138,19 @@ const CampaignsPage: React.FC = () => {
       >
         <Plus size={24} strokeWidth={2.5} />
       </RegisterFab>
+
+      <LoginRequiredModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onConfirm={() => {
+          // 현재 페이지 경로 저장 (권한 불일치 시 돌아갈 페이지)
+          setOriginPage('/campaigns');
+          // 등록 페이지 경로 저장 (로그인 성공 시 이동할 페이지)
+          setAuthRedirectPath('/campaigns/register');
+          setIsLoginModalOpen(false);
+          navigate('/login', { replace: true });
+        }}
+      />
     </PageWrapper>
   );
 };

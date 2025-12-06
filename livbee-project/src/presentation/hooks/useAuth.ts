@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserRepository } from '@/data/repositories/UserRepository';
 import { useRepository } from '@/presentation/hooks/useRepository';
 import type { LoginRequest, SignupRequest, User } from '@/domain/entities/User';
-import { consumeAuthRedirectPath } from '@/shared/utils/authRedirect';
+import { consumeAuthRedirectPath, setAuthRedirectPath } from '@/shared/utils/authRedirect';
 import { LoginUseCase } from '@/domain/usecases/auth/LoginUseCase';
 import { SignupUseCase } from '@/domain/usecases/auth/SignupUseCase';
 import { LogoutUseCase } from '@/domain/usecases/auth/LogoutUseCase';
@@ -118,6 +118,16 @@ const useAuthValue = (): UseAuthReturn => {
       try {
         const result = await loginUseCase.execute(request);
 
+        // 리다이렉트 경로를 먼저 가져옴 (setAuthState 전에)
+        // consumeAuthRedirectPath()를 호출하면 경로가 삭제되므로,
+        // AuthGuard에서 체크할 수 있도록 경로를 다시 저장
+        const redirectPath = options?.redirectTo || consumeAuthRedirectPath() || '/mypage';
+        
+        // 리다이렉트 경로가 있고 기본값이 아니면 다시 저장 (AuthGuard에서 체크하기 위해)
+        if (redirectPath && redirectPath !== '/mypage' && !options?.redirectTo) {
+          setAuthRedirectPath(redirectPath);
+        }
+
         // 사용자 정보 업데이트
         setAuthState({
           isLoggedIn: true,
@@ -125,8 +135,9 @@ const useAuthValue = (): UseAuthReturn => {
           isLoading: false,
         });
 
-        // 로그인 전 접근하려던 경로가 있으면 우선 이동
-        const redirectPath = options?.redirectTo || consumeAuthRedirectPath() || '/mypage';
+        // 리다이렉트 경로로 이동
+        // AuthGuard에서 리다이렉트 경로가 있으면 리다이렉트하지 않으므로
+        // 여기서 리다이렉트 경로로 이동
         navigate(redirectPath, { replace: true });
       } catch (error) {
         setAuthState((prev) => ({ ...prev, isLoading: false }));

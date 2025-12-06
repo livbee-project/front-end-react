@@ -1,16 +1,12 @@
-import React, { useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useRef } from 'react';
 import { useLoginBubblePosition } from '@/presentation/hooks/useLoginBubblePosition';
 import { LoginLogo } from '@/presentation/components/auth/LoginLogo';
 import { UserTypeTabs } from '@/presentation/components/auth/UserTypeTabs';
 import { LoginForm } from '@/presentation/components/auth/LoginForm';
 import { useLoginForm } from '@/presentation/components/auth/hooks/useLoginForm';
-import { useAuth } from '@/presentation/hooks/useAuth';
 import { PageWrapper } from './styled/LoginPageStyles';
 
 const LoginPage: React.FC = () => {
-  const navigate = useNavigate();
-  const { isLoggedIn } = useAuth();
   const showhostButtonRef = useRef<HTMLButtonElement>(null);
   const tabContainerRef = useRef<HTMLDivElement>(null);
 
@@ -26,7 +22,7 @@ const LoginPage: React.FC = () => {
     handleLogin,
     handleSignUpClick,
   } = useLoginForm({
-    onSuccess: () => navigate('/mypage'),
+    // onSuccess는 제거 - useAuth의 login 함수에서 이미 리다이렉트 처리
   });
 
   const bubbleLeft = useLoginBubblePosition({
@@ -34,12 +30,6 @@ const LoginPage: React.FC = () => {
     tabContainerRef,
     userType,
   });
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate('/mypage', { replace: true });
-    }
-  }, [isLoggedIn, navigate]);
 
   return (
     <PageWrapper>

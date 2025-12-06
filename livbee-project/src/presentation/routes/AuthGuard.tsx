@@ -4,7 +4,7 @@ import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import type { UserRole } from '@/domain/entities/User';
-import { setAuthRedirectPath } from '@/shared/utils/authRedirect';
+import { setAuthRedirectPath, consumeOriginPage, hasAuthRedirectPath } from '@/shared/utils/authRedirect';
 
 interface AuthGuardProps {
   children: React.ReactElement;
@@ -28,12 +28,23 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   // Role mismatch 체크
   const hasRoleMismatch = allowedRoles && allowedRoles.length > 0 && (!user || !allowedRoles.includes(user.role));
 
-  // Role mismatch 시 Toast 메시지 표시
+  // Role mismatch 시 적절한 Toast 메시지 표시
   useEffect(() => {
-    if (hasRoleMismatch) {
-      showToast('브랜드 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
+    if (hasRoleMismatch && allowedRoles && allowedRoles.length > 0) {
+      // 권한에 따른 메시지 결정
+      const isBrandOnly = allowedRoles.includes('brand') && !allowedRoles.includes('showhost');
+      const isShowhostOnly = allowedRoles.includes('showhost') && !allowedRoles.includes('brand');
+      
+      let message = '권한이 없습니다.';
+      if (isBrandOnly) {
+        message = '브랜드 권한 사용자만 이용 가능한 기능입니다.';
+      } else if (isShowhostOnly) {
+        message = '쇼호스트 권한 사용자만 이용 가능한 기능입니다.';
+      }
+      
+      showToast(message, undefined, 'error');
     }
-  }, [hasRoleMismatch, showToast]);
+  }, [hasRoleMismatch, allowedRoles, showToast]);
 
   if (isLoading) {
     return <LoadingState padding="32px" />;
@@ -46,11 +57,31 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   }
 
   if (guestOnly && isLoggedIn) {
+    // 리다이렉트 경로가 있으면 useAuth의 login 함수에서 처리하도록 함
+    // (로그인 성공 후 등록 페이지 등으로 이동해야 하는 경우)
+    if (hasAuthRedirectPath()) {
+      // 리다이렉트 경로가 있으면 AuthGuard에서 리다이렉트하지 않음
+      // useAuth의 login 함수에서 처리하도록 함
+      return children;
+    }
     return <Navigate to={redirectTo} replace />;
   }
 
   if (hasRoleMismatch) {
-    return <Navigate to="/" replace />;
+    // 등록 버튼을 누른 원래 페이지로 리다이렉트 (있으면)
+    let originPage = consumeOriginPage();
+    
+    // originPage가 없으면 현재 경로에서 부모 경로를 추출
+    // 예: /campaigns/register -> /campaigns
+    if (!originPage && location.pathname.includes('/register')) {
+      const pathParts = location.pathname.split('/');
+      if (pathParts.length >= 2) {
+        originPage = '/' + pathParts[1]; // /campaigns, /portfolios, /models 등
+      }
+    }
+    
+    const redirectPath = originPage || redirectTo;
+    return <Navigate to={redirectPath} replace />;
   }
 
   return children;

@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Plus } from 'lucide-react';
@@ -9,6 +9,8 @@ import { useListFetcher } from '@/presentation/hooks/useListFetcher';
 import { useListPageState } from '@/presentation/hooks/useListPageState';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';
+import { setAuthRedirectPath, setOriginPage } from '@/shared/utils/authRedirect';
+import LoginRequiredModal from '@/presentation/components/navigation/LoginRequiredModal';
 import { ModelSearchSection } from '@/presentation/components/model/ModelSearchSection';
 import { ModelFilterRow } from '@/presentation/components/model/ModelFilterRow';
 import { ModelCard } from './components/ModelCard';
@@ -17,8 +19,9 @@ import { mockModels, modelFilters } from './mock/mockModels';
 
 const ModelsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isLoggedIn } = useAuth();
   const { showToast } = useToast();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const modelRepository = useRepository(ModelRepository);
 
   // query 객체 메모이제이션
@@ -143,9 +146,14 @@ const ModelsPage: React.FC = () => {
       <RegisterFab
         type="button"
         onClick={() => {
+          // 비회원인 경우 로그인 모달 표시
+          if (!isLoggedIn) {
+            setIsLoginModalOpen(true);
+            return;
+          }
+          // 쇼호스트 권한이 아닌 경우 권한 오류 토스트
           if (user?.role !== 'showhost') {
-            showToast('브랜드 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
-            navigate('/', { replace: true });
+            showToast('쇼호스트 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
             return;
           }
           navigate('/models/register');
@@ -154,6 +162,19 @@ const ModelsPage: React.FC = () => {
       >
         <Plus size={24} strokeWidth={2.5} />
       </RegisterFab>
+
+      <LoginRequiredModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onConfirm={() => {
+          // 현재 페이지 경로 저장 (권한 불일치 시 돌아갈 페이지)
+          setOriginPage('/models');
+          // 등록 페이지 경로 저장 (로그인 성공 시 이동할 페이지)
+          setAuthRedirectPath('/models/register');
+          setIsLoginModalOpen(false);
+          navigate('/login', { replace: true });
+        }}
+      />
     </PageWrapper>
   );
 };

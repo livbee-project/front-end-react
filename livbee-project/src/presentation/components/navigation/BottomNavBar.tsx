@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useLocation, useNavigate } from 'react-router-dom';
 import BottomNavItem from './BottomNavItem';
-import { useToast } from '@/presentation/contexts/ToastContext';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { ROUTE_PATHS } from '@/app/routes/routeMeta';
 import { setAuthRedirectPath } from '@/shared/utils/authRedirect';
+import LoginRequiredModal from './LoginRequiredModal';
 // 커스텀 네비게이션 아이콘 컴포넌트
 import {
   IconHome,
@@ -41,7 +41,8 @@ const BottomNavBar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth(); // 인증 상태 가져오기
-  const { showToast } = useToast();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
 
   /**
    * 탭 클릭 시 네비게이션을 처리하는 함수
@@ -50,15 +51,10 @@ const BottomNavBar: React.FC = () => {
     // 1. 현재 경로와 같으면 아무것도 하지 않음
     if (location.pathname === path) return;
 
-    const redirectToLogin = () => {
-      setAuthRedirectPath(path);
-      showToast('로그인이 필요합니다.\n회원 전용 서비스입니다.');
-      navigate(ROUTE_PATHS.login, { replace: true });
-    };
-
     // 2. 로그인이 필요한 경로인지 확인
     if (AUTH_REQUIRED_PATHS.has(path) && !isLoggedIn) {
-      redirectToLogin();
+      setPendingPath(path);
+      setIsLoginModalOpen(true);
       return;
     }
 
@@ -66,28 +62,55 @@ const BottomNavBar: React.FC = () => {
     navigate(path);
   };
 
-  return (
-    <Nav>
-      <Wrapper>
-        {/*
-          --- (수정) TABS.map() 내부 ---
-          복잡한 <button> JSX 대신 BottomNavItem 컴포넌트를 렌더링
-        */}
-        {TABS.map((tab) => {
-          const isActive = location.pathname === tab.path;
+  /**
+   * 로그인 모달에서 로그인하기 버튼 클릭 시
+   */
+  const handleLoginConfirm = () => {
+    if (pendingPath) {
+      setAuthRedirectPath(pendingPath);
+      setIsLoginModalOpen(false);
+      navigate(ROUTE_PATHS.login, { replace: true });
+      setPendingPath(null);
+    }
+  };
 
-          return (
-            <BottomNavItem
-              key={tab.path}
-              label={tab.label}
-              icon={tab.icon}
-              isActive={isActive}
-              onClick={() => handleNavigate(tab.path)}
-            />
-          );
-        })}
-      </Wrapper>
-    </Nav>
+  /**
+   * 로그인 모달 닫기
+   */
+  const handleLoginModalClose = () => {
+    setIsLoginModalOpen(false);
+    setPendingPath(null);
+  };
+
+  return (
+    <>
+      <Nav>
+        <Wrapper>
+          {/*
+            --- (수정) TABS.map() 내부 ---
+            복잡한 <button> JSX 대신 BottomNavItem 컴포넌트를 렌더링
+          */}
+          {TABS.map((tab) => {
+            const isActive = location.pathname === tab.path;
+
+            return (
+              <BottomNavItem
+                key={tab.path}
+                label={tab.label}
+                icon={tab.icon}
+                isActive={isActive}
+                onClick={() => handleNavigate(tab.path)}
+              />
+            );
+          })}
+        </Wrapper>
+      </Nav>
+      <LoginRequiredModal
+        isOpen={isLoginModalOpen}
+        onClose={handleLoginModalClose}
+        onConfirm={handleLoginConfirm}
+      />
+    </>
   );
 };
 
