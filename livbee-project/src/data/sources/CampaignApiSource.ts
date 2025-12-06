@@ -63,7 +63,7 @@ export class CampaignApiSource {
     // 백엔드가 snake_case로 응답하는 경우 items 배열의 각 항목을 camelCase로 변환
     if (result.items && Array.isArray(result.items)) {
       const convertedItems = result.items.map((item) => 
-        convertKeysToCamelCase(item as Record<string, unknown>)
+        convertKeysToCamelCase(item as unknown as Record<string, unknown>)
       ) as unknown as CampaignListResponse['items'];
       
       return {
