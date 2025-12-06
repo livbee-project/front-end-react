@@ -16,6 +16,7 @@ import { extractErrorMessage, isSuccessResponse } from '@/shared/utils/apiRespon
 import { debug } from '@/shared/utils/logger';
 import { normalizeCampaignApplyResponse, normalizeApplicationActionResponse } from '@/shared/utils/apiNormalizer';
 import { transformCampaignDetailResponse } from '@/data/mappers/CampaignMapper';
+import { convertKeysToCamelCase } from '@/shared/utils/caseConverter';
 
 /**
  * 캠페인 API 소스
@@ -49,7 +50,7 @@ export class CampaignApiSource {
     // TODO: 인증 토큰이 필요한 경우 getAuthHeaders(token) 사용
     const headers = getAuthHeaders();
     
-    return fetchApi<CampaignListResponse>(
+    const result = await fetchApi<CampaignListResponse>(
       url,
       {
         method: 'GET',
@@ -58,6 +59,20 @@ export class CampaignApiSource {
       },
       '캠페인 목록 조회'
     );
+
+    // 백엔드가 snake_case로 응답하는 경우 items 배열의 각 항목을 camelCase로 변환
+    if (result.items && Array.isArray(result.items)) {
+      const convertedItems = result.items.map((item) => 
+        convertKeysToCamelCase(item as Record<string, unknown>)
+      ) as CampaignListResponse['items'];
+      
+      return {
+        ...result,
+        items: convertedItems,
+      };
+    }
+
+    return result;
   }
 
   /**
@@ -70,7 +85,7 @@ export class CampaignApiSource {
     const url = buildApiUrl('/campaigns');
     const headers = getAuthHeaders();
 
-    return fetchApi<CreateCampaignResponse>(
+    const result = await fetchApi<CreateCampaignResponse>(
       url,
       {
         method: 'POST',
@@ -79,6 +94,17 @@ export class CampaignApiSource {
       },
       '모집 공고 등록'
     );
+
+    // 백엔드가 snake_case로 응답하는 경우 camelCase로 변환
+    if (result.data) {
+      const convertedData = convertKeysToCamelCase(result.data as Record<string, unknown>);
+      return {
+        ...result,
+        data: convertedData as CreateCampaignResponse['data'],
+      };
+    }
+
+    return result;
   }
 
   /**

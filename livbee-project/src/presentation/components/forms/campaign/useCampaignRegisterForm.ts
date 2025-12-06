@@ -14,6 +14,7 @@ const STORAGE_KEY = 'campaign-register-form';
 
 const INITIAL_FORM_DATA: CampaignFormData = {
   brandName: '',
+  brandIntroduction: '',
   title: '',
   content: '',
   detailedContent: '',

@@ -31,13 +31,14 @@ export interface CreateCampaignRequest {
   // 필수 필드
   brandName: string;
   title: string;
-  shootDate: string; // ISO 8601 형식
-  closeAt: string; // ISO 8601 형식
+  shootDate: string; // YYYY-MM-DD 형식
+  closeAt: string; // YYYY-MM-DD 형식
   startTime: string; // "HH:mm" 형식
   endTime: string; // "HH:mm" 형식
 
   // 선택 필드
   isPublic?: boolean;
+  brandIntroduction?: string;
   prefix?: 'showhost' | 'staff' | 'model' | 'other'; // 영문 코드 (백엔드에서 자동 한글 변환)
   content?: string;
   detailedContent?: string; // 상세 내용 (content보다 우선 적용)
@@ -62,6 +63,7 @@ export interface CreateCampaignResponse {
   data: {
     id: string;
     brandName: string;
+    brandIntroduction?: string;
     title: string;
     category: string;
     categoryCode: string;
@@ -70,6 +72,7 @@ export interface CreateCampaignResponse {
     prefixCode: string;
     prefixName: string;
     content?: string;
+    detailedContent?: string;
     imageUrl?: string;
     thumbnailUrl?: string;
     shootDate: string;
@@ -91,7 +94,8 @@ export interface CreateCampaignResponse {
  */
 export interface CampaignApiErrorResponse {
   ok: false;
-  code: string;
+  code?: string;
+  error?: string; // 백엔드에서 error 필드로 응답할 수 있음
   message: string;
   userMessage?: string;
   errors?: Array<{

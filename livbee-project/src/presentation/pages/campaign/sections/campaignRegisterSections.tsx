@@ -8,6 +8,8 @@ import SelectInput from '@/presentation/components/forms/inputs/SelectInput';
 import DateInput from '@/presentation/components/forms/inputs/DateInput';
 import TimeInput from '@/presentation/components/forms/inputs/TimeInput';
 import ImageUpload from '@/presentation/components/upload/ImageUpload';
+import { Textarea } from '@/presentation/components/styled/CommonStyles';
+import styled from 'styled-components';
 
 export interface CampaignRegisterSection {
   key: string;
@@ -18,6 +20,7 @@ export interface CampaignRegisterSection {
 interface CampaignRegisterSectionsParams {
   formData: {
     brandName: string;
+    brandIntroduction: string;
     title: string;
     content: string;
     detailedContent: string;
@@ -52,6 +55,10 @@ const categoryOptions = [
   { value: 'lifestyle', label: '생활/리빙' },
 ];
 
+const StyledTextarea = styled(Textarea)`
+  width: 100%;
+`;
+
 export const createCampaignRegisterSections = ({
   formData,
   coverImageUrl,
@@ -80,6 +87,18 @@ export const createCampaignRegisterSections = ({
         placeholder="내용을 입력해주세요"
         value={formData.brandName}
         onChange={(e) => handleInputChange('brandName', e.target.value)}
+      />
+    ),
+  },
+  {
+    key: 'brandIntroduction',
+    title: '브랜드 소개',
+    content: (
+      <StyledTextarea
+        placeholder="브랜드에 대해 간단히 소개해주세요"
+        value={formData.brandIntroduction}
+        onChange={(e) => handleInputChange('brandIntroduction', e.target.value)}
+        rows={4}
       />
     ),
   },

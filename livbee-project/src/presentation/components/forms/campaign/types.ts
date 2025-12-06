@@ -1,5 +1,6 @@
 export interface CampaignFormData {
   brandName: string;
+  brandIntroduction: string;
   title: string;
   content: string;
   detailedContent: string;

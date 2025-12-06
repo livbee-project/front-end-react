@@ -16,11 +16,14 @@ const mapRecruitmentType = (type: CampaignFormData['recruitmentType']): 'showhos
 };
 
 /**
- * 날짜 문자열을 ISO 8601 형식으로 변환
+ * 날짜 문자열을 YYYY-MM-DD 형식으로 변환 (백엔드 date 타입에 맞춤)
  */
-const convertToISO8601 = (dateString: string): string => {
+const convertToDateString = (dateString: string): string => {
   if (!dateString) return '';
-  return `${dateString}T00:00:00.000Z`;
+  // 이미 YYYY-MM-DD 형식이면 그대로 반환
+  // ISO 8601 형식이면 날짜 부분만 추출
+  const dateOnly = dateString.split('T')[0];
+  return dateOnly;
 };
 
 /**
@@ -34,14 +37,15 @@ export const buildCampaignRequest = (
 ): CreateCampaignRequest => {
   return {
     brandName: formData.brandName.trim(),
+    brandIntroduction: formData.brandIntroduction.trim() || undefined,
     title: formData.title.trim(),
     content: formData.content.trim() || undefined,
     detailedContent: formData.detailedContent.trim() || undefined,
     prefix: mapRecruitmentType(formData.recruitmentType),
     category: formData.category as CreateCampaignRequest['category'],
     location: formData.location.trim() || undefined,
-    shootDate: convertToISO8601(formData.filmingDate),
-    closeAt: convertToISO8601(formData.deadline),
+    shootDate: convertToDateString(formData.filmingDate),
+    closeAt: convertToDateString(formData.deadline),
     startTime: formData.startTime || '',
     endTime: formData.endTime || '',
     productName: formData.productName.trim() || undefined,

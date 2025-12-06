@@ -27,7 +27,9 @@ export const handleCampaignApiError = (
     return new Error(errorMessages);
   }
 
-  const errorMessage = extractErrorMessage(result as FastApiErrorResponse | ApiResponse<unknown>);
+  // userMessage가 있으면 우선 사용, 없으면 message 사용
+  // 백엔드가 error 필드로 응답하는 경우도 처리
+  const errorMessage = error.userMessage || error.message || extractErrorMessage(result as FastApiErrorResponse | ApiResponse<unknown>);
   return new Error(errorMessage || '모집 공고 등록에 실패했습니다.');
 };
 
