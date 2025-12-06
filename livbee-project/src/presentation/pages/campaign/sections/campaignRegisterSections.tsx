@@ -32,11 +32,13 @@ interface CampaignRegisterSectionsParams {
     startTime: string;
     endTime: string;
     productName: string;
+    fee: string;
+    feeNegotiable: boolean;
   };
   coverImageUrl?: string;
   productImageUrl?: string;
   liveCoverImageUrl?: string;
-  handleInputChange: <K extends keyof CampaignRegisterSectionsParams['formData']>(field: K, value: string) => void;
+  handleInputChange: <K extends keyof CampaignRegisterSectionsParams['formData']>(field: K, value: string | boolean) => void;
   handleImageSelect: (file: File, type: 'cover' | 'product' | 'liveCover') => void;
 }
 
@@ -57,6 +59,38 @@ const categoryOptions = [
 
 const StyledTextarea = styled(Textarea)`
   width: 100%;
+`;
+
+const FeeContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.md};
+  width: 100%;
+`;
+
+const FeeInputWrapper = styled.div`
+  flex: 1;
+`;
+
+const CheckboxContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+  white-space: nowrap;
+`;
+
+const CheckboxInput = styled.input`
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: ${({ theme }) => theme.colors.primary};
+`;
+
+const CheckboxLabel = styled.label`
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.foreground};
+  cursor: pointer;
+  user-select: none;
 `;
 
 export const createCampaignRegisterSections = ({
@@ -221,6 +255,39 @@ export const createCampaignRegisterSections = ({
         value={formData.productName}
         onChange={(e) => handleInputChange('productName', e.target.value)}
       />
+    ),
+  },
+  {
+    key: 'fee',
+    title: '수당',
+    content: (
+      <FeeContainer>
+        <FeeInputWrapper>
+          <TextInput
+            type="number"
+            placeholder="금액을 입력해주세요"
+            value={formData.fee}
+            onChange={(e) => handleInputChange('fee', e.target.value)}
+            disabled={formData.feeNegotiable}
+          />
+        </FeeInputWrapper>
+        <CheckboxContainer>
+          <CheckboxInput
+            type="checkbox"
+            id="feeNegotiable"
+            checked={formData.feeNegotiable}
+            onChange={(e) => {
+              const isChecked = e.target.checked;
+              handleInputChange('feeNegotiable', isChecked);
+              // 협의 가능으로 체크하면 수당 필드 초기화
+              if (isChecked) {
+                handleInputChange('fee', '');
+              }
+            }}
+          />
+          <CheckboxLabel htmlFor="feeNegotiable">협의 가능</CheckboxLabel>
+        </CheckboxContainer>
+      </FeeContainer>
     ),
   },
   {

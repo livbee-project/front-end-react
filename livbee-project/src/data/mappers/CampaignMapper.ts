@@ -46,11 +46,9 @@ export const transformCampaignDetailResponse = (
     imageUrl: '',
     thumbnailUrl: '',
     liveVerticalCoverUrl: null,
-    liveStreamUrl: null,
     productThumbnailUrl: null,
     productImageUrl: '',
     productName: null,
-    productUrl: null,
     brandIntroduction: '',
     recruitmentSection: '',
     qualifications: [],
@@ -159,10 +157,6 @@ export const transformCampaignDetailResponse = (
     merged.liveVerticalCoverUrl = (payload.liveVerticalCoverUrl as string | null) || ((payload as Record<string, unknown>).live_vertical_cover_url as string | null) || null;
   }
   
-  if (typeof payload.liveStreamUrl === 'string' || typeof (payload as Record<string, unknown>).live_stream_url === 'string' || payload.liveStreamUrl === null) {
-    merged.liveStreamUrl = (payload.liveStreamUrl as string | null) || ((payload as Record<string, unknown>).live_stream_url as string | null) || null;
-  }
-  
   if (typeof payload.productThumbnailUrl === 'string' || typeof (payload as Record<string, unknown>).product_thumbnail_url === 'string' || payload.productThumbnailUrl === null) {
     merged.productThumbnailUrl = (payload.productThumbnailUrl as string | null) || ((payload as Record<string, unknown>).product_thumbnail_url as string | null) || null;
   }
@@ -173,10 +167,6 @@ export const transformCampaignDetailResponse = (
   
   if (typeof payload.productName === 'string' || typeof (payload as Record<string, unknown>).product_name === 'string' || payload.productName === null) {
     merged.productName = (payload.productName as string | null) || ((payload as Record<string, unknown>).product_name as string | null) || null;
-  }
-  
-  if (typeof payload.productUrl === 'string' || typeof (payload as Record<string, unknown>).product_url === 'string' || payload.productUrl === null) {
-    merged.productUrl = (payload.productUrl as string | null) || ((payload as Record<string, unknown>).product_url as string | null) || null;
   }
   
   if (typeof payload.recruitmentSection === 'string' || typeof (payload as Record<string, unknown>).recruitment_section === 'string') {

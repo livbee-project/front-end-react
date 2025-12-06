@@ -29,7 +29,14 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   const hasRoleMismatch = allowedRoles && allowedRoles.length > 0 && (!user || !allowedRoles.includes(user.role));
 
   // Role mismatch 시 적절한 Toast 메시지 표시
+  // 단, 로딩 중이거나 실제로 리다이렉트가 발생할 때만 표시
   useEffect(() => {
+    // 로딩 중이면 토스트 표시하지 않음 (새로고침 시 user가 아직 로드되지 않았을 수 있음)
+    if (isLoading) {
+      return;
+    }
+
+    // 실제로 권한 불일치가 있고 리다이렉트가 발생할 때만 토스트 표시
     if (hasRoleMismatch && allowedRoles && allowedRoles.length > 0) {
       // 권한에 따른 메시지 결정
       const isBrandOnly = allowedRoles.includes('brand') && !allowedRoles.includes('showhost');
@@ -44,7 +51,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
       
       showToast(message, undefined, 'error');
     }
-  }, [hasRoleMismatch, allowedRoles, showToast]);
+  }, [hasRoleMismatch, allowedRoles, showToast, isLoading]);
 
   if (isLoading) {
     return <LoadingState padding="32px" />;

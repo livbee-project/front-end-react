@@ -12,5 +12,7 @@ export interface CampaignFormData {
   startTime: string;
   endTime: string;
   productName: string;
+  fee: string;
+  feeNegotiable: boolean;
 }
 

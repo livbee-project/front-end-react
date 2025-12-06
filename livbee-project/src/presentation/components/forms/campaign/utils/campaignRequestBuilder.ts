@@ -35,6 +35,10 @@ export const buildCampaignRequest = (
   uploadedProductImageUrl?: string,
   uploadedLiveCoverImageUrl?: string
 ): CreateCampaignRequest => {
+  // 수당 문자열을 숫자로 변환 (빈 문자열이면 undefined)
+  const feeNumber = formData.fee.trim() ? Number(formData.fee.trim().replace(/,/g, '')) : undefined;
+  const fee = feeNumber && !isNaN(feeNumber) ? feeNumber : undefined;
+
   return {
     brandName: formData.brandName.trim(),
     brandIntroduction: formData.brandIntroduction.trim() || undefined,
@@ -49,6 +53,8 @@ export const buildCampaignRequest = (
     startTime: formData.startTime || '',
     endTime: formData.endTime || '',
     productName: formData.productName.trim() || undefined,
+    fee,
+    feeNegotiable: formData.feeNegotiable,
     coverImageUrl: uploadedCoverImageUrl,
     productThumbnailUrl: uploadedProductImageUrl,
     liveVerticalCoverUrl: uploadedLiveCoverImageUrl,

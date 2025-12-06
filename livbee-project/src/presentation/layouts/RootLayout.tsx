@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { Outlet, useLocation } from 'react-router-dom';
 import BottomNavBar from '@/presentation/components/navigation/BottomNavBar';
 import AppFooter from '@/presentation/components/footer/AppFooter';
-import { ToastProvider } from '@/presentation/contexts/ToastContext';
 import { ApiErrorToastListener } from '@/presentation/components/error/ApiErrorToastListener';
 import { ROUTE_PATHS } from '@/app/routes/routeMeta';
 
@@ -36,16 +35,14 @@ const RootLayout: React.FC = () => {
   }, [location.pathname, isChatPage]);
 
   return (
-    <ToastProvider>
-      <RootContainer>
-        <MainContent ref={mainContentRef} className="hide-scrollbar">
-          <ApiErrorToastListener />
-          <Outlet />
-          <AppFooter />
-        </MainContent>
-        <BottomNavBar />
-      </RootContainer>
-    </ToastProvider>
+    <RootContainer>
+      <MainContent ref={mainContentRef} className="hide-scrollbar">
+        <ApiErrorToastListener />
+        <Outlet />
+        <AppFooter />
+      </MainContent>
+      <BottomNavBar />
+    </RootContainer>
   );
 };
 

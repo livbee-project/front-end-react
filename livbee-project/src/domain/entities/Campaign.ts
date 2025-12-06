@@ -52,10 +52,8 @@ export interface CreateCampaignRequest {
   feeNegotiable?: boolean;
   coverImageUrl?: string;
   liveVerticalCoverUrl?: string;
-  liveStreamUrl?: string;
   productThumbnailUrl?: string;
   productName?: string;
-  productUrl?: string;
 }
 
 /**
@@ -158,11 +156,9 @@ export interface CampaignDetailResponse {
     imageUrl: string;
     thumbnailUrl: string;
     liveVerticalCoverUrl: string | null;
-    liveStreamUrl: string | null;
     productThumbnailUrl: string | null;
     productImageUrl: string;
     productName: string | null;
-    productUrl: string | null;
     brandIntroduction: string;
     recruitmentSection: string;
     qualifications: string[];
@@ -205,11 +201,9 @@ export interface CampaignDetail {
   imageUrl: string;
   thumbnailUrl: string;
   liveVerticalCoverUrl: string | null;
-  liveStreamUrl: string | null;
   productThumbnailUrl: string | null;
   productImageUrl: string;
   productName: string | null;
-  productUrl: string | null;
   brandIntroduction: string;
   recruitmentSection: string;
   qualifications: string[];

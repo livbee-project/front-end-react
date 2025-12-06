@@ -21,7 +21,15 @@ export class GlobalErrorBoundary extends React.Component<GlobalErrorBoundaryProp
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('[GlobalErrorBoundary]', error, errorInfo);
+    // 전체 에러 정보를 자세히 출력
+    console.group('🚨 [GlobalErrorBoundary] 에러 발생');
+    console.error('에러 메시지:', error.message);
+    console.error('에러 스택:', error.stack);
+    console.error('에러 이름:', error.name);
+    console.error('컴포넌트 스택:', errorInfo.componentStack);
+    console.error('전체 에러 객체:', error);
+    console.error('에러 정보:', errorInfo);
+    console.groupEnd();
   }
 
   handleReset = () => {

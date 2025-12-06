@@ -83,6 +83,9 @@ const ImageCropPage: React.FC = () => {
           if (result != null && typeof result === 'object' && 'then' in result && typeof (result as { then: unknown }).then === 'function') {
             await (result as Promise<unknown>);
           }
+          // 상태 업데이트와 sessionStorage 저장이 완료될 때까지 충분한 지연
+          // React 상태 업데이트는 비동기이므로 여러 렌더 사이클을 기다림
+          await new Promise((resolve) => setTimeout(resolve, 200));
         } catch (callbackError) {
           logError('ImageCropPage', '이미지 업로드 콜백 실패:', callbackError);
           // 콜백 실패해도 페이지는 이동 (사용자가 다시 시도할 수 있도록)
@@ -92,7 +95,8 @@ const ImageCropPage: React.FC = () => {
         delete window.__imageCropCallbacks[callbackKey];
       }
       
-      navigate(returnPath);
+      // 콜백 완료 후 페이지 이동
+      navigate(returnPath, { replace: true });
     } catch (error) {
       logError('ImageCropPage', '이미지 크롭 실패:', error);
       alert('이미지 크롭에 실패했습니다.');
