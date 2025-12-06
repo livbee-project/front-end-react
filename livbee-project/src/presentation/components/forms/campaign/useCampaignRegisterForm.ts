@@ -53,7 +53,6 @@ export const useCampaignRegisterForm = () => {
   const [liveCoverImageFile, setLiveCoverImageFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isInitialMount, setIsInitialMount] = useState(true);
-  const [isNavigatingToCrop, setIsNavigatingToCrop] = useState(false); // 크롭 페이지로 이동 중인지 추적
   
   // 현재 경로를 추적하기 위한 ref (cleanup에서 사용)
   const currentPathRef = useRef(location.pathname);
@@ -130,7 +129,6 @@ export const useCampaignRegisterForm = () => {
     if (hasRestoredImage) {
       clearImageUrls();
       clearStorage(); // 폼 데이터 세션도 삭제
-      setIsNavigatingToCrop(false); // 크롭 플로우 완료
       // 경로 ref도 업데이트 (크롭 완료 후 돌아온 상태)
       currentPathRef.current = location.pathname;
     }
@@ -231,8 +229,6 @@ export const useCampaignRegisterForm = () => {
       clearStorage();
       debug('useCampaignRegisterForm', '📍 clearImageUrls 호출 전');
       clearImageUrls();
-      debug('useCampaignRegisterForm', '📍 setIsNavigatingToCrop(false) 호출 전');
-      setIsNavigatingToCrop(false);
       debug('useCampaignRegisterForm', '📍 세션 데이터 삭제 완료');
     } else {
       debug('useCampaignRegisterForm', '📍 등록 페이지 또는 크롭 페이지이므로 세션 데이터 유지', {
@@ -273,7 +269,6 @@ export const useCampaignRegisterForm = () => {
         debug('useCampaignRegisterForm', '🧹 cleanup에서 세션 데이터 삭제 시작');
         clearStorage();
         clearImageUrls();
-        setIsNavigatingToCrop(false);
         debug('useCampaignRegisterForm', '🧹 cleanup에서 세션 데이터 삭제 완료');
       } else {
         debug('useCampaignRegisterForm', '🧹 cleanup에서 세션 데이터 유지', {
@@ -298,8 +293,6 @@ export const useCampaignRegisterForm = () => {
 
   const handleImageSelect = useCallback((file: File, type: 'cover' | 'product' | 'liveCover') => {
     const blobUrl = URL.createObjectURL(file);
-    // 크롭 페이지로 이동할 예정임을 표시
-    setIsNavigatingToCrop(true);
     
     if (type === 'cover') {
       setCoverImageFile(file);
