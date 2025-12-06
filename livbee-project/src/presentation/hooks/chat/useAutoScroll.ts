@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 interface UseAutoScrollParams {
   observe?: unknown;
@@ -10,11 +10,17 @@ export const useAutoScroll = ({ observe }: UseAutoScrollParams = {}) => {
 
   const scrollToBottom = useCallback(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      // requestAnimationFrame을 사용하여 DOM 업데이트 후 스크롤 실행
+      requestAnimationFrame(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+      });
     }
   }, []);
 
-  useEffect(() => {
+  // useLayoutEffect를 사용하여 렌더링 직후에 스크롤 실행
+  useLayoutEffect(() => {
     if (autoScroll) {
       scrollToBottom();
     }

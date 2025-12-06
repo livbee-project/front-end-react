@@ -150,11 +150,17 @@ const ChatRoomPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages, roomDetail?.room.me.lastReadMessageId]);
 
-  React.useEffect(() => {
-    if (autoScroll && scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  // 채팅 페이지가 처음 로드되거나 메시지가 추가될 때 항상 최신 메시지로 스크롤
+  React.useLayoutEffect(() => {
+    if (autoScroll && scrollRef.current && displayedMessages.length > 0 && !loading) {
+      // requestAnimationFrame을 사용하여 DOM 업데이트 후 스크롤 실행
+      requestAnimationFrame(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+      });
     }
-  }, [messages, autoScroll, scrollRef]);
+  }, [displayedMessages.length, autoScroll, loading]);
 
   const { handleSocketEvent } = useChatRoomSocket({
     activeRoomId,

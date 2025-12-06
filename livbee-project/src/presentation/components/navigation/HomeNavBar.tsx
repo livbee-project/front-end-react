@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { User, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Bell } from 'lucide-react';
+import logoImage from '@/presentation/assets/images/liveelogo.png';
 
 const NavBar = styled.nav`
   position: sticky;
@@ -28,21 +30,38 @@ const NavInner = styled.div`
   }
 `;
 
-const Logo = styled.h1`
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-`;
-
-const Actions = styled.div`
+const LogoContainer = styled.div`
   display: flex;
-  gap: 0.5rem;
+  align-items: center;
 `;
 
-const IconButton = styled.button`
+const LogoLink = styled(Link)`
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: ${({ theme }) => theme.colors.foreground};
+`;
+
+const LogoImage = styled.img`
+  height: 32px;
+  width: auto;
+  max-width: 120px;
+  object-fit: contain;
+  display: block;
+`;
+
+const IconContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const NotificationButton = styled.button`
+  position: relative;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  padding: 0.5rem;
+  border-radius: 9999px;
   border: none;
   background-color: transparent;
   display: flex;
@@ -55,20 +74,26 @@ const IconButton = styled.button`
   &:hover {
     background-color: ${({ theme }) => theme.colors.secondary};
   }
+
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
 `;
 
 const HomeNavBar: React.FC = () => (
   <NavBar>
     <NavInner>
-      <Logo>쇼핑라이브</Logo>
-      <Actions>
-        <IconButton type="button" aria-label="사용자 메뉴">
-          <User size={20} />
-        </IconButton>
-        <IconButton type="button" aria-label="닫기">
-          <X size={20} />
-        </IconButton>
-      </Actions>
+      <LogoContainer>
+        <LogoLink to="/">
+          <LogoImage src={logoImage} alt="Livbee 로고" />
+        </LogoLink>
+      </LogoContainer>
+      <IconContainer>
+        <NotificationButton type="button" aria-label="알림">
+          <Bell size={24} />
+        </NotificationButton>
+      </IconContainer>
     </NavInner>
   </NavBar>
 );
