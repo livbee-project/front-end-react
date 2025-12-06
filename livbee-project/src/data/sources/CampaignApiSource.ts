@@ -64,7 +64,7 @@ export class CampaignApiSource {
     if (result.items && Array.isArray(result.items)) {
       const convertedItems = result.items.map((item) => 
         convertKeysToCamelCase(item as Record<string, unknown>)
-      ) as CampaignListResponse['items'];
+      ) as unknown as CampaignListResponse['items'];
       
       return {
         ...result,

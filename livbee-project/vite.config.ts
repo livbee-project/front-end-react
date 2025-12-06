@@ -1,5 +1,5 @@
 /// <reference types="vitest/config" />
-import { defineConfig } from 'vite';
+import { defineConfig, type ViteDevServer } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
@@ -15,7 +15,7 @@ const dirname =
 const openExternalBrowser = () => {
   return {
     name: 'open-external-browser',
-    configureServer(server) {
+    configureServer(server: ViteDevServer) {
       server.httpServer?.once('listening', () => {
         setTimeout(() => {
           const address = server.httpServer?.address();
