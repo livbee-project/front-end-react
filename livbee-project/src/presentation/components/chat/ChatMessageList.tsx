@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Info } from 'lucide-react';
 import type { ChatMessage, ChatRoomDetail } from '@/domain/entities/Chat';
 import type { ApplicationCardData } from '@/shared/utils/chatUtils';

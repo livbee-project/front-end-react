@@ -4,11 +4,9 @@ import { warn } from '@/shared/utils/logger';
 /**
  * sessionStorage에서 폼 데이터를 복원하는 훅
  * @param storageKey sessionStorage 키
- * @param initialState 기본 초기 상태
  */
 export const useFormStorageRestore = <T>(
-  storageKey: string | undefined,
-  initialState: T
+  storageKey: string | undefined
 ): T | null => {
   return useMemo(() => {
     if (!storageKey || typeof window === 'undefined') {

@@ -51,7 +51,9 @@ const createCommonMenu = (navigate: ReturnType<typeof useNavigate>): MenuItemDat
  * 브랜드 타입 전략
  */
 export class BrandStrategy implements UserTypeStrategy {
-  constructor(private navigate: ReturnType<typeof useNavigate>) {}
+  constructor(_navigate: ReturnType<typeof useNavigate>) {
+    // BrandStrategy는 navigate를 사용하지 않음
+  }
 
   getProfileData(): ProfileData {
     return {
@@ -104,7 +106,11 @@ export class BrandStrategy implements UserTypeStrategy {
  * 쇼호스트 타입 전략
  */
 export class ShowhostStrategy implements UserTypeStrategy {
-  constructor(private navigate: ReturnType<typeof useNavigate>) {}
+  private navigate: ReturnType<typeof useNavigate>;
+
+  constructor(navigate: ReturnType<typeof useNavigate>) {
+    this.navigate = navigate;
+  }
 
   getProfileData(): ProfileData {
     return {
@@ -163,7 +169,11 @@ export class ShowhostStrategy implements UserTypeStrategy {
  * 모델 타입 전략
  */
 export class ModelStrategy implements UserTypeStrategy {
-  constructor(private navigate: ReturnType<typeof useNavigate>) {}
+  private navigate: ReturnType<typeof useNavigate>;
+
+  constructor(navigate: ReturnType<typeof useNavigate>) {
+    this.navigate = navigate;
+  }
 
   getProfileData(): ProfileData {
     return {

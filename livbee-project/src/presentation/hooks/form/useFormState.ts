@@ -10,7 +10,7 @@ import { useFormStorageSave } from './useFormStorageSave';
  */
 export const useFormState = <T>(initialState: T, storageKey?: string) => {
   // sessionStorage에서 복원된 상태 또는 초기 상태 사용
-  const restoredState = useFormStorageRestore(storageKey, initialState);
+  const restoredState = useFormStorageRestore<T>(storageKey);
   const [formData, setFormData] = useState<T>(restoredState ?? initialState);
 
   // sessionStorage 동기화 (formData 변경 시 자동 저장)
