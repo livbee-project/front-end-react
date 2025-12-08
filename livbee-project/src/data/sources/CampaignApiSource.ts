@@ -18,11 +18,13 @@ import { normalizeCampaignApplyResponse, normalizeApplicationActionResponse } fr
 import { transformCampaignDetailResponse } from '@/data/mappers/CampaignMapper';
 import { convertKeysToCamelCase } from '@/shared/utils/caseConverter';
 
+import type { ICampaignApiSource } from './interfaces/ICampaignApiSource';
+
 /**
  * 캠페인 API 소스
  * 실제 HTTP 요청을 담당하는 레이어
  */
-export class CampaignApiSource {
+export class CampaignApiSource implements ICampaignApiSource {
   /**
    * 모집 공고 목록 조회
    */

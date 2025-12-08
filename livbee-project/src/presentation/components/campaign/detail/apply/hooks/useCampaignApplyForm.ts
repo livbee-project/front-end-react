@@ -4,11 +4,12 @@ import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import { ChatRepository } from '@/data/repositories/ChatRepository';
 import { useRepository } from '@/presentation/hooks/common/useRepository';
 import { useToast } from '@/presentation/contexts/ToastContext';
-import { debug, warn, error as logError } from '@/shared/utils/logger';
+import { debug, warn } from '@/shared/utils/logger';
 import type { SnakeCaseResponse } from '@/shared/types/api';
 import { MOCK_PORTFOLIOS } from '@/shared/constants/portfolio';
 import { validateCampaignApplyForm } from '@/presentation/components/campaign/detail/apply/utils/campaignApplyValidation';
 import { buildCampaignApplyRequest } from '@/presentation/components/campaign/detail/apply/utils/campaignApplyRequestBuilder';
+import { handleCampaignApplyError } from '@/presentation/components/campaign/detail/apply/utils/campaignApplyErrorHandler';
 
 export interface PortfolioOption {
   id: number;
@@ -173,31 +174,18 @@ export const useCampaignApplyForm = ({
         });
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : '지원에 실패했습니다.';
+      const errorHandled = await handleCampaignApplyError(error, {
+        campaignId,
+        chatRepository,
+        showToast,
+        onClose,
+        navigate,
+      });
 
-      if (errorMessage.includes('이미 지원한') || errorMessage.includes('ALREADY_APPLIED')) {
-        try {
-          const rooms = await chatRepository.getRooms();
-
-          const existingRoom = rooms.find((room) => room.campaign?.id === campaignId);
-
-          if (existingRoom) {
-            showToast('이미 지원한 공고입니다. 기존 채팅방으로 이동합니다.');
-            onClose();
-            navigate(`/chat/${existingRoom.roomId}`);
-            return;
-          }
-
-          showToast('이미 지원한 공고입니다. 채팅방이 삭제되어 메시지 목록으로 이동합니다.');
-          onClose();
-          navigate('/mypage/messages');
-          return;
-        } catch (searchError) {
-          logError('CampaignApplyModal', '기존 채팅방 찾기 실패:', searchError);
-        }
+      if (!errorHandled) {
+        const errorMessage = error instanceof Error ? error.message : '지원에 실패했습니다.';
+        showToast(errorMessage, undefined, 'error');
       }
-
-      showToast(errorMessage, undefined, 'error');
     } finally {
       setIsSubmitting(false);
     }

@@ -8,11 +8,13 @@ import type {
   MeResponse,
 } from '@/domain/entities/User';
 
+import type { IUserApiSource } from './interfaces/IUserApiSource';
+
 /**
  * 사용자 API 소스
  * 실제 HTTP 요청을 담당하는 레이어
  */
-export class UserApiSource {
+export class UserApiSource implements IUserApiSource {
   /**
    * 로그인
    * @param request - 로그인 요청 데이터

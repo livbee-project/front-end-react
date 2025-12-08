@@ -1,33 +1,28 @@
 import React, { useCallback, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Info } from 'lucide-react';
 import { useChatRoomDetail } from '@/presentation/hooks/chat/useChatRoomDetail';
 import { useChatWebSocket } from '@/presentation/hooks/chat/useChatWebSocket';
 import { useToast } from '@/presentation/contexts/ToastContext';
-import { useRepository } from '@/presentation/hooks/common/useRepository';
-import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { ChatMessage } from '@/domain/entities/Chat';
 import ContactHeader from '@/presentation/components/chat/ContactHeader';
-import MessageGroup from '@/presentation/components/chat/MessageGroup';
+import { ChatMessageList } from '@/presentation/components/chat/ChatMessageList';
 import ComposerBar from '@/presentation/components/chat/ComposerBar';
 import {
   normalizeApplicationPayload,
   extractApplicationData,
 } from '@/shared/utils/chatUtils';
-import { debug, warn, error as logError } from '@/shared/utils/logger';
+import { warn } from '@/shared/utils/logger';
 import { useChatCounterpart } from '@/presentation/hooks/chat/useChatCounterpart';
 import { useDisplayedMessages } from '@/presentation/hooks/chat/useDisplayedMessages';
 import { useAutoScroll } from '@/presentation/hooks/chat/useAutoScroll';
 import { useChatRoomSocket } from '@/presentation/hooks/chat/useChatRoomSocket';
+import { useChatApplicationActions } from '@/presentation/hooks/chat/useChatApplicationActions';
 import {
   PageWrapper,
   ChatColumn,
   FixedPanel,
   ScrollArea,
-  ChatCard,
-  Messages,
   MessageValue,
-  ScrollHintButton,
 } from '@/presentation/components/chat/styled/ChatRoomStyles';
 
 interface ChatRoomState {
@@ -62,7 +57,6 @@ const ChatRoomPage: React.FC = () => {
 
   const myRole = roomDetail?.room.me.role;
   const isBrandUser = myRole === 'brand';
-  const campaignRepository = useRepository(CampaignRepository);
 
   const { counterpart, displayName, displayRole } = useChatCounterpart(roomDetail || undefined);
 
@@ -99,39 +93,10 @@ const ChatRoomPage: React.FC = () => {
     }
   };
 
-  const handleApplicationAction = useCallback(async (action: 'accept' | 'reject', applicationId?: string) => {
-    if (!applicationId) {
-      showToast('지원서 정보를 확인할 수 없습니다.', undefined, 'error');
-      return;
-    }
-
-    const actionLabel = action === 'accept' ? '수락' : '거절';
-    
-    try {
-      debug('ChatRoomPage', '지원서 상태 업데이트 요청:', { applicationId, action });
-      
-      const response = await campaignRepository.updateApplicationStatus({
-        applicationId,
-        action,
-      });
-
-      debug('ChatRoomPage', '지원서 상태 업데이트 응답:', response);
-
-      showToast(`지원서를 ${actionLabel}했습니다.`);
-      
-      // 소켓을 통해 실시간 업데이트가 오므로, 여기서는 즉시 새로고침하지 않음
-      // 백엔드에서 application.status.updated 이벤트를 보내면 handleSocketEvent에서 처리
-      // 다만, 소켓 연결이 끊어진 경우를 대비해 약간의 지연 후 새로고침 (폴백)
-      setTimeout(() => {
-        debug('ChatRoomPage', '폴백: refreshRoomDetail 호출');
-        refreshRoomDetail();
-      }, 1000);
-    } catch (error) {
-      logError('ChatRoomPage', '지원서 상태 업데이트 실패:', error);
-      const errorMessage = error instanceof Error ? error.message : `지원서 ${actionLabel}에 실패했습니다.`;
-      showToast(errorMessage, undefined, 'error');
-    }
-  }, [campaignRepository, refreshRoomDetail, showToast]);
+  // 지원서 액션 처리 훅
+  const { handleApplicationAction } = useChatApplicationActions({
+    refreshRoomDetail,
+  });
 
   const handleMarkAsRead = () => {
     if (!roomDetail || messages.length === 0) return;
@@ -204,63 +169,22 @@ const ChatRoomPage: React.FC = () => {
         </FixedPanel>
 
         <ScrollArea ref={scrollRef} onScroll={handleScroll}>
-          <ChatCard>
-            {loading && <MessageValue>채팅을 불러오는 중입니다...</MessageValue>}
-            {error && <MessageValue>{error}</MessageValue>}
-            {!loading && !error && displayedMessages.length === 0 && (
-              <MessageValue>아직 주고받은 메시지가 없습니다.</MessageValue>
-            )}
-            <Messages>
-              {displayedMessages.map((chatMessage, index) => {
-                const previous = displayedMessages[index - 1];
-                const applicationData = extractFn(chatMessage);
-                const isPaymentRequest = chatMessage.metadata?.type === 'payment_request';
-                // 지원서 카드는 항상 쇼호스트가 보낸 것으로 표시 (왼쪽 정렬)
-                // 결제 요청 메시지는 브랜드가 보낸 것이므로 브랜드 계정에서는 오른쪽 정렬
-                const isMyMessage = applicationData 
-                  ? false 
-                  : chatMessage.senderId === roomDetail?.room.me.userId;
-                const isSystem = chatMessage.messageType === 'system' && !isPaymentRequest;
-                
-                // 디버깅: 결제 요청 메시지 렌더링 확인
-                if (isPaymentRequest) {
-                  debug('ChatRoomPage', '결제 요청 메시지 렌더링:', {
-                    messageId: chatMessage.id,
-                    senderId: chatMessage.senderId,
-                    myUserId: roomDetail?.room.me.userId,
-                    isMyMessage,
-                    metadata: chatMessage.metadata,
-                  });
-                }
-                
-                return (
-                  <MessageGroup
-                    key={chatMessage.id}
-                    message={chatMessage}
-                    previousMessage={previous}
-                    applicationData={applicationData}
-                    isPaymentRequest={isPaymentRequest}
-                    isMyMessage={isMyMessage}
-                    isSystem={isSystem}
-                    roomDetail={roomDetail ?? undefined}
-                    isBrandUser={isBrandUser}
-                    onApplicationAccept={(applicationId) => handleApplicationAction('accept', applicationId)}
-                    onApplicationReject={(applicationId) => handleApplicationAction('reject', applicationId)}
-                    onPaymentClick={() => {
-                      // TODO: 결제 페이지로 이동
-                      showToast('결제 기능은 준비 중입니다.', undefined, 'info');
-                    }}
-                  />
-                );
-              })}
-            </Messages>
-            {!loading && !error && !autoScroll && (
-              <ScrollHintButton type="button" onClick={() => setAutoScroll(true)}>
-                <Info size={14} />
-                최근 메시지로 이동
-              </ScrollHintButton>
-            )}
-          </ChatCard>
+          <ChatMessageList
+            displayedMessages={displayedMessages}
+            roomDetail={roomDetail}
+            loading={loading}
+            error={error}
+            autoScroll={autoScroll}
+            isBrandUser={isBrandUser}
+            extractApplicationData={extractFn}
+            onApplicationAccept={(applicationId) => handleApplicationAction('accept', applicationId)}
+            onApplicationReject={(applicationId) => handleApplicationAction('reject', applicationId)}
+            onPaymentClick={() => {
+              // TODO: 결제 페이지로 이동
+              showToast('결제 기능은 준비 중입니다.', undefined, 'info');
+            }}
+            onScrollToBottom={() => setAutoScroll(true)}
+          />
         </ScrollArea>
       </ChatColumn>
 

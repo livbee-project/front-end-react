@@ -1,19 +1,6 @@
 import type { CreateCampaignRequest } from '@/domain/entities/Campaign';
 import type { CampaignFormData } from '../types';
-
-/**
- * 모집구분을 영문 코드로 변환
- */
-const mapRecruitmentType = (type: CampaignFormData['recruitmentType']): 'showhost' | 'staff' | 'model' | 'other' => {
-  const typeMap: Record<string, 'showhost' | 'staff' | 'model' | 'other'> = {
-    store: 'showhost',
-    showhost: 'showhost',
-    model: 'model',
-    staff: 'staff',
-    other: 'other',
-  };
-  return typeMap[type] || 'showhost';
-};
+import { mapRecruitmentType } from '../config/recruitmentTypeConfig';
 
 /**
  * 날짜 문자열을 YYYY-MM-DD 형식으로 변환 (백엔드 date 타입에 맞춤)

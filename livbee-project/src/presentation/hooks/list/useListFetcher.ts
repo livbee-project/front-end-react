@@ -1,5 +1,5 @@
-import { useCallback } from 'react';
 import { useListData } from '@/presentation/hooks/list/useListData';
+import { useRepositoryListMethod } from './useRepositoryListMethod';
 
 interface UseListFetcherOptions<Q, R extends object> {
   repository: R;
@@ -13,6 +13,7 @@ interface UseListFetcherOptions<Q, R extends object> {
 
 /**
  * Repository 메서드를 이용해 목록 데이터를 조회하는 공통 훅
+ * SRP 준수: Repository 메서드 호출 로직을 별도 훅에 위임
  */
 export function useListFetcher<
   T,
@@ -28,17 +29,7 @@ export function useListFetcher<
   cacheKey,
   cacheTime,
 }: UseListFetcherOptions<Q, R>) {
-  const fetchFunction = useCallback(
-    (request: Q, signal?: AbortSignal) => {
-      const fetchMethod = repository[method];
-      if (typeof fetchMethod !== 'function') {
-        return Promise.reject(new Error(`Repository method ${String(method)} is not a function`));
-      }
-
-      return (fetchMethod as (query: Q, signal?: AbortSignal) => Promise<Response>).call(repository, request, signal);
-    },
-    [repository, method]
-  );
+  const fetchFunction = useRepositoryListMethod<T, Q, R, Response>(repository, method);
 
   const resolvedCacheKey = cacheKey || `${repository.constructor.name}-${String(method)}-${JSON.stringify(query)}`;
 

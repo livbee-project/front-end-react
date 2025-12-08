@@ -11,11 +11,13 @@ import { ApiError, fetchApi } from '@/shared/utils/apiClient';
 import { transformPortfolioDetailResponse } from '@/data/mappers/PortfolioMapper';
 import { handleShowhostEntityError } from '@/data/errorHandlers/showhostEntityErrorHandler';
 
+import type { IPortfolioApiSource } from './interfaces/IPortfolioApiSource';
+
 /**
  * 포트폴리오 API 소스
  * 실제 HTTP 요청을 담당하는 레이어
  */
-export class PortfolioApiSource {
+export class PortfolioApiSource implements IPortfolioApiSource {
   /**
    * 포트폴리오 목록 조회
    */

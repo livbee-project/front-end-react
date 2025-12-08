@@ -6,7 +6,13 @@ import HomeSectionHeader from '@/presentation/components/home/sections/HomeSecti
 import GalleryGrid from '@/presentation/components/detail/common/GalleryGrid';
 import ActionSection from '@/presentation/components/detail/common/ActionSection';
 import GalleryLightbox from '@/presentation/components/detail/common/GalleryLightbox';
-import type { ImageGallery } from '@/presentation/hooks/imageCrop/useImageGallery';
+import type {
+  ProfileInfo,
+  ProfileDefaults,
+  GalleryData,
+  ProfileActions,
+  HeaderData,
+} from './types/ProfileDetailContentTypes';
 
 const GallerySection = styled.div`
   padding: ${({ theme }) => theme.spacing.xl} 0;
@@ -28,78 +34,41 @@ const GalleryWrapper = styled.div`
 `;
 
 interface ProfileDetailContentProps {
-  title: string;
-  name: string;
-  description: string;
-  detailedIntro: string;
-  profileImageUrl: string;
-  type: 'model' | 'showhost';
-  categories: string[];
-  tags: string[];
-  websiteUrl: string;
-  galleryImages: string[];
-  defaultGalleryImages: string[];
-  isReceivingOffers: boolean;
-  gallery: ImageGallery;
-  onProfileImageClick?: () => void;
-  onScrap?: () => void;
-  onOffer?: () => void;
-  onShare?: () => void;
-  defaultName: string;
-  defaultDescription: string;
-  defaultDetailedIntro: string;
-  defaultProfileImageUrl: string;
-  defaultWebsiteUrl: string;
-  defaultCategories: string[];
-  defaultTags: string[];
+  header: HeaderData;
+  profileInfo: ProfileInfo;
+  defaults: ProfileDefaults;
+  gallery: GalleryData;
+  actions: ProfileActions;
 }
 
 /**
  * 프로필 상세 페이지의 공통 컨텐츠 컴포넌트
+ * SRP 준수: 각 책임을 props 객체로 그룹화
  */
 export const ProfileDetailContent: React.FC<ProfileDetailContentProps> = ({
-  title,
-  name,
-  description,
-  detailedIntro,
-  profileImageUrl,
-  type,
-  categories,
-  tags,
-  websiteUrl,
-  galleryImages,
-  defaultGalleryImages,
-  isReceivingOffers,
+  header,
+  profileInfo,
+  defaults,
   gallery,
-  onProfileImageClick,
-  onScrap,
-  onOffer,
-  onShare,
-  defaultName,
-  defaultDescription,
-  defaultDetailedIntro,
-  defaultProfileImageUrl,
-  defaultCategories,
-  defaultTags,
-  defaultWebsiteUrl,
+  actions,
 }) => {
   const handleGalleryImageClick = (index: number) => {
-    gallery.open(index);
+    gallery.gallery.open(index);
   };
 
   return (
     <>
-      <StickyHeader title={title} onShare={onShare} />
+      <StickyHeader title={header.title} onShare={header.onShare} />
       <ProfileSection
-        name={name || defaultName}
-        description={description || defaultDescription}
-        detailedIntro={detailedIntro || defaultDetailedIntro}
-        profileImageUrl={profileImageUrl || defaultProfileImageUrl}
-        type={type}
-        categories={categories.length > 0 ? categories : defaultCategories}
-        tags={tags.length > 0 ? tags : defaultTags}
-        websiteUrl={websiteUrl || defaultWebsiteUrl}
-        onImageClick={onProfileImageClick}
+        name={profileInfo.name || defaults.name}
+        description={profileInfo.description || defaults.description}
+        detailedIntro={profileInfo.detailedIntro || defaults.detailedIntro}
+        profileImageUrl={profileInfo.profileImageUrl || defaults.profileImageUrl}
+        type={profileInfo.type}
+        categories={profileInfo.categories.length > 0 ? profileInfo.categories : defaults.categories}
+        tags={profileInfo.tags.length > 0 ? profileInfo.tags : defaults.tags}
+        websiteUrl={profileInfo.websiteUrl || defaults.websiteUrl}
+        onImageClick={actions.onProfileImageClick}
       />
       <GallerySection>
         <GalleryHeaderWrapper>
@@ -107,7 +76,7 @@ export const ProfileDetailContent: React.FC<ProfileDetailContentProps> = ({
         </GalleryHeaderWrapper>
         <GalleryWrapper>
           <GalleryGrid
-            images={galleryImages && galleryImages.length > 0 ? galleryImages : defaultGalleryImages}
+            images={gallery.images && gallery.images.length > 0 ? gallery.images : gallery.defaultImages}
             columns={3}
             onImageClick={handleGalleryImageClick}
           />
@@ -115,17 +84,17 @@ export const ProfileDetailContent: React.FC<ProfileDetailContentProps> = ({
       </GallerySection>
       <ActionSection
         isScraped={false}
-        isReceivingOffers={isReceivingOffers}
-        onScrap={onScrap}
-        onOffer={onOffer}
+        isReceivingOffers={actions.isReceivingOffers}
+        onScrap={actions.onScrap}
+        onOffer={actions.onOffer}
       />
       <GalleryLightbox
-        image={gallery.currentImage}
-        isOpen={gallery.isOpen}
-        onClose={gallery.close}
-        onPrev={gallery.showPrev}
-        onNext={gallery.showNext}
-        showControls={gallery.images.length > 1}
+        image={gallery.gallery.currentImage}
+        isOpen={gallery.gallery.isOpen}
+        onClose={gallery.gallery.close}
+        onPrev={gallery.gallery.showPrev}
+        onNext={gallery.gallery.showNext}
+        showControls={gallery.gallery.images.length > 1}
       />
     </>
   );

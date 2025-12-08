@@ -3,35 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { useFormImageUpload } from '@/presentation/components/forms/shared/hooks/useFormImageUpload';
 import { useFormFileUpload } from '@/presentation/components/forms/shared/hooks/useFormFileUpload';
-
-interface ValidationResult {
-  isValid: boolean;
-  errorMessage?: string;
-}
-
-interface UseFormSubmitOptions<TFormData, TToggleState> {
-  formData: TFormData;
-  toggles: TToggleState;
-  mainThumbnailFile: File | null;
-  galleryImageFiles: File[];
-  portfolioFile?: File | null;
-  resumeFile?: File | null;
-  validateForm: (formData: TFormData, toggles: TToggleState) => ValidationResult;
-  buildRequest: (
-    formData: TFormData,
-    mainThumbnailUrl: string | undefined,
-    galleryUrls: string[],
-    attachedFileUrl: string | undefined
-  ) => unknown;
-  createEntity: (request: unknown) => Promise<{ ok: boolean }>;
-  clearStorage: () => void;
-  clearToggleStorage: () => void;
-  clearImageUrls: () => void;
-  successMessage: string;
-  successNavigatePath: string;
-  portfolioFileErrorMessage?: string;
-  resumeFileErrorMessage?: string;
-}
+import type { UseFormSubmitOptions } from './types/useFormSubmitTypes';
 
 /**
  * 폼 제출 로직을 처리하는 공통 훅

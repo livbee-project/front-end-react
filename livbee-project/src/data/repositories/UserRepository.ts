@@ -1,3 +1,4 @@
+import type { IUserApiSource } from '@/data/sources/interfaces/IUserApiSource';
 import { UserApiSource } from '@/data/sources/UserApiSource';
 import type {
   LoginRequest,
@@ -13,10 +14,11 @@ import { error as logError } from '@/shared/utils/logger';
  * 도메인 로직과 데이터 소스 사이의 인터페이스 역할
  */
 export class UserRepository {
-  private apiSource: UserApiSource;
+  private apiSource: IUserApiSource;
 
-  constructor() {
-    this.apiSource = new UserApiSource();
+  constructor(apiSource?: IUserApiSource) {
+    // 의존성 주입: apiSource가 제공되지 않으면 기본 구현 사용
+    this.apiSource = apiSource ?? new UserApiSource();
   }
 
   /**

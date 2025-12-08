@@ -107,30 +107,41 @@ const ModelDetailPage: React.FC = () => {
   return (
     <DetailPageLayout>
       <ProfileDetailContent
-        title={displayModel.nickname || '모델'}
-        name={displayModel.nickname || ''}
-        description={displayModel.oneLineIntro || ''}
-        detailedIntro={displayModel.detailedIntro || ''}
-        profileImageUrl={displayModel.mainThumbnailUrl || ''}
-        type="model"
-        categories={categories}
-        tags={tags}
-        websiteUrl={websiteUrl || ''}
-        galleryImages={displayModel.subThumbnailUrls || []}
-        defaultGalleryImages={defaultModel.subThumbnailUrls}
-        isReceivingOffers={displayModel.isReceivingOffers ?? true}
-        gallery={gallery}
-        onProfileImageClick={handleProfileImageClick}
-        onScrap={handleScrap}
-        onOffer={handleOffer}
-        onShare={handleShare}
-        defaultName="한지우"
-        defaultDescription="청순/내추럴 컨셉 전문 모델"
-        defaultDetailedIntro="안녕하세요! 패션과 뷰티 분야에서 활동하고 있는 모델 한지우입니다.\n청순하고 자연스러운 이미지로 다양한 브랜드와 협업하고 있으며, 카메라 앞에서 자연스러운 포즈와 표현력을 자랑합니다.\n함께 성장할 수 있는 브랜드와의 협업을 기대합니다!"
-        defaultProfileImageUrl="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"
-        defaultWebsiteUrl="https://www.instagram.com/jiwoo_model"
-        defaultCategories={['패션', '뷰티']}
-        defaultTags={['키 168cm', '사이즈 55(S)', '경력 3년']}
+        header={{
+          title: displayModel.nickname || '모델',
+          onShare: handleShare,
+        }}
+        profileInfo={{
+          name: displayModel.nickname || '',
+          description: displayModel.oneLineIntro || '',
+          detailedIntro: displayModel.detailedIntro || '',
+          profileImageUrl: displayModel.mainThumbnailUrl || '',
+          type: 'model',
+          categories,
+          tags,
+          websiteUrl: websiteUrl || '',
+        }}
+        defaults={{
+          name: '한지우',
+          description: '청순/내추럴 컨셉 전문 모델',
+          detailedIntro: '안녕하세요! 패션과 뷰티 분야에서 활동하고 있는 모델 한지우입니다.\n청순하고 자연스러운 이미지로 다양한 브랜드와 협업하고 있으며, 카메라 앞에서 자연스러운 포즈와 표현력을 자랑합니다.\n함께 성장할 수 있는 브랜드와의 협업을 기대합니다!',
+          profileImageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+          websiteUrl: 'https://www.instagram.com/jiwoo_model',
+          categories: ['패션', '뷰티'],
+          tags: ['키 168cm', '사이즈 55(S)', '경력 3년'],
+        }}
+        gallery={{
+          images: displayModel.subThumbnailUrls || [],
+          defaultImages: defaultModel.subThumbnailUrls,
+          gallery,
+        }}
+        actions={{
+          onProfileImageClick: handleProfileImageClick,
+          onScrap: handleScrap,
+          onOffer: handleOffer,
+          onShare: handleShare,
+          isReceivingOffers: displayModel.isReceivingOffers ?? true,
+        }}
       />
     </DetailPageLayout>
   );

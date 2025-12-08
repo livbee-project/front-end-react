@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
 import { useDetailData } from '@/presentation/hooks/detail/useDetailData';
-import { useToast } from '@/presentation/contexts/ToastContext';
+import { useRepositoryMethod } from './useRepositoryMethod';
+import { useErrorHandler } from './useErrorHandler';
 
 interface UseDetailFetcherOptions<R extends object> {
   repository: R;
@@ -13,6 +13,7 @@ interface UseDetailFetcherOptions<R extends object> {
 
 /**
  * Repository 메서드를 이용해 상세 데이터를 조회하는 공통 훅
+ * SRP 준수: Repository 메서드 호출과 에러 처리를 각각의 훅에 위임
  */
 export function useDetailFetcher<T, R extends object>({
   repository,
@@ -22,25 +23,15 @@ export function useDetailFetcher<T, R extends object>({
   cacheKey,
   cacheTime,
 }: UseDetailFetcherOptions<R>) {
-  const { showToast } = useToast();
-  const fetchFunction = useCallback(
-    (targetId: string, signal?: AbortSignal) => {
-      const fetchMethod = repository[method];
-      if (typeof fetchMethod !== 'function') {
-        return Promise.reject(new Error(`Repository method ${String(method)} is not a function`));
-      }
-
-      return (fetchMethod as (id: string, signal?: AbortSignal) => Promise<T>).call(repository, targetId, signal);
-    },
-    [repository, method]
-  );
+  const fetchFunction = useRepositoryMethod<T, R>(repository, method);
+  const handleError = useErrorHandler(errorMessage);
 
   const resolvedCacheKey = cacheKey || `${repository.constructor.name}-${String(method)}`;
 
   return useDetailData<T>(fetchFunction, id, errorMessage, {
     cacheKey: resolvedCacheKey,
     cacheTime,
-    onError: (message) => showToast(message, undefined, 'error'),
+    onError: handleError,
   });
 }
 

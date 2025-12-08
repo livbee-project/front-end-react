@@ -5,6 +5,7 @@ import type {
   CreateModelRequest,
   CreateModelResponse,
 } from '@/domain/entities/Model';
+import type { IModelApiSource } from '@/data/sources/interfaces/IModelApiSource';
 import { ModelApiSource } from '@/data/sources/ModelApiSource';
 import { error as logError } from '@/shared/utils/logger';
 
@@ -13,10 +14,11 @@ import { error as logError } from '@/shared/utils/logger';
  * 도메인 로직과 데이터 소스 사이의 인터페이스 역할
  */
 export class ModelRepository {
-  private apiSource: ModelApiSource;
+  private apiSource: IModelApiSource;
 
-  constructor() {
-    this.apiSource = new ModelApiSource();
+  constructor(apiSource?: IModelApiSource) {
+    // 의존성 주입: apiSource가 제공되지 않으면 기본 구현 사용
+    this.apiSource = apiSource ?? new ModelApiSource();
   }
 
   /**

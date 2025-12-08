@@ -109,30 +109,41 @@ const PortfolioDetailPage: React.FC = () => {
   return (
     <DetailPageLayout>
       <ProfileDetailContent
-        title={displayPortfolio.nickname || '쇼호스트'}
-        name={displayPortfolio.nickname || ''}
-        description={displayPortfolio.oneLineIntro || ''}
-        detailedIntro={displayPortfolio.detailedIntro || ''}
-        profileImageUrl={displayPortfolio.mainThumbnailUrl || ''}
-        type="showhost"
-        categories={categories}
-        tags={tags}
-        websiteUrl={websiteUrl || ''}
-        galleryImages={displayPortfolio.subThumbnailUrls || []}
-        defaultGalleryImages={defaultPortfolio.subThumbnailUrls}
-        isReceivingOffers={displayPortfolio.isReceivingOffers ?? true}
-        gallery={gallery}
-        onProfileImageClick={handleProfileImageClick}
-        onScrap={handleScrap}
-        onOffer={handleOffer}
-        onShare={handleShare}
-        defaultName="김지현"
-        defaultDescription="패션 전문 쇼호스트, 5년 경력"
-        defaultDetailedIntro="안녕하세요! 패션과 뷰티 분야에서 5년간 활동한 쇼호스트 김지현입니다.\n라이브 커머스를 통해 고객과 소통하며 브랜드 가치를 전달하는 것을 즐깁니다. 진정성 있는 소통과 전문적인 제품 설명으로 높은 구매 전환율을 자랑합니다.\n함께 성장할 수 있는 브랜드와의 협업을 기대합니다!"
-        defaultProfileImageUrl="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80"
-        defaultWebsiteUrl="https://www.instagram.com/jihyun_host"
-        defaultCategories={['패션', '뷰티']}
-        defaultTags={['키 168cm', '사이즈 55(S)', '경력 5년']}
+        header={{
+          title: displayPortfolio.nickname || '쇼호스트',
+          onShare: handleShare,
+        }}
+        profileInfo={{
+          name: displayPortfolio.nickname || '',
+          description: displayPortfolio.oneLineIntro || '',
+          detailedIntro: displayPortfolio.detailedIntro || '',
+          profileImageUrl: displayPortfolio.mainThumbnailUrl || '',
+          type: 'showhost',
+          categories,
+          tags,
+          websiteUrl: websiteUrl || '',
+        }}
+        defaults={{
+          name: '김지현',
+          description: '패션 전문 쇼호스트, 5년 경력',
+          detailedIntro: '안녕하세요! 패션과 뷰티 분야에서 5년간 활동한 쇼호스트 김지현입니다.\n라이브 커머스를 통해 고객과 소통하며 브랜드 가치를 전달하는 것을 즐깁니다. 진정성 있는 소통과 전문적인 제품 설명으로 높은 구매 전환율을 자랑합니다.\n함께 성장할 수 있는 브랜드와의 협업을 기대합니다!',
+          profileImageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
+          websiteUrl: 'https://www.instagram.com/jihyun_host',
+          categories: ['패션', '뷰티'],
+          tags: ['키 168cm', '사이즈 55(S)', '경력 5년'],
+        }}
+        gallery={{
+          images: displayPortfolio.subThumbnailUrls || [],
+          defaultImages: defaultPortfolio.subThumbnailUrls,
+          gallery,
+        }}
+        actions={{
+          onProfileImageClick: handleProfileImageClick,
+          onScrap: handleScrap,
+          onOffer: handleOffer,
+          onShare: handleShare,
+          isReceivingOffers: displayPortfolio.isReceivingOffers ?? true,
+        }}
       />
     </DetailPageLayout>
   );

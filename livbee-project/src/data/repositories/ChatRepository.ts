@@ -7,14 +7,16 @@ import type {
   SendChatMessageResponse,
   ReadChatMessageRequest,
 } from '@/domain/entities/Chat';
+import type { IChatApiSource } from '@/data/sources/interfaces/IChatApiSource';
 import { ChatApiSource } from '@/data/sources/ChatApiSource';
 import { error as logError } from '@/shared/utils/logger';
 
 export class ChatRepository {
-  private apiSource: ChatApiSource;
+  private apiSource: IChatApiSource;
 
-  constructor() {
-    this.apiSource = new ChatApiSource();
+  constructor(apiSource?: IChatApiSource) {
+    // 의존성 주입: apiSource가 제공되지 않으면 기본 구현 사용
+    this.apiSource = apiSource ?? new ChatApiSource();
   }
 
   async getRooms(params?: { page?: number; size?: number }): Promise<ChatRoomSummary[]> {

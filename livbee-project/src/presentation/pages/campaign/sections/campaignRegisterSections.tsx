@@ -8,8 +8,9 @@ import SelectInput from '@/presentation/components/forms/inputs/SelectInput';
 import DateInput from '@/presentation/components/forms/inputs/DateInput';
 import TimeInput from '@/presentation/components/forms/inputs/TimeInput';
 import ImageUpload from '@/presentation/components/upload/ImageUpload';
-import { Textarea } from '@/presentation/components/styled/CommonStyles';
-import styled from 'styled-components';
+import { FeeSection } from './components/FeeSection';
+import { StyledTextarea } from './styles/campaignRegisterSectionStyles';
+import { recruitmentTypeOptions, categoryOptions } from './constants/campaignRegisterOptions';
 
 export interface CampaignRegisterSection {
   key: string;
@@ -42,56 +43,6 @@ interface CampaignRegisterSectionsParams {
   handleImageSelect: (file: File, type: 'cover' | 'product' | 'liveCover') => void;
 }
 
-const recruitmentTypeOptions = [
-  { value: 'store', label: '스토어 모집' },
-  { value: 'model', label: '모델 모집' },
-  { value: 'showhost', label: '쇼호스트 모집' },
-  { value: 'staff', label: '스태프 모집' },
-];
-
-const categoryOptions = [
-  { value: 'food', label: '식품' },
-  { value: 'fashion', label: '패션' },
-  { value: 'beauty', label: '뷰티' },
-  { value: 'electronics', label: '전자제품' },
-  { value: 'lifestyle', label: '생활/리빙' },
-];
-
-const StyledTextarea = styled(Textarea)`
-  width: 100%;
-`;
-
-const FeeContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing.md};
-  width: 100%;
-`;
-
-const FeeInputWrapper = styled.div`
-  flex: 1;
-`;
-
-const CheckboxContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing.sm};
-  white-space: nowrap;
-`;
-
-const CheckboxInput = styled.input`
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  accent-color: ${({ theme }) => theme.colors.primary};
-`;
-
-const CheckboxLabel = styled.label`
-  font-size: 14px;
-  color: ${({ theme }) => theme.colors.foreground};
-  cursor: pointer;
-  user-select: none;
-`;
 
 export const createCampaignRegisterSections = ({
   formData,
@@ -261,33 +212,12 @@ export const createCampaignRegisterSections = ({
     key: 'fee',
     title: '수당',
     content: (
-      <FeeContainer>
-        <FeeInputWrapper>
-          <TextInput
-            type="number"
-            placeholder="금액을 입력해주세요"
-            value={formData.fee}
-            onChange={(e) => handleInputChange('fee', e.target.value)}
-            disabled={formData.feeNegotiable}
-          />
-        </FeeInputWrapper>
-        <CheckboxContainer>
-          <CheckboxInput
-            type="checkbox"
-            id="feeNegotiable"
-            checked={formData.feeNegotiable}
-            onChange={(e) => {
-              const isChecked = e.target.checked;
-              handleInputChange('feeNegotiable', isChecked);
-              // 협의 가능으로 체크하면 수당 필드 초기화
-              if (isChecked) {
-                handleInputChange('fee', '');
-              }
-            }}
-          />
-          <CheckboxLabel htmlFor="feeNegotiable">협의 가능</CheckboxLabel>
-        </CheckboxContainer>
-      </FeeContainer>
+      <FeeSection
+        fee={formData.fee}
+        feeNegotiable={formData.feeNegotiable}
+        onFeeChange={(value) => handleInputChange('fee', value)}
+        onFeeNegotiableChange={(checked) => handleInputChange('feeNegotiable', checked)}
+      />
     ),
   },
   {

@@ -1,56 +1,20 @@
-import { useCallback, useState, useEffect } from 'react';
-import { warn } from '@/shared/utils/logger';
+import { useCallback, useState } from 'react';
+import { useFormStorageRestore } from './useFormStorageRestore';
+import { useFormStorageSave } from './useFormStorageSave';
 
 /**
  * 범용 폼 상태를 관리하는 훅
+ * 상태 관리만 담당하며, sessionStorage 로직은 별도 훅에 위임
  * @param initialState 초기 상태
  * @param storageKey sessionStorage에 저장할 키 (선택적, 제공 시 자동 저장/복원)
  */
 export const useFormState = <T>(initialState: T, storageKey?: string) => {
-  // sessionStorage에서 복원 또는 초기 상태 사용
-  const getInitialState = useCallback((): T => {
-    if (!storageKey || typeof window === 'undefined') {
-      return initialState;
-    }
-    
-    try {
-      const stored = sessionStorage.getItem(storageKey);
-      if (stored) {
-        return JSON.parse(stored) as T;
-      }
-    } catch (error) {
-      warn('useFormState', `Failed to restore form state from sessionStorage (${storageKey}):`, error);
-    }
-    
-    return initialState;
-  }, [initialState, storageKey]);
+  // sessionStorage에서 복원된 상태 또는 초기 상태 사용
+  const restoredState = useFormStorageRestore(storageKey, initialState);
+  const [formData, setFormData] = useState<T>(restoredState ?? initialState);
 
-  const [formData, setFormData] = useState<T>(getInitialState);
-  const [isInitialMount, setIsInitialMount] = useState(true);
-
-  // 초기 마운트 시에는 저장하지 않음 (복원만 수행)
-  useEffect(() => {
-    setIsInitialMount(false);
-  }, []);
-
-  // sessionStorage에 저장 (초기 마운트 제외, 실제 변경 시에만 저장)
-  useEffect(() => {
-    if (isInitialMount || !storageKey || typeof window === 'undefined') {
-      return;
-    }
-
-    try {
-      const currentStored = sessionStorage.getItem(storageKey);
-      const newValue = JSON.stringify(formData);
-      
-      // 이전 값과 다를 때만 저장 (불필요한 저장 방지)
-      if (currentStored !== newValue) {
-        sessionStorage.setItem(storageKey, newValue);
-      }
-    } catch (error) {
-      warn('useFormState', `Failed to save form state to sessionStorage (${storageKey}):`, error);
-    }
-  }, [formData, storageKey, isInitialMount]);
+  // sessionStorage 동기화 (formData 변경 시 자동 저장)
+  const { clearStorage } = useFormStorageSave(storageKey, formData);
 
   /**
    * 필드 값을 업데이트합니다.
@@ -103,27 +67,8 @@ export const useFormState = <T>(initialState: T, storageKey?: string) => {
    */
   const resetForm = useCallback(() => {
     setFormData(initialState);
-    if (storageKey && typeof window !== 'undefined') {
-      try {
-        sessionStorage.removeItem(storageKey);
-      } catch (error) {
-        warn('useFormState', `Failed to remove form state from sessionStorage (${storageKey}):`, error);
-      }
-    }
-  }, [initialState, storageKey]);
-
-  /**
-   * sessionStorage에서 폼 데이터를 삭제합니다.
-   */
-  const clearStorage = useCallback(() => {
-    if (storageKey && typeof window !== 'undefined') {
-      try {
-        sessionStorage.removeItem(storageKey);
-      } catch (error) {
-        warn('useFormState', `Failed to clear form state from sessionStorage (${storageKey}):`, error);
-      }
-    }
-  }, [storageKey]);
+    clearStorage();
+  }, [initialState, clearStorage]);
 
   return {
     formData,

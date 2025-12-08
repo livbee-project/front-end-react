@@ -11,11 +11,13 @@ import { ApiError, fetchApi } from '@/shared/utils/apiClient';
 import { transformModelDetailResponse } from '@/data/mappers/ModelMapper';
 import { handleShowhostEntityError } from '@/data/errorHandlers/showhostEntityErrorHandler';
 
+import type { IModelApiSource } from './interfaces/IModelApiSource';
+
 /**
  * 모델 API 소스
  * 실제 HTTP 요청을 담당하는 레이어
  */
-export class ModelApiSource {
+export class ModelApiSource implements IModelApiSource {
   /**
    * 모델 목록 조회
    */
