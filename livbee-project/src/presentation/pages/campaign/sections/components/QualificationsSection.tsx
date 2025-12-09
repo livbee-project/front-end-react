@@ -40,7 +40,8 @@ const RemoveButton = styled.button`
   transition: background 0.2s;
 
   &:hover {
-    background: ${({ theme }) => theme.colors.errorHover || '#d32f2f'};
+    background: ${({ theme }) => theme.colors.error};
+    opacity: 0.9;
   }
 
   &:disabled {
@@ -59,14 +60,14 @@ const AddButton = styled.button`
   border: 1px dashed ${({ theme }) => theme.colors.border || '#ddd'};
   border-radius: ${({ theme }) => theme.radii.md};
   background: transparent;
-  color: ${({ theme }) => theme.colors.textSecondary || '#666'};
+  color: ${({ theme }) => theme.colors.muted};
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    border-color: ${({ theme }) => theme.colors.primary || '#007bff'};
-    color: ${({ theme }) => theme.colors.primary || '#007bff'};
-    background: ${({ theme }) => theme.colors.primaryLight || 'rgba(0, 123, 255, 0.1)'};
+    border-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.primary};
+    background: ${({ theme }) => theme.primaryOpacity['10']};
   }
 `;
 
