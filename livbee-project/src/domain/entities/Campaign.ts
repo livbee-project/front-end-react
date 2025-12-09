@@ -54,6 +54,7 @@ export interface CreateCampaignRequest {
   liveVerticalCoverUrl?: string;
   productThumbnailUrl?: string;
   productName?: string;
+  qualifications?: string[]; // 자격 요건 목록
 }
 
 /**
@@ -84,6 +85,7 @@ export interface CreateCampaignResponse {
     location?: string;
     fee?: number;
     feeNegotiable?: boolean;
+    qualifications?: string[];
     isPublic: boolean;
     createdAt: string;
     updatedAt: string;

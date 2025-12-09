@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
+import React, { Suspense, lazy } from 'react';
 import '@/presentation/styles/global.css';
 import TopNavLayout from '@/presentation/layouts/TopNavLayout';
 import RootLayout from '@/presentation/layouts/RootLayout';
@@ -8,25 +8,47 @@ import { AuthGuard } from '@/presentation/routes/AuthGuard';
 import { ROUTE_PATHS, ROUTE_ROLE_PERMISSIONS } from '@/app/routes/routeMeta';
 import { RouteFallback } from '@/presentation/components/states/RouteFallback';
 
-const Home = lazy(() => import('@/presentation/pages/home/Home'));
-const CampaignsPage = lazy(() => import('@/presentation/pages/campaign/CampaignsPage'));
-const CampaignRegisterPage = lazy(() => import('@/presentation/pages/campaign/CampaignRegisterPage'));
-const CampaignDetailPage = lazy(() => import('@/presentation/pages/campaign/CampaignDetailPage'));
-const ModelsPage = lazy(() => import('@/presentation/pages/model/ModelsPage'));
-const ModelRegisterPage = lazy(() => import('@/presentation/pages/model/ModelRegisterPage'));
-const ModelDetailPage = lazy(() => import('@/presentation/pages/model/ModelDetailPage'));
-const PortfolioPage = lazy(() => import('@/presentation/pages/portfolio/PortfolioPage'));
-const PortfolioRegisterPage = lazy(() => import('@/presentation/pages/portfolio/PortfolioRegisterPage'));
-const PortfolioDetailPage = lazy(() => import('@/presentation/pages/portfolio/PortfolioDetailPage'));
-const MyPortfolioPage = lazy(() => import('@/presentation/pages/portfolio/MyPortfolioPage'));
-const MyPage = lazy(() => import('@/presentation/pages/mypage/MyPage'));
-const ClipsPage = lazy(() => import('@/presentation/pages/clip/ClipsPage'));
-const MyClipsPage = lazy(() => import('@/presentation/pages/clip/MyClipsPage'));
-const MyAppliedCampaignsPage = lazy(() => import('@/presentation/pages/mypage/MyAppliedCampaignsPage'));
-const MessagesPage = lazy(() => import('@/presentation/pages/message/MessagesPage'));
-const LoginPage = lazy(() => import('@/presentation/pages/auth/LoginPage'));
-const ImageCropPage = lazy(() => import('@/presentation/pages/image/ImageCropPage'));
-const ChatRoomPage = lazy(() => import('@/presentation/pages/chat/ChatRoomPage'));
+// 동적 임포트에 에러 핸들링 추가 (Vite HMR 이슈 대응)
+const lazyWithRetry = <T extends React.ComponentType<any>>(
+  importFn: () => Promise<{ default: T }>
+): React.LazyExoticComponent<T> => {
+  return lazy(() =>
+    importFn().catch((error) => {
+      console.error('Failed to load module:', error);
+      // 재시도 로직: 1초 후 다시 시도
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          importFn()
+            .then(resolve)
+            .catch((retryError) => {
+              console.error('Retry failed:', retryError);
+              throw retryError;
+            });
+        }, 1000);
+      });
+    })
+  );
+};
+
+const Home = lazyWithRetry(() => import('@/presentation/pages/home/Home'));
+const CampaignsPage = lazyWithRetry(() => import('@/presentation/pages/campaign/CampaignsPage'));
+const CampaignRegisterPage = lazyWithRetry(() => import('@/presentation/pages/campaign/CampaignRegisterPage'));
+const CampaignDetailPage = lazyWithRetry(() => import('@/presentation/pages/campaign/CampaignDetailPage'));
+const ModelsPage = lazyWithRetry(() => import('@/presentation/pages/model/ModelsPage'));
+const ModelRegisterPage = lazyWithRetry(() => import('@/presentation/pages/model/ModelRegisterPage'));
+const ModelDetailPage = lazyWithRetry(() => import('@/presentation/pages/model/ModelDetailPage'));
+const PortfolioPage = lazyWithRetry(() => import('@/presentation/pages/portfolio/PortfolioPage'));
+const PortfolioRegisterPage = lazyWithRetry(() => import('@/presentation/pages/portfolio/PortfolioRegisterPage'));
+const PortfolioDetailPage = lazyWithRetry(() => import('@/presentation/pages/portfolio/PortfolioDetailPage'));
+const MyPortfolioPage = lazyWithRetry(() => import('@/presentation/pages/portfolio/MyPortfolioPage'));
+const MyPage = lazyWithRetry(() => import('@/presentation/pages/mypage/MyPage'));
+const ClipsPage = lazyWithRetry(() => import('@/presentation/pages/clip/ClipsPage'));
+const MyClipsPage = lazyWithRetry(() => import('@/presentation/pages/clip/MyClipsPage'));
+const MyAppliedCampaignsPage = lazyWithRetry(() => import('@/presentation/pages/mypage/MyAppliedCampaignsPage'));
+const MessagesPage = lazyWithRetry(() => import('@/presentation/pages/message/MessagesPage'));
+const LoginPage = lazyWithRetry(() => import('@/presentation/pages/auth/LoginPage'));
+const ImageCropPage = lazyWithRetry(() => import('@/presentation/pages/image/ImageCropPage'));
+const ChatRoomPage = lazyWithRetry(() => import('@/presentation/pages/chat/ChatRoomPage'));
 
 const AppRouter = () => (
   <BrowserRouter>

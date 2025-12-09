@@ -12,7 +12,7 @@ import type {
 } from '@/domain/entities/Campaign';
 import { buildApiUrl, getAuthHeaders } from '@/shared/config/apiConfig';
 import { ApiError, fetchApi } from '@/shared/utils/apiClient';
-import { extractErrorMessage, isSuccessResponse } from '@/shared/utils/apiResponseHandler';
+import { extractErrorMessage, isSuccessResponse, type ApiResponse } from '@/shared/utils/apiResponseHandler';
 import { debug } from '@/shared/utils/logger';
 import { normalizeCampaignApplyResponse, normalizeApplicationActionResponse } from '@/shared/utils/apiNormalizer';
 import { transformCampaignDetailResponse } from '@/data/mappers/CampaignMapper';
@@ -87,26 +87,53 @@ export class CampaignApiSource implements ICampaignApiSource {
     const url = buildApiUrl('/campaigns');
     const headers = getAuthHeaders();
 
-    const result = await fetchApi<CreateCampaignResponse>(
+    // 디버깅: 실제로 전송되는 JSON 데이터 확인
+    const requestBody = JSON.stringify(request);
+    console.log('[CampaignApiSource] 📤 API 요청 데이터:', {
+      url,
+      method: 'POST',
+      body: requestBody,
+      parsedBody: JSON.parse(requestBody),
+    });
+
+    const result = await fetchApi<ApiResponse<CreateCampaignResponse['data']>>(
       url,
       {
         method: 'POST',
         headers,
-        body: JSON.stringify(request),
+        body: requestBody,
       },
       '모집 공고 등록'
     );
 
-    // 백엔드가 snake_case로 응답하는 경우 camelCase로 변환
-    if (result.data) {
-      const convertedData = convertKeysToCamelCase(result.data as Record<string, unknown>);
+    // fetchApi가 성공 응답을 받으면 extractData를 통해 data만 반환하거나 전체 응답을 반환할 수 있음
+    // 201 Created 응답이므로 성공으로 간주하고 ok: true를 명시적으로 추가
+    
+    // data만 반환된 경우 (extractData가 data 필드를 추출한 경우)
+    if (result && typeof result === 'object' && 'id' in result && !('ok' in result)) {
+      const convertedData = convertKeysToCamelCase(result as Record<string, unknown>);
       return {
-        ...result,
+        ok: true,
         data: convertedData as CreateCampaignResponse['data'],
       };
     }
 
-    return result;
+    // 전체 응답이 반환된 경우
+    const response = result as unknown as CreateCampaignResponse;
+    if (response.data) {
+      const convertedData = convertKeysToCamelCase(response.data as Record<string, unknown>);
+      return {
+        ok: true, // 201 응답이므로 명시적으로 ok: true 설정
+        data: convertedData as CreateCampaignResponse['data'],
+      };
+    }
+
+    // data 필드가 없는 경우 (기존 응답 형식)
+    // 201 응답이므로 성공으로 간주
+    return {
+      ok: true,
+      data: convertKeysToCamelCase(result as Record<string, unknown>) as CreateCampaignResponse['data'],
+    };
   }
 
   /**

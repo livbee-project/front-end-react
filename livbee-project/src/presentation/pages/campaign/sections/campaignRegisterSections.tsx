@@ -9,6 +9,7 @@ import DateInput from '@/presentation/components/forms/inputs/DateInput';
 import TimeInput from '@/presentation/components/forms/inputs/TimeInput';
 import ImageUpload from '@/presentation/components/upload/ImageUpload';
 import { FeeSection } from './components/FeeSection';
+import { QualificationsSection } from './components/QualificationsSection';
 import { StyledTextarea } from './styles/campaignRegisterSectionStyles';
 import { recruitmentTypeOptions, categoryOptions } from './constants/campaignRegisterOptions';
 
@@ -35,12 +36,16 @@ interface CampaignRegisterSectionsParams {
     productName: string;
     fee: string;
     feeNegotiable: boolean;
+    qualifications: string[];
   };
   coverImageUrl?: string;
   productImageUrl?: string;
   liveCoverImageUrl?: string;
-  handleInputChange: <K extends keyof CampaignRegisterSectionsParams['formData']>(field: K, value: string | boolean) => void;
+  handleInputChange: <K extends keyof CampaignRegisterSectionsParams['formData']>(field: K, value: string | boolean, index?: number) => void;
   handleImageSelect: (file: File, type: 'cover' | 'product' | 'liveCover') => void;
+  handleAddQualification: () => void;
+  handleRemoveQualification: (index: number) => void;
+  handleQualificationChange: (index: number, value: string) => void;
 }
 
 
@@ -51,6 +56,9 @@ export const createCampaignRegisterSections = ({
   liveCoverImageUrl,
   handleInputChange,
   handleImageSelect,
+  handleAddQualification,
+  handleRemoveQualification,
+  handleQualificationChange,
 }: CampaignRegisterSectionsParams): CampaignRegisterSection[] => [
   {
     key: 'cover',
@@ -117,6 +125,18 @@ export const createCampaignRegisterSections = ({
         placeholder="내용을 입력해주세요"
         value={formData.detailedContent}
         onChange={(e) => handleInputChange('detailedContent', e.target.value)}
+      />
+    ),
+  },
+  {
+    key: 'qualifications',
+    title: '자격 요건',
+    content: (
+      <QualificationsSection
+        qualifications={Array.isArray(formData.qualifications) ? formData.qualifications : ['']}
+        onAdd={handleAddQualification}
+        onRemove={handleRemoveQualification}
+        onChange={handleQualificationChange}
       />
     ),
   },

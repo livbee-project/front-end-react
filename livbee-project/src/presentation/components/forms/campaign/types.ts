@@ -14,5 +14,6 @@ export interface CampaignFormData {
   productName: string;
   fee: string;
   feeNegotiable: boolean;
+  qualifications: string[];
 }
 

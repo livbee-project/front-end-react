@@ -82,7 +82,7 @@ export const useFormSubmit = <TFormData, TToggleState>({
         clearStorage();
         clearToggleStorage();
         clearImageUrls();
-        showToast(successMessage);
+        showToast(successMessage, undefined, 'success');
         navigate(successNavigatePath, { replace: true });
       }
     } catch (error) {

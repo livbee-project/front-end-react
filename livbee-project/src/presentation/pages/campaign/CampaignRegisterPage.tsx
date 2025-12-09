@@ -17,6 +17,9 @@ const CampaignRegisterPage: React.FC = () => {
     handleInputChange,
     handleImageSelect,
     handleSubmit,
+    handleAddQualification,
+    handleRemoveQualification,
+    handleQualificationChange,
   } = useCampaignRegisterForm();
 
   const sections = useMemo(
@@ -28,8 +31,21 @@ const CampaignRegisterPage: React.FC = () => {
         liveCoverImageUrl,
         handleInputChange,
         handleImageSelect,
+        handleAddQualification,
+        handleRemoveQualification,
+        handleQualificationChange,
       }),
-    [coverImageUrl, formData, productImageUrl, liveCoverImageUrl, handleImageSelect, handleInputChange]
+    [
+      coverImageUrl,
+      formData,
+      productImageUrl,
+      liveCoverImageUrl,
+      handleImageSelect,
+      handleInputChange,
+      handleAddQualification,
+      handleRemoveQualification,
+      handleQualificationChange,
+    ]
   );
 
   return (

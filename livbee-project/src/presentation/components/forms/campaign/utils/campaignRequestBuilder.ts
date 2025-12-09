@@ -26,6 +26,11 @@ export const buildCampaignRequest = (
   const feeNumber = formData.fee.trim() ? Number(formData.fee.trim().replace(/,/g, '')) : undefined;
   const fee = feeNumber && !isNaN(feeNumber) ? feeNumber : undefined;
 
+  // 자격 요건 필터링 (빈 문자열 제거)
+  const qualifications = formData.qualifications
+    .map((q) => q.trim())
+    .filter((q) => q.length > 0);
+
   return {
     brandName: formData.brandName.trim(),
     brandIntroduction: formData.brandIntroduction.trim() || undefined,
@@ -45,6 +50,7 @@ export const buildCampaignRequest = (
     coverImageUrl: uploadedCoverImageUrl,
     productThumbnailUrl: uploadedProductImageUrl,
     liveVerticalCoverUrl: uploadedLiveCoverImageUrl,
+    qualifications: qualifications.length > 0 ? qualifications : undefined,
     isPublic: true,
   };
 };
