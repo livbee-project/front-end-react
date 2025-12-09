@@ -15,7 +15,7 @@ import { error as logError } from '@/shared/utils/logger';
 declare global {
   interface Window {
     __imageCropCallbacks?: {
-      [key: string]: (file: File) => void;
+      [key: string]: (file: File, type?: 'cover' | 'product' | 'liveCover') => void;
     };
   }
 }
@@ -71,33 +71,61 @@ const ImageCropPage: React.FC = () => {
   const handleSave = async () => {
     try {
       const croppedFile = await cropImage();
+      console.log('[ImageCropPage] ✂️ 크롭된 파일 생성 완료', {
+        fileName: croppedFile.name,
+        fileSize: croppedFile.size,
+        fileType: croppedFile.type,
+        callbackKey,
+        hasCallback: !!(callbackKey && window.__imageCropCallbacks?.[callbackKey]),
+      });
       
       // 전역 콜백 호출
       if (callbackKey && window.__imageCropCallbacks?.[callbackKey]) {
         const callback = window.__imageCropCallbacks[callbackKey];
+        console.log('[ImageCropPage] 📞 콜백 호출 시작', {
+          callbackKey,
+          callbackType: typeof callback,
+        });
         
         // 콜백이 비동기 함수일 수 있으므로 await 처리
         try {
           const result: unknown = callback(croppedFile);
+          console.log('[ImageCropPage] ✅ 콜백 호출 완료', {
+            result,
+            isPromise: result != null && typeof result === 'object' && 'then' in result,
+          });
+          
           // Promise인 경우 완료될 때까지 대기
           if (result != null && typeof result === 'object' && 'then' in result && typeof (result as { then: unknown }).then === 'function') {
             await (result as Promise<unknown>);
+            console.log('[ImageCropPage] ✅ Promise 완료 대기 완료');
           }
           // 상태 업데이트와 sessionStorage 저장이 완료될 때까지 충분한 지연
           // React 상태 업데이트는 비동기이므로 여러 렌더 사이클을 기다림
           await new Promise((resolve) => setTimeout(resolve, 200));
+          console.log('[ImageCropPage] ⏳ 상태 업데이트 대기 완료');
         } catch (callbackError) {
+          console.error('[ImageCropPage] ❌ 콜백 호출 실패:', callbackError);
           logError('ImageCropPage', '이미지 업로드 콜백 실패:', callbackError);
           // 콜백 실패해도 페이지는 이동 (사용자가 다시 시도할 수 있도록)
         }
         
         // 콜백 호출 후 정리
         delete window.__imageCropCallbacks[callbackKey];
+        console.log('[ImageCropPage] 🧹 콜백 정리 완료');
+      } else {
+        console.warn('[ImageCropPage] ⚠️ 콜백이 없습니다', {
+          callbackKey,
+          hasCallbacks: !!window.__imageCropCallbacks,
+          callbackKeys: window.__imageCropCallbacks ? Object.keys(window.__imageCropCallbacks) : [],
+        });
       }
       
       // 콜백 완료 후 페이지 이동
+      console.log('[ImageCropPage] 🔄 페이지 이동 시작', { returnPath });
       navigate(returnPath, { replace: true });
     } catch (error) {
+      console.error('[ImageCropPage] ❌ 이미지 크롭 실패:', error);
       logError('ImageCropPage', '이미지 크롭 실패:', error);
       alert('이미지 크롭에 실패했습니다.');
     }

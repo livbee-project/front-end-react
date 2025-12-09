@@ -49,6 +49,9 @@ export const useCampaignRegisterForm = () => {
     coverImageFile,
     productImageFile,
     liveCoverImageFile,
+    getCoverImageFile,
+    getProductImageFile,
+    getLiveCoverImageFile,
     hasStoredImages,
     handleImageSelect: baseHandleImageSelect,
     clearImageStates,
@@ -165,34 +168,98 @@ export const useCampaignRegisterForm = () => {
       let uploadedProductImageUrl: string | undefined;
       let uploadedLiveCoverImageUrl: string | undefined;
 
-      if (coverImageFile) {
-        const url = await uploadFile(coverImageFile, { type: 'image' });
+      // ref에서도 파일 확인 (상태가 null일 수 있으므로)
+      // blob URL에서 파일을 생성할 수 있으므로 await 필요
+      const finalCoverImageFile = coverImageFile || await getCoverImageFile();
+      const finalProductImageFile = productImageFile || await getProductImageFile();
+      const finalLiveCoverImageFile = liveCoverImageFile || await getLiveCoverImageFile();
+
+      if (finalCoverImageFile) {
+        console.log('[useCampaignRegisterForm] 📤 커버 이미지 업로드 시작', {
+          fileName: finalCoverImageFile.name,
+          fileSize: finalCoverImageFile.size,
+          fileType: finalCoverImageFile.type,
+          fromState: !!coverImageFile,
+          fromRef: !!getCoverImageFile() && !coverImageFile,
+        });
+        // 모집공고 등록 시 category는 'campaign', resourceId는 아직 생성되지 않았으므로 undefined
+        // publicId는 'cover'로 지정 (백엔드 폴더 구조에 따라)
+        const url = await uploadFile(finalCoverImageFile, {
+          type: 'image',
+          category: 'campaign',
+          publicId: 'cover',
+        });
+        console.log('[useCampaignRegisterForm] ✅ 커버 이미지 업로드 완료', { url });
         if (!url) {
           showToast('커버 이미지 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
           setIsSubmitting(false);
           return;
         }
         uploadedCoverImageUrl = url;
+      } else {
+        console.log('[useCampaignRegisterForm] ⚠️ coverImageFile이 없습니다', {
+          coverImageFile: null,
+          refFile: getCoverImageFile(),
+          coverImageUrl,
+        });
       }
 
-      if (productImageFile) {
-        const url = await uploadFile(productImageFile, { type: 'image' });
+      if (finalProductImageFile) {
+        console.log('[useCampaignRegisterForm] 📤 상품 이미지 업로드 시작', {
+          fileName: finalProductImageFile.name,
+          fileSize: finalProductImageFile.size,
+          fileType: finalProductImageFile.type,
+          fromState: !!productImageFile,
+          fromRef: !!getProductImageFile() && !productImageFile,
+        });
+        // 상품 이미지는 'product'로 지정 (백엔드 폴더 구조에 따라 'product.jpg' 또는 'products/{product_id}.jpg')
+        const url = await uploadFile(finalProductImageFile, {
+          type: 'image',
+          category: 'campaign',
+          publicId: 'product',
+        });
+        console.log('[useCampaignRegisterForm] ✅ 상품 이미지 업로드 완료', { url });
         if (!url) {
           showToast('상품 이미지 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
           setIsSubmitting(false);
           return;
         }
         uploadedProductImageUrl = url;
+      } else {
+        console.log('[useCampaignRegisterForm] ⚠️ productImageFile이 없습니다', {
+          productImageFile: null,
+          refFile: getProductImageFile(),
+          productImageUrl,
+        });
       }
 
-      if (liveCoverImageFile) {
-        const url = await uploadFile(liveCoverImageFile, { type: 'image' });
+      if (finalLiveCoverImageFile) {
+        console.log('[useCampaignRegisterForm] 📤 라이브 커버 이미지 업로드 시작', {
+          fileName: finalLiveCoverImageFile.name,
+          fileSize: finalLiveCoverImageFile.size,
+          fileType: finalLiveCoverImageFile.type,
+          fromState: !!liveCoverImageFile,
+          fromRef: !!getLiveCoverImageFile() && !liveCoverImageFile,
+        });
+        // 라이브 커버 이미지는 'live-cover'로 지정 (백엔드 폴더 구조에 따라)
+        const url = await uploadFile(finalLiveCoverImageFile, {
+          type: 'image',
+          category: 'campaign',
+          publicId: 'live-cover',
+        });
+        console.log('[useCampaignRegisterForm] ✅ 라이브 커버 이미지 업로드 완료', { url });
         if (!url) {
           showToast('라이브 커버 이미지 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
           setIsSubmitting(false);
           return;
         }
         uploadedLiveCoverImageUrl = url;
+      } else {
+        console.log('[useCampaignRegisterForm] ⚠️ liveCoverImageFile이 없습니다', {
+          liveCoverImageFile: null,
+          refFile: getLiveCoverImageFile(),
+          liveCoverImageUrl,
+        });
       }
 
       const request = buildCampaignRequest(

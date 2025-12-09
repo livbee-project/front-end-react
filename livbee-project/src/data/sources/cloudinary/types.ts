@@ -8,21 +8,24 @@
 export type UploadType = 'image' | 'raw';
 
 /**
+ * 서명 응답 데이터 타입
+ */
+export interface UploadSignatureData {
+  apiKey: string;
+  signature: string;
+  timestamp: string;
+  cloudName: string;
+  folder: string;
+  [key: string]: string | number;
+}
+
+/**
  * 서명 응답 타입
  * 백엔드에서 받는 서명 데이터 구조
  */
 export interface UploadSignatureResponse {
-  data?: {
-    apiKey: string;
-    signature: string;
-    timestamp: string;
-    [key: string]: string | number;
-  };
-  // 또는 data 없이 직접 파라미터들이 올 수도 있음
-  apiKey?: string;
-  signature?: string;
-  timestamp?: string;
-  [key: string]: string | number | object | undefined;
+  ok: boolean;
+  data: UploadSignatureData;
 }
 
 /**
@@ -39,10 +42,18 @@ export interface CloudinaryUploadResponse {
 }
 
 /**
+ * 업로드 카테고리 타입
+ */
+export type UploadCategory = 'campaign' | 'portfolio' | 'news' | 'user' | 'studio';
+
+/**
  * 업로드 옵션
  */
 export interface UploadOptions {
   fileName?: string;
   type?: UploadType;
+  category?: UploadCategory;
+  resourceId?: string;
+  publicId?: string; // Cloudinary에 저장될 파일명 (예: 'cover', 'thumbnail', 'product')
 }
 

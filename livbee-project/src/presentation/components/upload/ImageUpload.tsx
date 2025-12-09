@@ -10,7 +10,7 @@ import type { ImageUploadProps } from '@/types/components';
 declare global {
   interface Window {
     __imageCropCallbacks?: {
-      [key: string]: (file: File) => void;
+      [key: string]: (file: File, type?: 'cover' | 'product' | 'liveCover') => void;
     };
   }
 }
@@ -49,7 +49,14 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         if (!window.__imageCropCallbacks) {
           window.__imageCropCallbacks = {};
         }
+        // onImageSelect는 이미 (file) => handleImageSelect(file, type) 형태로 래핑되어 있으므로
+        // 그대로 등록하면 됨
         window.__imageCropCallbacks[callbackKey] = onImageSelect;
+        console.log('[ImageUpload] 📝 콜백 등록', {
+          callbackKey,
+          hasCallback: !!onImageSelect,
+          callbackType: typeof onImageSelect,
+        });
       }
       
       navigate('/image/crop', {
@@ -59,6 +66,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           returnPath: location.pathname,
           callbackKey,
         },
+      });
+      console.log('[ImageUpload] 🔄 크롭 페이지로 이동', {
+        callbackKey,
+        imageFileName: file.name,
+        returnPath: location.pathname,
       });
     } else {
       // 크롭 기능이 비활성화되어 있으면 바로 콜백 호출

@@ -1,6 +1,6 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { getStoredImageUrls, saveImageUrls, clearImageUrls } from '@/presentation/components/forms/campaign/utils/campaignImageStorage';
+import { getStoredImageUrls, saveImageUrls, clearImageUrls, saveImageFileNames, getStoredImageFileNames } from '@/presentation/components/forms/campaign/utils/campaignImageStorage';
 import { debug } from '@/shared/utils/logger';
 
 interface UseCampaignImageManagementOptions {
@@ -21,6 +21,11 @@ export const useCampaignImageManagement = ({ onImageRestored }: UseCampaignImage
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
   const [productImageFile, setProductImageFile] = useState<File | null>(null);
   const [liveCoverImageFile, setLiveCoverImageFile] = useState<File | null>(null);
+  
+  // File 객체를 ref로도 저장하여 페이지 재마운트 시에도 유지
+  const coverImageFileRef = useRef<File | null>(null);
+  const productImageFileRef = useRef<File | null>(null);
+  const liveCoverImageFileRef = useRef<File | null>(null);
 
   // 페이지 복귀 시 sessionStorage에서 이미지 URL 복원 및 처리
   useEffect(() => {
@@ -80,11 +85,20 @@ export const useCampaignImageManagement = ({ onImageRestored }: UseCampaignImage
 
   // 이미지 선택 핸들러
   const handleImageSelect = useCallback(
-    (file: File, type: 'cover' | 'product' | 'liveCover') => {
+    (file: File, type?: 'cover' | 'product' | 'liveCover') => {
+      // type이 없으면 기본값으로 'cover' 사용 (하위 호환성)
+      const imageType = type || 'cover';
       const blobUrl = URL.createObjectURL(file);
 
-      if (type === 'cover') {
+      debug('useCampaignImageManagement', '🖼️ handleImageSelect 호출', {
+        fileName: file.name,
+        fileSize: file.size,
+        type: imageType,
+      });
+
+      if (imageType === 'cover') {
         setCoverImageFile(file);
+        coverImageFileRef.current = file; // ref에도 저장
         setCoverImageUrl(blobUrl);
         // 이미지 선택 시 sessionStorage에 저장 (크롭 페이지로 이동하기 전)
         saveImageUrls({
@@ -92,9 +106,22 @@ export const useCampaignImageManagement = ({ onImageRestored }: UseCampaignImage
           product: productImageUrl,
           liveCover: liveCoverImageUrl,
         });
+        // 파일명도 함께 저장
+        const currentFileNames = getStoredImageFileNames();
+        saveImageFileNames({
+          ...currentFileNames,
+          cover: file.name,
+        });
+        debug('useCampaignImageManagement', '✅ cover 이미지 저장 완료', {
+          hasFile: !!file,
+          blobUrl,
+          fileName: file.name,
+          fileSize: file.size,
+        });
         // 폼 데이터 저장은 handleImageSelect에서 처리됨
-      } else if (type === 'product') {
+      } else if (imageType === 'product') {
         setProductImageFile(file);
+        productImageFileRef.current = file; // ref에도 저장
         setProductImageUrl(blobUrl);
         // 이미지 선택 시 sessionStorage에 저장
         saveImageUrls({
@@ -102,15 +129,40 @@ export const useCampaignImageManagement = ({ onImageRestored }: UseCampaignImage
           product: blobUrl,
           liveCover: liveCoverImageUrl,
         });
+        // 파일명도 함께 저장
+        const currentFileNames = getStoredImageFileNames();
+        saveImageFileNames({
+          ...currentFileNames,
+          product: file.name,
+        });
+        debug('useCampaignImageManagement', '✅ product 이미지 저장 완료', {
+          hasFile: !!file,
+          blobUrl,
+          fileName: file.name,
+          fileSize: file.size,
+        });
         // 폼 데이터 저장은 handleImageSelect에서 처리됨
       } else {
         setLiveCoverImageFile(file);
+        liveCoverImageFileRef.current = file; // ref에도 저장
         setLiveCoverImageUrl(blobUrl);
         // 이미지 선택 시 sessionStorage에 저장
         saveImageUrls({
           cover: coverImageUrl,
           product: productImageUrl,
           liveCover: blobUrl,
+        });
+        // 파일명도 함께 저장
+        const currentFileNames = getStoredImageFileNames();
+        saveImageFileNames({
+          ...currentFileNames,
+          liveCover: file.name,
+        });
+        debug('useCampaignImageManagement', '✅ liveCover 이미지 저장 완료', {
+          hasFile: !!file,
+          blobUrl,
+          fileName: file.name,
+          fileSize: file.size,
         });
         // 폼 데이터 저장은 handleImageSelect에서 처리됨
       }
@@ -126,8 +178,111 @@ export const useCampaignImageManagement = ({ onImageRestored }: UseCampaignImage
     setCoverImageFile(null);
     setProductImageFile(null);
     setLiveCoverImageFile(null);
+    coverImageFileRef.current = null;
+    productImageFileRef.current = null;
+    liveCoverImageFileRef.current = null;
     clearImageUrls();
   }, []);
+
+  // blob URL에서 File 객체를 생성하는 헬퍼 함수
+  const blobUrlToFile = useCallback(async (blobUrl: string, fileName: string): Promise<File | null> => {
+    try {
+      const response = await fetch(blobUrl);
+      const blob = await response.blob();
+      return new File([blob], fileName, { type: blob.type });
+    } catch (error) {
+      debug('useCampaignImageManagement', '❌ blobUrlToFile 실패', { blobUrl, fileName, error });
+      return null;
+    }
+  }, []);
+
+  // ref에서 파일을 가져오는 getter 함수들 (항상 최신 값을 반환)
+  // 상태나 ref에 파일이 없으면 blob URL에서 파일을 생성
+  const getCoverImageFile = useCallback(async (): Promise<File | null> => {
+    // 먼저 상태나 ref에서 확인
+    const file = coverImageFile || coverImageFileRef.current;
+    if (file) {
+      debug('useCampaignImageManagement', '📂 getCoverImageFile - 상태/ref에서 가져옴', {
+        coverImageFile: !!coverImageFile,
+        refFile: !!coverImageFileRef.current,
+      });
+      return file;
+    }
+
+    // blob URL에서 File 생성 시도
+    if (coverImageUrl && coverImageUrl.startsWith('blob:')) {
+      const storedFileNames = getStoredImageFileNames();
+      const fileName = storedFileNames.cover || coverImageUrl.split('/').pop() || 'cover-image.jpg';
+      debug('useCampaignImageManagement', '📂 getCoverImageFile - blob URL에서 생성 시도', {
+        coverImageUrl,
+        fileName,
+      });
+      return await blobUrlToFile(coverImageUrl, fileName);
+    }
+
+    debug('useCampaignImageManagement', '📂 getCoverImageFile - 파일 없음', {
+      coverImageFile: !!coverImageFile,
+      refFile: !!coverImageFileRef.current,
+      coverImageUrl,
+    });
+    return null;
+  }, [coverImageFile, coverImageUrl, blobUrlToFile]);
+  
+  const getProductImageFile = useCallback(async (): Promise<File | null> => {
+    const file = productImageFile || productImageFileRef.current;
+    if (file) {
+      debug('useCampaignImageManagement', '📂 getProductImageFile - 상태/ref에서 가져옴', {
+        productImageFile: !!productImageFile,
+        refFile: !!productImageFileRef.current,
+      });
+      return file;
+    }
+
+    if (productImageUrl && productImageUrl.startsWith('blob:')) {
+      const storedFileNames = getStoredImageFileNames();
+      const fileName = storedFileNames.product || productImageUrl.split('/').pop() || 'product-image.jpg';
+      debug('useCampaignImageManagement', '📂 getProductImageFile - blob URL에서 생성 시도', {
+        productImageUrl,
+        fileName,
+      });
+      return await blobUrlToFile(productImageUrl, fileName);
+    }
+
+    debug('useCampaignImageManagement', '📂 getProductImageFile - 파일 없음', {
+      productImageFile: !!productImageFile,
+      refFile: !!productImageFileRef.current,
+      productImageUrl,
+    });
+    return null;
+  }, [productImageFile, productImageUrl, blobUrlToFile]);
+  
+  const getLiveCoverImageFile = useCallback(async (): Promise<File | null> => {
+    const file = liveCoverImageFile || liveCoverImageFileRef.current;
+    if (file) {
+      debug('useCampaignImageManagement', '📂 getLiveCoverImageFile - 상태/ref에서 가져옴', {
+        liveCoverImageFile: !!liveCoverImageFile,
+        refFile: !!liveCoverImageFileRef.current,
+      });
+      return file;
+    }
+
+    if (liveCoverImageUrl && liveCoverImageUrl.startsWith('blob:')) {
+      const storedFileNames = getStoredImageFileNames();
+      const fileName = storedFileNames.liveCover || liveCoverImageUrl.split('/').pop() || 'live-cover-image.jpg';
+      debug('useCampaignImageManagement', '📂 getLiveCoverImageFile - blob URL에서 생성 시도', {
+        liveCoverImageUrl,
+        fileName,
+      });
+      return await blobUrlToFile(liveCoverImageUrl, fileName);
+    }
+
+    debug('useCampaignImageManagement', '📂 getLiveCoverImageFile - 파일 없음', {
+      liveCoverImageFile: !!liveCoverImageFile,
+      refFile: !!liveCoverImageFileRef.current,
+      liveCoverImageUrl,
+    });
+    return null;
+  }, [liveCoverImageFile, liveCoverImageUrl, blobUrlToFile]);
 
   return {
     coverImageUrl,
@@ -136,6 +291,10 @@ export const useCampaignImageManagement = ({ onImageRestored }: UseCampaignImage
     coverImageFile,
     productImageFile,
     liveCoverImageFile,
+    // ref에서 파일을 가져오는 함수들도 노출
+    getCoverImageFile,
+    getProductImageFile,
+    getLiveCoverImageFile,
     hasStoredImages,
     handleImageSelect,
     clearImageStates,

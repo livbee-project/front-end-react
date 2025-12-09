@@ -10,6 +10,8 @@ export interface Campaign {
   prefix: '쇼호스트모집' | '촬영스태프' | '모델모집' | '기타모집';
   imageUrl?: string;
   thumbnailUrl?: string;
+  coverImageUrl?: string; // 대표 이미지 (cover_image_url)
+  productThumbnailUrl?: string; // 상품 썸네일 이미지 (홈 페이지 카드 하단 정사각형 이미지용)
   shootDate: string; // ISO 8601 형식
   closeAt: string; // ISO 8601 형식
   durationHours?: number;

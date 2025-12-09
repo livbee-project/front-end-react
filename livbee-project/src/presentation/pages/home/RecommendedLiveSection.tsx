@@ -101,7 +101,8 @@ const RecommendedLiveSection: React.FC = React.memo(() => {
     >
       <HorizontalScroll>
         {campaigns.map((campaign) => {
-          const imageUrl = campaign.imageUrl || campaign.thumbnailUrl || undefined;
+          // 대표 이미지 우선순위: coverImageUrl > imageUrl > thumbnailUrl
+          const imageUrl = campaign.coverImageUrl || campaign.imageUrl || campaign.thumbnailUrl || undefined;
           // 백엔드에서 최적화된 summary 필드 우선 사용, 없으면 detailedContent 또는 content 사용
           const summary = campaign.summary || campaign.detailedContent || campaign.content || '';
           const displaySummary = summary ? htmlToText(summary).slice(0, 60) : '';

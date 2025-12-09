@@ -48,6 +48,12 @@ export const useCloudinaryUpload = (): UseCloudinaryUploadReturn => {
         return secureUrl;
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : '파일 업로드에 실패했습니다.';
+        console.error('[useCloudinaryUpload] ❌ 업로드 에러 발생', {
+          error: err,
+          errorMessage,
+          errorStack: err instanceof Error ? err.stack : undefined,
+          options,
+        });
         setError(errorMessage);
         setIsUploading(false);
         return null;
