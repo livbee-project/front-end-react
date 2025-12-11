@@ -61,7 +61,6 @@ export const usePortfolioRegisterForm = () => {
     handleGalleryImageSelect: baseHandleGalleryImageSelect,
     handleGalleryImageReplace: baseHandleGalleryImageReplace,
     handleGalleryImageRemove,
-    clearImageStates,
   } = usePortfolioImageManagement({
     onImageRestored: () => {
       // 이미지 복원 후 폼 데이터 복원 트리거
