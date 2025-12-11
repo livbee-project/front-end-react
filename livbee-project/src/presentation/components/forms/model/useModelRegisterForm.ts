@@ -215,7 +215,7 @@ export const useModelRegisterForm = () => {
       if (finalMainThumbnailFile) {
         const url = await uploadFile(finalMainThumbnailFile, {
           type: 'image',
-          category: 'model',
+          category: 'portfolio',
           publicId: 'main-thumbnail',
         });
         if (!url) {
@@ -230,7 +230,7 @@ export const useModelRegisterForm = () => {
       for (const file of finalGalleryImageFiles) {
         const url = await uploadFile(file, {
           type: 'image',
-          category: 'model',
+          category: 'portfolio',
         });
         if (!url) {
           showToast('갤러리 이미지 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
@@ -308,6 +308,7 @@ export const useModelRegisterForm = () => {
     handleGalleryImageRemove,
     handlePortfolioFileSelect,
     handlePortfolioFileRemove,
+    handleFileError,
     handleSubmit,
   };
 };

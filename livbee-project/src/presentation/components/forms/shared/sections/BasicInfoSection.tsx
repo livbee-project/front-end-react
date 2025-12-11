@@ -3,7 +3,6 @@ import FormField from '@/presentation/components/forms/common/FormField';
 import {
   FormSection,
   SectionTitle,
-  SectionDescription,
   InputGroup,
   LabelNote,
   StyledInput,

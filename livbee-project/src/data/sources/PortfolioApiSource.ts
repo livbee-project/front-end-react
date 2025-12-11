@@ -92,11 +92,12 @@ export class PortfolioApiSource implements IPortfolioApiSource {
     console.log('\n' + '='.repeat(80));
     console.log('📤 포트폴리오 등록 API 요청');
     console.log('='.repeat(80));
+    const headersRecord = headers as Record<string, string>;
     console.log('URL:', url);
     console.log('Method: POST');
     console.log('Headers:', {
-      'Content-Type': headers['Content-Type'],
-      'Authorization': headers['Authorization'] ? 'Bearer ***' : '없음',
+      'Content-Type': headersRecord['Content-Type'],
+      'Authorization': headersRecord['Authorization'] ? 'Bearer ***' : '없음',
     });
     console.log('\n요청 Body (JSON):');
     console.log(requestBody);
@@ -112,7 +113,7 @@ export class PortfolioApiSource implements IPortfolioApiSource {
       // #endregion
       
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/0f91d27f-d165-4cdf-82ab-ecb2f2648200',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'PortfolioApiSource.ts:100',message:'fetchApi 호출 전',data:{requestBody:requestBody.substring(0,200),headersContentType:headers['Content-Type'],hasAuth:!!headers['Authorization']},timestamp:Date.now(),sessionId:'debug-session',runId:'run3',hypothesisId:'B'})}).catch(()=>{});
+      fetch('http://127.0.0.1:7242/ingest/0f91d27f-d165-4cdf-82ab-ecb2f2648200',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'PortfolioApiSource.ts:100',message:'fetchApi 호출 전',data:{requestBody:requestBody.substring(0,200),headersContentType:headersRecord['Content-Type'],hasAuth:!!headersRecord['Authorization']},timestamp:Date.now(),sessionId:'debug-session',runId:'run3',hypothesisId:'B'})}).catch(()=>{});
       // #endregion
       
       const result = await fetchApi<{ message?: string; data?: CreatePortfolioResponse['data'] }>(
@@ -136,7 +137,7 @@ export class PortfolioApiSource implements IPortfolioApiSource {
       if (result && typeof result === 'object' && 'id' in result && !('ok' in result)) {
         return {
           ok: true,
-          data: result as CreatePortfolioResponse['data'],
+          data: result as unknown as CreatePortfolioResponse['data'],
         };
       }
       

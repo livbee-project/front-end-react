@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components';
 /* eslint-disable react-refresh/only-export-components */
-import { H1, H2, PMuted, Small, Caption } from '@/presentation/components/styled/Typography';
+import { H2, PMuted, Small, Caption } from '@/presentation/components/styled/Typography';
 
 export const PageWrapper = styled.div`
   min-height: 100vh;

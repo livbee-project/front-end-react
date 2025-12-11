@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import type { PortfolioFormData, PortfolioToggleState } from '@/presentation/components/forms/portfolio/types';
-import { clearImageUrls, getStoredImageUrls } from '@/presentation/components/forms/portfolio/utils/portfolioImageStorage';
+import { clearImageUrls } from '@/presentation/components/forms/portfolio/utils/portfolioImageStorage';
 import { debug } from '@/shared/utils/logger';
 
 const FORM_STORAGE_KEY = 'portfolio-register-form';
@@ -34,7 +34,6 @@ interface UsePortfolioFormStorageOptions {
   hasStoredImages: boolean;
   mainThumbnailUrl: string;
   galleryImageUrls: string[];
-  onClearImageStates?: () => void;
   onImageRestored?: () => void;
 }
 
@@ -49,7 +48,6 @@ export const usePortfolioFormStorage = ({
   hasStoredImages,
   mainThumbnailUrl,
   galleryImageUrls,
-  onClearImageStates,
   onImageRestored,
 }: UsePortfolioFormStorageOptions) => {
   const location = useLocation();

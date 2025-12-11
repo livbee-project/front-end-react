@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import type { ModelFormData, ModelToggleState } from '@/presentation/components/forms/model/types';
-import { clearImageUrls, getStoredImageUrls } from '@/presentation/components/forms/model/utils/modelImageStorage';
+import { clearImageUrls } from '@/presentation/components/forms/model/utils/modelImageStorage';
 import { debug } from '@/shared/utils/logger';
 
 const FORM_STORAGE_KEY = 'model-register-form';
@@ -43,7 +43,6 @@ interface UseModelFormStorageOptions {
   hasStoredImages: boolean;
   mainThumbnailUrl: string;
   galleryImageUrls: string[];
-  onClearImageStates?: () => void;
   onImageRestored?: () => void;
 }
 
@@ -58,7 +57,6 @@ export const useModelFormStorage = ({
   hasStoredImages,
   mainThumbnailUrl,
   galleryImageUrls,
-  onClearImageStates,
   onImageRestored,
 }: UseModelFormStorageOptions) => {
   const location = useLocation();

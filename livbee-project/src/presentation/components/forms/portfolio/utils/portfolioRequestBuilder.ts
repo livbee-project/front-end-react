@@ -75,7 +75,7 @@ export const buildPortfolioRequest = (
   };
   
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/0f91d27f-d165-4cdf-82ab-ecb2f2648200',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'portfolioRequestBuilder.ts:75',message:'요청 객체 생성 완료',data:{requestKeys:Object.keys(request),hasNickname:!!request.nickname,hasRegistrationType:!!request.registrationType,hasMainThumbnail:!!request.mainThumbnailUrl,subThumbnailCount:request.subThumbnailUrls?.length||0,undefinedFields:Object.entries(request).filter(([k,v])=>v===undefined).map(([k])=>k)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+  fetch('http://127.0.0.1:7242/ingest/0f91d27f-d165-4cdf-82ab-ecb2f2648200',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'portfolioRequestBuilder.ts:75',message:'요청 객체 생성 완료',data:{requestKeys:Object.keys(request),hasNickname:!!request.nickname,hasRegistrationType:!!request.registrationType,hasMainThumbnail:!!request.mainThumbnailUrl,subThumbnailCount:request.subThumbnailUrls?.length||0,undefinedFields:Object.entries(request).filter(([,v])=>v===undefined).map(([k])=>k)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
   // #endregion
   
   return request;

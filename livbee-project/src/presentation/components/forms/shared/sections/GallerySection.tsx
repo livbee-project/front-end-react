@@ -12,11 +12,12 @@ import { saveScrollPositionBeforeCrop } from '@/shared/utils/scrollPosition';
 
 /**
  * 전역 타입 확장
+ * ImageUpload.tsx와 타입 일치를 위해 type 파라미터를 optional로 선언
  */
 declare global {
   interface Window {
     __imageCropCallbacks?: {
-      [key: string]: (file: File) => void;
+      [key: string]: (file: File, type?: 'cover' | 'product' | 'liveCover') => void;
     };
   }
 }
@@ -80,7 +81,7 @@ const DeleteButton = styled.button`
   padding: 0;
 
   &:hover {
-    background-color: ${({ theme }) => theme.colors.destructive};
+    background-color: ${({ theme }) => theme.colors.error};
     transform: scale(1.1);
   }
 

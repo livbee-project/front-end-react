@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
-import { Upload, Video, FileText, X, ArrowUp } from 'lucide-react';
+import { Video, FileText, X, ArrowUp } from 'lucide-react';
 import {
   FormSection,
   SectionTitle,
@@ -88,7 +88,7 @@ const RemoveButton = styled.button`
 
   &:hover {
     background-color: #FEE2E2;
-    color: ${({ theme }) => theme.colors.destructive};
+    color: ${({ theme }) => theme.colors.error};
   }
 
   svg {
