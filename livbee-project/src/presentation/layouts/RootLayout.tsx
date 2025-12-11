@@ -22,8 +22,37 @@ const RootLayout: React.FC = () => {
   }, []);
 
   // 경로 변경 시 채팅 페이지가 아닌 경우 스크롤을 최상단으로 이동
+  // 단, 크롭 페이지에서 돌아올 때는 스크롤 위치 유지
   // useLayoutEffect를 사용하여 렌더링 전에 스크롤 위치 설정
   useLayoutEffect(() => {
+    // sessionStorage에서 저장된 스크롤 위치 확인 (크롭 페이지에서 돌아온 경우)
+    const savedScrollData = sessionStorage.getItem('scrollPosition');
+    
+    if (savedScrollData) {
+      try {
+        const scrollData = JSON.parse(savedScrollData);
+        // 저장된 경로와 현재 경로가 일치하는 경우에만 복원
+        if (scrollData.path === location.pathname) {
+          // 약간의 지연을 두어 DOM이 완전히 렌더링된 후 스크롤 복원
+          requestAnimationFrame(() => {
+            if (mainContentRef.current) {
+              mainContentRef.current.scrollTop = scrollData.mainContentScrollTop || 0;
+            }
+            if (scrollData.scrollY) {
+              window.scrollTo(0, scrollData.scrollY);
+            }
+          });
+          // 복원 후 sessionStorage에서 삭제
+          sessionStorage.removeItem('scrollPosition');
+          return;
+        }
+      } catch (error) {
+        console.error('스크롤 위치 복원 실패:', error);
+        sessionStorage.removeItem('scrollPosition');
+      }
+    }
+    
+    // 크롭 페이지에서 돌아온 경우가 아니고 채팅 페이지가 아닌 경우 스크롤을 최상단으로 이동
     if (!isChatPage) {
       // MainContent 스크롤 컨테이너를 최상단으로 이동
       if (mainContentRef.current) {
@@ -32,7 +61,7 @@ const RootLayout: React.FC = () => {
       // window 레벨 스크롤도 최상단으로 이동 (혹시 모를 경우 대비)
       window.scrollTo(0, 0);
     }
-  }, [location.pathname, isChatPage]);
+  }, [location.pathname, location.state, isChatPage]);
 
   return (
     <RootContainer>

@@ -17,8 +17,9 @@ const RegisterPageLayout: React.FC<RegisterPageLayoutProps> = ({ children }) => 
    * 페이지 컨테이너 스타일
    */
   const pageStyle: React.CSSProperties = {
-    padding: '16px',
-    paddingBottom: '32px',
+    minHeight: '100vh',
+    backgroundColor: '#F9FAFB',
+    padding: '0 20px 20px 20px',
   };
 
   return <div style={pageStyle}>{children}</div>;

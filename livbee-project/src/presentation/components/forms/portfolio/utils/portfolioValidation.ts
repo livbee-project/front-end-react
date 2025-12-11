@@ -8,6 +8,15 @@ export const validatePortfolioForm = (
   formData: PortfolioFormData,
   toggles: PortfolioToggleState
 ): { isValid: boolean; errorMessage?: string } => {
+  // 필수 필드 검증
+  if (!formData.name.trim()) {
+    return { isValid: false, errorMessage: '닉네임은 필수 입력값입니다.' };
+  }
+
+  if (!formData.registrationType.trim()) {
+    return { isValid: false, errorMessage: '등록 유형은 필수 입력값입니다.' };
+  }
+
   const trimmedContact = formData.contact.trim();
   if (trimmedContact && !isValidPhoneNumber(trimmedContact)) {
     return { isValid: false, errorMessage: '연락처 형식이 올바르지 않습니다.' };

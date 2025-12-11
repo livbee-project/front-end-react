@@ -15,8 +15,8 @@ import {
   GallerySection,
 } from '@/presentation/components/forms/portfolio/sections';
 import { FormSubmitSection } from '@/presentation/components/forms/common/FormSubmitSection';
+import { RegisterPageHeader } from '@/presentation/components/forms/common/RegisterPageHeader';
 import { useModelRegisterForm } from '@/presentation/components/forms/model/useModelRegisterForm';
-import StickyHeader from '@/presentation/components/detail/common/StickyHeader';
 
 const ModelRegisterPage: React.FC = () => {
   const {
@@ -31,9 +31,11 @@ const ModelRegisterPage: React.FC = () => {
     handleToggleChange,
     handleProfileImageSelect,
     handleGalleryImageSelect,
+    handleGalleryImageReplace,
     handleGalleryImageRemove,
     handlePortfolioFileSelect,
     handlePortfolioFileRemove,
+    handleFileError,
     handleSubmit,
   } = useModelRegisterForm();
 
@@ -41,10 +43,9 @@ const ModelRegisterPage: React.FC = () => {
   const websitesArray = formData.websites.map((w) => w.content || '');
 
   return (
-    <>
-      <StickyHeader title="모델 등록" />
-      <PageWrapper>
-        <FormContainer>
+    <PageWrapper>
+      <RegisterPageHeader title="등록하기" />
+      <FormContainer>
           <RegisterForm
             onSubmit={(e) => {
               e.preventDefault();
@@ -87,6 +88,7 @@ const ModelRegisterPage: React.FC = () => {
             onFileAdd={handlePortfolioFileSelect}
             onResumeRemove={() => {}}
             onPortfolioRemove={handlePortfolioFileRemove}
+            onFileError={handleFileError}
           />
           <TagsSection
             tags={formData.tags.map((t) => (typeof t === 'object' ? t.value || '' : t))}
@@ -99,6 +101,7 @@ const ModelRegisterPage: React.FC = () => {
           <GallerySection
             images={galleryImageUrls}
             onSelectImage={handleGalleryImageSelect}
+            onReplaceImage={handleGalleryImageReplace}
             onRemoveImage={handleGalleryImageRemove}
           />
           <FormSubmitSection
@@ -109,7 +112,6 @@ const ModelRegisterPage: React.FC = () => {
           </RegisterForm>
         </FormContainer>
       </PageWrapper>
-    </>
   );
 };
 

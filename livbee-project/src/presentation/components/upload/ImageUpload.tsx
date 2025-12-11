@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { RiImageLine } from 'react-icons/ri';
 import type { ImageUploadProps } from '@/types/components';
+import { saveScrollPositionBeforeCrop } from '@/shared/utils/scrollPosition';
 
 /**
  * 전역 타입 확장
@@ -39,6 +40,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
     // 크롭 기능이 활성화되어 있으면 크롭 페이지로 이동
     if (enableCrop) {
+      // 현재 스크롤 위치 저장 (크롭 페이지에서 돌아올 때 복원하기 위해)
+      saveScrollPositionBeforeCrop(location.pathname);
+
       // 파일을 Blob URL로 변환하여 전달 (함수는 전달할 수 없으므로)
       const imageUrl = URL.createObjectURL(file);
       
@@ -65,6 +69,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           imageFileName: file.name,
           returnPath: location.pathname,
           callbackKey,
+          aspectRatio, // 미리보기 비율 전달
         },
       });
       console.log('[ImageUpload] 🔄 크롭 페이지로 이동', {

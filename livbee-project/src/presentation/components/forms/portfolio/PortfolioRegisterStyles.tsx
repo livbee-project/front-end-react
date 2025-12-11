@@ -4,60 +4,101 @@ import { H1, H2, PMuted, Small, Caption } from '@/presentation/components/styled
 
 export const PageWrapper = styled.div`
   min-height: 100vh;
-  background: ${({ theme }) => theme.colors.background};
-  padding: 40px 20px;
+  background-color: #F9FAFB;
+  padding: 0 20px 20px 20px;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 30px 16px;
+  @media (min-width: 768px) {
+    padding: 0 20px 40px 20px;
   }
 `;
 
 export const FormContainer = styled.div`
-  max-width: 680px;
+  max-width: 640px;
   margin: 0 auto;
-  background: ${({ theme }) => theme.colors.card};
-  border-radius: ${({ theme }) => theme.radii.xl};
-  box-shadow: 0 12px 32px rgba(3, 2, 19, 0.06);
-  padding: 40px;
+`;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 24px;
+export const HeaderContainer = styled.header`
+  width: 100%;
+  background-color: #FFFFFF;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #F3F4F6;
+  margin: 0 -20px 24px -20px;
+  width: calc(100% + 40px);
+
+  @media (min-width: 768px) {
+    margin: 0 -20px 24px -20px;
+    width: calc(100% + 40px);
   }
+`;
+
+export const BackButton = styled.button`
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: transparent;
+  color: #111111;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #F3F4F6;
+  }
+`;
+
+export const HeaderTitle = styled.h1`
+  flex: 1;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111111;
+  margin: 0;
+`;
+
+export const HeaderSpacer = styled.div`
+  width: 40px;
 `;
 
 export const RegisterForm = styled.form`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.lg};
+  gap: 24px;
 `;
 
 export const FormSection = styled.section`
-  padding: 30px 0;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
-
-  &:last-of-type {
-    border-bottom: none;
-  }
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 24px 0;
-  }
+  background-color: #FFFFFF;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 `;
 
-export const SectionTitle = styled(H1)`
-  margin: 0 0 ${({ theme }) => theme.spacing.md};
+export const SectionTitle = styled.h2`
+  font-size: 16px;
+  font-weight: 700;
+  color: #111111;
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #F3F4F6;
 `;
 
-export const SectionDescription = styled(Small)`
-  color: ${({ theme }) => theme.colors.muted};
-  margin: 0 0 ${({ theme }) => theme.spacing.xl};
+export const SectionDescription = styled.p`
+  font-size: 13px;
+  color: #6B7280;
+  margin: 0 0 16px;
   line-height: 1.5;
 `;
 
 export const InputGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.lg};
+  gap: 16px;
 `;
 
 export const LabelText = styled(H2)`
@@ -68,8 +109,10 @@ export const LabelText = styled(H2)`
 `;
 
 export const LabelNote = styled(Caption)`
-  color: ${({ theme }) => theme.colors.muted};
+  font-size: 12px;
   font-weight: 400;
+  color: #9CA3AF;
+  margin-left: 4px;
 `;
 
 export const FieldRow = styled.div`
@@ -80,17 +123,25 @@ export const FieldRow = styled.div`
 
 export const StyledSelect = styled.select`
   width: 100%;
-  padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.lg}`};
-  border-radius: ${({ theme }) => theme.radii.md};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  font: ${({ theme }) => theme.fonts.body};
-  background: ${({ theme }) => theme.colors.background};
-  color: ${({ theme }) => theme.colors.foreground};
+  background-color: #F9FAFB;
+  border: none;
+  border-radius: 16px;
+  padding: 16px 20px;
+  font-size: 15px;
+  color: #111111;
+  height: auto;
+  transition: all 0.2s;
+  font-family: inherit;
 
   &:focus {
     outline: none;
-    border-color: ${({ theme }) => theme.colors.primary};
-    box-shadow: 0 0 0 2px ${({ theme }) => theme.primaryOpacity['10']};
+    background-color: #FFFFFF;
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}20;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
 
@@ -106,32 +157,60 @@ export const HiddenInput = styled.input`
   ${hiddenInputStyles}
 `;
 
-const underlineField = css`
+export const StyledInput = styled.input`
   width: 100%;
-  padding: 8px 0;
+  background-color: #F9FAFB;
   border: none;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
-  background: transparent;
-  font: ${({ theme }) => theme.fonts.body};
+  border-radius: 16px;
+  padding: 16px 20px;
+  font-size: 15px;
+  color: #111111;
+  transition: all 0.2s;
+  font-family: inherit;
+
+  &::placeholder {
+    color: #9CA3AF;
+  }
 
   &:focus {
     outline: none;
-    border-bottom-color: ${({ theme }) => theme.colors.primary};
+    background-color: #FFFFFF;
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}20;
   }
 
   &:disabled {
     opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
 
-export const StyledInput = styled.input`
-  ${underlineField}
-`;
-
 export const StyledTextarea = styled.textarea`
-  ${underlineField};
-  min-height: 120px;
+  width: 100%;
+  background-color: #F9FAFB;
+  border: none;
+  border-radius: 16px;
+  padding: 16px 20px;
+  font-size: 15px;
+  color: #111111;
   resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+  transition: all 0.2s;
+
+  &::placeholder {
+    color: #9CA3AF;
+  }
+
+  &:focus {
+    outline: none;
+    background-color: #FFFFFF;
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}20;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 `;
 
 export const MutedHint = styled(PMuted)`
@@ -143,32 +222,52 @@ export const SmallText = styled(Small)`
 `;
 
 export const ButtonGroup = styled.div`
-  padding-top: 30px;
-  margin-top: 40px;
-  border-top: 1px solid ${({ theme }) => theme.colors.border};
+  display: flex;
+  gap: 12px;
+  margin-top: 32px;
 `;
 
-export const SubmitButton = styled.button`
-  width: 100%;
-  height: 52px;
+export const CancelButton = styled.button`
+  flex: 1;
+  height: 56px;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  background-color: #F3F4F6;
+  color: #6B7280;
   border: none;
-  border-radius: ${({ theme }) => theme.radii.md};
-  background: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.primaryForeground};
-  font: ${({ theme }) => theme.fonts.body};
-  font-weight: 500;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #E5E7EB;
+  }
 
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
   }
+`;
 
-  &:not(:disabled):hover {
-    background: ${({ theme }) => theme.colors.primaryHover};
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px ${({ theme }) => theme.primaryOpacity['25']};
+export const SubmitButton = styled.button`
+  flex: 1;
+  height: 56px;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #5566E3;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 `;
 

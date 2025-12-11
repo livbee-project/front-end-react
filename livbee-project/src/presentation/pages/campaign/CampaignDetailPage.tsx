@@ -86,7 +86,8 @@ const CampaignDetailPage: React.FC = () => {
   };
 
   const displayData = {
-    imageUrl: campaign.imageUrl || campaign.coverImageUrl || mockData.imageUrl,
+    // 대표 이미지 우선순위: coverImageUrl > imageUrl > thumbnailUrl
+    imageUrl: campaign.coverImageUrl || campaign.imageUrl || campaign.thumbnailUrl || mockData.imageUrl,
     brandName: campaign.brandName || mockData.brandName,
     title: campaign.title || mockData.title,
     dDay: campaign.closeAt

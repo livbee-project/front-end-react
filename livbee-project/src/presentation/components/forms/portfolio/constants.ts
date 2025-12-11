@@ -22,10 +22,10 @@ export const SNS_ENTRIES = [
 ] as const;
 
 export const TAG_ENTRIES = [
-  { id: 0, label: '키', placeholder: '165cm' },
-  { id: 1, label: '몸무게', placeholder: '50kg' },
-  { id: 2, label: '사이즈', placeholder: '55' },
-  { id: 3, label: '경력', placeholder: '5년' },
-  { id: 4, label: '나이', placeholder: '25세' },
+  { id: 0, label: '키', placeholder: '165', unit: 'cm' },
+  { id: 1, label: '몸무게', placeholder: '50', unit: 'kg' },
+  { id: 2, label: '사이즈', placeholder: '55', unit: '' },
+  { id: 3, label: '경력', placeholder: '5', unit: '년' },
+  { id: 4, label: '나이', placeholder: '25', unit: '세' },
 ] as const;
 

@@ -3,7 +3,11 @@ import {
   PageWrapper,
   FormContainer,
   RegisterForm,
+  ButtonGroup,
+  CancelButton,
+  SubmitButton,
 } from '@/presentation/components/forms/portfolio/PortfolioRegisterStyles';
+import { RegisterPageHeader } from '@/presentation/components/forms/common/RegisterPageHeader';
 import {
   ProfileImageSection,
   RegistrationTypeSection,
@@ -14,11 +18,11 @@ import {
   TagsSection,
   GallerySection,
 } from '@/presentation/components/forms/portfolio/sections';
-import { FormSubmitSection } from '@/presentation/components/forms/common/FormSubmitSection';
 import { usePortfolioRegisterForm } from '@/presentation/components/forms/portfolio/usePortfolioRegisterForm';
-import StickyHeader from '@/presentation/components/detail/common/StickyHeader';
+import { useNavigate } from 'react-router-dom';
 
 const PortfolioRegisterPage: React.FC = () => {
+  const navigate = useNavigate();
   const {
     formData,
     toggles,
@@ -32,19 +36,24 @@ const PortfolioRegisterPage: React.FC = () => {
     handleToggleChange,
     handleProfileImageSelect,
     handleGalleryImageSelect,
+    handleGalleryImageReplace,
     handleGalleryImageRemove,
     handlePortfolioFileAdd,
     handleResumeFileRemove,
     handlePortfolioFileRemove,
+    handleFileError,
     handleSubmitForm,
   } = usePortfolioRegisterForm();
 
+  const handleCancel = () => {
+    navigate(-1);
+  };
+
   return (
-    <>
-      <StickyHeader title="쇼호스트 등록" />
-      <PageWrapper>
-        <FormContainer>
-          <RegisterForm onSubmit={handleSubmitForm}>
+    <PageWrapper>
+      <RegisterPageHeader title="등록하기" />
+      <FormContainer>
+        <RegisterForm onSubmit={handleSubmitForm}>
           <ProfileImageSection
             thumbnailUrl={mainThumbnailUrl}
             onSelectImage={handleProfileImageSelect}
@@ -79,6 +88,7 @@ const PortfolioRegisterPage: React.FC = () => {
             onFileAdd={handlePortfolioFileAdd}
             onResumeRemove={handleResumeFileRemove}
             onPortfolioRemove={handlePortfolioFileRemove}
+            onFileError={handleFileError}
           />
           <TagsSection
             tags={formData.tags}
@@ -89,17 +99,20 @@ const PortfolioRegisterPage: React.FC = () => {
           <GallerySection
             images={galleryImageUrls}
             onSelectImage={handleGalleryImageSelect}
+            onReplaceImage={handleGalleryImageReplace}
             onRemoveImage={handleGalleryImageRemove}
           />
-          <FormSubmitSection
-            disabled={isSubmitting || isImageUploading}
-            isSubmitting={isSubmitting}
-            submitType="submit"
-          />
-          </RegisterForm>
-        </FormContainer>
-      </PageWrapper>
-    </>
+          <ButtonGroup>
+            <CancelButton type="button" onClick={handleCancel} disabled={isSubmitting || isImageUploading}>
+              취소
+            </CancelButton>
+            <SubmitButton type="submit" disabled={isSubmitting || isImageUploading}>
+              {isSubmitting ? '등록 중...' : '등록하기'}
+            </SubmitButton>
+          </ButtonGroup>
+        </RegisterForm>
+      </FormContainer>
+    </PageWrapper>
   );
 };
 

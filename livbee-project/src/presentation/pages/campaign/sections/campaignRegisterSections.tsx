@@ -62,11 +62,11 @@ export const createCampaignRegisterSections = ({
 }: CampaignRegisterSectionsParams): CampaignRegisterSection[] => [
   {
     key: 'cover',
-    title: '대표이미지 1:2*',
+    title: '대표이미지 2:1*',
     content: (
       <ImageUpload
         size={200}
-        aspectRatio="1:2"
+        aspectRatio="2:1"
         imageUrl={coverImageUrl}
         onImageSelect={(file) => handleImageSelect(file, 'cover')}
       />
@@ -253,10 +253,11 @@ export const createCampaignRegisterSections = ({
   },
   {
     key: 'liveCover',
-    title: '라이브 커버 이미지',
+    title: '라이브 커버 이미지 1:2',
     content: (
       <ImageUpload
         size={200}
+        aspectRatio="1:2"
         imageUrl={liveCoverImageUrl}
         onImageSelect={(file) => handleImageSelect(file, 'liveCover')}
       />

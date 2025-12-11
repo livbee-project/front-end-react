@@ -1,6 +1,9 @@
 import React from 'react';
-import FormSection from '@/presentation/components/forms/sections/FormSection';
-import { StyledSelect } from '@/presentation/components/forms/portfolio/PortfolioRegisterStyles';
+import {
+  FormSection,
+  SectionTitle,
+  StyledSelect,
+} from '@/presentation/components/forms/portfolio/PortfolioRegisterStyles';
 
 interface RegistrationTypeSectionProps {
   value: string;
@@ -9,7 +12,8 @@ interface RegistrationTypeSectionProps {
 
 export const RegistrationTypeSection: React.FC<RegistrationTypeSectionProps> = ({ value, onChange }) => {
   return (
-    <FormSection title="등록 구분">
+    <FormSection>
+      <SectionTitle>등록 구분</SectionTitle>
       <StyledSelect value={value} onChange={(event) => onChange(event.target.value)}>
         <option value="">등록 유형을 선택하세요</option>
         <option value="showhost">쇼호스트 - 라이브 커머스 진행</option>

@@ -11,6 +11,7 @@ export interface Campaign {
   imageUrl?: string;
   thumbnailUrl?: string;
   coverImageUrl?: string; // 대표 이미지 (cover_image_url)
+  liveVerticalCoverUrl?: string; // 라이브 커버 이미지 (live_vertical_cover_url, 홈 페이지 카드용)
   productThumbnailUrl?: string; // 상품 썸네일 이미지 (홈 페이지 카드 하단 정사각형 이미지용)
   shootDate: string; // ISO 8601 형식
   closeAt: string; // ISO 8601 형식
