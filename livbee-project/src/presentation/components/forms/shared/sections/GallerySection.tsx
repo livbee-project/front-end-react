@@ -178,7 +178,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images, onSelect
         input.type = 'file';
         input.accept = 'image/*';
         input.style.display = 'none';
-        input.onchange = (e) => handleFileChange(e as React.ChangeEvent<HTMLInputElement>, index);
+        input.onchange = (e) => handleFileChange(e as unknown as React.ChangeEvent<HTMLInputElement>, index);
         document.body.appendChild(input);
         replaceInputRefs.current[index] = input;
       }

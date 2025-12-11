@@ -77,7 +77,6 @@ export const usePortfolioRegisterForm = () => {
     hasStoredImages,
     mainThumbnailUrl,
     galleryImageUrls,
-    onClearImageStates: clearImageStates,
     onImageRestored: () => {
       // 이미지 복원 후 추가 처리 필요 시 여기서 수행
     },
