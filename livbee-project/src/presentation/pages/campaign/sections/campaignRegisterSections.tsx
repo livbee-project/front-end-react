@@ -3,15 +3,10 @@
  */
 
 import React from 'react';
-import TextInput from '@/presentation/components/forms/inputs/TextInput';
-import SelectInput from '@/presentation/components/forms/inputs/SelectInput';
-import DateInput from '@/presentation/components/forms/inputs/DateInput';
-import TimeInput from '@/presentation/components/forms/inputs/TimeInput';
-import ImageUpload from '@/presentation/components/upload/ImageUpload';
-import { FeeSection } from './components/FeeSection';
-import { QualificationsSection } from './components/QualificationsSection';
-import { StyledTextarea } from './styles/campaignRegisterSectionStyles';
-import { recruitmentTypeOptions, categoryOptions } from './constants/campaignRegisterOptions';
+import { CampaignBasicInfoSection } from './components/CampaignBasicInfoSection';
+import { CampaignRecruitmentInfoSection } from './components/CampaignRecruitmentInfoSection';
+import { CampaignFilmingInfoSection } from './components/CampaignFilmingInfoSection';
+import { CampaignProductInfoSection } from './components/CampaignProductInfoSection';
 
 export interface CampaignRegisterSection {
   key: string;
@@ -25,7 +20,6 @@ interface CampaignRegisterSectionsParams {
     brandIntroduction: string;
     title: string;
     content: string;
-    detailedContent: string;
     recruitmentType: string;
     category: string;
     location: string;
@@ -61,205 +55,72 @@ export const createCampaignRegisterSections = ({
   handleQualificationChange,
 }: CampaignRegisterSectionsParams): CampaignRegisterSection[] => [
   {
-    key: 'cover',
-    title: '대표이미지 2:1*',
+    key: 'basicInfo',
+    title: '',
     content: (
-      <ImageUpload
-        size={200}
-        aspectRatio="2:1"
-        imageUrl={coverImageUrl}
-        onImageSelect={(file) => handleImageSelect(file, 'cover')}
+      <CampaignBasicInfoSection
+        coverImageUrl={coverImageUrl}
+        brandName={formData.brandName}
+        brandIntroduction={formData.brandIntroduction}
+        title={formData.title}
+        content={formData.content}
+        qualifications={formData.qualifications}
+        onCoverImageSelect={(file) => handleImageSelect(file, 'cover')}
+        onBrandNameChange={(value) => handleInputChange('brandName', value)}
+        onBrandIntroductionChange={(value) => handleInputChange('brandIntroduction', value)}
+        onTitleChange={(value) => handleInputChange('title', value)}
+        onContentChange={(value) => handleInputChange('content', value)}
+        onAddQualification={handleAddQualification}
+        onRemoveQualification={handleRemoveQualification}
+        onQualificationChange={handleQualificationChange}
       />
     ),
   },
   {
-    key: 'brandName',
-    title: '브랜드명*',
+    key: 'recruitmentInfo',
+    title: '',
     content: (
-      <TextInput
-        placeholder="내용을 입력해주세요"
-        value={formData.brandName}
-        onChange={(e) => handleInputChange('brandName', e.target.value)}
+      <CampaignRecruitmentInfoSection
+        recruitmentType={formData.recruitmentType}
+        category={formData.category}
+        onRecruitmentTypeChange={(value) => handleInputChange('recruitmentType', value)}
+        onCategoryChange={(value) => handleInputChange('category', value)}
       />
     ),
   },
   {
-    key: 'brandIntroduction',
-    title: '브랜드 소개',
+    key: 'filmingInfo',
+    title: '',
     content: (
-      <StyledTextarea
-        placeholder="브랜드에 대해 간단히 소개해주세요"
-        value={formData.brandIntroduction}
-        onChange={(e) => handleInputChange('brandIntroduction', e.target.value)}
-        rows={4}
-      />
-    ),
-  },
-  {
-    key: 'title',
-    title: '제목*',
-    content: (
-      <TextInput
-        placeholder="내용을 입력해주세요"
-        value={formData.title}
-        onChange={(e) => handleInputChange('title', e.target.value)}
-      />
-    ),
-  },
-  {
-    key: 'content',
-    title: '내용*',
-    content: (
-      <TextInput
-        placeholder="내용을 입력해주세요"
-        value={formData.content}
-        onChange={(e) => handleInputChange('content', e.target.value)}
-      />
-    ),
-  },
-  {
-    key: 'detailedContent',
-    title: '상세 내용*',
-    content: (
-      <TextInput
-        placeholder="내용을 입력해주세요"
-        value={formData.detailedContent}
-        onChange={(e) => handleInputChange('detailedContent', e.target.value)}
-      />
-    ),
-  },
-  {
-    key: 'qualifications',
-    title: '자격 요건',
-    content: (
-      <QualificationsSection
-        qualifications={Array.isArray(formData.qualifications) ? formData.qualifications : ['']}
-        onAdd={handleAddQualification}
-        onRemove={handleRemoveQualification}
-        onChange={handleQualificationChange}
-      />
-    ),
-  },
-  {
-    key: 'recruitmentType',
-    title: '모집구분*',
-    content: (
-      <SelectInput
-        value={formData.recruitmentType}
-        options={recruitmentTypeOptions}
-        onChange={(e) => handleInputChange('recruitmentType', e.target.value)}
-      />
-    ),
-  },
-  {
-    key: 'category',
-    title: '카테고리*',
-    content: (
-      <SelectInput
-        value={formData.category}
-        options={categoryOptions}
-        onChange={(e) => handleInputChange('category', e.target.value)}
-      />
-    ),
-  },
-  {
-    key: 'location',
-    title: '장소',
-    content: (
-      <TextInput
-        placeholder="내용을 입력해주세요"
-        value={formData.location}
-        onChange={(e) => handleInputChange('location', e.target.value)}
-      />
-    ),
-  },
-  {
-    key: 'filmingDate',
-    title: '촬영일*',
-    content: (
-      <DateInput
-        placeholder="내용을 입력해주세요"
-        value={formData.filmingDate}
-        onChange={(e) => handleInputChange('filmingDate', e.target.value)}
-      />
-    ),
-  },
-  {
-    key: 'deadline',
-    title: '공고 마감일*',
-    content: (
-      <DateInput
-        placeholder="내용을 입력해주세요"
-        value={formData.deadline}
-        onChange={(e) => handleInputChange('deadline', e.target.value)}
-      />
-    ),
-  },
-  {
-    key: 'startTime',
-    title: '시작시간*',
-    content: (
-      <TimeInput
-        placeholder="내용을 입력해주세요"
-        value={formData.startTime}
-        onChange={(e) => handleInputChange('startTime', e.target.value)}
-      />
-    ),
-  },
-  {
-    key: 'endTime',
-    title: '종료시간*',
-    content: (
-      <TimeInput
-        placeholder="내용을 입력해주세요"
-        value={formData.endTime}
-        onChange={(e) => handleInputChange('endTime', e.target.value)}
-      />
-    ),
-  },
-  {
-    key: 'productName',
-    title: '상품명',
-    content: (
-      <TextInput
-        placeholder="내용을 입력해주세요"
-        value={formData.productName}
-        onChange={(e) => handleInputChange('productName', e.target.value)}
-      />
-    ),
-  },
-  {
-    key: 'fee',
-    title: '수당',
-    content: (
-      <FeeSection
+      <CampaignFilmingInfoSection
+        location={formData.location}
+        filmingDate={formData.filmingDate}
+        startTime={formData.startTime}
+        endTime={formData.endTime}
+        deadline={formData.deadline}
         fee={formData.fee}
         feeNegotiable={formData.feeNegotiable}
+        onLocationChange={(value) => handleInputChange('location', value)}
+        onFilmingDateChange={(value) => handleInputChange('filmingDate', value)}
+        onStartTimeChange={(value) => handleInputChange('startTime', value)}
+        onEndTimeChange={(value) => handleInputChange('endTime', value)}
+        onDeadlineChange={(value) => handleInputChange('deadline', value)}
         onFeeChange={(value) => handleInputChange('fee', value)}
         onFeeNegotiableChange={(checked) => handleInputChange('feeNegotiable', checked)}
       />
     ),
   },
   {
-    key: 'productImage',
-    title: '상품 이미지',
+    key: 'productInfo',
+    title: '',
     content: (
-      <ImageUpload
-        size={200}
-        imageUrl={productImageUrl}
-        onImageSelect={(file) => handleImageSelect(file, 'product')}
-      />
-    ),
-  },
-  {
-    key: 'liveCover',
-    title: '라이브 커버 이미지 1:2',
-    content: (
-      <ImageUpload
-        size={200}
-        aspectRatio="1:2"
-        imageUrl={liveCoverImageUrl}
-        onImageSelect={(file) => handleImageSelect(file, 'liveCover')}
+      <CampaignProductInfoSection
+        productName={formData.productName}
+        productImageUrl={productImageUrl}
+        liveCoverImageUrl={liveCoverImageUrl}
+        onProductNameChange={(value) => handleInputChange('productName', value)}
+        onProductImageSelect={(file) => handleImageSelect(file, 'product')}
+        onLiveCoverImageSelect={(file) => handleImageSelect(file, 'liveCover')}
       />
     ),
   },

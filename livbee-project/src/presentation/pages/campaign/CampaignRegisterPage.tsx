@@ -51,11 +51,17 @@ const CampaignRegisterPage: React.FC = () => {
   return (
     <RegisterPageLayout>
       <RegisterPageHeader title="등록하기" />
-      {sections.map(({ key, title, content }) => (
-        <FormSection key={key} title={title}>
-          {content}
-        </FormSection>
-      ))}
+      {sections.map(({ key, title, content }) => {
+        // basicInfo, recruitmentInfo, filmingInfo, productInfo 섹션은 이미 카드 스타일이므로 FormSection으로 감싸지 않음
+        if (key === 'basicInfo' || key === 'recruitmentInfo' || key === 'filmingInfo' || key === 'productInfo') {
+          return <React.Fragment key={key}>{content}</React.Fragment>;
+        }
+        return (
+          <FormSection key={key} title={title}>
+            {content}
+          </FormSection>
+        );
+      })}
 
       <FormSubmitSection
         onSubmit={handleSubmit}

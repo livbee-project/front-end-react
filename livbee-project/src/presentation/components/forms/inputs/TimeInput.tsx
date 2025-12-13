@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Clock } from 'lucide-react';
 import { Input } from '@/presentation/components/styled/CommonStyles';
 import type { TimeInputProps } from '@/types/forms';
 
@@ -19,24 +18,10 @@ const StyledInput = styled(Input).attrs({ type: 'time' })`
   }
 `;
 
-const IconWrapper = styled.div`
-  position: absolute;
-  right: ${({ theme }) => theme.spacing.md};
-  top: 50%;
-  transform: translateY(-50%);
-  color: ${({ theme }) => theme.colors.muted};
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-`;
-
 const TimeInput: React.FC<TimeInputProps> = ({ value, onChange, ...props }) => {
   return (
     <InputWrapper>
       <StyledInput value={value} onChange={onChange} {...props} />
-      <IconWrapper>
-        <Clock size={18} />
-      </IconWrapper>
     </InputWrapper>
   );
 };

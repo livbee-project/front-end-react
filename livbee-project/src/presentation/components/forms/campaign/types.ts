@@ -3,7 +3,6 @@ export interface CampaignFormData {
   brandIntroduction: string;
   title: string;
   content: string;
-  detailedContent: string;
   recruitmentType: 'showhost' | 'staff' | 'model' | 'other' | 'store';
   category: 'food' | 'fashion' | 'beauty' | 'electronics' | 'lifestyle';
   location: string;

@@ -36,7 +36,6 @@ export const buildCampaignRequest = (
     brandIntroduction: formData.brandIntroduction.trim() || undefined,
     title: formData.title.trim(),
     content: formData.content.trim() || undefined,
-    detailedContent: formData.detailedContent.trim() || undefined,
     prefix: mapRecruitmentType(formData.recruitmentType),
     category: formData.category as CreateCampaignRequest['category'],
     location: formData.location.trim() || undefined,

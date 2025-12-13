@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Plus, X } from 'lucide-react';
-import TextInput from '@/presentation/components/forms/inputs/TextInput';
+import { StyledInput } from '@/presentation/components/forms/portfolio/PortfolioRegisterStyles';
 
 interface QualificationsSectionProps {
   qualifications: string[];
@@ -57,6 +57,7 @@ const AddButton = styled.button`
   gap: ${({ theme }) => theme.spacing.xs};
   width: 100%;
   padding: ${({ theme }) => theme.spacing.md};
+  margin-top: ${({ theme }) => theme.spacing.md};
   border: 1px dashed ${({ theme }) => theme.colors.border || '#ddd'};
   border-radius: ${({ theme }) => theme.radii.md};
   background: transparent;
@@ -88,7 +89,7 @@ export const QualificationsSection: React.FC<QualificationsSectionProps> = ({
       {qualifications.map((qualification, index) => (
         <QualificationItem key={index}>
           <QualificationInput>
-            <TextInput
+            <StyledInput
               placeholder="자격 요건을 입력해주세요"
               value={qualification}
               onChange={(e) => onChange(index, e.target.value)}

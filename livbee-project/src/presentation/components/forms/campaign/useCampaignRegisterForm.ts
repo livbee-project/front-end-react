@@ -17,7 +17,6 @@ const INITIAL_FORM_DATA: CampaignFormData = {
   brandIntroduction: '',
   title: '',
   content: '',
-  detailedContent: '',
   recruitmentType: 'showhost',
   category: 'food',
   location: '',
