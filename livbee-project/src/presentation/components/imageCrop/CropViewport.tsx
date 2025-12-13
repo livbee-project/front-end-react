@@ -134,11 +134,22 @@ const GridContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  position: relative;
 `;
 
 const GridLine = styled.div`
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  /* 각 셀의 오른쪽과 아래쪽에만 border 적용하여 겹침 방지 */
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  
+  /* 마지막 열과 행의 border 제거 */
+  &:nth-child(3n) {
+    border-right: none;
+  }
+  
+  &:nth-child(n+7) {
+    border-bottom: none;
+  }
 `;
 
 const DarkOverlay = styled.div.attrs<{
