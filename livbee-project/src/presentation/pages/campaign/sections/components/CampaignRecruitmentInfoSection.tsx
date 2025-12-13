@@ -36,7 +36,7 @@ const OptionButton = styled.button<{ $selected: boolean }>`
   transition: all 0.2s;
   background-color: ${({ $selected, theme }) => 
     $selected ? theme.colors.primary : '#F9FAFB'};
-  color: ${({ $selected, theme }) => 
+  color: ${({ $selected }) => 
     $selected ? '#FFFFFF' : '#374151'};
 
   &:hover {

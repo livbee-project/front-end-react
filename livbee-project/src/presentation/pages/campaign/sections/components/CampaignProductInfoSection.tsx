@@ -20,7 +20,7 @@ const ImageUploadButton = styled.div<{ $hasImage: boolean; $aspectRatio?: string
   width: 67.5%; /* 56.25% * 1.2 = 67.5% */
   aspect-ratio: ${({ $aspectRatio }) => ($aspectRatio === '1:2' ? '1 / 2' : '1')};
   margin: 12px auto 0;
-  border: 2px dashed ${({ $hasImage, theme }) => ($hasImage ? 'transparent' : '#D1D5DB')};
+  border: 2px dashed ${({ $hasImage }) => ($hasImage ? 'transparent' : '#D1D5DB')};
   border-radius: 16px;
   background-color: ${({ $hasImage }) => ($hasImage ? 'transparent' : '#F9FAFB')};
   display: flex;
