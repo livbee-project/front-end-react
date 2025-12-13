@@ -53,7 +53,6 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, onClose }) => 
     let hourScrollTimeout: NodeJS.Timeout | null = null;
     let minuteScrollTimeout: NodeJS.Timeout | null = null;
     let animationFrameId: number | null = null;
-    let isMonitoring = true; // 즉시 모니터링 시작
 
     const findPickerColumns = () => {
       // data-column-name 속성으로 컬럼 찾기
@@ -186,7 +185,6 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, onClose }) => 
     });
 
     return () => {
-      isMonitoring = false;
       observer.disconnect();
       if (hourScrollTimeout) {
         clearTimeout(hourScrollTimeout);
