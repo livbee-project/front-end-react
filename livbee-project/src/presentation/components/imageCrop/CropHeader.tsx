@@ -46,6 +46,14 @@ const TopBar = styled.div`
   right: 0;
   z-index: 1000; /* 다른 요소 위에 표시 */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* 하단 그림자 */
+  height: calc(60px + env(safe-area-inset-top)); /* 고정 높이 */
+  box-sizing: border-box;
+  flex-shrink: 0; /* 축소 방지 */
+  touch-action: none; /* 터치 이벤트 차단 (확대/축소/드래그 방지) */
+  user-select: none; /* 텍스트 선택 방지 */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 `;
 
 const IconButton = styled.button<{ $variant: 'cancel' | 'confirm' }>`

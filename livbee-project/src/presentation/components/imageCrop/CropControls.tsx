@@ -62,6 +62,14 @@ const BottomBar = styled.div`
   right: 0;
   z-index: 1000; /* 다른 요소 위에 표시 */
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3); /* 상단 그림자 */
+  height: calc(80px + 40px + env(safe-area-inset-bottom)); /* 고정 높이 (컨트롤 + 권장 말풍선) */
+  box-sizing: border-box;
+  flex-shrink: 0; /* 축소 방지 */
+  touch-action: pan-x; /* 가로 스크롤만 허용 (비율 버튼 스크롤용), 확대/축소는 차단 */
+  user-select: none; /* 텍스트 선택 방지 */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 `;
 
 const RatioButtonWrapper = styled.div`
