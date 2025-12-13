@@ -15,6 +15,7 @@ import {
   CheckboxLabel,
 } from '../styles/campaignRegisterSectionStyles';
 import Calendar from '@/presentation/components/ui/Calendar';
+import TimePicker from '@/presentation/components/ui/TimePicker';
 
 const FeeContainer = styled(BaseFeeContainer)`
   flex-direction: column;
@@ -156,8 +157,16 @@ const formatDateDisplay = (dateString: string): string => {
   return `${year}. ${month}. ${day}.`;
 };
 
+// 시간 포맷팅 함수
+const formatTimeDisplay = (timeString: string): string => {
+  if (!timeString) return '';
+  return timeString; // HH:MM 형식 그대로 반환
+};
+
 const TimeInputWrapper = styled.div`
   width: 100%;
+  position: static;
+  overflow: visible;
   box-sizing: border-box;
 `;
 
@@ -207,6 +216,7 @@ export const CampaignFilmingInfoSection: React.FC<CampaignFilmingInfoSectionProp
   onFeeNegotiableChange,
 }) => {
   const [openCalendar, setOpenCalendar] = useState<'filmingDate' | 'deadline' | null>(null);
+  const [openTimePicker, setOpenTimePicker] = useState<'startTime' | 'endTime' | null>(null);
 
   const handleFilmingDateClick = () => {
     setOpenCalendar(openCalendar === 'filmingDate' ? null : 'filmingDate');
@@ -224,6 +234,24 @@ export const CampaignFilmingInfoSection: React.FC<CampaignFilmingInfoSectionProp
   const handleDeadlineChange = (date: string) => {
     onDeadlineChange(date);
     setOpenCalendar(null);
+  };
+
+  const handleStartTimeClick = () => {
+    setOpenTimePicker(openTimePicker === 'startTime' ? null : 'startTime');
+  };
+
+  const handleEndTimeClick = () => {
+    setOpenTimePicker(openTimePicker === 'endTime' ? null : 'endTime');
+  };
+
+  const handleStartTimeChange = (time: string) => {
+    onStartTimeChange(time);
+    setOpenTimePicker(null);
+  };
+
+  const handleEndTimeChange = (time: string) => {
+    onEndTimeChange(time);
+    setOpenTimePicker(null);
   };
 
   // 오늘 날짜를 최소 날짜로 설정
@@ -271,42 +299,50 @@ export const CampaignFilmingInfoSection: React.FC<CampaignFilmingInfoSectionProp
           <TimeInputWrapper>
             <SplitInputContainer>
               <InputField
-                type="time"
-                value={startTime}
-                onChange={(e) => onStartTimeChange(e.target.value)}
+                type="text"
+                value={formatTimeDisplay(startTime)}
+                onChange={() => {}}
                 placeholder="09:00"
+                readOnly
               />
               <TimeIconArea
                 type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-                  input?.showPicker?.();
-                }}
+                onClick={handleStartTimeClick}
                 aria-label="시간 선택"
               />
             </SplitInputContainer>
+            {openTimePicker === 'startTime' && (
+              <TimePicker
+                value={startTime}
+                onChange={handleStartTimeChange}
+                onClose={() => setOpenTimePicker(null)}
+              />
+            )}
           </TimeInputWrapper>
         </FormField>
         <FormField label="종료시간" required>
           <TimeInputWrapper>
             <SplitInputContainer>
               <InputField
-                type="time"
-                value={endTime}
-                onChange={(e) => onEndTimeChange(e.target.value)}
+                type="text"
+                value={formatTimeDisplay(endTime)}
+                onChange={() => {}}
                 placeholder="18:00"
+                readOnly
               />
               <TimeIconArea
                 type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-                  input?.showPicker?.();
-                }}
+                onClick={handleEndTimeClick}
                 aria-label="시간 선택"
               />
             </SplitInputContainer>
+            {openTimePicker === 'endTime' && (
+              <TimePicker
+                value={endTime}
+                onChange={handleEndTimeChange}
+                onClose={() => setOpenTimePicker(null)}
+              />
+            )}
           </TimeInputWrapper>
         </FormField>
         <FormField label="공고마감일" required>
