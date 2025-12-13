@@ -119,13 +119,28 @@ const ImageCropPage: React.FC = () => {
     cropImage,
   } = useImageCrop(imageSrc, selectedRatio, imageFileName);
 
-  // 전체 스크롤 잠금 (body scroll lock)
+  // 전체 스크롤 잠금 및 브라우저 줌 차단
   useEffect(() => {
     const originalStyle = window.getComputedStyle(document.body).overflow;
     document.body.style.overflow = 'hidden';
     
+    // viewport meta 태그를 동적으로 수정하여 브라우저 줌 차단
+    const viewportMeta = document.querySelector('meta[name="viewport"]');
+    const originalViewport = viewportMeta?.getAttribute('content') || '';
+    
+    if (viewportMeta) {
+      viewportMeta.setAttribute(
+        'content',
+        'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+      );
+    }
+    
     return () => {
       document.body.style.overflow = originalStyle;
+      // viewport meta 태그 원래대로 복원
+      if (viewportMeta && originalViewport) {
+        viewportMeta.setAttribute('content', originalViewport);
+      }
     };
   }, []);
 

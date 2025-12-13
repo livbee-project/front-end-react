@@ -32,9 +32,24 @@ export const CropViewport: React.FC<CropViewportProps> = ({
       onMouseMove={(e) => onDragMove(e.clientX, e.clientY)}
       onMouseUp={onDragEnd}
       onMouseLeave={onDragEnd}
-      onTouchStart={(e) => onDragStart(e.touches[0].clientX, e.touches[0].clientY)}
-      onTouchMove={(e) => onDragMove(e.touches[0].clientX, e.touches[0].clientY)}
+      onTouchStart={(e) => {
+        // 두 손가락 터치(핀치 줌) 차단
+        if (e.touches.length > 1) {
+          e.preventDefault();
+          return;
+        }
+        onDragStart(e.touches[0].clientX, e.touches[0].clientY);
+      }}
+      onTouchMove={(e) => {
+        // 두 손가락 터치(핀치 줌) 차단
+        if (e.touches.length > 1) {
+          e.preventDefault();
+          return;
+        }
+        onDragMove(e.touches[0].clientX, e.touches[0].clientY);
+      }}
       onTouchEnd={onDragEnd}
+      onTouchCancel={onDragEnd}
     >
       <ImageWrapper $width={imageSize.width} $height={imageSize.height}>
         <CropImage
@@ -86,6 +101,10 @@ const Container = styled.div`
   background-color: #000;
   box-sizing: border-box;
   width: 100%;
+  touch-action: pan-x pan-y; /* 드래그만 허용, 핀치 줌 차단 */
+  -webkit-touch-callout: none; /* iOS 롱프레스 메뉴 차단 */
+  -webkit-user-select: none;
+  user-select: none;
 `;
 
 const ImageWrapper = styled.div<{ $width: number; $height: number }>`
