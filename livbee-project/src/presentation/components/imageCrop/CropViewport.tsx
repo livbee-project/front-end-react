@@ -74,29 +74,29 @@ export const CropViewport: React.FC<CropViewportProps> = ({
 };
 
 const Container = styled.div`
-  flex: 1;
+  position: fixed; /* 고정 위치 */
+  top: calc(60px + env(safe-area-inset-top)); /* 상단 헤더 높이 */
+  bottom: calc(80px + 40px + env(safe-area-inset-bottom)); /* 하단 컨트롤 높이 */
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow-y: auto; /* 세로 스크롤 가능 */
-  overflow-x: hidden;
-  position: relative;
+  overflow: hidden; /* 스크롤 비활성화 */
   background-color: #000;
-  /* 상단 헤더 영역을 위한 패딩 */
-  padding-top: calc(60px + env(safe-area-inset-top));
-  /* 하단 컨트롤 영역을 위한 패딩 (컨트롤 높이 + 권장 말풍선 높이) */
-  padding-bottom: calc(80px + 40px + env(safe-area-inset-bottom));
   box-sizing: border-box;
+  width: 100%;
 `;
 
 const ImageWrapper = styled.div<{ $width: number; $height: number }>`
   position: relative;
-  width: ${({ $width }) => ($width > 0 ? `${$width}px` : 'auto')};
-  height: ${({ $height }) => ($height > 0 ? `${$height}px` : 'auto')};
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: auto;
+  max-width: 100%;
+  max-height: 100%;
 `;
 
 const CropImage = styled.img<{ $width: number; $height: number }>`
