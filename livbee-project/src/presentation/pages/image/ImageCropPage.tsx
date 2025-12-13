@@ -10,19 +10,38 @@ import type { CropRatio } from '@/types/imageCrop';
 import { error as logError } from '@/shared/utils/logger';
 
 /**
+ * 유효한 크롭 비율 목록
+ */
+const VALID_CROP_RATIOS: CropRatio[] = ['1:1', '1:2', '2:1', '2:3', '4:3'];
+
+/**
+ * 비율 매칭 허용 오차
+ */
+const RATIO_TOLERANCE = 0.01;
+
+/**
+ * 비율 값 상수
+ */
+const RATIO_VALUES = {
+  SQUARE: 1,
+  PORTRAIT: 0.5,
+  LANDSCAPE: 2,
+  PORTRAIT_2_3: 2 / 3,
+  LANDSCAPE_4_3: 4 / 3,
+} as const;
+
+/**
  * aspectRatio 문자열을 CropRatio로 변환
  * @param aspectRatio - "16:9", "1:1" 등의 비율 문자열
  * @returns CropRatio 또는 null (일치하는 비율이 없으면 null)
  */
 const convertAspectRatioToCropRatio = (aspectRatio?: string): CropRatio | null => {
   if (!aspectRatio) return null;
-  
-  // CropRatio에 정의된 비율만 변환
-  const validRatios: CropRatio[] = ['1:1', '1:2', '2:3', '4:3'];
-  if (validRatios.includes(aspectRatio as CropRatio)) {
+
+  if (VALID_CROP_RATIOS.includes(aspectRatio as CropRatio)) {
     return aspectRatio as CropRatio;
   }
-  
+
   return null;
 };
 
@@ -38,20 +57,19 @@ const getImageOriginalRatio = async (imageUrl: string): Promise<CropRatio | null
       const width = img.naturalWidth;
       const height = img.naturalHeight;
       const ratio = width / height;
-      
-      // 정확한 비율 매칭 (약간의 오차 허용)
-      const tolerance = 0.01;
-      
-      if (Math.abs(ratio - 1) < tolerance) {
+
+      if (Math.abs(ratio - RATIO_VALUES.SQUARE) < RATIO_TOLERANCE) {
         resolve('1:1');
-      } else if (Math.abs(ratio - 0.5) < tolerance) {
+      } else if (Math.abs(ratio - RATIO_VALUES.PORTRAIT) < RATIO_TOLERANCE) {
         resolve('1:2');
-      } else if (Math.abs(ratio - 2/3) < tolerance) {
+      } else if (Math.abs(ratio - RATIO_VALUES.LANDSCAPE) < RATIO_TOLERANCE) {
+        resolve('2:1');
+      } else if (Math.abs(ratio - RATIO_VALUES.PORTRAIT_2_3) < RATIO_TOLERANCE) {
         resolve('2:3');
-      } else if (Math.abs(ratio - 4/3) < tolerance) {
+      } else if (Math.abs(ratio - RATIO_VALUES.LANDSCAPE_4_3) < RATIO_TOLERANCE) {
         resolve('4:3');
       } else {
-        resolve(null); // 일치하는 비율이 없으면 null
+        resolve(null);
       }
     };
     img.onerror = () => resolve(null);
@@ -86,6 +104,7 @@ const ImageCropPage: React.FC = () => {
 
   const [selectedRatio, setSelectedRatio] = useState<CropRatio>('original');
   const [imageSrc, setImageSrc] = useState<string>('');
+  const [recommendedRatio, setRecommendedRatio] = useState<CropRatio | null>(null);
 
   const {
     cropArea,
@@ -115,6 +134,7 @@ const ImageCropPage: React.FC = () => {
       const cropRatio = convertAspectRatioToCropRatio(aspectRatio);
       if (cropRatio) {
         setSelectedRatio(cropRatio);
+        setRecommendedRatio(cropRatio);
         return;
       }
     }
@@ -123,9 +143,11 @@ const ImageCropPage: React.FC = () => {
     getImageOriginalRatio(imageUrl).then((originalRatio) => {
       if (originalRatio) {
         setSelectedRatio(originalRatio);
+        setRecommendedRatio(originalRatio);
       } else {
         // 일치하는 비율이 없으면 원본 비율 유지
         setSelectedRatio('original');
+        setRecommendedRatio(null);
       }
     });
 
@@ -244,6 +266,7 @@ const ImageCropPage: React.FC = () => {
       <CropControls
         selectedRatio={selectedRatio}
         onRatioChange={setSelectedRatio}
+        recommendedRatio={recommendedRatio}
       />
       <HiddenCanvas ref={canvasRef} />
     </PageContainer>
@@ -261,6 +284,8 @@ const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   background-color: #000;
+  overflow: hidden;
+  position: relative;
 `;
 
 const HiddenCanvas = styled.canvas`

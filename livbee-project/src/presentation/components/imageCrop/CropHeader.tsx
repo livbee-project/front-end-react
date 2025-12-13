@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import styled from 'styled-components';
+import { X, Check } from 'lucide-react';
 import { theme } from '@/presentation/styles/theme';
 
 interface CropHeaderProps {
@@ -7,15 +8,26 @@ interface CropHeaderProps {
   onSave: () => void;
 }
 
+const ICON_SIZE = 20;
+const BUTTON_SIZE = 40;
+
 export const CropHeader: React.FC<CropHeaderProps> = ({ onBack, onSave }) => {
+  const handleBackClick = useCallback(() => {
+    onBack();
+  }, [onBack]);
+
+  const handleSaveClick = useCallback(() => {
+    onSave();
+  }, [onSave]);
+
   return (
     <TopBar>
-      <HeaderButton onClick={onBack}>
-        {'<< 뒤로가기'}
-      </HeaderButton>
-      <HeaderButton onClick={onSave}>
-        저장
-      </HeaderButton>
+      <IconButton onClick={handleBackClick} $variant="cancel">
+        <X size={ICON_SIZE} />
+      </IconButton>
+      <IconButton onClick={handleSaveClick} $variant="confirm">
+        <Check size={ICON_SIZE} />
+      </IconButton>
     </TopBar>
   );
 };
@@ -29,12 +41,45 @@ const TopBar = styled.div`
   color: ${theme.colors.primaryForeground};
 `;
 
-const HeaderButton = styled.button`
-  background: none;
+const IconButton = styled.button<{ $variant: 'cancel' | 'confirm' }>`
+  width: ${BUTTON_SIZE}px;
+  height: ${BUTTON_SIZE}px;
+  border-radius: 50%;
   border: none;
-  color: ${theme.colors.primaryForeground};
-  font: ${({ theme }) => theme.fonts.h2};
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  padding: ${({ theme }) => theme.spacing.sm};
+  transition: all 0.2s;
+  position: relative;
+  flex-shrink: 0;
+
+  ${({ $variant }) =>
+    $variant === 'cancel'
+      ? `
+    background-color: #000000;
+    color: #ffffff;
+    
+    &:hover {
+      background-color: #333333;
+    }
+    
+    &:active {
+      background-color: #1a1a1a;
+    }
+  `
+      : `
+    background-color: ${theme.colors.primary};
+    color: #ffffff;
+    
+    &:hover {
+      background-color: ${theme.colors.primaryHover || theme.colors.primary};
+      opacity: 0.9;
+    }
+    
+    &:active {
+      opacity: 0.8;
+    }
+  `}
 `;
 
