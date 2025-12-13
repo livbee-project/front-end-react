@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import StoryHighlightsSection from '@/presentation/pages/home/StoryHighlightsSection';
+// import StoryHighlightsSection from '@/presentation/pages/home/StoryHighlightsSection';
 import ShoppingLiveSection from '@/presentation/pages/home/ShoppingLiveSection';
 import HowShowhostSection from '@/presentation/pages/home/HowShowhostSection';
 import RecommendedLiveSection from '@/presentation/pages/home/RecommendedLiveSection';
@@ -37,7 +37,7 @@ const Home: React.FC = () => (
       <BannerWrapper>
         <BannerSliderSection />
       </BannerWrapper>
-      <StoryHighlightsSection />
+      {/* <StoryHighlightsSection /> */}
       <ShoppingLiveSection />
       <RecommendedLiveSection />
       <HowShowhostSection />
