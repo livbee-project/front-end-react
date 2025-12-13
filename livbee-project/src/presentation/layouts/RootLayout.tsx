@@ -33,15 +33,38 @@ const RootLayout: React.FC = () => {
         const scrollData = JSON.parse(savedScrollData);
         // 저장된 경로와 현재 경로가 일치하는 경우에만 복원
         if (scrollData.path === location.pathname) {
-          // 약간의 지연을 두어 DOM이 완전히 렌더링된 후 스크롤 복원
-          requestAnimationFrame(() => {
+          // 모바일에서 DOM 렌더링 완료를 보장하기 위해 여러 단계로 스크롤 복원
+          const restoreScroll = () => {
             if (mainContentRef.current) {
               mainContentRef.current.scrollTop = scrollData.mainContentScrollTop || 0;
             }
             if (scrollData.scrollY) {
               window.scrollTo(0, scrollData.scrollY);
             }
-          });
+            
+            // 모바일 브라우저의 뷰포트 높이 변화를 고려하여 추가 확인
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                if (mainContentRef.current) {
+                  const currentScroll = mainContentRef.current.scrollTop;
+                  const targetScroll = scrollData.mainContentScrollTop || 0;
+                  // 스크롤 위치가 정확히 복원되지 않았으면 재시도
+                  if (Math.abs(currentScroll - targetScroll) > 1) {
+                    mainContentRef.current.scrollTop = targetScroll;
+                  }
+                }
+              });
+            });
+          };
+          
+          // 즉시 복원 시도
+          restoreScroll();
+          
+          // 모바일 브라우저의 뷰포트 높이 변화를 고려하여 약간의 지연 후 재시도
+          setTimeout(() => {
+            restoreScroll();
+          }, 100);
+          
           // 복원 후 sessionStorage에서 삭제
           sessionStorage.removeItem('scrollPosition');
           return;

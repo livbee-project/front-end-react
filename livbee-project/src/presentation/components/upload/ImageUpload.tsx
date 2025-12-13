@@ -64,6 +64,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       }
       
       navigate('/image/crop', {
+        replace: true,
         state: {
           imageUrl,
           imageFileName: file.name,

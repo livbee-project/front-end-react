@@ -148,6 +148,7 @@ export const CampaignBasicInfoSection: React.FC<CampaignBasicInfoSectionProps> =
     }
 
     navigate('/image/crop', {
+      replace: true,
       state: {
         imageUrl,
         imageFileName: file.name,

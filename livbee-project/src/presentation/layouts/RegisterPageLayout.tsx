@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 
 /**
  * RegisterPageLayout 컴포넌트가 받을 props 타입을 정의합니다.
@@ -13,17 +14,22 @@ interface RegisterPageLayoutProps {
  * 일관된 패딩과 스타일을 제공합니다.
  */
 const RegisterPageLayout: React.FC<RegisterPageLayoutProps> = ({ children }) => {
-  /**
-   * 페이지 컨테이너 스타일
-   */
-  const pageStyle: React.CSSProperties = {
-    minHeight: '100vh',
-    backgroundColor: '#F9FAFB',
-    padding: '0 20px 20px 20px',
-  };
-
-  return <div style={pageStyle}>{children}</div>;
+  return <PageContainer>{children}</PageContainer>;
 };
+
+const PageContainer = styled.div`
+  min-height: 100dvh; /* 모바일 브라우저의 동적 뷰포트 높이 사용 */
+  background-color: #F9FAFB;
+  padding: 0 20px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom)); /* Safe area 고려 */
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+`;
 
 export default RegisterPageLayout;
 

@@ -120,6 +120,7 @@ export const ProfileImageSection: React.FC<ProfileImageSectionProps> = ({ thumbn
     
     // 크롭 페이지로 이동
     navigate('/image/crop', {
+      replace: true,
       state: {
         imageUrl,
         imageFileName: file.name,

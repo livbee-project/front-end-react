@@ -128,6 +128,7 @@ export const CampaignProductInfoSection: React.FC<CampaignProductInfoSectionProp
     }
 
     navigate('/image/crop', {
+      replace: true,
       state: {
         imageUrl,
         imageFileName: file.name,
@@ -169,6 +170,7 @@ export const CampaignProductInfoSection: React.FC<CampaignProductInfoSectionProp
     }
 
     navigate('/image/crop', {
+      replace: true,
       state: {
         imageUrl,
         imageFileName: file.name,

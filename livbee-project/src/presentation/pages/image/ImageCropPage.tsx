@@ -245,6 +245,7 @@ const ImageCropPage: React.FC = () => {
    */
   const handleBack = () => {
     navigate(returnPath, {
+      replace: true,
       state: { 
         preserveScroll: true, // 스크롤 위치 유지 플래그
       },
