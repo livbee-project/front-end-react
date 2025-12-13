@@ -3,6 +3,7 @@ import 'react-day-picker/dist/style.css';
 import { useCalendarDOM } from './Calendar.hooks';
 import {
   CalendarContainer,
+  CalendarOverlay,
   StyledDayPicker,
   CalendarFooter,
   CancelButton,
@@ -75,23 +76,26 @@ const Calendar: React.FC<CalendarProps> = ({
   }, [onClose]);
 
   return (
-    <CalendarContainer ref={calendarRef}>
-      <StyledDayPicker
-        mode="single"
-        selected={selectedDate}
-        onSelect={handleDateSelect}
-        showOutsideDays
-        fixedWeeks
-        fromDate={minDate}
-        toDate={maxDate}
-      />
-      <CalendarFooter>
-        <CancelButton onClick={handleCancelClick}>취소</CancelButton>
-        <ConfirmButton onClick={handleConfirmClick} disabled={!selectedDate}>
-          선택
-        </ConfirmButton>
-      </CalendarFooter>
-    </CalendarContainer>
+    <>
+      <CalendarOverlay onClick={handleCancelClick} />
+      <CalendarContainer ref={calendarRef}>
+        <StyledDayPicker
+          mode="single"
+          selected={selectedDate}
+          onSelect={handleDateSelect}
+          showOutsideDays
+          fixedWeeks
+          fromDate={minDate}
+          toDate={maxDate}
+        />
+        <CalendarFooter>
+          <CancelButton onClick={handleCancelClick}>취소</CancelButton>
+          <ConfirmButton onClick={handleConfirmClick} disabled={!selectedDate}>
+            선택
+          </ConfirmButton>
+        </CalendarFooter>
+      </CalendarContainer>
+    </>
   );
 };
 

@@ -128,6 +128,8 @@ const UnitText = styled.span`
 const DateInputWrapper = styled.div`
   width: 100%;
   position: relative;
+  overflow: visible;
+  z-index: 1;
 `;
 
 // 날짜 포맷팅 함수
