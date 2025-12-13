@@ -88,10 +88,21 @@ export const CalendarContainer = styled.div`
   min-width: 280px;
   max-width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));
   width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));
-  max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  max-height: calc(100dvh - 80px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   overflow-y: auto;
   box-sizing: border-box;
   overscroll-behavior: contain;
+  
+  /* 모바일에서 화면 하단이 잘리지 않도록 위치 및 크기 조정 */
+  @media (max-width: 767px) {
+    /* 모달이 화면을 벗어나지 않도록 충분한 여유 공간 확보 */
+    max-height: calc(100dvh - 150px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    /* 중앙 정렬 유지하되, max-height로 하단이 잘리지 않도록 보장 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    bottom: auto;
+  }
 
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     position: absolute;
