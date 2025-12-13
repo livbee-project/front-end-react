@@ -291,7 +291,7 @@ const LoadingContainer = styled.div`
 
 const PageContainer = styled.div`
   width: 100%;
-  height: 100vh;
+  height: 100dvh; /* 모바일 브라우저의 동적 뷰포트 높이 사용 */
   display: flex;
   flex-direction: column;
   background-color: #000;

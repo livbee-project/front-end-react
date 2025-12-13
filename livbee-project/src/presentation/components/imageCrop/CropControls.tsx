@@ -52,10 +52,16 @@ const BottomBar = styled.div`
   gap: ${({ theme }) => theme.spacing.md};
   padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
   padding-top: calc(${({ theme }) => theme.spacing.md} + 40px);
+  padding-bottom: calc(${({ theme }) => theme.spacing.md} + env(safe-area-inset-bottom));
   background-color: #1a1a1a;
   overflow-x: auto;
   overflow-y: visible;
-  position: relative;
+  position: fixed; /* 하단 고정 */
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000; /* 다른 요소 위에 표시 */
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3); /* 상단 그림자 */
 `;
 
 const RatioButtonWrapper = styled.div`

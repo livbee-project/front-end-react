@@ -78,9 +78,15 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  overflow-y: auto; /* 세로 스크롤 가능 */
+  overflow-x: hidden;
   position: relative;
   background-color: #000;
+  /* 상단 헤더 영역을 위한 패딩 */
+  padding-top: calc(60px + env(safe-area-inset-top));
+  /* 하단 컨트롤 영역을 위한 패딩 (컨트롤 높이 + 권장 말풍선 높이) */
+  padding-bottom: calc(80px + 40px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
 `;
 
 const ImageWrapper = styled.div<{ $width: number; $height: number }>`
