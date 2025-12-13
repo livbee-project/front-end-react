@@ -90,13 +90,14 @@ const Container = styled.div`
 
 const ImageWrapper = styled.div<{ $width: number; $height: number }>`
   position: relative;
-  width: 100%;
-  height: 100%;
+  width: ${({ $width }) => ($width > 0 ? `${$width}px` : 'auto')};
+  height: ${({ $height }) => ($height > 0 ? `${$height}px` : 'auto')};
+  max-width: 100%;
+  max-height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  max-width: 100%;
-  max-height: 100%;
+  margin: auto;
 `;
 
 const CropImage = styled.img<{ $width: number; $height: number }>`
