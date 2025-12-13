@@ -20,10 +20,13 @@ const FeeContainer = styled(BaseFeeContainer)`
   flex-direction: column;
   align-items: flex-start;
   gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
 `;
 
 const FeeInputWrapper = styled(BaseFeeInputWrapper)`
   width: 100%;
+  box-sizing: border-box;
 `;
 
 const FormSection = styled(BaseFormSection)`
@@ -35,6 +38,7 @@ const SplitInputContainer = styled.div`
   width: 100%;
   height: 56px;
   margin: 0;
+  box-sizing: border-box;
 `;
 
 const InputField = styled.input`
@@ -47,6 +51,13 @@ const InputField = styled.input`
   color: #111111;
   transition: all 0.2s;
   font-family: inherit;
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+
+  @media (max-width: 480px) {
+    padding: 16px 12px;
+  }
 
   &::-webkit-calendar-picker-indicator {
     display: none;
@@ -81,6 +92,7 @@ const IconArea = styled.button`
   flex-shrink: 0;
   transition: background-color 0.2s;
   position: relative;
+  box-sizing: border-box;
 
   &:hover {
     background-color: #D1D5DB;
@@ -118,6 +130,7 @@ const UnitArea = styled.div`
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-sizing: border-box;
 `;
 
 const UnitText = styled.span`
@@ -130,6 +143,7 @@ const DateInputWrapper = styled.div`
   position: relative;
   overflow: visible;
   z-index: 1;
+  box-sizing: border-box;
 `;
 
 // 날짜 포맷팅 함수
@@ -145,6 +159,7 @@ const formatDateDisplay = (dateString: string): string => {
 
 const TimeInputWrapper = styled.div`
   width: 100%;
+  box-sizing: border-box;
 `;
 
 const FeeInput = styled(InputField)`
