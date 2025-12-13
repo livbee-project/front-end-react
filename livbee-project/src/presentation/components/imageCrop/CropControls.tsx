@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
-import { theme } from '@/presentation/styles/theme';
 import { CROP_RATIOS } from '@/types/imageCrop';
 import type { CropRatio } from '@/types/imageCrop';
 
