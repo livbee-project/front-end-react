@@ -119,6 +119,16 @@ const ImageCropPage: React.FC = () => {
     cropImage,
   } = useImageCrop(imageSrc, selectedRatio, imageFileName);
 
+  // 전체 스크롤 잠금 (body scroll lock)
+  useEffect(() => {
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    document.body.style.overflow = 'hidden';
+    
+    return () => {
+      document.body.style.overflow = originalStyle;
+    };
+  }, []);
+
   // 이미지 URL이 없으면 이전 페이지로 이동
   // aspectRatio가 있으면 해당 비율로 초기화, 없으면 이미지 원본 비율 확인
   useEffect(() => {

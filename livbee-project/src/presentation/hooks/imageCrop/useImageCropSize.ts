@@ -78,12 +78,21 @@ export const useImageCropSize = ({
     
     const cropWidth = maxCropWidth;
     const cropHeight = maxCropHeight;
-    const x = (actualDisplayWidth - cropWidth) / 2;
-    const y = (actualDisplayHeight - cropHeight) / 2;
+    
+    // 중앙 정렬 계산 (clampCropPosition 사용하여 경계 보정)
+    const centerX = actualDisplayWidth / 2;
+    const centerY = actualDisplayHeight / 2;
+    const { x, y } = clampCropPosition(
+      centerX - cropWidth / 2,
+      centerY - cropHeight / 2,
+      cropWidth,
+      cropHeight,
+      { width: actualDisplayWidth, height: actualDisplayHeight }
+    );
 
     setCropArea({
-      x: Math.max(0, x),
-      y: Math.max(0, y),
+      x,
+      y,
       width: cropWidth,
       height: cropHeight,
     });
