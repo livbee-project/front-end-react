@@ -36,6 +36,16 @@ const Calendar: React.FC<CalendarProps> = ({
     setSelectedDate(parseDateString(value));
   }, [value]);
 
+  // 배경 스크롤 비활성화 (body scroll lock)
+  useEffect(() => {
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    document.body.style.overflow = 'hidden';
+    
+    return () => {
+      document.body.style.overflow = originalStyle;
+    };
+  }, []);
+
   // 외부 클릭 감지 (메모이제이션)
   const handleClickOutside = useCallback(
     (event: MouseEvent) => {

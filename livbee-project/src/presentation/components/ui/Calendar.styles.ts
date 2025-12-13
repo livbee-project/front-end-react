@@ -62,8 +62,12 @@ export const CalendarOverlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
+  width: 100vw;
+  height: 100dvh;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 9999;
+  z-index: 99999;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  box-sizing: border-box;
 
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     display: none;
@@ -79,13 +83,15 @@ export const CalendarContainer = styled.div`
   border-radius: ${({ theme }) => theme.radii.xl};
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   padding: 16px;
-  z-index: 10000;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: 100000;
   min-width: 280px;
-  max-width: calc(100vw - 32px);
-  width: calc(100vw - 32px);
-  max-height: calc(100vh - 32px);
+  max-width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));
+  width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));
+  max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   overflow-y: auto;
   box-sizing: border-box;
+  overscroll-behavior: contain;
 
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     position: absolute;
@@ -95,6 +101,7 @@ export const CalendarContainer = styled.div`
     transform: none;
     min-width: 360px;
     padding: 20px;
+    padding-bottom: 20px;
     width: auto;
     max-width: none;
     max-height: none;

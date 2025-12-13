@@ -140,9 +140,8 @@ const UnitText = styled.span`
 
 const DateInputWrapper = styled.div`
   width: 100%;
-  position: relative;
+  position: static;
   overflow: visible;
-  z-index: 1;
   box-sizing: border-box;
 `;
 
