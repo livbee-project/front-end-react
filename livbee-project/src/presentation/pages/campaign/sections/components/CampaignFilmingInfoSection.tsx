@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import FormField from '@/presentation/components/forms/common/FormField';
 import {
   FormSection as BaseFormSection,
@@ -14,6 +14,7 @@ import {
   CheckboxInput,
   CheckboxLabel,
 } from '../styles/campaignRegisterSectionStyles';
+import Calendar from '@/presentation/components/ui/Calendar';
 
 const FeeContainer = styled(BaseFeeContainer)`
   flex-direction: column;
@@ -126,7 +127,19 @@ const UnitText = styled.span`
 
 const DateInputWrapper = styled.div`
   width: 100%;
+  position: relative;
 `;
+
+// 날짜 포맷팅 함수
+const formatDateDisplay = (dateString: string): string => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}. ${month}. ${day}.`;
+};
 
 const TimeInputWrapper = styled.div`
   width: 100%;
@@ -177,6 +190,30 @@ export const CampaignFilmingInfoSection: React.FC<CampaignFilmingInfoSectionProp
   onFeeChange,
   onFeeNegotiableChange,
 }) => {
+  const [openCalendar, setOpenCalendar] = useState<'filmingDate' | 'deadline' | null>(null);
+
+  const handleFilmingDateClick = () => {
+    setOpenCalendar(openCalendar === 'filmingDate' ? null : 'filmingDate');
+  };
+
+  const handleDeadlineClick = () => {
+    setOpenCalendar(openCalendar === 'deadline' ? null : 'deadline');
+  };
+
+  const handleFilmingDateChange = (date: string) => {
+    onFilmingDateChange(date);
+    setOpenCalendar(null);
+  };
+
+  const handleDeadlineChange = (date: string) => {
+    onDeadlineChange(date);
+    setOpenCalendar(null);
+  };
+
+  // 오늘 날짜를 최소 날짜로 설정
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   return (
     <FormSection>
       <SectionTitle>촬영 정보</SectionTitle>
@@ -192,21 +229,26 @@ export const CampaignFilmingInfoSection: React.FC<CampaignFilmingInfoSectionProp
           <DateInputWrapper>
             <SplitInputContainer>
               <InputField
-                type="date"
-                value={filmingDate}
-                onChange={(e) => onFilmingDateChange(e.target.value)}
-                placeholder="날짜를 선택해주세요"
+                type="text"
+                value={formatDateDisplay(filmingDate)}
+                onChange={() => {}}
+                placeholder="연도. 월. 일."
+                readOnly
               />
               <IconArea
                 type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-                  input?.showPicker?.();
-                }}
+                onClick={handleFilmingDateClick}
                 aria-label="날짜 선택"
               />
             </SplitInputContainer>
+            {openCalendar === 'filmingDate' && (
+              <Calendar
+                value={filmingDate}
+                onChange={handleFilmingDateChange}
+                onClose={() => setOpenCalendar(null)}
+                minDate={today}
+              />
+            )}
           </DateInputWrapper>
         </FormField>
         <FormField label="시작시간" required>
@@ -255,21 +297,26 @@ export const CampaignFilmingInfoSection: React.FC<CampaignFilmingInfoSectionProp
           <DateInputWrapper>
             <SplitInputContainer>
               <InputField
-                type="date"
-                value={deadline}
-                onChange={(e) => onDeadlineChange(e.target.value)}
-                placeholder="날짜를 선택해주세요"
+                type="text"
+                value={formatDateDisplay(deadline)}
+                onChange={() => {}}
+                placeholder="연도. 월. 일."
+                readOnly
               />
               <IconArea
                 type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-                  input?.showPicker?.();
-                }}
+                onClick={handleDeadlineClick}
                 aria-label="날짜 선택"
               />
             </SplitInputContainer>
+            {openCalendar === 'deadline' && (
+              <Calendar
+                value={deadline}
+                onChange={handleDeadlineChange}
+                onClose={() => setOpenCalendar(null)}
+                minDate={today}
+              />
+            )}
           </DateInputWrapper>
         </FormField>
         <FormField label="출연료" required>
