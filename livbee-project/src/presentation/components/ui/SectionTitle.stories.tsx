@@ -1,6 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import SectionTitle from './SectionTitle';
-import styled from 'styled-components';
+import SectionTitle from '@/presentation/components/ui/SectionTitle';
+import {
+  SectionTitleMargins,
+  SectionTitleUsageExamples,
+  SectionTitleVariants,
+  SectionTitleWithBullet,
+} from '@/presentation/components/ui/SectionTitleStoryContent';
 
 const meta: Meta<typeof SectionTitle> = {
   title: 'UI Components/SectionTitle',
@@ -34,43 +39,14 @@ const meta: Meta<typeof SectionTitle> = {
 export default meta;
 type Story = StoryObj<typeof SectionTitle>;
 
-// ===== 기본 제목 =====
 export const Default: Story = {
   args: {
     children: '섹션 제목',
   },
 };
 
-// ===== Variants =====
-const VariantContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.xl};
-`;
-
 export const Variants: Story = {
-  render: () => (
-    <VariantContainer>
-      <div>
-        <SectionTitle variant="default">Default 제목</SectionTitle>
-        <p style={{ marginTop: '8px', fontSize: '12px', color: '#717182' }}>
-          기본 스타일: 14px, Bold 700
-        </p>
-      </div>
-      <div>
-        <SectionTitle variant="subtitle">Subtitle 제목</SectionTitle>
-        <p style={{ marginTop: '8px', fontSize: '12px', color: '#717182' }}>
-          부제목 스타일: 14px, Medium 500, Muted 색상
-        </p>
-      </div>
-      <div>
-        <SectionTitle variant="detail">Detail 제목</SectionTitle>
-        <p style={{ marginTop: '8px', fontSize: '12px', color: '#717182' }}>
-          상세 페이지 스타일: 14px, Bold 700
-        </p>
-      </div>
-    </VariantContainer>
-  ),
+  render: () => <SectionTitleVariants />,
   parameters: {
     docs: {
       description: {
@@ -80,14 +56,8 @@ export const Variants: Story = {
   },
 };
 
-// ===== Bullet 포함 =====
 export const WithBullet: Story = {
-  render: () => (
-    <VariantContainer>
-      <SectionTitle showBullet>Bullet이 있는 제목</SectionTitle>
-      <SectionTitle showBullet variant="detail">Detail 스타일 + Bullet</SectionTitle>
-    </VariantContainer>
-  ),
+  render: () => <SectionTitleWithBullet />,
   parameters: {
     docs: {
       description: {
@@ -97,24 +67,8 @@ export const WithBullet: Story = {
   },
 };
 
-// ===== 다양한 마진 =====
 export const DifferentMargins: Story = {
-  render: () => (
-    <VariantContainer>
-      <div style={{ border: '1px solid #e0e0e0', padding: '16px', borderRadius: '8px' }}>
-        <SectionTitle marginBottom="8px">작은 마진 (8px)</SectionTitle>
-        <p>콘텐츠가 바로 이어집니다.</p>
-      </div>
-      <div style={{ border: '1px solid #e0e0e0', padding: '16px', borderRadius: '8px' }}>
-        <SectionTitle marginBottom="16px">기본 마진 (16px)</SectionTitle>
-        <p>콘텐츠가 적당한 간격으로 이어집니다.</p>
-      </div>
-      <div style={{ border: '1px solid #e0e0e0', padding: '16px', borderRadius: '8px' }}>
-        <SectionTitle marginBottom="24px">큰 마진 (24px)</SectionTitle>
-        <p>콘텐츠가 넓은 간격으로 이어집니다.</p>
-      </div>
-    </VariantContainer>
-  ),
+  render: () => <SectionTitleMargins />,
   parameters: {
     docs: {
       description: {
@@ -124,24 +78,8 @@ export const DifferentMargins: Story = {
   },
 };
 
-// ===== 사용 예시 =====
 export const UsageExamples: Story = {
-  render: () => (
-    <VariantContainer>
-      <div>
-        <SectionTitle>홈 섹션 제목</SectionTitle>
-        <p style={{ marginTop: '8px' }}>섹션 내용이 여기에 표시됩니다.</p>
-      </div>
-      <div>
-        <SectionTitle variant="subtitle">부제목</SectionTitle>
-        <p style={{ marginTop: '8px' }}>부제목 아래 내용이 표시됩니다.</p>
-      </div>
-      <div>
-        <SectionTitle variant="detail" showBullet>상세 페이지 섹션</SectionTitle>
-        <p style={{ marginTop: '8px' }}>상세 페이지의 섹션 내용입니다.</p>
-      </div>
-    </VariantContainer>
-  ),
+  render: () => <SectionTitleUsageExamples />,
   parameters: {
     docs: {
       description: {

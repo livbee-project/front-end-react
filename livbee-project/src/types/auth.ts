@@ -3,7 +3,8 @@
  */
 
 /**
- * 사용자 타입 (브랜드 또는 쇼호스트)
+ * @deprecated UserType은 @/domain/entities/User에서 import하세요
+ * 인증 관련에서는 UserRole을 사용하세요
  */
-export type UserType = 'brand' | 'showhost';
+export type { UserRole as UserType } from '@/domain/entities/User';
 

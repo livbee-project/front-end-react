@@ -1,105 +1,148 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
-import { Upload, Video, FileText, X } from 'lucide-react';
-import FormSection from '@/presentation/components/forms/sections/FormSection';
-import FormField from '@/presentation/components/forms/common/FormField';
-import { HiddenInput, SmallText } from '../PortfolioRegisterStyles';
-import { Small } from '@/presentation/components/styled/Typography';
+import { Video, FileText, X, ArrowUp } from 'lucide-react';
+import {
+  FormSection,
+  SectionTitle,
+  SectionDescription,
+  HiddenInput,
+} from '@/presentation/components/forms/portfolio/PortfolioRegisterStyles';
+import { MAX_FILE_SIZE, formatFileSize } from '@/shared/constants/fileUpload';
 
 interface PortfolioFilesSectionProps {
-  resumeFileInfo: string;
-  portfolioFileInfo: string;
+  resumeFileInfo: string | null;
+  portfolioFileInfo: string | null;
   onFileAdd: (file: File) => void;
   onResumeRemove: () => void;
   onPortfolioRemove: () => void;
+  onFileError?: (message: string) => void;
 }
 
 const PortfolioList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.md};
-`;
-
-const EmptyStateButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: ${({ theme }) => theme.spacing.md};
-  padding: 20px;
-  border: 2px dashed ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  background: ${({ theme }) => theme.colors.secondary};
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-
-  &:hover {
-    border-color: ${({ theme }) => theme.colors.primary};
-    background: ${({ theme }) => theme.primaryOpacity['10']};
-  }
-
-  ${Small} {
-    color: ${({ theme }) => theme.colors.muted};
-  }
+  gap: 12px;
 `;
 
 const FileItem = styled.div`
+  background-color: #F9FAFB;
+  border: none;
+  border-radius: 16px;
+  padding: 16px;
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing.md};
-  padding: ${({ theme }) => theme.spacing.md};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.md};
-  background: ${({ theme }) => theme.colors.secondary};
+  gap: 12px;
+  margin-bottom: 12px;
 `;
 
 const FileIcon = styled.div<{ $variant: 'video' | 'file' }>`
-  width: 40px;
-  height: 40px;
-  border-radius: ${({ theme }) => theme.radii.md};
-  background: ${({ theme, $variant }) =>
-    $variant === 'video' ? theme.primaryOpacity['25'] : theme.primaryOpacity['10']};
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background-color: ${({ theme }) => theme.colors.primary}20;
   color: ${({ theme }) => theme.colors.primary};
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
 `;
 
 const FileInfo = styled.div`
   flex: 1;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.xs};
 `;
 
-const FileName = styled.span`
+const FileName = styled.div`
+  font-size: 15px;
   font-weight: 600;
-  white-space: nowrap;
+  color: #111111;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 2px;
 `;
 
-const FileSize = styled(SmallText)`
-  white-space: nowrap;
+const FileSize = styled.div`
+  font-size: 13px;
+  color: #6B7280;
 `;
 
 const RemoveButton = styled.button`
-  width: 32px;
-  height: 32px;
-  border-radius: ${({ theme }) => theme.radii.full};
-  border: none;
-  background: transparent;
-  color: ${({ theme }) => theme.colors.muted};
-  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: transparent;
+  color: #9CA3AF;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s, color 0.2s;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
 
   &:hover {
-    background: ${({ theme }) => theme.primaryOpacity['10']};
-    color: ${({ theme }) => theme.colors.primary};
+    background-color: #FEE2E2;
+    color: ${({ theme }) => theme.colors.error};
   }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+const AddFileButton = styled.button`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  border: 2px dashed #D1D5DB;
+  border-radius: 16px;
+  background-color: #F9FAFB;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary};
+    background-color: ${({ theme }) => theme.colors.primary}05;
+  }
+`;
+
+const UploadIcon = styled.div`
+  width: 48px;
+  height: 48px;
+  background-color: #F3F4F6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9CA3AF;
+  margin-bottom: 12px;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+`;
+
+const UploadText = styled.p`
+  font-size: 14px;
+  color: #6B7280;
+  font-weight: 500;
+  margin: 0 0 4px 0;
+`;
+
+const UploadSubtext = styled.p`
+  font-size: 12px;
+  color: #9CA3AF;
+  margin: 0;
 `;
 
 const renderFileText = (fileInfo: string) => {
@@ -117,12 +160,22 @@ export const PortfolioFilesSection: React.FC<PortfolioFilesSectionProps> = ({
   onFileAdd,
   onResumeRemove,
   onPortfolioRemove,
+  onFileError,
 }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      // 파일 크기 검증
+      if (file.size > MAX_FILE_SIZE) {
+        const errorMessage = `파일 크기가 너무 큽니다. 최대 ${formatFileSize(MAX_FILE_SIZE)}까지 업로드 가능합니다. (현재: ${formatFileSize(file.size)})`;
+        if (onFileError) {
+          onFileError(errorMessage);
+        }
+        event.target.value = '';
+        return;
+      }
       onFileAdd(file);
       event.target.value = '';
     }
@@ -156,25 +209,28 @@ export const PortfolioFilesSection: React.FC<PortfolioFilesSectionProps> = ({
   const hasFiles = resumeFileInfo || portfolioFileInfo;
 
   return (
-    <FormSection title="포트폴리오" description="PDF, 영상 등 관련 자료를 업로드해주세요.">
-      <FormField helper="파일은 1개씩 업로드되며, 새 파일 업로드 시 교체됩니다.">
-        <HiddenInput
-          ref={fileInputRef}
-          type="file"
-          accept=".pdf,.ppt,.pptx,.mp4,.mov,.avi,.mkv"
-          onChange={handleFileChange}
-        />
-        <PortfolioList>
-          {!hasFiles && (
-            <EmptyStateButton type="button" onClick={() => fileInputRef.current?.click()}>
-              <Upload size={24} />
-              <Small>추가된 파일이 없습니다</Small>
-            </EmptyStateButton>
-          )}
-          {renderFileItem('resume', resumeFileInfo)}
-          {renderFileItem('portfolio', portfolioFileInfo)}
-        </PortfolioList>
-      </FormField>
+    <FormSection>
+      <SectionTitle>포트폴리오</SectionTitle>
+      <SectionDescription>PDF, 영상 파일 등을 첨부할 수 있습니다 (최대 {formatFileSize(MAX_FILE_SIZE)})</SectionDescription>
+      <HiddenInput
+        ref={fileInputRef}
+        type="file"
+        accept=".pdf,.ppt,.pptx,.mp4,.mov,.avi,.mkv"
+        onChange={handleFileChange}
+      />
+      <PortfolioList>
+        {resumeFileInfo && renderFileItem('resume', resumeFileInfo)}
+        {portfolioFileInfo && renderFileItem('portfolio', portfolioFileInfo)}
+        {!hasFiles && (
+          <AddFileButton type="button" onClick={() => fileInputRef.current?.click()}>
+            <UploadIcon>
+              <ArrowUp size={24} />
+            </UploadIcon>
+            <UploadText>포트폴리오 파일을 추가해주세요</UploadText>
+            <UploadSubtext>PDF, 영상 파일 등</UploadSubtext>
+          </AddFileButton>
+        )}
+      </PortfolioList>
     </FormSection>
   );
 };

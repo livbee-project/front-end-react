@@ -24,6 +24,12 @@ export const GlobalStyle = createGlobalStyle`
 
   *, *::before, *::after {
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    min-height: 100%;
+    font-size: 16px;
   }
 
   body {
@@ -33,6 +39,13 @@ export const GlobalStyle = createGlobalStyle`
     color: ${({ theme }) => theme.colors.foreground};
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    min-height: 100dvh;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    overscroll-behavior-y: none;
+  }
+
+  #root {
+    min-height: 100%;
   }
 
   img {

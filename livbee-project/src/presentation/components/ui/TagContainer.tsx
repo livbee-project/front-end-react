@@ -1,5 +1,5 @@
 import React from 'react';
-import Tag from './Tag';
+import Tag from '@/presentation/components/ui/Tag';
 
 /**
  * TagContainer 컴포넌트가 받을 props 타입을 정의합니다.

@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import TimeInput from './TimeInput';
-import { useState } from 'react';
-import styled from 'styled-components';
+import TimeInput from '@/presentation/components/forms/inputs/TimeInput';
+import {
+  TimeInputDefaultStory,
+  TimeInputDisabledStory,
+  TimeInputUsageStory,
+  TimeInputVariationsStory,
+} from '@/presentation/components/forms/inputs/TimeInputStoryContent';
 
 const meta: Meta<typeof TimeInput> = {
   title: 'Forms/TimeInput',
@@ -30,27 +34,8 @@ const meta: Meta<typeof TimeInput> = {
 export default meta;
 type Story = StoryObj<typeof TimeInput>;
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.xl};
-  max-width: 400px;
-`;
-
-// ===== 기본 시간 입력 =====
 export const Default: Story = {
-  render: () => {
-    const [value, setValue] = useState('09:00');
-
-    return (
-      <Container>
-        <TimeInput value={value} onChange={(e) => setValue(e.target.value)} />
-        <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>
-          선택된 시간: {value || '없음'}
-        </p>
-      </Container>
-    );
-  },
+  render: () => <TimeInputDefaultStory />,
   parameters: {
     docs: {
       description: {
@@ -60,36 +45,8 @@ export const Default: Story = {
   },
 };
 
-// ===== 다양한 시간 =====
 export const TimeVariations: Story = {
-  render: () => {
-    const [morning, setMorning] = useState('09:00');
-    const [afternoon, setAfternoon] = useState('14:30');
-    const [evening, setEvening] = useState('18:00');
-
-    return (
-      <Container>
-        <div>
-          <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>
-            오전 시간
-          </label>
-          <TimeInput value={morning} onChange={(e) => setMorning(e.target.value)} />
-        </div>
-        <div>
-          <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>
-            오후 시간
-          </label>
-          <TimeInput value={afternoon} onChange={(e) => setAfternoon(e.target.value)} />
-        </div>
-        <div>
-          <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>
-            저녁 시간
-          </label>
-          <TimeInput value={evening} onChange={(e) => setEvening(e.target.value)} />
-        </div>
-      </Container>
-    );
-  },
+  render: () => <TimeInputVariationsStory />,
   parameters: {
     docs: {
       description: {
@@ -99,18 +56,8 @@ export const TimeVariations: Story = {
   },
 };
 
-// ===== 비활성화 상태 =====
 export const Disabled: Story = {
-  render: () => {
-    return (
-      <Container>
-        <TimeInput value="12:00" onChange={() => {}} disabled />
-        <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>
-          비활성화된 시간 입력 필드입니다.
-        </p>
-      </Container>
-    );
-  },
+  render: () => <TimeInputDisabledStory />,
   parameters: {
     docs: {
       description: {
@@ -120,39 +67,8 @@ export const Disabled: Story = {
   },
 };
 
-// ===== 사용 예시 =====
 export const UsageExample: Story = {
-  render: () => {
-    const [startTime, setStartTime] = useState('09:00');
-    const [endTime, setEndTime] = useState('18:00');
-
-    return (
-      <Container>
-        <div>
-          <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>
-            시작 시간
-          </label>
-          <TimeInput value={startTime} onChange={(e) => setStartTime(e.target.value)} />
-        </div>
-        <div>
-          <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>
-            종료 시간
-          </label>
-          <TimeInput value={endTime} onChange={(e) => setEndTime(e.target.value)} />
-        </div>
-        <div
-          style={{
-            padding: '12px',
-            backgroundColor: '#f5f5f5',
-            borderRadius: '8px',
-            fontSize: '14px',
-          }}
-        >
-          <strong>선택된 시간대:</strong> {startTime} ~ {endTime}
-        </div>
-      </Container>
-    );
-  },
+  render: () => <TimeInputUsageStory />,
   parameters: {
     docs: {
       description: {

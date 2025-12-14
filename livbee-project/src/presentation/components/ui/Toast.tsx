@@ -6,7 +6,7 @@ import { P } from '@/presentation/components/styled/Typography';
 /**
  * Toast 타입 (variant)
  */
-export type ToastVariant = 'info' | 'error';
+export type ToastVariant = 'info' | 'error' | 'success';
 
 /**
  * Toast 컴포넌트가 받을 props 타입을 정의합니다.
@@ -32,6 +32,7 @@ type ToastAnimationState = 'entering' | 'visible' | 'exiting';
  * variant에 따라 색상이 변경됩니다.
  * - info: 오렌지색 배경 (기본값)
  * - error: 빨간색 배경
+ * - success: 초록색 배경
  * 아래에서 위로 올라오는 애니메이션과 위에서 아래로 내려가는 애니메이션을 포함합니다.
  */
 const Toast: React.FC<ToastProps> = ({ message, duration = 2000, variant = 'info', onClose }) => {
@@ -83,7 +84,11 @@ const ToastContainer = styled.div<{
   $variant: ToastVariant;
   $animationState: ToastAnimationState;
 }>`
-  background-color: ${({ $variant }) => ($variant === 'error' ? '#E53E3E' : '#FF6B35')};
+  background-color: ${({ $variant }) => {
+    if ($variant === 'error') return '#E53E3E';
+    if ($variant === 'success') return '#48BB78'; // 초록색
+    return '#FF6B35'; // info (오렌지색)
+  }};
   border-radius: ${({ theme }) => theme.radii.xl};
   padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.xl};
   display: flex;

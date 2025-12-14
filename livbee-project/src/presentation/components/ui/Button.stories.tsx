@@ -1,6 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import Button from './Button';
-import styled from 'styled-components';
+import Button from '@/presentation/components/ui/Button';
+import {
+  ButtonCombinationsSection,
+  ButtonSizesSection,
+  ButtonStatesSection,
+  ButtonVariantsSection,
+} from '@/presentation/components/ui/ButtonStoryContent';
 
 const meta: Meta<typeof Button> = {
   title: 'UI Components/Button',
@@ -43,7 +48,6 @@ const meta: Meta<typeof Button> = {
 export default meta;
 type Story = StoryObj<typeof Button>;
 
-// ===== 기본 버튼 =====
 export const Default: Story = {
   args: {
     children: '버튼',
@@ -52,43 +56,8 @@ export const Default: Story = {
   },
 };
 
-// ===== Variants =====
-const VariantContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.lg};
-`;
-
-const VariantRow = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.md};
-  align-items: center;
-`;
-
-const VariantLabel = styled.div`
-  min-width: 100px;
-  font-size: 14px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.foreground};
-`;
-
 export const Variants: Story = {
-  render: () => (
-    <VariantContainer>
-      <VariantRow>
-        <VariantLabel>Primary</VariantLabel>
-        <Button variant="primary">Primary Button</Button>
-      </VariantRow>
-      <VariantRow>
-        <VariantLabel>Secondary</VariantLabel>
-        <Button variant="secondary">Secondary Button</Button>
-      </VariantRow>
-      <VariantRow>
-        <VariantLabel>Outline</VariantLabel>
-        <Button variant="outline">Outline Button</Button>
-      </VariantRow>
-    </VariantContainer>
-  ),
+  render: () => <ButtonVariantsSection />,
   parameters: {
     docs: {
       description: {
@@ -98,43 +67,8 @@ export const Variants: Story = {
   },
 };
 
-// ===== Sizes =====
-const SizeContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.lg};
-`;
-
-const SizeRow = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.md};
-  align-items: center;
-`;
-
-const SizeLabel = styled.div`
-  min-width: 100px;
-  font-size: 14px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.foreground};
-`;
-
 export const Sizes: Story = {
-  render: () => (
-    <SizeContainer>
-      <SizeRow>
-        <SizeLabel>Small</SizeLabel>
-        <Button size="small">Small Button</Button>
-      </SizeRow>
-      <SizeRow>
-        <SizeLabel>Medium</SizeLabel>
-        <Button size="medium">Medium Button</Button>
-      </SizeRow>
-      <SizeRow>
-        <SizeLabel>Large</SizeLabel>
-        <Button size="large">Large Button</Button>
-      </SizeRow>
-    </SizeContainer>
-  ),
+  render: () => <ButtonSizesSection />,
   parameters: {
     docs: {
       description: {
@@ -144,43 +78,8 @@ export const Sizes: Story = {
   },
 };
 
-// ===== States =====
-const StateContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.lg};
-`;
-
-const StateRow = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.md};
-  align-items: center;
-`;
-
-const StateLabel = styled.div`
-  min-width: 150px;
-  font-size: 14px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.foreground};
-`;
-
 export const States: Story = {
-  render: () => (
-    <StateContainer>
-      <StateRow>
-        <StateLabel>Default</StateLabel>
-        <Button>Default Button</Button>
-      </StateRow>
-      <StateRow>
-        <StateLabel>Disabled</StateLabel>
-        <Button disabled>Disabled Button</Button>
-      </StateRow>
-      <StateRow>
-        <StateLabel>Full Width</StateLabel>
-        <Button fullWidth>Full Width Button</Button>
-      </StateRow>
-    </StateContainer>
-  ),
+  render: () => <ButtonStatesSection />,
   parameters: {
     docs: {
       description: {
@@ -190,49 +89,8 @@ export const States: Story = {
   },
 };
 
-// ===== 조합 예시 =====
-const CombinationGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: ${({ theme }) => theme.spacing.lg};
-`;
-
-const CombinationCard = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.md};
-  padding: ${({ theme }) => theme.spacing.lg};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.md};
-`;
-
-const CombinationTitle = styled.div`
-  font-size: 14px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.foreground};
-`;
-
 export const Combinations: Story = {
-  render: () => (
-    <CombinationGrid>
-      <CombinationCard>
-        <CombinationTitle>Primary Small</CombinationTitle>
-        <Button variant="primary" size="small">작은 주요 버튼</Button>
-      </CombinationCard>
-      <CombinationCard>
-        <CombinationTitle>Secondary Medium</CombinationTitle>
-        <Button variant="secondary" size="medium">보조 버튼</Button>
-      </CombinationCard>
-      <CombinationCard>
-        <CombinationTitle>Outline Large</CombinationTitle>
-        <Button variant="outline" size="large">큰 경계선 버튼</Button>
-      </CombinationCard>
-      <CombinationCard>
-        <CombinationTitle>Primary Disabled</CombinationTitle>
-        <Button variant="primary" disabled>비활성화 버튼</Button>
-      </CombinationCard>
-    </CombinationGrid>
-  ),
+  render: () => <ButtonCombinationsSection />,
   parameters: {
     docs: {
       description: {

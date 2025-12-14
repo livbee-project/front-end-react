@@ -20,8 +20,8 @@ export const H1 = styled.h1`
 `;
 
 /**
- * H2 - 섹션 타이틀, 이름, 브랜드명
- * 14px, Bold 700
+ * H2 - 섹션 타이틀
+ * 16px, Bold 700
  */
 export const H2 = styled.h2`
   margin: 0;
@@ -31,12 +31,12 @@ export const H2 = styled.h2`
 `;
 
 /**
- * H3 - 섹션 타이틀, 이름, 브랜드명
- * 14px, Bold 700
+ * H3 - 카드/중요 타이틀
+ * 15px, Bold 700
  */
 export const H3 = styled.h3`
   margin: 0;
-  font: ${({ theme }) => theme.fonts.h2};
+  font: ${({ theme }) => theme.fonts.h3};
   color: ${({ theme }) => theme.colors.foreground};
   line-height: 1.4;
 `;
@@ -45,7 +45,7 @@ export const H3 = styled.h3`
 
 /**
  * P - 본문 텍스트
- * 14px, Light 300
+ * 14px, Regular 400
  */
 export const P = styled.p`
   margin: 0;
@@ -56,7 +56,7 @@ export const P = styled.p`
 
 /**
  * PMuted - 본문 텍스트 (보조 색상)
- * 14px, Light 300
+ * 14px, Regular 400
  */
 export const PMuted = styled.p`
   margin: 0;
@@ -66,12 +66,12 @@ export const PMuted = styled.p`
 `;
 
 /**
- * Small - 작은 본문
- * 13px, Light 300
+ * Small - 보조/버튼 텍스트
+ * 13px, Medium 500
  */
 export const Small = styled.p`
   margin: 0;
-  font: 300 13px/1.6 'NexonLv2Gothic';
+  font: ${({ theme }) => theme.fonts.button};
   color: ${({ theme }) => theme.colors.foreground};
   line-height: 1.6;
 `;

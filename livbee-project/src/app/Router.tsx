@@ -1,38 +1,62 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
+import React, { Suspense, lazy } from 'react';
 import '@/presentation/styles/global.css';
 import TopNavLayout from '@/presentation/layouts/TopNavLayout';
 import RootLayout from '@/presentation/layouts/RootLayout';
+import { AuthProvider } from '@/presentation/hooks/auth/useAuth';
+import { AuthGuard } from '@/presentation/routes/AuthGuard';
+import { ROUTE_PATHS, ROUTE_ROLE_PERMISSIONS } from '@/app/routes/routeMeta';
+import { RouteFallback } from '@/presentation/components/states/RouteFallback';
+import { error as logError } from '@/shared/utils/logger';
 
-const Home = lazy(() => import('@/presentation/pages/home/Home'));
-const CampaignsPage = lazy(() => import('@/presentation/pages/campaign/CampaignsPage'));
-const CampaignRegisterPage = lazy(() => import('@/presentation/pages/campaign/CampaignRegisterPage'));
-const CampaignDetailPage = lazy(() => import('@/presentation/pages/campaign/CampaignDetailPage'));
-const ModelsPage = lazy(() => import('@/presentation/pages/model/ModelsPage'));
-const ModelRegisterPage = lazy(() => import('@/presentation/pages/model/ModelRegisterPage'));
-const ModelDetailPage = lazy(() => import('@/presentation/pages/model/ModelDetailPage'));
-const PortfolioPage = lazy(() => import('@/presentation/pages/portfolio/PortfolioPage'));
-const PortfolioRegisterPage = lazy(() => import('@/presentation/pages/portfolio/PortfolioRegisterPage'));
-const PortfolioDetailPage = lazy(() => import('@/presentation/pages/portfolio/PortfolioDetailPage'));
-const MyPortfolioPage = lazy(() => import('@/presentation/pages/portfolio/MyPortfolioPage'));
-const MyPage = lazy(() => import('@/presentation/pages/mypage/MyPage'));
-const ClipsPage = lazy(() => import('@/presentation/pages/clip/ClipsPage'));
-const MyClipsPage = lazy(() => import('@/presentation/pages/clip/MyClipsPage'));
-const MyAppliedCampaignsPage = lazy(() => import('@/presentation/pages/mypage/MyAppliedCampaignsPage'));
-const MessagesPage = lazy(() => import('@/presentation/pages/message/MessagesPage'));
-const LoginPage = lazy(() => import('@/presentation/pages/auth/LoginPage'));
-const ImageCropPage = lazy(() => import('@/presentation/pages/image/ImageCropPage'));
-const ChatRoomPage = lazy(() => import('@/presentation/pages/chat/ChatRoomPage'));
+// 동적 임포트에 에러 핸들링 추가 (Vite HMR 이슈 대응)
+const lazyWithRetry = <T extends React.ComponentType<any>>(
+  importFn: () => Promise<{ default: T }>
+): React.LazyExoticComponent<T> => {
+  return lazy(() =>
+    importFn().catch((error) => {
+      logError('Router', 'Failed to load module:', error);
+      // 재시도 로직: 1초 후 다시 시도
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          importFn()
+            .then(resolve)
+            .catch((retryError) => {
+              logError('Router', 'Retry failed:', retryError);
+              throw retryError;
+            });
+        }, 1000);
+      });
+    })
+  );
+};
+
+const Home = lazyWithRetry(() => import('@/presentation/pages/home/Home'));
+const CampaignsPage = lazyWithRetry(() => import('@/presentation/pages/campaign/CampaignsPage'));
+const CampaignRegisterPage = lazyWithRetry(() => import('@/presentation/pages/campaign/CampaignRegisterPage'));
+const CampaignDetailPage = lazyWithRetry(() => import('@/presentation/pages/campaign/CampaignDetailPage'));
+const ModelsPage = lazyWithRetry(() => import('@/presentation/pages/model/ModelsPage'));
+const ModelRegisterPage = lazyWithRetry(() => import('@/presentation/pages/model/ModelRegisterPage'));
+const ModelDetailPage = lazyWithRetry(() => import('@/presentation/pages/model/ModelDetailPage'));
+const PortfolioPage = lazyWithRetry(() => import('@/presentation/pages/portfolio/PortfolioPage'));
+const PortfolioRegisterPage = lazyWithRetry(() => import('@/presentation/pages/portfolio/PortfolioRegisterPage'));
+const PortfolioDetailPage = lazyWithRetry(() => import('@/presentation/pages/portfolio/PortfolioDetailPage'));
+const MyPortfolioPage = lazyWithRetry(() => import('@/presentation/pages/portfolio/MyPortfolioPage'));
+const MyPage = lazyWithRetry(() => import('@/presentation/pages/mypage/MyPage'));
+const ClipsPage = lazyWithRetry(() => import('@/presentation/pages/clip/ClipsPage'));
+const MyClipsPage = lazyWithRetry(() => import('@/presentation/pages/clip/MyClipsPage'));
+const MyAppliedCampaignsPage = lazyWithRetry(() => import('@/presentation/pages/mypage/MyAppliedCampaignsPage'));
+const MessagesPage = lazyWithRetry(() => import('@/presentation/pages/message/MessagesPage'));
+const LoginPage = lazyWithRetry(() => import('@/presentation/pages/auth/LoginPage'));
+const ImageCropPage = lazyWithRetry(() => import('@/presentation/pages/image/ImageCropPage'));
+const ChatRoomPage = lazyWithRetry(() => import('@/presentation/pages/chat/ChatRoomPage'));
 
 const AppRouter = () => (
   <BrowserRouter>
-    {/*
-      (유지) .app-container의 100vh 스타일을 유지합니다.
-      이것이 RootLayout이 3단(헤더/컨텐츠/푸터) 분리 작업을
-      수행하기 위한 기준 높이가 됩니다.
-    */}
-    <div className="app-container" style={{ height: '100vh' }}>
-      <Routes>
+    <AuthProvider>
+      <Suspense fallback={<RouteFallback />}>
+        <div className="app-container" style={{ height: '100vh' }}>
+          <Routes>
         {/*
           --- (수정) 최상위 Shell Route 적용 ---
 
@@ -49,186 +73,136 @@ const AppRouter = () => (
           */}
           <Route element={<TopNavLayout />}>
             {/* 기존 탭 페이지들 */}
-            <Route
-              path="/"
-              element={
-                <Suspense fallback={null}>
-                  <Home />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/clips"
-              element={
-                <Suspense fallback={null}>
-                  <ClipsPage />
-                </Suspense>
-              }
-            />
-            <Route path="/live" element={<div>쇼핑라이브 페이지</div>} />
-            <Route path="/news" element={<div>뉴스 페이지</div>} />
-            <Route path="/event" element={<div>이벤트 페이지</div>} />
-            <Route path="/service" element={<div>서비스 페이지</div>} />
-            <Route
-              path="/chat"
-              element={
-                <Suspense fallback={null}>
-                  <ChatRoomPage />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/chat/:roomId"
-              element={
-                <Suspense fallback={null}>
-                  <ChatRoomPage />
-                </Suspense>
-              }
-            />
+            <Route path={ROUTE_PATHS.home} element={<Home />} />
+            <Route path={ROUTE_PATHS.clips} element={<ClipsPage />} />
+            <Route path={ROUTE_PATHS.live} element={<div>쇼핑라이브 페이지</div>} />
+            <Route path={ROUTE_PATHS.news} element={<div>뉴스 페이지</div>} />
+            <Route path={ROUTE_PATHS.event} element={<div>이벤트 페이지</div>} />
+            <Route path={ROUTE_PATHS.service} element={<div>서비스 페이지</div>} />
 
             {/* (추가) BottomNavBar의 탭 경로들을 추가합니다. */}
+            <Route path={ROUTE_PATHS.campaigns} element={<CampaignsPage />} />
             <Route
-              path="/campaigns"
+              path={ROUTE_PATHS.campaignRegister}
               element={
-                <Suspense fallback={null}>
-                  <CampaignsPage />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/campaigns/register"
-              element={
-                <Suspense fallback={null}>
+                <AuthGuard requireAuth allowedRoles={ROUTE_ROLE_PERMISSIONS[ROUTE_PATHS.campaignRegister]}>
                   <CampaignRegisterPage />
-                </Suspense>
+                </AuthGuard>
               }
             />
+            <Route path={ROUTE_PATHS.models} element={<ModelsPage />} />
             <Route
-              path="/models"
+              path={ROUTE_PATHS.modelRegister}
               element={
-                <Suspense fallback={null}>
-                  <ModelsPage />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/models/register"
-              element={
-                <Suspense fallback={null}>
+                <AuthGuard requireAuth allowedRoles={ROUTE_ROLE_PERMISSIONS[ROUTE_PATHS.modelRegister]}>
                   <ModelRegisterPage />
-                </Suspense>
+                </AuthGuard>
               }
             />
+            <Route path={ROUTE_PATHS.portfolios} element={<PortfolioPage />} />
             <Route
-              path="/portfolios"
+              path={ROUTE_PATHS.portfolioRegister}
               element={
-                <Suspense fallback={null}>
-                  <PortfolioPage />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/portfolios/register"
-              element={
-                <Suspense fallback={null}>
+                <AuthGuard
+                  requireAuth
+                  allowedRoles={ROUTE_ROLE_PERMISSIONS[ROUTE_PATHS.portfolioRegister]}
+                >
                   <PortfolioRegisterPage />
-                </Suspense>
+                </AuthGuard>
               }
             />
             <Route
-              path="/mypage/portfolios"
+              path={ROUTE_PATHS.myPortfolio}
               element={
-                <Suspense fallback={null}>
+                <AuthGuard requireAuth allowedRoles={ROUTE_ROLE_PERMISSIONS[ROUTE_PATHS.myPortfolio]}>
                   <MyPortfolioPage />
-                </Suspense>
+                </AuthGuard>
               }
             />
             <Route
-              path="/mypage/clips"
+              path={ROUTE_PATHS.myClips}
               element={
-                <Suspense fallback={null}>
+                <AuthGuard requireAuth allowedRoles={ROUTE_ROLE_PERMISSIONS[ROUTE_PATHS.myClips]}>
                   <MyClipsPage />
-                </Suspense>
+                </AuthGuard>
               }
             />
             <Route
-              path="/mypage/applied-campaigns"
+              path={ROUTE_PATHS.myAppliedCampaigns}
               element={
-                <Suspense fallback={null}>
+                <AuthGuard
+                  requireAuth
+                  allowedRoles={ROUTE_ROLE_PERMISSIONS[ROUTE_PATHS.myAppliedCampaigns]}
+                >
                   <MyAppliedCampaignsPage />
-                </Suspense>
+                </AuthGuard>
               }
             />
             <Route
-              path="/mypage/messages"
+              path={ROUTE_PATHS.myMessages}
               element={
-                <Suspense fallback={null}>
+                <AuthGuard requireAuth>
                   <MessagesPage />
-                </Suspense>
+                </AuthGuard>
               }
             />
             <Route
-              path="/mypage"
+              path={ROUTE_PATHS.myPage}
               element={
-                <Suspense fallback={null}>
+                <AuthGuard requireAuth>
                   <MyPage />
-                </Suspense>
+                </AuthGuard>
               }
             />
           </Route>
 
-          {/* 상세 페이지는 TopNavLayout을 사용하지 않아 상단 바를 숨깁니다. */}
+          {/* 채팅방 페이지는 TopNavLayout 밖에 위치 (상단 탭바 없음) */}
           <Route
-            path="/campaigns/:id"
+            path={ROUTE_PATHS.chat}
             element={
-              <Suspense fallback={null}>
-                <CampaignDetailPage />
-              </Suspense>
+              <AuthGuard requireAuth>
+                <ChatRoomPage />
+              </AuthGuard>
             }
           />
           <Route
-            path="/models/:id"
+            path={ROUTE_PATHS.chatRoom}
             element={
-              <Suspense fallback={null}>
-                <ModelDetailPage />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/portfolios/:id"
-            element={
-              <Suspense fallback={null}>
-                <PortfolioDetailPage />
-              </Suspense>
+              <AuthGuard requireAuth>
+                <ChatRoomPage />
+              </AuthGuard>
             }
           />
 
-          {/*
-            (참고) 3. TopNavLayout 밖에, RootLayout 안에
-            경로를 선언하면(예: /login), 상단 탭바는 없지만
-            하단 탭바는 있는 페이지를 만들 수 있습니다.
-          */}
+          {/* 상세 페이지는 TopNavLayout을 사용하지 않아 상단 바를 숨깁니다. */}
+          <Route path={ROUTE_PATHS.campaignDetail} element={<CampaignDetailPage />} />
+          <Route path={ROUTE_PATHS.modelDetail} element={<ModelDetailPage />} />
+          <Route path={ROUTE_PATHS.portfolioDetail} element={<PortfolioDetailPage />} />
+
+          {/* 로그인 페이지 - 하단 네비게이션 표시 */}
           <Route
-            path="/login"
+            path={ROUTE_PATHS.login}
             element={
-              <Suspense fallback={null}>
+              <AuthGuard requireAuth={false} guestOnly redirectTo={ROUTE_PATHS.myPage}>
                 <LoginPage />
-              </Suspense>
+              </AuthGuard>
             }
           />
         </Route>
 
-        {/* 이미지 크롭 페이지 - 레이아웃 없이 전체 화면 */}
+        {/* 이미지 크롭 페이지 - 레이아웃 없이 전체 화면 (하단 네비게이션 없음) */}
         <Route
-          path="/image/crop"
+          path={ROUTE_PATHS.imageCrop}
           element={
-            <Suspense fallback={null}>
+            <AuthGuard requireAuth>
               <ImageCropPage />
-            </Suspense>
+            </AuthGuard>
           }
         />
       </Routes>
     </div>
+      </Suspense>
+    </AuthProvider>
   </BrowserRouter>
 );
 

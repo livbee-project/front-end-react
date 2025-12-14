@@ -1,10 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import ListPageLayout from './ListPageLayout';
+import ListPageLayout from '@/presentation/layouts/ListPageLayout';
 import { MemoryRouter } from 'react-router-dom';
-import CampaignCard from '@/presentation/components/cards/CampaignCard';
-import Pagination from '@/presentation/components/list/Pagination';
-import styled from 'styled-components';
-import React, { useState } from 'react';
+import React from 'react';
+import {
+  CampaignPageDemo,
+  ListContentWrapper,
+  PortfolioPageDemo,
+} from '@/presentation/layouts/ListPageLayoutStoryContent';
+import { CampaignCard } from '@/presentation/components/campaign/CampaignCard';
+import { createMockCampaign } from '@/presentation/stories/mocks/campaign';
 
 const meta: Meta<typeof ListPageLayout> = {
   title: 'Layouts/ListPageLayout',
@@ -45,73 +49,35 @@ export default meta;
 type Story = StoryObj<typeof ListPageLayout>;
 
 // ===== 기본 레이아웃 =====
-const ListContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.md};
-  padding: ${({ theme }) => theme.spacing.lg};
-`;
-
 export const Default: Story = {
   args: {
     searchPlaceholder: '검색',
     hintText: '카드를 누르면 상세 정보를 보실 수 있습니다.',
     floatingActionButtonPath: '/campaigns/register',
     children: (
-      <ListContent>
-        <CampaignCard
-          brandName="브랜드 1"
-          title="공고 제목 1"
-          content="공고 내용 1"
-        />
-        <CampaignCard
-          brandName="브랜드 2"
-          title="공고 제목 2"
-          content="공고 내용 2"
-        />
-        <CampaignCard
-          brandName="브랜드 3"
-          title="공고 제목 3"
-          content="공고 내용 3"
-        />
-      </ListContent>
+      <ListContentWrapper>
+        {[1, 2, 3].map((index) => (
+          <CampaignCard
+            key={index}
+            campaign={createMockCampaign({
+              id: `cmp-default-${index}`,
+              brandName: `브랜드 ${index}`,
+              title: `공고 제목 ${index}`,
+              content: `공고 내용 ${index}`,
+            })}
+            isScrapped={index === 2}
+            onCardClick={() => {}}
+            onScrapClick={(event) => event.stopPropagation()}
+          />
+        ))}
+      </ListContentWrapper>
     ),
   },
 };
 
 // ===== 모집공고 페이지 =====
 export const CampaignPage: Story = {
-  render: () => {
-    const [page, setPage] = useState(1);
-
-    return (
-      <ListPageLayout
-        searchPlaceholder="모집공고를 검색하세요"
-        hintText="카드를 누르면 상세 정보를 보실 수 있습니다."
-        floatingActionButtonPath="/campaigns/register"
-        onSearch={(query) => alert(`검색: ${query}`)}
-      >
-        <ListContent>
-          <CampaignCard
-            brandName="패션 브랜드"
-            title="2024 봄/여름 컬렉션 모델 모집"
-            content="패션 쇼와 광고 촬영에 참여할 모델을 모집합니다."
-          />
-          <CampaignCard
-            brandName="뷰티 브랜드"
-            title="화장품 광고 모델 모집"
-            content="신제품 런칭 광고에 출연할 모델을 찾고 있습니다."
-          />
-          <CampaignCard
-            brandName="라이프스타일 브랜드"
-            title="인플루언서 협업 모집"
-            content="제품 리뷰 및 콘텐츠 제작에 참여할 인플루언서를 모집합니다."
-          />
-        </ListContent>
-        <Pagination currentPage={page} totalPages={5} onPageChange={setPage} />
-      </ListPageLayout>
-    );
-  },
+  render: () => <CampaignPageDemo />,
   parameters: {
     docs: {
       description: {
@@ -123,31 +89,7 @@ export const CampaignPage: Story = {
 
 // ===== 포트폴리오 페이지 =====
 export const PortfolioPage: Story = {
-  render: () => {
-    const [page, setPage] = useState(1);
-
-    return (
-      <ListPageLayout
-        searchPlaceholder="포트폴리오를 검색하세요"
-        hintText="포트폴리오 카드를 클릭하면 상세 정보를 볼 수 있습니다."
-        floatingActionButtonPath="/portfolios/register"
-        onSearch={(query) => alert(`검색: ${query}`)}
-      >
-        <ListContent>
-          <div style={{ padding: '20px', backgroundColor: '#f5f6ff', borderRadius: '8px' }}>
-            포트폴리오 카드 1
-          </div>
-          <div style={{ padding: '20px', backgroundColor: '#f5f6ff', borderRadius: '8px' }}>
-            포트폴리오 카드 2
-          </div>
-          <div style={{ padding: '20px', backgroundColor: '#f5f6ff', borderRadius: '8px' }}>
-            포트폴리오 카드 3
-          </div>
-        </ListContent>
-        <Pagination currentPage={page} totalPages={8} onPageChange={setPage} />
-      </ListPageLayout>
-    );
-  },
+  render: () => <PortfolioPageDemo />,
   parameters: {
     docs: {
       description: {
@@ -163,11 +105,11 @@ export const WithoutHint: Story = {
     searchPlaceholder: '검색',
     floatingActionButtonPath: '/register',
     children: (
-      <ListContent>
+      <ListContentWrapper>
         <div style={{ padding: '20px', backgroundColor: '#f5f6ff', borderRadius: '8px' }}>
           리스트 아이템
         </div>
-      </ListContent>
+      </ListContentWrapper>
     ),
   },
   parameters: {

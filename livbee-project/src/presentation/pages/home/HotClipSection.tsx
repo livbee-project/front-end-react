@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import HomeSection from './components/HomeSection';
+import HomeSection from '@/presentation/pages/home/components/HomeSection';
 import { H3, PMuted, Caption } from '@/presentation/components/styled/Typography';
 
 const clips = [

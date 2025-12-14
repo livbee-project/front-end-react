@@ -1,3 +1,4 @@
+import type { IUserApiSource } from '@/data/sources/interfaces/IUserApiSource';
 import { UserApiSource } from '@/data/sources/UserApiSource';
 import type {
   LoginRequest,
@@ -6,52 +7,52 @@ import type {
   SignupResponse,
   MeResponse,
 } from '@/domain/entities/User';
+import { BaseRepository } from '@/data/repositories/BaseRepository';
 
 /**
  * 사용자 리포지토리
  * 도메인 로직과 데이터 소스 사이의 인터페이스 역할
  */
-export class UserRepository {
-  private apiSource: UserApiSource;
+export class UserRepository extends BaseRepository {
+  private apiSource: IUserApiSource;
 
-  constructor() {
-    this.apiSource = new UserApiSource();
+  constructor(apiSource?: IUserApiSource) {
+    super();
+    // 의존성 주입: apiSource가 제공되지 않으면 기본 구현 사용
+    this.apiSource = apiSource ?? new UserApiSource();
   }
 
   /**
    * 로그인
    */
   async login(request: LoginRequest): Promise<LoginResponse> {
-    try {
-      return await this.apiSource.login(request);
-    } catch (error) {
-      console.error('로그인 실패:', error);
-      throw error;
-    }
+    return this.handleError(
+      () => this.apiSource.login(request),
+      'UserRepository',
+      '로그인'
+    );
   }
 
   /**
    * 회원가입
    */
   async signup(request: SignupRequest): Promise<SignupResponse> {
-    try {
-      return await this.apiSource.signup(request);
-    } catch (error) {
-      console.error('회원가입 실패:', error);
-      throw error;
-    }
+    return this.handleError(
+      () => this.apiSource.signup(request),
+      'UserRepository',
+      '회원가입'
+    );
   }
 
   /**
    * 내 정보 조회
    */
   async getMe(signal?: AbortSignal): Promise<MeResponse> {
-    try {
-      return await this.apiSource.getMe(signal);
-    } catch (error) {
-      console.error('내 정보 조회 실패:', error);
-      throw error;
-    }
+    return this.handleError(
+      () => this.apiSource.getMe(signal),
+      'UserRepository',
+      '내 정보 조회'
+    );
   }
 }
 

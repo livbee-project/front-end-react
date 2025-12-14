@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import ListItem from './ListItem';
-import VerticalList from './VerticalList';
+import ListItem from '@/presentation/components/list/ListItem';
+import VerticalList from '@/presentation/components/list/VerticalList';
 import styled from 'styled-components';
 
 const meta: Meta<typeof ListItem> = {

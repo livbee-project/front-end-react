@@ -1,17 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Caption } from '@/presentation/components/styled/Typography';
 
 /**
  * BottomNavItem이 받을 props 타입을 정의합니다.
  * @param label - 탭에 표시될 텍스트
- * @param icon - 탭에 표시될 아이콘 (임시 텍스트)
+ * @param icon - 탭에 표시될 아이콘
  * @param isActive - 이 탭이 현재 활성화되었는지 여부
  * @param onClick - 탭 버튼 클릭 시 실행될 함수
  */
 interface BottomNavItemProps {
   label: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
   isActive: boolean;
   onClick: () => void;
 }
@@ -27,42 +26,57 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({
   onClick,
 }) => {
   return (
-    <TabButton onClick={onClick}>
+    <TabButton $isActive={isActive} onClick={onClick} aria-label={label}>
       <IconWrapper $isActive={isActive}>
-        <Icon size={20} />
+        <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
       </IconWrapper>
-      <LabelText $isActive={isActive}>{label}</LabelText>
+      <NavLabel $isActive={isActive}>{label}</NavLabel>
     </TabButton>
   );
 };
 
-const TabButton = styled.button`
+const TabButton = styled.button<{ $isActive: boolean }>`
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  padding: ${({ theme }) => theme.spacing.sm} 0;
-  gap: ${({ theme }) => theme.spacing.sm};
-  background: none;
+  gap: 2px;
+  padding: 6px 16px;
+  min-width: 60px;
+  background: ${({ $isActive, theme }) =>
+    $isActive ? theme.colors.secondary : 'transparent'};
   border: none;
   cursor: pointer;
+  text-decoration: none;
+  border-radius: 16px;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.secondary};
+  }
 `;
 
 const IconWrapper = styled.div<{ $isActive: boolean }>`
   color: ${({ $isActive, theme }) =>
     $isActive ? theme.colors.primary : theme.colors.muted};
-  transition: color 0.1s ease;
+  transition: color 0.2s ease-in-out;
   display: flex;
   align-items: center;
+  flex-shrink: 0;
+
+  svg {
+    flex-shrink: 0;
+  }
 `;
 
-const LabelText = styled(Caption)<{ $isActive: boolean }>`
+const NavLabel = styled.span<{ $isActive: boolean }>`
+  font: ${({ theme }) => theme.fonts.caption};
   color: ${({ $isActive, theme }) =>
     $isActive ? theme.colors.primary : theme.colors.muted};
-  transition: color 0.1s ease;
-  font-weight: 700;
-  margin: 0;
+  font-weight: ${({ $isActive }) => ($isActive ? 500 : 300)};
+  white-space: nowrap;
+  line-height: 1.4;
+  transition: all 0.2s ease-in-out;
 `;
 
 export default BottomNavItem;

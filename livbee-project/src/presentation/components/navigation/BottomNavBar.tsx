@@ -1,36 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useLocation, useNavigate } from 'react-router-dom';
-import BottomNavItem from './BottomNavItem';
-import { useToast } from '@/presentation/contexts/ToastContext';
-import { useAuth } from '@/presentation/hooks/useAuth';
-// (추가) react-icons/ri (Remix Icon) 라이브러리에서 아이콘들을 임포트합니다.
+import BottomNavItem from '@/presentation/components/navigation/BottomNavItem';
+import { useAuth } from '@/presentation/hooks/auth/useAuth';
+import { ROUTE_PATHS } from '@/app/routes/routeMeta';
+import { setAuthRedirectPath } from '@/shared/utils/authRedirect';
+import LoginRequiredModal from '@/presentation/components/navigation/LoginRequiredModal';
+// 커스텀 네비게이션 아이콘 컴포넌트
 import {
-  RiHomeLine,
-  RiArchiveDrawerLine,
-  RiUserStarLine,
-  RiUser3Line,
-  RiUserSettingsLine,
-} from 'react-icons/ri';
+  IconHome,
+  IconSearch,
+  IconMic,
+  IconCamera,
+  IconSmile,
+} from '@/presentation/components/icons/NavigationIcons';
 
 /**
- * (수정) 탭 메뉴의 데이터
- * icon 속성을 텍스트('[H]')에서 임포트한 아이콘 컴포넌트(RiHomeLine)로 변경합니다.
- * Flutter의 RemixIcons 이름과 거의 동일합니다.
+ * 하단 네비게이션 탭 메뉴 데이터
+ * 디자인 스펙에 따라 커스텀 SVG 아이콘 사용
  */
 const TABS = [
-  { label: '홈', path: '/', icon: RiHomeLine },
-  { label: '모집공고', path: '/campaigns', icon: RiArchiveDrawerLine },
-  { label: '모델', path: '/models', icon: RiUserStarLine },
-  { label: '포트폴리오', path: '/portfolios', icon: RiUser3Line },
-  { label: '마이페이지', path: '/mypage', icon: RiUserSettingsLine },
+  { label: '홈', path: ROUTE_PATHS.home, icon: IconHome },
+  { label: '모집공고', path: ROUTE_PATHS.campaigns, icon: IconSearch },
+  { label: '쇼호스트', path: ROUTE_PATHS.portfolios, icon: IconMic },
+  { label: '모델', path: ROUTE_PATHS.models, icon: IconCamera },
+  { label: 'MY', path: ROUTE_PATHS.myPage, icon: IconSmile },
 ];
 /**
  * 로그인이 필요한 경로
  * Flutter의 authRequiredRoutes
  * (현재는 비활성화 - 필요시 다시 활성화)
  */
-const AUTH_REQUIRED_PATHS: string[] = [];
+const AUTH_REQUIRED_PATHS = new Set<string>([ROUTE_PATHS.myPage]);
 
 /**
  * 화면 하단에 고정되는 공통 네비게이션 바 컴포넌트
@@ -40,7 +41,8 @@ const BottomNavBar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth(); // 인증 상태 가져오기
-  const { showToast } = useToast();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
 
   /**
    * 탭 클릭 시 네비게이션을 처리하는 함수
@@ -49,63 +51,90 @@ const BottomNavBar: React.FC = () => {
     // 1. 현재 경로와 같으면 아무것도 하지 않음
     if (location.pathname === path) return;
 
-    // 2. 마이페이지 클릭 시 로그인 페이지로 이동
-    if (path === '/mypage' && !isLoggedIn) {
-      navigate('/login', { replace: true });
+    // 2. 로그인이 필요한 경로인지 확인
+    if (AUTH_REQUIRED_PATHS.has(path) && !isLoggedIn) {
+      setPendingPath(path);
+      setIsLoginModalOpen(true);
       return;
     }
 
-    // 3. 로그인이 필요한 경로인지 확인
-    if (AUTH_REQUIRED_PATHS.includes(path) && !isLoggedIn) {
-      // Flutter의 showCommonPromptDialog 로직
-      showToast('로그인이 필요합니다.\n회원 전용 서비스입니다.');
-      navigate('/login', { replace: true });
-    } else {
-      // 4. 페이지 이동
-      // Flutter의 context.replace와 동일하게 { replace: true } 옵션 사용
-      navigate(path, { replace: true });
+    // 3. 페이지 이동
+    navigate(path);
+  };
+
+  /**
+   * 로그인 모달에서 로그인하기 버튼 클릭 시
+   */
+  const handleLoginConfirm = () => {
+    if (pendingPath) {
+      setAuthRedirectPath(pendingPath);
+      setIsLoginModalOpen(false);
+      navigate(ROUTE_PATHS.login, { replace: true });
+      setPendingPath(null);
     }
   };
 
-  return (
-    <Nav>
-      <Wrapper>
-        {/*
-          --- (수정) TABS.map() 내부 ---
-          복잡한 <button> JSX 대신 BottomNavItem 컴포넌트를 렌더링
-        */}
-        {TABS.map((tab) => {
-          const isActive = location.pathname === tab.path;
+  /**
+   * 로그인 모달 닫기
+   */
+  const handleLoginModalClose = () => {
+    setIsLoginModalOpen(false);
+    setPendingPath(null);
+  };
 
-          return (
-            <BottomNavItem
-              key={tab.path}
-              label={tab.label}
-              icon={tab.icon}
-              isActive={isActive}
-              onClick={() => handleNavigate(tab.path)}
-            />
-          );
-        })}
-      </Wrapper>
-    </Nav>
+  return (
+    <>
+      <Nav>
+        <Wrapper>
+          {/*
+            --- (수정) TABS.map() 내부 ---
+            복잡한 <button> JSX 대신 BottomNavItem 컴포넌트를 렌더링
+          */}
+          {TABS.map((tab) => {
+            const isActive = location.pathname === tab.path;
+
+            return (
+              <BottomNavItem
+                key={tab.path}
+                label={tab.label}
+                icon={tab.icon}
+                isActive={isActive}
+                onClick={() => handleNavigate(tab.path)}
+              />
+            );
+          })}
+        </Wrapper>
+      </Nav>
+      <LoginRequiredModal
+        isOpen={isLoginModalOpen}
+        onClose={handleLoginModalClose}
+        onConfirm={handleLoginConfirm}
+      />
+    </>
   );
 };
 
 const Nav = styled.nav`
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: ${({ theme }) => theme.colors.background};
   width: 100%;
+  max-width: 1200px;
   border-top: 1px solid ${({ theme }) => theme.colors.border};
   box-shadow: 0 -8px 22px rgba(0, 0, 0, 0.06);
   padding-bottom: env(safe-area-inset-bottom, 0);
   box-sizing: border-box;
+  z-index: 100;
 `;
 
 const Wrapper = styled.div`
   display: flex;
   justify-content: space-around;
-  align-items: stretch;
-  height: 100%;
+  align-items: center;
+  padding: ${({ theme }) => theme.spacing.sm} 0;
+  width: 100%;
 `;
 
 export default BottomNavBar;

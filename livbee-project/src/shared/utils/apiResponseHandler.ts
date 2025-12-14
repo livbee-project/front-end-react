@@ -3,10 +3,12 @@
  * FastAPI와 기존 Express API 응답 형식을 모두 처리합니다.
  */
 
+import type { FastApiErrorResponse } from '@/shared/types/api';
+
 /**
  * API 응답 타입 (성공/실패 모두 포함)
  */
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   ok?: boolean;
   success?: boolean;
   data?: T;
@@ -37,7 +39,10 @@ export const extractData = <T>(response: ApiResponse<T>): T | null => {
       return response.data as T;
     }
     // 기존 형식: { ok: true, ...data }
-    return response as unknown as T;
+    // response 자체가 T 타입인 경우 (data 필드가 없는 경우)
+    // 이 경우는 타입 시스템의 한계로 인해 타입 단언이 필요합니다.
+    // 하지만 런타임에서는 response가 이미 올바른 형식임을 보장합니다.
+    return response as T;
   }
   return null;
 };
@@ -45,15 +50,22 @@ export const extractData = <T>(response: ApiResponse<T>): T | null => {
 /**
  * API 응답에서 에러 메시지 추출
  */
-export const extractErrorMessage = (response: ApiResponse): string => {
-  if (response.userMessage) {
-    return response.userMessage;
+export const extractErrorMessage = (response: ApiResponse | FastApiErrorResponse): string => {
+  // FastAPI 에러 형식: { detail: "..." }
+  const fastApiError = response as FastApiErrorResponse;
+  if (fastApiError.detail) {
+    return fastApiError.detail;
   }
-  if (response.message) {
-    return response.message;
+  
+  const apiResponse = response as ApiResponse;
+  if (apiResponse.userMessage) {
+    return apiResponse.userMessage;
   }
-  if (response.error) {
-    return response.error;
+  if (apiResponse.message) {
+    return apiResponse.message;
+  }
+  if (apiResponse.error) {
+    return apiResponse.error;
   }
   return '알 수 없는 오류가 발생했습니다.';
 };

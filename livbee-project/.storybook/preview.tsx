@@ -34,6 +34,10 @@ const preview: Preview = {
           'UI Components',
         ],
       },
+      // Overview를 기본 진입 페이지로 설정
+      initialGlobals: {
+        viewMode: 'docs',
+      },
     },
   },
   decorators: [

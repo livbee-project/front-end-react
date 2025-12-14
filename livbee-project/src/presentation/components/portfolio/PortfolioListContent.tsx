@@ -1,10 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import Pagination from '@/presentation/components/list/Pagination';
-import { LoadingState } from '@/presentation/components/states/LoadingState';
-import { ErrorState } from '@/presentation/components/states/ErrorState';
-import { EmptyState } from '@/presentation/components/states/EmptyState';
-import { PortfolioCard } from './PortfolioCard';
+import { ListStatePlaceholder } from '@/presentation/components/list/ListStatePlaceholder';
+import { PortfolioCard } from '@/presentation/components/portfolio/PortfolioCard';
 import type { Portfolio } from '@/domain/entities/Portfolio';
 
 interface PortfolioListContentProps {
@@ -34,56 +32,37 @@ export const PortfolioListContent: React.FC<PortfolioListContentProps> = ({
   onPageChange,
   onRetry,
 }) => {
-  if (loading && portfolios.length === 0) {
-    return (
-      <StateWrapper>
-        <LoadingState />
-      </StateWrapper>
-    );
-  }
-
-  if (error && portfolios.length === 0) {
-    return (
-      <StateWrapper>
-        <ErrorState message={error} onRetry={onRetry} />
-      </StateWrapper>
-    );
-  }
-
-  if (!loading && filteredPortfolios.length === 0) {
-    return (
-      <StateWrapper>
-        <EmptyState message="등록된 쇼호스트가 없습니다." />
-      </StateWrapper>
-    );
-  }
-
   return (
-    <>
-      <CardsColumn>
-        {filteredPortfolios.map((portfolio) => (
-          <PortfolioCard
-            key={portfolio.id}
-            portfolio={portfolio}
-            isScrapped={isScrapped(portfolio.id)}
-            onCardClick={() => onCardClick(portfolio.id)}
-            onScrapClick={(event) => onScrapClick(portfolio.id, event)}
-          />
-        ))}
-      </CardsColumn>
+    <ListStatePlaceholder
+      data={portfolios}
+      loading={loading}
+      error={error}
+      onRetry={onRetry}
+      emptyMessage="등록된 쇼호스트가 없습니다."
+      showEmptyState={filteredPortfolios.length === 0}
+    >
+      <>
+        <CardsColumn>
+          {filteredPortfolios.map((portfolio) => (
+            <PortfolioCard
+              key={portfolio.id}
+              portfolio={portfolio}
+              isScrapped={isScrapped(portfolio.id)}
+              onCardClick={() => onCardClick(portfolio.id)}
+              onScrapClick={(event) => onScrapClick(portfolio.id, event)}
+            />
+          ))}
+        </CardsColumn>
 
-      {totalPages && totalPages > 1 && (
-        <PaginationWrapper>
-          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
-        </PaginationWrapper>
-      )}
-    </>
+        {totalPages && totalPages > 1 && (
+          <PaginationWrapper>
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
+          </PaginationWrapper>
+        )}
+      </>
+    </ListStatePlaceholder>
   );
 };
-
-const StateWrapper = styled.div`
-  padding: ${({ theme }) => theme.spacing['2xl']} 0;
-`;
 
 const CardsColumn = styled.div`
   display: flex;

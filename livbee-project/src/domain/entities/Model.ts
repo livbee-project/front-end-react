@@ -144,6 +144,13 @@ export interface CreateModelRequest {
   youtubeUrl?: string;
   tiktokUrl?: string;
 
+  // 연락처 정보
+  contact?: string;
+  openChat?: string;
+
+  // 등록 정보
+  registrationType?: string;
+
   // 기타 설정
   publicScope?: string;
   isReceivingOffers?: boolean;

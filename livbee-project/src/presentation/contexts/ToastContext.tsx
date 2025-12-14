@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import type { ReactNode } from 'react';
@@ -44,7 +45,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
    * 토스트 메시지를 표시하는 함수
    * @param message - 표시할 메시지
    * @param duration - 표시 시간 (밀리초)
-   * @param variant - 토스트 타입 ('info' 또는 'error', 기본값: 'info')
+   * @param variant - 토스트 타입 ('info', 'error', 'success', 기본값: 'info')
    */
   const showToast = useCallback((message: string, duration?: number, variant: ToastVariant = 'info') => {
     const id = `toast-${Date.now()}-${Math.random()}`;

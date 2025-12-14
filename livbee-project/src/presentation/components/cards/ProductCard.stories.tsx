@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import ProductCard from './ProductCard';
-import styled from 'styled-components';
+import ProductCard from '@/presentation/components/cards/ProductCard';
+import {
+  ProductCardExamplesSection,
+  ProductCardListSection,
+  ProductCardLongNameSection,
+} from '@/presentation/components/cards/ProductCardStoryContent';
 
 const meta: Meta<typeof ProductCard> = {
   title: 'Cards/ProductCard',
@@ -49,32 +53,8 @@ export const WithImage: Story = {
 };
 
 // ===== 다양한 예시 =====
-const CardContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.md};
-  max-width: 500px;
-`;
-
 export const Examples: Story = {
-  render: () => (
-    <CardContainer>
-      <ProductCard
-        imageUrl="https://via.placeholder.com/60x60"
-        productName="패션 아이템 1"
-        onClick={() => alert('상품 1 클릭')}
-      />
-      <ProductCard
-        imageUrl="https://via.placeholder.com/60x60"
-        productName="뷰티 제품 2"
-        onClick={() => alert('상품 2 클릭')}
-      />
-      <ProductCard
-        productName="이미지 없는 상품"
-        onClick={() => alert('상품 3 클릭')}
-      />
-    </CardContainer>
-  ),
+  render: () => <ProductCardExamplesSection />,
   parameters: {
     docs: {
       description: {
@@ -86,15 +66,7 @@ export const Examples: Story = {
 
 // ===== 긴 상품명 =====
 export const LongProductName: Story = {
-  render: () => (
-    <CardContainer>
-      <ProductCard
-        imageUrl="https://via.placeholder.com/60x60"
-        productName="매우 긴 상품명이 여기에 표시되며 텍스트가 길어지면 말줄임표로 처리됩니다"
-        onClick={() => alert('상품 클릭')}
-      />
-    </CardContainer>
-  ),
+  render: () => <ProductCardLongNameSection />,
   parameters: {
     docs: {
       description: {
@@ -105,37 +77,8 @@ export const LongProductName: Story = {
 };
 
 // ===== 리스트 예시 =====
-const ListContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.sm};
-  max-width: 600px;
-  padding: ${({ theme }) => theme.spacing.lg};
-  background-color: ${({ theme }) => theme.colors.background};
-  border-radius: ${({ theme }) => theme.radii.md};
-`;
-
 export const ListExample: Story = {
-  render: () => (
-    <ListContainer>
-      <h3 style={{ marginBottom: '16px', fontSize: '16px', fontWeight: 700 }}>관련 상품</h3>
-      <ProductCard
-        imageUrl="https://via.placeholder.com/60x60"
-        productName="패션 아이템 1"
-        onClick={() => alert('상품 1 클릭')}
-      />
-      <ProductCard
-        imageUrl="https://via.placeholder.com/60x60"
-        productName="뷰티 제품 2"
-        onClick={() => alert('상품 2 클릭')}
-      />
-      <ProductCard
-        imageUrl="https://via.placeholder.com/60x60"
-        productName="라이프스타일 제품 3"
-        onClick={() => alert('상품 3 클릭')}
-      />
-    </ListContainer>
-  ),
+  render: () => <ProductCardListSection />,
   parameters: {
     docs: {
       description: {

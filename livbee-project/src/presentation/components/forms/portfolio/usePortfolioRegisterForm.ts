@@ -1,14 +1,17 @@
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
-import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
 import { useToast } from '@/presentation/contexts/ToastContext';
-import { useRepository } from '@/presentation/hooks/useRepository';
-import { useFormState } from '@/presentation/hooks/useFormState';
-import { useFormUpload } from '@/presentation/hooks/useFormUpload';
-import type { CreatePortfolioRequest } from '@/domain/entities/Portfolio';
-import { isValidPhoneNumber, isValidUrl } from '@/shared/utils/validation';
-import type { PortfolioFormData, PortfolioToggleState } from './types';
+import { useRepository } from '@/presentation/hooks/common/useRepository';
+import { useCloudinaryUpload } from '@/presentation/hooks/common/useCloudinaryUpload';
+import { useFormState } from '@/presentation/hooks/form/useFormState';
+import type { PortfolioFormData, PortfolioToggleState } from '@/presentation/components/forms/portfolio/types';
+import { clearImageUrls } from '@/presentation/components/forms/portfolio/utils/portfolioImageStorage';
+import { validatePortfolioForm } from '@/presentation/components/forms/portfolio/utils/portfolioValidation';
+import { buildPortfolioRequest } from '@/presentation/components/forms/portfolio/utils/portfolioRequestBuilder';
+import { usePortfolioImageManagement } from '@/presentation/components/forms/portfolio/hooks/usePortfolioImageManagement';
+import { usePortfolioFormStorage } from '@/presentation/components/forms/portfolio/hooks/usePortfolioFormStorage';
+import { formatFileSize } from '@/shared/constants/fileUpload';
 
 const INITIAL_FORM_DATA: PortfolioFormData = {
   registrationType: '',
@@ -34,30 +37,74 @@ export const usePortfolioRegisterForm = () => {
   const { uploadFile, isUploading: isImageUploading } = useCloudinaryUpload();
   const { showToast } = useToast();
   const portfolioRepository = useRepository(PortfolioRepository);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { formData, updateField, updateArrayField } = useFormState<PortfolioFormData>(INITIAL_FORM_DATA);
+  // 자동 저장 비활성화: 이미지 선택 시점에만 수동으로 저장
+  const { formData, updateField, updateArrayField, setFormData } = useFormState<PortfolioFormData>(INITIAL_FORM_DATA, undefined);
   const {
     formData: toggles,
     updateField: updateToggleField,
     updateArrayField: updateToggleArrayField,
-  } = useFormState<PortfolioToggleState>(INITIAL_TOGGLE_STATE);
+    setFormData: setToggles,
+  } = useFormState<PortfolioToggleState>(INITIAL_TOGGLE_STATE, undefined);
 
+  // 이미지 관리 훅
   const {
-    profileFile: mainThumbnailFile,
-    profileUrl: mainThumbnailUrl,
-    galleryFiles: galleryImageFiles,
-    galleryUrls: galleryImageUrls,
-    selectProfileImage,
-    selectGalleryImage,
-    removeGalleryImage,
-  } = useFormUpload({ maxGalleryImages: 9 });
+    mainThumbnailUrl,
+    galleryImageUrls,
+    mainThumbnailFile,
+    galleryImageFiles,
+    getMainThumbnailFile,
+    getGalleryImageFiles,
+    hasStoredImages,
+    handleMainThumbnailSelect: baseHandleMainThumbnailSelect,
+    handleGalleryImageSelect: baseHandleGalleryImageSelect,
+    handleGalleryImageReplace: baseHandleGalleryImageReplace,
+    handleGalleryImageRemove,
+  } = usePortfolioImageManagement({
+    onImageRestored: () => {
+      // 이미지 복원 후 폼 데이터 복원 트리거
+    },
+  });
 
-  const [resumeFileUrl, setResumeFileUrl] = useState('');
-  const [portfolioFileUrl, setPortfolioFileUrl] = useState('');
+  // sessionStorage 관리 훅
+  const { clearStorage, saveFormData } = usePortfolioFormStorage({
+    formData,
+    setFormData,
+    toggles,
+    setToggles,
+    hasStoredImages,
+    mainThumbnailUrl,
+    galleryImageUrls,
+    onImageRestored: () => {
+      // 이미지 복원 후 추가 처리 필요 시 여기서 수행
+    },
+  });
 
+  // 이미지 선택 핸들러 (폼 데이터 저장 포함)
+  const handleMainThumbnailSelect = useCallback(
+    (file: File) => {
+      baseHandleMainThumbnailSelect(file);
+      saveFormData();
+    },
+    [baseHandleMainThumbnailSelect, saveFormData]
+  );
+
+  const handleGalleryImageSelect = useCallback(
+    (file: File) => {
+      const added = baseHandleGalleryImageSelect(file);
+      if (added) {
+        saveFormData();
+      }
+      return added;
+    },
+    [baseHandleGalleryImageSelect, saveFormData]
+  );
+
+  const [resumeFileUrl, setResumeFileUrl] = useState<string | null>(null);
+  const [portfolioFileUrl, setPortfolioFileUrl] = useState<string | null>(null);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = useCallback(
     (field: keyof PortfolioFormData, value: string, index?: number) => {
@@ -86,32 +133,40 @@ export const usePortfolioRegisterForm = () => {
     [toggles, updateToggleArrayField, updateToggleField]
   );
 
-  const handleGalleryImageSelect = useCallback(
+  const handleGalleryImageSelectWithToast = useCallback(
     (file: File) => {
-      const added = selectGalleryImage(file);
+      const added = handleGalleryImageSelect(file);
       if (!added) {
         showToast('갤러리 이미지는 최대 9개까지 업로드 가능합니다.', undefined, 'error');
       }
     },
-    [selectGalleryImage, showToast]
+    [handleGalleryImageSelect, showToast]
   );
 
-  const handleGalleryImageRemove = useCallback(
-    (index: number) => {
-      removeGalleryImage(index);
+  const handleGalleryImageReplace = useCallback(
+    (index: number, file: File) => {
+      baseHandleGalleryImageReplace(index, file);
+      saveFormData();
     },
-    [removeGalleryImage]
+    [baseHandleGalleryImageReplace, saveFormData]
   );
 
   const handlePortfolioFileAdd = useCallback((file: File) => {
     if (file.type.startsWith('video')) {
       setPortfolioFile(file);
-      setPortfolioFileUrl(`${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`);
+      setPortfolioFileUrl(`${file.name} (${formatFileSize(file.size)})`);
     } else {
       setResumeFile(file);
-      setResumeFileUrl(`${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`);
+      setResumeFileUrl(`${file.name} (${formatFileSize(file.size)})`);
     }
   }, []);
+
+  const handleFileError = useCallback(
+    (message: string) => {
+      showToast(message, undefined, 'error');
+    },
+    [showToast]
+  );
 
   const handleResumeFileRemove = useCallback(() => {
     setResumeFile(null);
@@ -124,43 +179,31 @@ export const usePortfolioRegisterForm = () => {
   }, []);
 
   const handleSubmit = useCallback(async () => {
+    // 유효성 검사
+    const validation = validatePortfolioForm(formData, toggles);
+    if (!validation.isValid) {
+      showToast(validation.errorMessage || '입력 정보를 확인해주세요.', undefined, 'error');
+      return;
+    }
+
     setIsSubmitting(true);
-
-    const trimmedContact = formData.contact.trim();
-    if (trimmedContact && !isValidPhoneNumber(trimmedContact)) {
-      showToast('연락처 형식이 올바르지 않습니다.', undefined, 'error');
-      setIsSubmitting(false);
-      return;
-    }
-
-    const trimmedRecentLive = formData.recentLiveLink.trim();
-    if (trimmedRecentLive && !isValidUrl(trimmedRecentLive)) {
-      showToast('최근 라이브 링크가 올바르지 않습니다.', undefined, 'error');
-      setIsSubmitting(false);
-      return;
-    }
-
-    const hasInvalidWebsite = formData.websites.some((url, index) => {
-      const trimmed = url.trim();
-      if (!trimmed || !toggles.websites[index]) {
-        return false;
-      }
-      return !isValidUrl(trimmed);
-    });
-
-    if (hasInvalidWebsite) {
-      showToast('SNS / 사이트 링크를 올바르게 입력해주세요.', undefined, 'error');
-      setIsSubmitting(false);
-      return;
-    }
 
     try {
       let uploadedMainThumbnailUrl: string | undefined;
-      const uploadedGalleryUrls: string[] = [];
-      let uploadedAttachedFileUrl: string | undefined;
+      let uploadedGalleryUrls: string[] = [];
+      let uploadedPortfolioFileUrl: string | undefined;
+      let uploadedResumeFileUrl: string | undefined;
 
-      if (mainThumbnailFile) {
-        const url = await uploadFile(mainThumbnailFile, { type: 'image' });
+      // ref에서도 파일 확인 (상태가 null일 수 있으므로)
+      const finalMainThumbnailFile = mainThumbnailFile || await getMainThumbnailFile();
+      const finalGalleryImageFiles = galleryImageFiles.length > 0 ? galleryImageFiles : await getGalleryImageFiles();
+
+      if (finalMainThumbnailFile) {
+        const url = await uploadFile(finalMainThumbnailFile, {
+          type: 'image',
+          category: 'portfolio',
+          publicId: 'main-thumbnail',
+        });
         if (!url) {
           showToast('프로필 이미지 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
           setIsSubmitting(false);
@@ -169,8 +212,12 @@ export const usePortfolioRegisterForm = () => {
         uploadedMainThumbnailUrl = url;
       }
 
-      for (const file of galleryImageFiles) {
-        const url = await uploadFile(file, { type: 'image' });
+      // 갤러리 이미지 업로드
+      for (const file of finalGalleryImageFiles) {
+        const url = await uploadFile(file, {
+          type: 'image',
+          category: 'portfolio',
+        });
         if (!url) {
           showToast('갤러리 이미지 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
           setIsSubmitting(false);
@@ -179,79 +226,66 @@ export const usePortfolioRegisterForm = () => {
         uploadedGalleryUrls.push(url);
       }
 
-      if (resumeFile) {
-        const url = await uploadFile(resumeFile, { type: 'raw' });
-        if (!url) {
-          showToast('이력서 파일 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
-          setIsSubmitting(false);
-          return;
-        }
-        uploadedAttachedFileUrl = url;
-      } else if (portfolioFile) {
+      // 파일 업로드
+      if (portfolioFile) {
         const url = await uploadFile(portfolioFile, { type: 'raw' });
         if (!url) {
           showToast('포트폴리오 파일 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
           setIsSubmitting(false);
           return;
         }
-        uploadedAttachedFileUrl = url;
+        uploadedPortfolioFileUrl = url;
+      } else if (resumeFile) {
+        const url = await uploadFile(resumeFile, { type: 'raw' });
+        if (!url) {
+          showToast('이력서 파일 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
+          setIsSubmitting(false);
+          return;
+        }
+        uploadedResumeFileUrl = url;
       }
 
-      const websiteUrl = formData.websites[0]?.trim() || undefined;
-      const instagramUrl = formData.websites[1]?.trim() || undefined;
-      const youtubeUrl = formData.websites[2]?.trim() || undefined;
+      const request = buildPortfolioRequest(
+        formData,
+        uploadedMainThumbnailUrl,
+        uploadedGalleryUrls,
+        uploadedResumeFileUrl || uploadedPortfolioFileUrl
+      );
 
-      const recentLives = trimmedRecentLive
-        ? [
-            {
-              url: trimmedRecentLive,
-              title: undefined,
-              date: undefined,
-            },
-          ]
-        : undefined;
-
-      const request: CreatePortfolioRequest = {
-        nickname: formData.name.trim() || undefined,
-        oneLineIntro: formData.oneLineIntro.trim() || undefined,
-        detailedIntro: formData.detailedIntro.trim() || undefined,
-        mainThumbnailUrl: uploadedMainThumbnailUrl,
-        subThumbnailUrls: uploadedGalleryUrls.length > 0 ? uploadedGalleryUrls : undefined,
-        websiteUrl,
-        instagramUrl,
-        youtubeUrl,
-        recentLives,
-        attachedFileUrl: uploadedAttachedFileUrl,
-        status: 'published',
-        publicScope: '전체공개',
-        isAgePublic: true,
-        isSizingPublic: true,
-        isReceivingOffers: true,
-      };
+      console.log('[usePortfolioRegisterForm] 📤 포트폴리오 등록 요청 데이터:', JSON.stringify(request, null, 2));
 
       const response = await portfolioRepository.createPortfolio(request);
 
       if (response.ok) {
-        showToast('포트폴리오가 등록되었습니다.');
+        // 제출 성공 시 sessionStorage 삭제
+        clearStorage();
+        clearImageUrls();
+        showToast('포트폴리오가 등록되었습니다.', undefined, 'success');
         navigate('/portfolios', { replace: true });
+      } else {
+        const errorMessage = '포트폴리오 등록에 실패했습니다.';
+        showToast(errorMessage, undefined, 'error');
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : '포트폴리오 등록에 실패했습니다.';
-      showToast(errorMessage, undefined, 'error');
+      console.error('포트폴리오 등록 실패:', error);
     } finally {
       setIsSubmitting(false);
     }
   }, [
     formData,
-    galleryImageFiles,
-    mainThumbnailFile,
-    navigate,
-    portfolioFile,
-    portfolioRepository,
-    resumeFile,
     toggles,
-    showToast,
+    mainThumbnailFile,
+    galleryImageFiles,
+    portfolioFile,
+    resumeFile,
+    getMainThumbnailFile,
+    getGalleryImageFiles,
     uploadFile,
+    portfolioRepository,
+    clearStorage,
+    clearImageUrls,
+    navigate,
+    showToast,
   ]);
 
   const handleSubmitForm = useCallback(
@@ -275,12 +309,14 @@ export const usePortfolioRegisterForm = () => {
     isImageUploading,
     handleInputChange,
     handleToggleChange,
-    handleProfileImageSelect: selectProfileImage,
-    handleGalleryImageSelect,
+    handleProfileImageSelect: handleMainThumbnailSelect,
+    handleGalleryImageSelect: handleGalleryImageSelectWithToast,
+    handleGalleryImageReplace,
     handleGalleryImageRemove,
     handlePortfolioFileAdd,
     handleResumeFileRemove,
     handlePortfolioFileRemove,
+    handleFileError,
     handleSubmitForm,
   };
 };

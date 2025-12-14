@@ -1,14 +1,17 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
-import { useRepository } from '@/presentation/hooks/useRepository';
-import { useCloudinaryUpload } from '@/presentation/hooks/useCloudinaryUpload';
+import { useRepository } from '@/presentation/hooks/common/useRepository';
+import { useCloudinaryUpload } from '@/presentation/hooks/common/useCloudinaryUpload';
 import { useToast } from '@/presentation/contexts/ToastContext';
-import { useFormState } from '@/presentation/hooks/useFormState';
-import { useFormUpload } from '@/presentation/hooks/useFormUpload';
-import type { CreateModelRequest } from '@/domain/entities/Model';
-import type { ModelFormData, ModelToggleState } from './types';
-import { isValidPhoneNumber, isValidUrl } from '@/shared/utils/validation';
+import { useFormState } from '@/presentation/hooks/form/useFormState';
+import type { ModelFormData, ModelToggleState } from '@/presentation/components/forms/model/types';
+import { clearImageUrls } from '@/presentation/components/forms/model/utils/modelImageStorage';
+import { validateModelForm } from '@/presentation/components/forms/model/utils/modelValidation';
+import { buildModelRequest } from '@/presentation/components/forms/model/utils/modelRequestBuilder';
+import { useModelImageManagement } from '@/presentation/components/forms/model/hooks/useModelImageManagement';
+import { useModelFormStorage } from '@/presentation/components/forms/model/hooks/useModelFormStorage';
+import { formatFileSize } from '@/shared/constants/fileUpload';
 
 const INITIAL_FORM_DATA: ModelFormData = {
   name: '',
@@ -45,30 +48,73 @@ export const useModelRegisterForm = () => {
   const { uploadFile, isUploading: isImageUploading } = useCloudinaryUpload();
   const { showToast } = useToast();
   const modelRepository = useRepository(ModelRepository);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { formData, updateField, updateArrayField } = useFormState<ModelFormData>(INITIAL_FORM_DATA);
+  // 자동 저장 비활성화: 이미지 선택 시점에만 수동으로 저장
+  const { formData, updateField, updateArrayField, setFormData } = useFormState<ModelFormData>(INITIAL_FORM_DATA, undefined);
   const {
     formData: toggles,
     updateField: updateToggleField,
     updateArrayField: updateToggleArrayField,
-  } = useFormState<ModelToggleState>(INITIAL_TOGGLE_STATE);
+    setFormData: setToggles,
+  } = useFormState<ModelToggleState>(INITIAL_TOGGLE_STATE, undefined);
 
+  // 이미지 관리 훅
   const {
-    profileFile: mainThumbnailFile,
-    profileUrl: mainThumbnailUrl,
-    galleryFiles: galleryImageFiles,
-    galleryUrls: galleryImageUrls,
-    selectProfileImage,
-    removeProfileImage,
-    selectGalleryImage,
-    removeGalleryImage,
-  } = useFormUpload({ maxGalleryImages: MAX_GALLERY_IMAGES });
+    mainThumbnailUrl,
+    galleryImageUrls,
+    mainThumbnailFile,
+    galleryImageFiles,
+    getMainThumbnailFile,
+    getGalleryImageFiles,
+    hasStoredImages,
+    handleMainThumbnailSelect: baseHandleMainThumbnailSelect,
+    handleGalleryImageSelect: baseHandleGalleryImageSelect,
+    handleGalleryImageReplace: baseHandleGalleryImageReplace,
+    handleGalleryImageRemove: baseHandleGalleryImageRemove,
+    clearImageStates,
+  } = useModelImageManagement({
+    onImageRestored: () => {
+      // 이미지 복원 후 폼 데이터 복원 트리거
+    },
+  });
 
-  const [portfolioFileUrl, setPortfolioFileUrl] = useState('');
+  // sessionStorage 관리 훅
+  const { clearStorage, saveFormData } = useModelFormStorage({
+    formData,
+    setFormData,
+    toggles,
+    setToggles,
+    hasStoredImages,
+    mainThumbnailUrl,
+    galleryImageUrls,
+    onImageRestored: () => {
+      // 이미지 복원 후 추가 처리 필요 시 여기서 수행
+    },
+  });
 
+  // 이미지 선택 핸들러 (폼 데이터 저장 포함)
+  const handleMainThumbnailSelect = useCallback(
+    (file: File) => {
+      baseHandleMainThumbnailSelect(file);
+      saveFormData();
+    },
+    [baseHandleMainThumbnailSelect, saveFormData]
+  );
+
+  const handleGalleryImageSelect = useCallback(
+    (file: File) => {
+      const added = baseHandleGalleryImageSelect(file);
+      if (added) {
+        saveFormData();
+      }
+      return added;
+    },
+    [baseHandleGalleryImageSelect, saveFormData]
+  );
+
+  const [portfolioFileUrl, setPortfolioFileUrl] = useState<string | null>(null);
   const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = useCallback(
     (field: keyof ModelFormData, value: string, index?: number, subField?: keyof (ModelFormData['websites'][number]) ) => {
@@ -103,26 +149,35 @@ export const useModelRegisterForm = () => {
     [toggles, updateToggleArrayField, updateToggleField]
   );
 
-  const handleGalleryImageSelect = useCallback(
+  const handleGalleryImageSelectWithToast = useCallback(
     (file: File) => {
-      const added = selectGalleryImage(file);
+      const added = handleGalleryImageSelect(file);
       if (!added) {
         showToast(`갤러리 이미지는 최대 ${MAX_GALLERY_IMAGES}개까지 업로드 가능합니다.`, undefined, 'error');
       }
     },
-    [selectGalleryImage, showToast]
+    [handleGalleryImageSelect, showToast]
+  );
+
+  const handleGalleryImageReplace = useCallback(
+    (index: number, file: File) => {
+      baseHandleGalleryImageReplace(index, file);
+      saveFormData();
+    },
+    [baseHandleGalleryImageReplace, saveFormData]
   );
 
   const handleGalleryImageRemove = useCallback(
     (index: number) => {
-      removeGalleryImage(index);
+      baseHandleGalleryImageRemove(index);
+      saveFormData();
     },
-    [removeGalleryImage]
+    [baseHandleGalleryImageRemove, saveFormData]
   );
 
   const handlePortfolioFileSelect = useCallback((file: File) => {
     setPortfolioFile(file);
-    setPortfolioFileUrl(`${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`);
+    setPortfolioFileUrl(`${file.name} (${formatFileSize(file.size)})`);
   }, []);
 
   const handlePortfolioFileRemove = useCallback(() => {
@@ -130,42 +185,38 @@ export const useModelRegisterForm = () => {
     setPortfolioFileUrl('');
   }, []);
 
-  const parseNumber = (value: string): number | undefined => {
-    const num = parseFloat(value.trim());
-    return Number.isNaN(num) ? undefined : num;
-  };
+  const handleFileError = useCallback(
+    (message: string) => {
+      showToast(message, undefined, 'error');
+    },
+    [showToast]
+  );
 
   const handleSubmit = useCallback(async () => {
+    // 유효성 검사
+    const validation = validateModelForm(formData, toggles);
+    if (!validation.isValid) {
+      showToast(validation.errorMessage || '입력 정보를 확인해주세요.', undefined, 'error');
+      return;
+    }
+
     setIsSubmitting(true);
-
-    const trimmedContact = formData.contact.trim();
-    if (trimmedContact && !isValidPhoneNumber(trimmedContact)) {
-      showToast('연락처 형식이 올바르지 않습니다.', undefined, 'error');
-      setIsSubmitting(false);
-      return;
-    }
-
-    const hasInvalidWebsite = formData.websites.some((website, index) => {
-      const trimmed = website.content.trim();
-      if (!trimmed || !toggles.websites[index]) {
-        return false;
-      }
-      return !isValidUrl(trimmed);
-    });
-
-    if (hasInvalidWebsite) {
-      showToast('SNS 링크를 올바르게 입력해주세요.', undefined, 'error');
-      setIsSubmitting(false);
-      return;
-    }
 
     try {
       let uploadedMainThumbnailUrl: string | undefined;
-      const uploadedGalleryUrls: string[] = [];
+      let uploadedGalleryUrls: string[] = [];
       let uploadedPortfolioFileUrl: string | undefined;
 
-      if (mainThumbnailFile) {
-        const url = await uploadFile(mainThumbnailFile, { type: 'image' });
+      // ref에서도 파일 확인 (상태가 null일 수 있으므로)
+      const finalMainThumbnailFile = mainThumbnailFile || await getMainThumbnailFile();
+      const finalGalleryImageFiles = galleryImageFiles.length > 0 ? galleryImageFiles : await getGalleryImageFiles();
+
+      if (finalMainThumbnailFile) {
+        const url = await uploadFile(finalMainThumbnailFile, {
+          type: 'image',
+          category: 'portfolio',
+          publicId: 'main-thumbnail',
+        });
         if (!url) {
           showToast('프로필 이미지 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
           setIsSubmitting(false);
@@ -174,8 +225,12 @@ export const useModelRegisterForm = () => {
         uploadedMainThumbnailUrl = url;
       }
 
-      for (const file of galleryImageFiles) {
-        const url = await uploadFile(file, { type: 'image' });
+      // 갤러리 이미지 업로드
+      for (const file of finalGalleryImageFiles) {
+        const url = await uploadFile(file, {
+          type: 'image',
+          category: 'portfolio',
+        });
         if (!url) {
           showToast('갤러리 이미지 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
           setIsSubmitting(false);
@@ -184,6 +239,7 @@ export const useModelRegisterForm = () => {
         uploadedGalleryUrls.push(url);
       }
 
+      // 파일 업로드
       if (portfolioFile) {
         const url = await uploadFile(portfolioFile, { type: 'raw' });
         if (!url) {
@@ -194,60 +250,44 @@ export const useModelRegisterForm = () => {
         uploadedPortfolioFileUrl = url;
       }
 
-      const websiteUrl = formData.websites[0]?.content.trim() || undefined;
-      const instagramUrl = formData.websites[1]?.content.trim() || undefined;
-      const youtubeUrl = formData.websites[2]?.content.trim() || undefined;
-
-      const height = parseNumber(formData.tags[0]?.value || '');
-      const weight = parseNumber(formData.tags[1]?.value || '');
-      const topSize = formData.tags[2]?.value.trim() || undefined;
-      const experienceYears = parseNumber(formData.tags[3]?.value || '');
-      const age = parseNumber(formData.tags[4]?.value || '');
-
-      const request: CreateModelRequest = {
-        nickname: formData.name.trim() || undefined,
-        oneLineIntro: formData.oneLineIntro.trim() || undefined,
-        detailedIntro: formData.detailedIntro.trim() || undefined,
-        mainThumbnailUrl: uploadedMainThumbnailUrl,
-        subThumbnailUrls: uploadedGalleryUrls.length > 0 ? uploadedGalleryUrls : undefined,
-        websiteUrl,
-        instagramUrl,
-        youtubeUrl,
-        attachedFileUrl: uploadedPortfolioFileUrl,
-        height,
-        weight,
-        topSize,
-        experienceYears,
-        age,
-        status: 'published',
-        publicScope: '전체공개',
-        isAgePublic: true,
-        isSizingPublic: true,
-        isReceivingOffers: true,
-      };
+      const request = buildModelRequest(
+        formData,
+        uploadedMainThumbnailUrl,
+        uploadedGalleryUrls,
+        uploadedPortfolioFileUrl
+      );
 
       const response = await modelRepository.createModel(request);
 
       if (response.ok) {
-        showToast('모델이 등록되었습니다.');
+        // 제출 성공 시 sessionStorage 삭제
+        clearStorage();
+        clearImageUrls();
+        showToast('모델이 등록되었습니다.', undefined, 'success');
         navigate('/models', { replace: true });
+      } else {
+        const errorMessage = '모델 등록에 실패했습니다.';
+        showToast(errorMessage, undefined, 'error');
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : '모델 등록에 실패했습니다.';
-      showToast(message, undefined, 'error');
+      console.error('모델 등록 실패:', error);
     } finally {
       setIsSubmitting(false);
     }
   }, [
     formData,
-    galleryImageFiles,
-    mainThumbnailFile,
-    modelRepository,
-    navigate,
-    portfolioFile,
     toggles,
-    showToast,
+    mainThumbnailFile,
+    galleryImageFiles,
+    portfolioFile,
+    getMainThumbnailFile,
+    getGalleryImageFiles,
     uploadFile,
+    modelRepository,
+    clearStorage,
+    clearImageUrls,
+    navigate,
+    showToast,
   ]);
 
   return {
@@ -260,12 +300,14 @@ export const useModelRegisterForm = () => {
     isImageUploading,
     handleInputChange,
     handleToggleChange,
-    handleProfileImageSelect: selectProfileImage,
-    handleProfileImageRemove: removeProfileImage,
-    handleGalleryImageSelect,
+    handleProfileImageSelect: handleMainThumbnailSelect,
+    handleProfileImageRemove: clearImageStates,
+    handleGalleryImageSelect: handleGalleryImageSelectWithToast,
+    handleGalleryImageReplace,
     handleGalleryImageRemove,
     handlePortfolioFileSelect,
     handlePortfolioFileRemove,
+    handleFileError,
     handleSubmit,
   };
 };

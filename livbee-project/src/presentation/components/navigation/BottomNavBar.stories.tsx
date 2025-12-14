@@ -1,18 +1,30 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import BottomNavBar from './BottomNavBar';
+import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
+import BottomNavBar from '@/presentation/components/navigation/BottomNavBar';
 import { ToastProvider } from '@/presentation/contexts/ToastContext';
-import { AuthProvider } from '@/presentation/hooks/useAuth';
-import React from 'react';
+import { AuthContext, type UseAuthReturn } from '@/presentation/hooks/auth/useAuth';
 
-// Storybook에서 사용할 간단한 AuthProvider 래퍼
-const MockAuthProvider: React.FC<{ children: React.ReactNode; isLoggedIn?: boolean }> = ({ 
-  children, 
-  isLoggedIn = false 
-}) => {
-  // useAuth 훅을 모킹하기 위한 간단한 컨텍스트
-  return <>{children}</>;
-};
+const createMockAuthValue = (overrides?: Partial<UseAuthReturn>): UseAuthReturn => ({
+  isLoggedIn: false,
+  user: null,
+  isLoading: false,
+  login: async () => {},
+  signup: async () => {},
+  logout: () => {},
+  refreshUser: async () => {},
+  ...overrides,
+});
+
+const MockAuthProvider = ({
+  children,
+  value,
+}: {
+  children: ReactNode;
+  value?: Partial<UseAuthReturn>;
+}) => (
+  <AuthContext.Provider value={createMockAuthValue(value)}>{children}</AuthContext.Provider>
+);
 
 const meta: Meta<typeof BottomNavBar> = {
   title: 'Navigation/BottomNavBar',
@@ -26,24 +38,6 @@ const meta: Meta<typeof BottomNavBar> = {
     },
   },
   tags: ['autodocs'],
-  decorators: [
-    (Story, context) => {
-      const isLoggedIn = context.args.isLoggedIn ?? false;
-      return (
-        <MemoryRouter initialEntries={[context.args.initialPath || '/']}>
-          <ToastProvider>
-            <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ flex: 1, padding: '20px' }}>
-                <p>페이지 내용이 여기에 표시됩니다.</p>
-                <p>현재 경로: {context.args.initialPath || '/'}</p>
-              </div>
-              <Story />
-            </div>
-          </ToastProvider>
-        </MemoryRouter>
-      );
-    },
-  ],
   argTypes: {
     initialPath: {
       control: 'select',
@@ -66,6 +60,21 @@ export const Default: Story = {
     initialPath: '/',
     isLoggedIn: false,
   },
+  render: (args) => (
+    <MemoryRouter initialEntries={[args.initialPath || '/']}>
+      <MockAuthProvider value={{ isLoggedIn: Boolean(args.isLoggedIn) }}>
+        <ToastProvider>
+          <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ flex: 1, padding: '20px' }}>
+              <p>페이지 내용이 여기에 표시됩니다.</p>
+              <p>현재 경로: {args.initialPath || '/'}</p>
+            </div>
+            <BottomNavBar />
+          </div>
+        </ToastProvider>
+      </MockAuthProvider>
+    </MemoryRouter>
+  ),
 };
 
 // ===== 다양한 경로 =====
@@ -79,13 +88,15 @@ export const DifferentPaths: Story = {
           <div key={path} style={{ border: '1px solid #e0e0e0', borderRadius: '8px', padding: '20px' }}>
             <h3 style={{ marginBottom: '10px' }}>경로: {path}</h3>
             <MemoryRouter initialEntries={[path]}>
-              <ToastProvider>
-                <div style={{ position: 'relative', height: '200px', border: '1px solid #f0f0f0' }}>
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
-                    <BottomNavBar />
+              <MockAuthProvider>
+                <ToastProvider>
+                  <div style={{ position: 'relative', height: '200px', border: '1px solid #f0f0f0' }}>
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+                      <BottomNavBar />
+                    </div>
                   </div>
-                </div>
-              </ToastProvider>
+                </ToastProvider>
+              </MockAuthProvider>
             </MemoryRouter>
           </div>
         ))}
@@ -109,25 +120,29 @@ export const LoginStates: Story = {
         <div style={{ border: '1px solid #e0e0e0', borderRadius: '8px', padding: '20px' }}>
           <h3 style={{ marginBottom: '10px' }}>로그인 안 함</h3>
           <MemoryRouter initialEntries={['/']}>
-            <ToastProvider>
-              <div style={{ position: 'relative', height: '200px', border: '1px solid #f0f0f0' }}>
-                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
-                  <BottomNavBar />
+            <MockAuthProvider value={{ isLoggedIn: false }}>
+              <ToastProvider>
+                <div style={{ position: 'relative', height: '200px', border: '1px solid #f0f0f0' }}>
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+                    <BottomNavBar />
+                  </div>
                 </div>
-              </div>
-            </ToastProvider>
+              </ToastProvider>
+            </MockAuthProvider>
           </MemoryRouter>
         </div>
         <div style={{ border: '1px solid #e0e0e0', borderRadius: '8px', padding: '20px' }}>
           <h3 style={{ marginBottom: '10px' }}>로그인 함</h3>
           <MemoryRouter initialEntries={['/']}>
-            <ToastProvider>
-              <div style={{ position: 'relative', height: '200px', border: '1px solid #f0f0f0' }}>
-                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
-                  <BottomNavBar />
+            <MockAuthProvider value={{ isLoggedIn: true }}>
+              <ToastProvider>
+                <div style={{ position: 'relative', height: '200px', border: '1px solid #f0f0f0' }}>
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+                    <BottomNavBar />
+                  </div>
                 </div>
-              </div>
-            </ToastProvider>
+              </ToastProvider>
+            </MockAuthProvider>
           </MemoryRouter>
         </div>
       </div>

@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import SearchInput from './SearchInput';
-import styled from 'styled-components';
-import React, { useState } from 'react';
+import SearchInput from '@/presentation/components/search/SearchInput';
+import {
+  SearchPlaceholderDemo,
+  SearchSubmitDemo,
+  SearchStateDemo,
+  SearchUsageDemo,
+} from '@/presentation/components/search/SearchInputStoryContent';
 
 const meta: Meta<typeof SearchInput> = {
   title: 'Navigation/SearchInput',
@@ -38,36 +42,8 @@ export const Default: Story = {
 };
 
 // ===== 다양한 플레이스홀더 =====
-const PlaceholderContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.lg};
-  max-width: 600px;
-`;
-
 export const Placeholders: Story = {
-  render: () => (
-    <PlaceholderContainer>
-      <div>
-        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>
-          모집공고 검색
-        </label>
-        <SearchInput placeholder="모집공고를 검색하세요" />
-      </div>
-      <div>
-        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>
-          포트폴리오 검색
-        </label>
-        <SearchInput placeholder="포트폴리오를 검색하세요" />
-      </div>
-      <div>
-        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>
-          모델 검색
-        </label>
-        <SearchInput placeholder="모델명을 검색하세요" />
-      </div>
-    </PlaceholderContainer>
-  ),
+  render: () => <SearchPlaceholderDemo />,
   parameters: {
     docs: {
       description: {
@@ -79,27 +55,7 @@ export const Placeholders: Story = {
 
 // ===== 검색 제출 =====
 export const WithSubmit: Story = {
-  render: () => {
-    const [searchTerm, setSearchTerm] = useState('');
-
-    return (
-      <div style={{ maxWidth: '600px' }}>
-        <SearchInput
-          placeholder="검색어를 입력하고 Enter를 누르세요"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onSearchSubmit={(value) => {
-            alert(`검색어: ${value}`);
-          }}
-        />
-        {searchTerm && (
-          <p style={{ marginTop: '8px', fontSize: '12px', color: '#717182' }}>
-            입력된 검색어: {searchTerm}
-          </p>
-        )}
-      </div>
-    );
-  },
+  render: () => <SearchSubmitDemo />,
   parameters: {
     docs: {
       description: {
@@ -110,36 +66,8 @@ export const WithSubmit: Story = {
 };
 
 // ===== 다양한 상태 =====
-const StateContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.lg};
-  max-width: 600px;
-`;
-
 export const States: Story = {
-  render: () => (
-    <StateContainer>
-      <div>
-        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>
-          기본 상태
-        </label>
-        <SearchInput placeholder="검색어를 입력하세요" />
-      </div>
-      <div>
-        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>
-          값이 있는 상태
-        </label>
-        <SearchInput placeholder="검색어를 입력하세요" defaultValue="검색어" />
-      </div>
-      <div>
-        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>
-          비활성화
-        </label>
-        <SearchInput placeholder="검색어를 입력하세요" disabled />
-      </div>
-    </StateContainer>
-  ),
+  render: () => <SearchStateDemo />,
   parameters: {
     docs: {
       description: {
@@ -151,41 +79,7 @@ export const States: Story = {
 
 // ===== 사용 예시 =====
 export const UsageExamples: Story = {
-  render: () => {
-    const [campaignSearch, setCampaignSearch] = useState('');
-    const [portfolioSearch, setPortfolioSearch] = useState('');
-
-    return (
-      <StateContainer>
-        <div>
-          <h3 style={{ marginBottom: '12px', fontSize: '16px', fontWeight: 700 }}>
-            모집공고 페이지
-          </h3>
-          <SearchInput
-            placeholder="모집공고를 검색하세요"
-            value={campaignSearch}
-            onChange={(e) => setCampaignSearch(e.target.value)}
-            onSearchSubmit={(value) => {
-              alert(`모집공고 검색: ${value}`);
-            }}
-          />
-        </div>
-        <div>
-          <h3 style={{ marginBottom: '12px', fontSize: '16px', fontWeight: 700 }}>
-            포트폴리오 페이지
-          </h3>
-          <SearchInput
-            placeholder="포트폴리오를 검색하세요"
-            value={portfolioSearch}
-            onChange={(e) => setPortfolioSearch(e.target.value)}
-            onSearchSubmit={(value) => {
-              alert(`포트폴리오 검색: ${value}`);
-            }}
-          />
-        </div>
-      </StateContainer>
-    );
-  },
+  render: () => <SearchUsageDemo />,
   parameters: {
     docs: {
       description: {

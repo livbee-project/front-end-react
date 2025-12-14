@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { H2, PMuted } from './Typography';
+import { H2, PMuted } from '@/presentation/components/styled/Typography';
 
 /**
  * CommonStyles - 공통 스타일 컴포넌트
@@ -18,7 +18,7 @@ export const Input = styled.input`
   background-color: ${({ theme }) => theme.input.backgroundColor};
   border-radius: ${({ theme }) => theme.input.borderRadius};
   border: 1px solid transparent;
-  font: 400 15px/1.6 'NexonLv2Gothic';
+  font: 400 16px/1.6 'NexonLv2Gothic';
   color: ${({ theme }) => theme.colors.foreground};
   outline: none;
   box-sizing: border-box;
@@ -48,7 +48,7 @@ export const Textarea = styled.textarea`
   background-color: ${({ theme }) => theme.input.backgroundColor};
   border-radius: ${({ theme }) => theme.input.borderRadius};
   border: 1px solid transparent;
-  font: 400 15px/1.6 'NexonLv2Gothic';
+  font: 400 16px/1.6 'NexonLv2Gothic';
   color: ${({ theme }) => theme.colors.foreground};
   outline: none;
   box-sizing: border-box;

@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import type { UserType } from '@/types/mypage';
+import type { UserType } from '@/domain/entities/User';
+import { TYPE_SWITCHER_CONFIGS } from '@/presentation/components/mypage/config/typeSwitcherConfig';
 
 interface TypeSwitcherProps {
   availableTypes: UserType[];
@@ -8,6 +9,10 @@ interface TypeSwitcherProps {
   onTypeChange: (type: UserType) => void;
 }
 
+/**
+ * 타입 스위처 컴포넌트
+ * OCP 준수: 동적 렌더링을 사용하여 새로운 타입 추가 시 기존 코드 수정 없이 확장 가능
+ */
 export const TypeSwitcher: React.FC<TypeSwitcherProps> = ({
   availableTypes,
   selectedType,
@@ -19,20 +24,16 @@ export const TypeSwitcher: React.FC<TypeSwitcherProps> = ({
 
   return (
     <Container>
-      {availableTypes.includes('brand') && (
-        <TypeBadge $isActive={selectedType === 'brand'} onClick={() => onTypeChange('brand')}>
-          브랜드
-        </TypeBadge>
-      )}
-      {availableTypes.includes('showhost') && (
-        <TypeBadge $isActive={selectedType === 'showhost'} onClick={() => onTypeChange('showhost')}>
-          쇼호스트
-        </TypeBadge>
-      )}
-      {availableTypes.includes('model') && (
-        <TypeBadge $isActive={selectedType === 'model'} onClick={() => onTypeChange('model')}>
-          모델
-        </TypeBadge>
+      {TYPE_SWITCHER_CONFIGS.filter((config) => availableTypes.includes(config.type)).map(
+        (config) => (
+          <TypeBadge
+            key={config.type}
+            $isActive={selectedType === config.type}
+            onClick={() => onTypeChange(config.type)}
+          >
+            {config.label}
+          </TypeBadge>
+        )
       )}
     </Container>
   );

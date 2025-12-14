@@ -1,7 +1,14 @@
 import type React from 'react';
+import type {
+  ModalProps as CommonModalProps,
+  BaseInputProps as CommonBaseInputProps,
+  ImageUploadProps as CommonImageUploadProps,
+} from '@/types/commonProps';
 
 /**
  * 공통 컴포넌트 Props 타입 정의
+ * @deprecated 일부 타입은 @/types/commonProps로 이동되었습니다.
+ * 새로운 컴포넌트는 commonProps의 타입을 사용하세요.
  */
 
 // ===== 섹션 관련 =====
@@ -59,10 +66,10 @@ export interface ImageCardProps extends BaseCardProps {
 
 // ===== 모달 관련 =====
 
-export interface BaseModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+/**
+ * @deprecated @/types/commonProps의 ModalProps를 사용하세요
+ */
+export interface BaseModalProps extends CommonModalProps {}
 
 // ===== 파일 업로드 관련 =====
 
@@ -71,20 +78,23 @@ export interface FileUploadProps {
   onImageSelect?: (file: File) => void;
 }
 
-export interface ImageUploadProps extends FileUploadProps {
+/**
+ * @deprecated @/types/commonProps의 ImageUploadProps를 사용하세요
+ */
+export interface ImageUploadProps extends CommonImageUploadProps {
   size?: number;
-  aspectRatio?: string;
-  enableCrop?: boolean;
 }
 
 // ===== 입력 컴포넌트 =====
 
-export interface BaseInputProps {
-  value: string;
-  onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-}
+/**
+ * @deprecated @/types/commonProps의 BaseInputProps를 사용하세요
+ */
+export interface BaseInputProps extends CommonBaseInputProps {}
 
-export interface SelectInputProps extends BaseInputProps {
+export interface SelectInputProps
+  extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'value' | 'onChange'>,
+    BaseInputProps {
   options: { value: string; label: string }[];
 }
 
@@ -100,16 +110,6 @@ export interface ListContainerProps {
 export interface BaseButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> {
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   children: React.ReactNode;
-}
-
-// ===== 상세 페이지 관련 =====
-
-export interface DetailHeaderProps {
-  imageUrl?: string;
-  brandName: string;
-  deadlineDay?: string;
-  title: string;
-  content: string;
 }
 
 export interface ProfileSectionProps {
@@ -136,5 +136,6 @@ export interface ActionSectionProps {
 export interface StickyHeaderProps {
   title: string;
   onShare?: () => void;
+  showShare?: boolean;
 }
 

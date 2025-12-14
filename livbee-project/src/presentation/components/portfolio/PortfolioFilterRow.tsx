@@ -32,7 +32,7 @@ const FilterContainer = styled.div`
   gap: ${({ theme }) => theme.spacing.sm};
   overflow-x: auto;
   padding-bottom: ${({ theme }) => theme.spacing.xs};
-  margin-bottom: ${({ theme }) => theme.spacing.xl};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
   -ms-overflow-style: none;
   scrollbar-width: none;
   &::-webkit-scrollbar {

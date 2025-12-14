@@ -96,12 +96,6 @@ export interface GallerySectionProps {
   onRemoveImage: (index: number) => void;
 }
 
-export interface SubmitSectionProps {
-  disabled: boolean;
-  isSubmitting: boolean;
-  onSubmit?: () => void;
-}
-
 export interface RegistrationTypeSectionProps {
   value: string;
   onChange: (value: string) => void;

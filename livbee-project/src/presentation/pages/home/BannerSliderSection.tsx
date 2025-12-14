@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useSlider } from '@/presentation/hooks/useSlider';
+import { useSlider } from '@/presentation/hooks/common/useSlider';
 import banner01 from '@/presentation/assets/images/banner_01.jpg';
 import banner02 from '@/presentation/assets/images/banner_02.jpg';
 

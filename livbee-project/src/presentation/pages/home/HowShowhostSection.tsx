@@ -1,14 +1,14 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import HomeSection, { Highlight } from './components/HomeSection';
+import HomeSection, { Highlight } from '@/presentation/pages/home/components/HomeSection';
 import Button from '@/presentation/components/ui/Button';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { EmptyState } from '@/presentation/components/states/EmptyState';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { Portfolio } from '@/domain/entities/Portfolio';
-import { useRepository } from '@/presentation/hooks/useRepository';
-import { useListData } from '@/presentation/hooks/useListData';
+import { useRepository } from '@/presentation/hooks/common/useRepository';
+import { useListData } from '@/presentation/hooks/list/useListData';
 import { H3, PMuted } from '@/presentation/components/styled/Typography';
 
 const List = styled.div`
@@ -53,18 +53,33 @@ const Intro = styled(PMuted)`
   margin-top: ${({ theme }) => theme.spacing.xs};
 `;
 
-const HowShowhostSection: React.FC = () => {
+const HowShowhostSection: React.FC = React.memo(() => {
   const navigate = useNavigate();
   const portfolioRepository = useRepository(PortfolioRepository);
+
+  // query 객체 메모이제이션
+  const query = useMemo(() => ({ page: 1, limit: 5 }), []);
+  
+  // fetchFunction 메모이제이션
+  const fetchPortfolios = useCallback(
+    (query: { page: number; limit: number }, signal?: AbortSignal) => {
+      return portfolioRepository.getPortfolioList(query, signal);
+    },
+    [portfolioRepository]
+  );
+
+  const cacheKey = useMemo(() => `how-showhost-${JSON.stringify(query)}`, [query]);
+
   const { data: portfolios, loading } = useListData<
     Portfolio,
     { page: number; limit: number },
     { items: Portfolio[] }
   >(
-    (query, signal) => portfolioRepository.getPortfolioList(query, signal),
-    { page: 1, limit: 5 },
+    fetchPortfolios,
+    query,
     [],
-    '쇼호스트 목록을 불러오는 중 오류가 발생했습니다.'
+    '쇼호스트 목록을 불러오는 중 오류가 발생했습니다.',
+    { cacheKey }
   );
 
   if (loading) {
@@ -115,6 +130,8 @@ const HowShowhostSection: React.FC = () => {
       </List>
     </HomeSection>
   );
-};
+});
+
+HowShowhostSection.displayName = 'HowShowhostSection';
 
 export default HowShowhostSection;

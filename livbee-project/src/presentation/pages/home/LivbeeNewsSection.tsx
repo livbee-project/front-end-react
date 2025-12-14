@@ -1,8 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Calendar } from 'lucide-react';
-import HomeSection from './components/HomeSection';
+import HomeSection from '@/presentation/pages/home/components/HomeSection';
 import { H3, PMuted, Caption } from '@/presentation/components/styled/Typography';
+import { debug } from '@/shared/utils/logger';
 
 const newsItems = [
   {
@@ -63,7 +64,7 @@ const Meta = styled.div`
 `;
 
 const LivbeeNewsSection: React.FC = () => (
-  <HomeSection title="뉴스" onMore={() => console.log('뉴스 더보기')}>
+  <HomeSection title="뉴스" onMore={() => debug('LivbeeNewsSection', '뉴스 더보기 클릭')}>
     <List>
       {newsItems.map((news) => (
         <Card key={news.id}>

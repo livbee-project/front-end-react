@@ -32,9 +32,24 @@ export const CropViewport: React.FC<CropViewportProps> = ({
       onMouseMove={(e) => onDragMove(e.clientX, e.clientY)}
       onMouseUp={onDragEnd}
       onMouseLeave={onDragEnd}
-      onTouchStart={(e) => onDragStart(e.touches[0].clientX, e.touches[0].clientY)}
-      onTouchMove={(e) => onDragMove(e.touches[0].clientX, e.touches[0].clientY)}
+      onTouchStart={(e) => {
+        // 두 손가락 터치(핀치 줌) 차단
+        if (e.touches.length > 1) {
+          e.preventDefault();
+          return;
+        }
+        onDragStart(e.touches[0].clientX, e.touches[0].clientY);
+      }}
+      onTouchMove={(e) => {
+        // 두 손가락 터치(핀치 줌) 차단
+        if (e.touches.length > 1) {
+          e.preventDefault();
+          return;
+        }
+        onDragMove(e.touches[0].clientX, e.touches[0].clientY);
+      }}
       onTouchEnd={onDragEnd}
+      onTouchCancel={onDragEnd}
     >
       <ImageWrapper $width={imageSize.width} $height={imageSize.height}>
         <CropImage
@@ -74,19 +89,30 @@ export const CropViewport: React.FC<CropViewportProps> = ({
 };
 
 const Container = styled.div`
-  flex: 1;
+  position: fixed; /* 고정 위치 */
+  top: calc(60px + env(safe-area-inset-top)); /* 상단 헤더 높이 */
+  bottom: calc(80px + 40px + env(safe-area-inset-bottom)); /* 하단 컨트롤 높이 */
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  position: relative;
+  overflow: hidden; /* 스크롤 비활성화 */
   background-color: #000;
+  box-sizing: border-box;
+  width: 100%;
+  touch-action: pan-x pan-y; /* 드래그만 허용, 핀치 줌 차단 */
+  -webkit-touch-callout: none; /* iOS 롱프레스 메뉴 차단 */
+  -webkit-user-select: none;
+  user-select: none;
 `;
 
 const ImageWrapper = styled.div<{ $width: number; $height: number }>`
   position: relative;
   width: ${({ $width }) => ($width > 0 ? `${$width}px` : 'auto')};
   height: ${({ $height }) => ($height > 0 ? `${$height}px` : 'auto')};
+  max-width: 100%;
+  max-height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -128,11 +154,22 @@ const GridContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  position: relative;
 `;
 
 const GridLine = styled.div`
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  /* 각 셀의 오른쪽과 아래쪽에만 border 적용하여 겹침 방지 */
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  
+  /* 마지막 열과 행의 border 제거 */
+  &:nth-child(3n) {
+    border-right: none;
+  }
+  
+  &:nth-child(n+7) {
+    border-bottom: none;
+  }
 `;
 
 const DarkOverlay = styled.div.attrs<{

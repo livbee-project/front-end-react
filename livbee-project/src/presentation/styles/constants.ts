@@ -6,7 +6,7 @@
  */
 
 import type { CSSProperties } from 'react';
-import { theme } from './theme';
+import { theme } from '@/presentation/styles/theme';
 
 /**
  * @deprecated theme.spacing을 사용하세요

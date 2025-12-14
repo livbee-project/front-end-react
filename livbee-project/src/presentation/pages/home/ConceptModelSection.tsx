@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import HomeSection, { Highlight, HorizontalScroll } from './components/HomeSection';
+import HomeSection, { Highlight, HorizontalScroll } from '@/presentation/pages/home/components/HomeSection';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { EmptyState } from '@/presentation/components/states/EmptyState';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
 import type { Model } from '@/domain/entities/Model';
-import { useRepository } from '@/presentation/hooks/useRepository';
-import { useListData } from '@/presentation/hooks/useListData';
+import { useRepository } from '@/presentation/hooks/common/useRepository';
+import { useListData } from '@/presentation/hooks/list/useListData';
 import { HomeCard } from '@/presentation/components/cards/HomeCard';
 import { HomeCardImage } from '@/presentation/components/cards/HomeCardImage';
 import { HomeCardBody, HomeCardTitle, HomeCardDescription } from '@/presentation/components/cards/HomeCardBody';
@@ -26,18 +26,33 @@ const StyledCard = styled(HomeCard)`
   }
 `;
 
-const ConceptModelSection: React.FC = () => {
+const ConceptModelSection: React.FC = React.memo(() => {
   const navigate = useNavigate();
   const modelRepository = useRepository(ModelRepository);
+
+  // query 객체 메모이제이션
+  const query = useMemo(() => ({ page: 1, limit: 10 }), []);
+  
+  // fetchFunction 메모이제이션
+  const fetchModels = useCallback(
+    (query: { page: number; limit: number }, signal?: AbortSignal) => {
+      return modelRepository.getModelList(query, signal);
+    },
+    [modelRepository]
+  );
+
+  const cacheKey = useMemo(() => `concept-models-${JSON.stringify(query)}`, [query]);
+
   const { data: models, loading } = useListData<
     Model,
     { page: number; limit: number },
     { items: Model[] }
   >(
-    (query, signal) => modelRepository.getModelList(query, signal),
-    { page: 1, limit: 10 },
+    fetchModels,
+    query,
     [],
-    '모델 목록을 불러오는 중 오류가 발생했습니다.'
+    '모델 목록을 불러오는 중 오류가 발생했습니다.',
+    { cacheKey }
   );
 
   if (loading) {
@@ -74,6 +89,8 @@ const ConceptModelSection: React.FC = () => {
       </HorizontalScroll>
     </HomeSection>
   );
-};
+});
+
+ConceptModelSection.displayName = 'ConceptModelSection';
 
 export default ConceptModelSection;

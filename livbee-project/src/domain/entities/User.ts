@@ -4,6 +4,12 @@
 export type UserRole = 'brand' | 'showhost';
 
 /**
+ * 사용자 타입 (UI에서 사용)
+ * UserRole에 'model'을 추가한 확장 타입
+ */
+export type UserType = UserRole | 'model';
+
+/**
  * 사용자 엔티티
  */
 export interface User {

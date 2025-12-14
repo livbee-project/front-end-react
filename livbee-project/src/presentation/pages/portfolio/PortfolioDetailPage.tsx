@@ -1,50 +1,97 @@
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import StickyHeader from '@/presentation/components/detail/StickyHeader';
-import ProfileSection from '@/presentation/components/detail/ProfileSection';
-import HomeSectionHeader from '@/presentation/components/section/HomeSectionHeader';
-import GalleryGrid from '@/presentation/components/detail/GalleryGrid';
-import ActionSection from '@/presentation/components/detail/ActionSection';
+import { useParams } from 'react-router-dom';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
-import DetailSection from '@/presentation/layouts/DetailSection';
-import { LoadingState } from '@/presentation/components/states/LoadingState';
-import { ErrorState } from '@/presentation/components/states/ErrorState';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { PortfolioDetail } from '@/domain/entities/Portfolio';
-import { useRepository } from '@/presentation/hooks/useRepository';
-import { useDetailData } from '@/presentation/hooks/useDetailData';
-import { useImageGallery } from '@/presentation/hooks/useImageGallery';
-import GalleryLightbox from '@/presentation/components/detail/GalleryLightbox';
-
-const GallerySection = styled(DetailSection)`
-  padding: ${({ theme }) => theme.spacing.xl} ${({ theme }) => theme.spacing.lg};
-`;
-
-const GalleryWrapper = styled.div`
-  margin-top: ${({ theme }) => theme.spacing.lg};
-`;
+import { useRepository } from '@/presentation/hooks/common/useRepository';
+import { useDetailFetcher } from '@/presentation/hooks/detail/useDetailFetcher';
+import { useDetailPageState } from '@/presentation/hooks/detail/useDetailPageState';
+import { useProfileDetailPage } from '@/presentation/pages/detail/shared/useProfileDetailPage';
+import { ProfileDetailContent } from '@/presentation/pages/detail/shared/ProfileDetailContent';
 
 const PortfolioDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
 
   const portfolioRepository = useRepository(PortfolioRepository);
 
-  const { data: portfolio, loading: isLoading, error } = useDetailData<PortfolioDetail>(
-    (id, signal) => portfolioRepository.getPortfolioById(id, signal),
+  const {
+    data: portfolio,
+    loading: isLoading,
+    error,
+  } = useDetailFetcher<PortfolioDetail, PortfolioRepository>({
+    repository: portfolioRepository,
+    method: 'getPortfolioById',
     id,
-    '포트폴리오를 불러오는데 실패했습니다.'
-  );
+    errorMessage: '포트폴리오를 불러오는데 실패했습니다.',
+  });
 
-  const gallery = useImageGallery(portfolio?.subThumbnailUrls ?? []);
+  // 하드코딩된 기본 데이터 (데이터가 없을 때 사용)
+  const defaultPortfolio: PortfolioDetail = {
+    id: id || '',
+    user: '',
+    nickname: '김지현',
+    oneLineIntro: '패션 전문 쇼호스트, 5년 경력',
+    detailedIntro: '안녕하세요! 패션과 뷰티 분야에서 5년간 활동한 쇼호스트 김지현입니다.\n라이브 커머스를 통해 고객과 소통하며 브랜드 가치를 전달하는 것을 즐깁니다. 진정성 있는 소통과 전문적인 제품 설명으로 높은 구매 전환율을 자랑합니다.\n함께 성장할 수 있는 브랜드와의 협업을 기대합니다!',
+    experienceYears: 5,
+    age: null,
+    isAgePublic: false,
+    mainThumbnailUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
+    backgroundImageUrl: null,
+    subThumbnailUrls: [
+      'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
+    ],
+    status: 'active',
+    detailedRegion: null,
+    gender: null,
+    height: 168,
+    weight: null,
+    topSize: '55(S)',
+    bottomSize: null,
+    shoeSize: null,
+    isSizingPublic: true,
+    websiteUrl: 'https://www.instagram.com/jihyun_host',
+    instagramUrl: null,
+    youtubeUrl: null,
+    tiktokUrl: null,
+    publicScope: 'public',
+    isReceivingOffers: true,
+    recentLives: [],
+    attachedFileUrl: null,
+    createdAt: '',
+    updatedAt: '',
+  };
+
+  // 모든 Hook은 early return 이전에 호출되어야 합니다
+  const { displayData: displayPortfolio, gallery, categories, tags, websiteUrl } = useProfileDetailPage({
+    data: portfolio,
+    defaultData: defaultPortfolio,
+  });
+
+  // 로딩/에러 상태 처리
+  const { renderState, isReady } = useDetailPageState({
+    data: portfolio,
+    loading: isLoading,
+    error,
+    notFoundMessage: '포트폴리오를 찾을 수 없습니다.',
+    listPath: '/portfolios',
+    LayoutComponent: DetailPageLayout,
+  });
+
+  if (renderState) {
+    return <>{renderState}</>;
+  }
+
+  if (!isReady) {
+    return null;
+  }
 
   const handleProfileImageClick = () => {
     // TODO: 이미지 확대 또는 갤러리 열기 기능 구현
-  };
-
-  const handleGalleryImageClick = (index: number) => {
-    gallery.open(index);
   };
 
   const handleScrap = () => {
@@ -59,103 +106,44 @@ const PortfolioDetailPage: React.FC = () => {
     // TODO: 공유 기능 구현
   };
 
-  if (isLoading) {
-    return (
-      <DetailPageLayout>
-        <LoadingState padding="16px" />
-      </DetailPageLayout>
-    );
-  }
-
-  if (error || !portfolio) {
-    return (
-      <DetailPageLayout>
-        <ErrorState
-          message={error || '포트폴리오를 찾을 수 없습니다.'}
-          padding="16px"
-          onRetry={() => navigate('/portfolios')}
-          retryLabel="목록으로 돌아가기"
-        />
-      </DetailPageLayout>
-    );
-  }
-
-  // 카테고리 배열 생성 (description에서 추출)
-  const categories: string[] = [];
-  const description = portfolio.oneLineIntro || '';
-  if (description.includes('패션')) {
-    categories.push('패션');
-  }
-  if (description.includes('뷰티')) {
-    categories.push('뷰티');
-  }
-  if (description.includes('식품')) {
-    categories.push('식품');
-  }
-  if (description.includes('가전')) {
-    categories.push('가전');
-  }
-  if (description.includes('생활') || description.includes('리빙')) {
-    categories.push('생활/리빙');
-  }
-
-  // 태그 배열 생성
-  const tags: string[] = [];
-  if (portfolio.height != null) {
-    tags.push(`키 ${portfolio.height}cm`);
-  }
-  if (portfolio.weight != null) {
-    tags.push(`몸무게 ${portfolio.weight}kg`);
-  }
-  if (portfolio.topSize) {
-    tags.push(`사이즈 ${portfolio.topSize}`);
-  }
-  if (portfolio.experienceYears != null && portfolio.experienceYears > 0) {
-    tags.push(`경력 ${portfolio.experienceYears}년`);
-  }
-
   return (
     <DetailPageLayout>
-      <StickyHeader title={portfolio.nickname || '쇼호스트'} onShare={handleShare} />
-
-      <ProfileSection
-        name={portfolio.nickname || '이름 없음'}
-        description={portfolio.oneLineIntro}
-        detailedIntro={portfolio.detailedIntro}
-        profileImageUrl={portfolio.mainThumbnailUrl || undefined}
-        type="showhost"
-        categories={categories}
-        tags={tags}
-        websiteUrl={portfolio.websiteUrl}
-        onImageClick={handleProfileImageClick}
-      />
-
-      {portfolio.subThumbnailUrls && portfolio.subThumbnailUrls.length > 0 && (
-        <GallerySection>
-          <HomeSectionHeader title="갤러리" />
-          <GalleryWrapper>
-            <GalleryGrid
-              images={portfolio.subThumbnailUrls}
-              columns={3}
-              onImageClick={handleGalleryImageClick}
-            />
-          </GalleryWrapper>
-        </GallerySection>
-      )}
-
-      <ActionSection
-        isScraped={false}
-        isReceivingOffers={portfolio.isReceivingOffers}
-        onScrap={handleScrap}
-        onOffer={handleOffer}
-      />
-      <GalleryLightbox
-        image={gallery.currentImage}
-        isOpen={gallery.isOpen}
-        onClose={gallery.close}
-        onPrev={gallery.showPrev}
-        onNext={gallery.showNext}
-        showControls={gallery.images.length > 1}
+      <ProfileDetailContent
+        header={{
+          title: displayPortfolio.nickname || '쇼호스트',
+          onShare: handleShare,
+        }}
+        profileInfo={{
+          name: displayPortfolio.nickname || '',
+          description: displayPortfolio.oneLineIntro || '',
+          detailedIntro: displayPortfolio.detailedIntro || '',
+          profileImageUrl: displayPortfolio.mainThumbnailUrl || '',
+          type: 'showhost',
+          categories,
+          tags,
+          websiteUrl: websiteUrl || '',
+        }}
+        defaults={{
+          name: '김지현',
+          description: '패션 전문 쇼호스트, 5년 경력',
+          detailedIntro: '안녕하세요! 패션과 뷰티 분야에서 5년간 활동한 쇼호스트 김지현입니다.\n라이브 커머스를 통해 고객과 소통하며 브랜드 가치를 전달하는 것을 즐깁니다. 진정성 있는 소통과 전문적인 제품 설명으로 높은 구매 전환율을 자랑합니다.\n함께 성장할 수 있는 브랜드와의 협업을 기대합니다!',
+          profileImageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
+          websiteUrl: 'https://www.instagram.com/jihyun_host',
+          categories: ['패션', '뷰티'],
+          tags: ['키 168cm', '사이즈 55(S)', '경력 5년'],
+        }}
+        gallery={{
+          images: displayPortfolio.subThumbnailUrls || [],
+          defaultImages: defaultPortfolio.subThumbnailUrls,
+          gallery,
+        }}
+        actions={{
+          onProfileImageClick: handleProfileImageClick,
+          onScrap: handleScrap,
+          onOffer: handleOffer,
+          onShare: handleShare,
+          isReceivingOffers: displayPortfolio.isReceivingOffers ?? true,
+        }}
       />
     </DetailPageLayout>
   );

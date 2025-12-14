@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import PortraitCard from './PortraitCard';
-import styled from 'styled-components';
+import PortraitCard from '@/presentation/components/cards/PortraitCard';
+import {
+  PortraitCardSizesSection,
+  PortraitCardScrollSection,
+  PortraitCardUsageSection,
+} from '@/presentation/components/cards/PortraitCardStoryContent';
 
 const meta: Meta<typeof PortraitCard> = {
   title: 'Cards/PortraitCard',
@@ -59,32 +63,8 @@ export const WithImage: Story = {
 };
 
 // ===== 다양한 크기 =====
-const SizeContainer = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.xl};
-  flex-wrap: wrap;
-`;
-
 export const Sizes: Story = {
-  render: () => (
-    <SizeContainer>
-      <PortraitCard
-        title="작은 카드"
-        content="너비 200px"
-        width={200}
-      />
-      <PortraitCard
-        title="기본 카드"
-        content="너비 300px (기본값)"
-        width={300}
-      />
-      <PortraitCard
-        title="큰 카드"
-        content="너비 400px"
-        width={400}
-      />
-    </SizeContainer>
-  ),
+  render: () => <PortraitCardSizesSection />,
   parameters: {
     docs: {
       description: {
@@ -95,57 +75,8 @@ export const Sizes: Story = {
 };
 
 // ===== 가로 스크롤 예시 =====
-const ScrollContainer = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.lg};
-  overflow-x: auto;
-  padding: ${({ theme }) => theme.spacing.lg} 0;
-  
-  &::-webkit-scrollbar {
-    height: 8px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: ${({ theme }) => theme.colors.secondary};
-    border-radius: 4px;
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.colors.primary};
-    border-radius: 4px;
-  }
-`;
-
 export const HorizontalScroll: Story = {
-  render: () => (
-    <ScrollContainer>
-      <PortraitCard
-        title="모델 1"
-        content="한 줄 소개"
-        onPress={() => alert('카드 1 클릭')}
-      />
-      <PortraitCard
-        title="모델 2"
-        content="한 줄 소개"
-        onPress={() => alert('카드 2 클릭')}
-      />
-      <PortraitCard
-        title="모델 3"
-        content="한 줄 소개"
-        onPress={() => alert('카드 3 클릭')}
-      />
-      <PortraitCard
-        title="모델 4"
-        content="한 줄 소개"
-        onPress={() => alert('카드 4 클릭')}
-      />
-      <PortraitCard
-        title="모델 5"
-        content="한 줄 소개"
-        onPress={() => alert('카드 5 클릭')}
-      />
-    </ScrollContainer>
-  ),
+  render: () => <PortraitCardScrollSection />,
   parameters: {
     docs: {
       description: {
@@ -157,28 +88,7 @@ export const HorizontalScroll: Story = {
 
 // ===== 사용 예시 =====
 export const UsageExamples: Story = {
-  render: () => (
-    <SizeContainer>
-      <PortraitCard
-        imageUrl="https://via.placeholder.com/300x400"
-        title="김모델"
-        content="패션 모델, 5년 경력"
-        onPress={() => alert('김모델 클릭')}
-      />
-      <PortraitCard
-        imageUrl="https://via.placeholder.com/300x400"
-        title="이모델"
-        content="뷰티 모델, 3년 경력"
-        onPress={() => alert('이모델 클릭')}
-      />
-      <PortraitCard
-        imageUrl="https://via.placeholder.com/300x400"
-        title="박모델"
-        content="라이프스타일 모델, 신인"
-        onPress={() => alert('박모델 클릭')}
-      />
-    </SizeContainer>
-  ),
+  render: () => <PortraitCardUsageSection />,
   parameters: {
     docs: {
       description: {

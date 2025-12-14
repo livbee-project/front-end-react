@@ -4,12 +4,15 @@ import styled from 'styled-components';
 import { Plus } from 'lucide-react';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import type { Campaign } from '@/domain/entities/Campaign';
-import { useRepository } from '@/presentation/hooks/useRepository';
-import { useListData } from '@/presentation/hooks/useListData';
-import { useListFilters } from '@/presentation/hooks/useListFilters';
-import { useListSearch } from '@/presentation/hooks/useListSearch';
-import { useScrapToggle } from '@/presentation/hooks/useScrapToggle';
-import { CampaignHeader } from '@/presentation/components/campaign/CampaignHeader';
+import { useRepository } from '@/presentation/hooks/common/useRepository';
+import { useListFetcher } from '@/presentation/hooks/list/useListFetcher';
+import { useListFilters } from '@/presentation/hooks/list/useListFilters';
+import { useListSearch } from '@/presentation/hooks/list/useListSearch';
+import { useScrapToggle } from '@/presentation/hooks/common/useScrapToggle';
+import { useAuth } from '@/presentation/hooks/auth/useAuth';
+import { useToast } from '@/presentation/contexts/ToastContext';
+import { setAuthRedirectPath, setOriginPage } from '@/shared/utils/authRedirect';
+import LoginRequiredModal from '@/presentation/components/navigation/LoginRequiredModal';
 import { CampaignSearchSection } from '@/presentation/components/campaign/CampaignSearchSection';
 import { CampaignFilterRow } from '@/presentation/components/campaign/CampaignFilterRow';
 import { CampaignListContent } from '@/presentation/components/campaign/CampaignListContent';
@@ -18,33 +21,46 @@ type FilterValue = '전체' | Campaign['category'];
 
 const CampaignsPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user, isLoggedIn } = useAuth();
+  const { showToast } = useToast();
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const { searchInputValue, setSearchInputValue, searchQuery, handleSearchSubmit, clearSearch } = useListSearch();
   const { activeFilter, setActiveFilter } = useListFilters<FilterValue>('전체');
   const { handleScrapToggle, isScrapped } = useScrapToggle();
 
   const campaignRepository = useRepository(CampaignRepository);
 
+  // query 객체 메모이제이션
+  const query = useMemo(
+    () => ({
+      page: currentPage,
+      limit: 20,
+      search: searchQuery || undefined,
+      sort: 'latest' as const,
+    }),
+    [currentPage, searchQuery]
+  );
+
+  // fetchFunction 메모이제이션
   const {
     data: campaigns,
     loading,
     error,
     totalPages,
-  } = useListData<
+  } = useListFetcher<
     Campaign,
     { page: number; limit: number; search?: string; sort?: 'latest' | 'deadline' },
+    CampaignRepository,
     { items: Campaign[]; currentPage?: number; totalPages?: number; totalItems?: number }
-  >(
-    (query, signal) => campaignRepository.getCampaignList(query, signal),
-    {
-      page: currentPage,
-      limit: 20,
-      search: searchQuery || undefined,
-      sort: 'latest' as const,
-    },
-    [currentPage, searchQuery],
-    '캠페인 목록을 불러오는 중 오류가 발생했습니다.'
-  );
+  >({
+    repository: campaignRepository,
+    method: 'getCampaignList',
+    query,
+    dependencies: [currentPage, searchQuery],
+    errorMessage: '캠페인 목록을 불러오는 중 오류가 발생했습니다.',
+    cacheKey: `campaign-list-${JSON.stringify(query)}`,
+  });
 
   const filteredCampaigns = useMemo(() => {
     if (activeFilter === '전체') {
@@ -80,12 +96,6 @@ const CampaignsPage: React.FC = () => {
   return (
     <PageWrapper>
       <PageInner>
-        <CampaignHeader
-          title="진행중인 캠페인"
-          description="브랜드가 찾고 있는 쇼호스트에 지원해보세요"
-          highlightText="캠페인"
-        />
-
         <CampaignSearchSection
           value={searchInputValue}
           onChange={setSearchInputValue}
@@ -109,9 +119,38 @@ const CampaignsPage: React.FC = () => {
         />
       </PageInner>
 
-      <RegisterFab type="button" onClick={() => navigate('/campaigns/register')} aria-label="모집공고 등록">
+      <RegisterFab
+        type="button"
+        onClick={() => {
+          // 비회원인 경우 로그인 모달 표시
+          if (!isLoggedIn) {
+            setIsLoginModalOpen(true);
+            return;
+          }
+          // 브랜드 권한이 아닌 경우 권한 오류 토스트
+          if (user?.role !== 'brand') {
+            showToast('브랜드 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
+            return;
+          }
+          navigate('/campaigns/register');
+        }}
+        aria-label="모집공고 등록"
+      >
         <Plus size={24} strokeWidth={2.5} />
       </RegisterFab>
+
+      <LoginRequiredModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onConfirm={() => {
+          // 현재 페이지 경로 저장 (권한 불일치 시 돌아갈 페이지)
+          setOriginPage('/campaigns');
+          // 등록 페이지 경로 저장 (로그인 성공 시 이동할 페이지)
+          setAuthRedirectPath('/campaigns/register');
+          setIsLoginModalOpen(false);
+          navigate('/login', { replace: true });
+        }}
+      />
     </PageWrapper>
   );
 };

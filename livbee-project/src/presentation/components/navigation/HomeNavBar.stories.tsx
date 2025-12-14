@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import styled from 'styled-components';
-import HomeNavBar from './HomeNavBar';
+import HomeNavBar from '@/presentation/components/navigation/HomeNavBar';
 
 const meta: Meta<typeof HomeNavBar> = {
   title: 'Navigation/HomeNavBar',

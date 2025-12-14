@@ -4,49 +4,64 @@ import styled from 'styled-components';
 import { Plus } from 'lucide-react';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { Portfolio } from '@/domain/entities/Portfolio';
-import { useRepository } from '@/presentation/hooks/useRepository';
-import { useListData } from '@/presentation/hooks/useListData';
-import { useListFilters } from '@/presentation/hooks/useListFilters';
-import { useListSearch } from '@/presentation/hooks/useListSearch';
-import { useScrapToggle } from '@/presentation/hooks/useScrapToggle';
-import { PortfolioHeader } from '@/presentation/components/portfolio/PortfolioHeader';
+import { useRepository } from '@/presentation/hooks/common/useRepository';
+import { useListFetcher } from '@/presentation/hooks/list/useListFetcher';
+import { useListFilters } from '@/presentation/hooks/list/useListFilters';
+import { useListSearch } from '@/presentation/hooks/list/useListSearch';
+import { useScrapToggle } from '@/presentation/hooks/common/useScrapToggle';
+import { useAuth } from '@/presentation/hooks/auth/useAuth';
+import { useToast } from '@/presentation/contexts/ToastContext';
+import { setAuthRedirectPath, setOriginPage } from '@/shared/utils/authRedirect';
+import LoginRequiredModal from '@/presentation/components/navigation/LoginRequiredModal';
 import { PortfolioSearchSection } from '@/presentation/components/portfolio/PortfolioSearchSection';
 import { PortfolioFilterRow } from '@/presentation/components/portfolio/PortfolioFilterRow';
 import { PortfolioListContent } from '@/presentation/components/portfolio/PortfolioListContent';
 
 const PortfolioPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user, isLoggedIn } = useAuth();
+  const { showToast } = useToast();
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const { searchInputValue, setSearchInputValue, searchQuery, handleSearchSubmit, clearSearch } = useListSearch();
   const { activeFilter, setActiveFilter } = useListFilters<string>('전체');
   const { handleScrapToggle, isScrapped } = useScrapToggle();
 
   const portfolioRepository = useRepository(PortfolioRepository);
 
+  // query 객체 메모이제이션
+  const query = useMemo(
+    () => ({
+      page: currentPage,
+      limit: 20,
+      search: searchQuery || undefined,
+    }),
+    [currentPage, searchQuery]
+  );
+
   const {
     data: portfolios,
     loading,
     error,
     totalPages,
-  } = useListData<
+  } = useListFetcher<
     Portfolio,
     { page: number; limit: number; search?: string },
+    PortfolioRepository,
     { items: Portfolio[]; currentPage?: number; totalPages?: number; totalItems?: number }
-  >(
-    (query, signal) => portfolioRepository.getPortfolioList(query, signal),
-    {
-      page: currentPage,
-      limit: 20,
-      search: searchQuery || undefined,
-    },
-    [currentPage, searchQuery],
-    '포트폴리오 목록을 불러오는 중 오류가 발생했습니다.'
-  );
+  >({
+    repository: portfolioRepository,
+    method: 'getPortfolioList',
+    query,
+    dependencies: [currentPage, searchQuery],
+    errorMessage: '포트폴리오 목록을 불러오는 중 오류가 발생했습니다.',
+    cacheKey: `portfolio-list-${JSON.stringify(query)}`,
+  });
 
   const filteredPortfolios = useMemo(() => {
     // TODO: 필터 기능은 추후 카테고리 데이터 추가 시 구현
     return portfolios;
-  }, [portfolios, activeFilter]);
+  }, [portfolios]);
 
   const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     handleSearchSubmit(event);
@@ -75,12 +90,6 @@ const PortfolioPage: React.FC = () => {
   return (
     <PageWrapper>
       <PageInner>
-        <PortfolioHeader
-          title="쇼호스트 찾기"
-          description="브랜드에 맞는 쇼호스트를 찾아보세요"
-          highlightText="찾기"
-        />
-
         <PortfolioSearchSection
           value={searchInputValue}
           onChange={setSearchInputValue}
@@ -104,9 +113,38 @@ const PortfolioPage: React.FC = () => {
         />
       </PageInner>
 
-      <RegisterFab type="button" onClick={() => navigate('/portfolios/register')} aria-label="쇼호스트 등록">
+      <RegisterFab
+        type="button"
+        onClick={() => {
+          // 비회원인 경우 로그인 모달 표시
+          if (!isLoggedIn) {
+            setIsLoginModalOpen(true);
+            return;
+          }
+          // 쇼호스트 권한이 아닌 경우 권한 오류 토스트
+          if (user?.role !== 'showhost') {
+            showToast('쇼호스트 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
+            return;
+          }
+          navigate('/portfolios/register');
+        }}
+        aria-label="쇼호스트 등록"
+      >
         <Plus size={24} strokeWidth={2.5} />
       </RegisterFab>
+
+      <LoginRequiredModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onConfirm={() => {
+          // 현재 페이지 경로 저장 (권한 불일치 시 돌아갈 페이지)
+          setOriginPage('/portfolios');
+          // 등록 페이지 경로 저장 (로그인 성공 시 이동할 페이지)
+          setAuthRedirectPath('/portfolios/register');
+          setIsLoginModalOpen(false);
+          navigate('/login', { replace: true });
+        }}
+      />
     </PageWrapper>
   );
 };

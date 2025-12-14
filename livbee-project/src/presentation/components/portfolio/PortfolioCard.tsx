@@ -25,7 +25,7 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
       <TopSection>
         <ProfileImageContainer>
           {portfolio.mainThumbnailUrl ? (
-            <ProfileImage src={portfolio.mainThumbnailUrl} alt={portfolio.nickname || '프로필'} />
+            <ProfileImage src={portfolio.mainThumbnailUrl} alt={portfolio.nickname || '프로필'} loading="lazy" decoding="async" />
           ) : (
             <PlaceholderImage />
           )}

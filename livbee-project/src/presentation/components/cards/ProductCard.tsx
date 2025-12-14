@@ -64,7 +64,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       {/* 이미지 */}
       <ImageContainer $hasImage={!!imageUrl}>
         {imageUrl ? (
-          <ProductImage src={imageUrl} alt={productName} />
+          <ProductImage src={imageUrl} alt={productName} loading="lazy" decoding="async" />
         ) : (
           <PlaceholderImage size={24} />
         )}
