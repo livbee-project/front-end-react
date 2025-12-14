@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { RiImageLine } from 'react-icons/ri';
-import type { ImageUploadProps } from '@/types/components';
+import type { ImageUploadProps } from '@/types/commonProps';
 import { saveScrollPositionBeforeCrop } from '@/shared/utils/scrollPosition';
 
 /**

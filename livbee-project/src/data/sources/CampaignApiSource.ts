@@ -68,7 +68,7 @@ export class CampaignApiSource implements ICampaignApiSource {
     if (result.items && Array.isArray(result.items)) {
       const convertedItems = result.items.map((item) => {
         if (item && typeof item === 'object' && !Array.isArray(item)) {
-          return convertKeysToCamelCase(item as Record<string, unknown>);
+          return convertKeysToCamelCase(item as unknown as Record<string, unknown>);
         }
         return item;
       }) as CampaignListResponse['items'];

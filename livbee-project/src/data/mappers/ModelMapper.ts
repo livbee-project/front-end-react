@@ -3,7 +3,7 @@
  * Clean Architecture: Data Layer - Mapper
  */
 
-import type { ModelDetail, ModelDetailResponse } from '@/domain/entities/Model';
+import type { ModelDetail } from '@/domain/entities/Model';
 import { isObject } from '@/shared/utils/typeGuards';
 
 /**

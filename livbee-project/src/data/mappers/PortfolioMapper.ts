@@ -3,7 +3,7 @@
  * Clean Architecture: Data Layer - Mapper
  */
 
-import type { PortfolioDetail, PortfolioDetailResponse } from '@/domain/entities/Portfolio';
+import type { PortfolioDetail } from '@/domain/entities/Portfolio';
 import { isObject } from '@/shared/utils/typeGuards';
 
 /**

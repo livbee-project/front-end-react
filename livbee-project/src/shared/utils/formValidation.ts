@@ -74,7 +74,7 @@ export function validateOptional(
   if (isEmpty(value)) {
     return { isValid: true }; // 값이 없으면 검증 통과
   }
-  if (!validator(value)) {
+  if (!value || !validator(value)) {
     return { isValid: false, errorMessage: message };
   }
   return { isValid: true };

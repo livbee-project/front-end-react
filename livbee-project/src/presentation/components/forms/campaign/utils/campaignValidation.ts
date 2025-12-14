@@ -1,5 +1,5 @@
 import { validateTimeRange } from '@/shared/utils/validation';
-import { validateRequiredFields, validateAll, type ValidationResult } from '@/shared/utils/formValidation';
+import { validateRequiredFields, type ValidationResult } from '@/shared/utils/formValidation';
 import type { CampaignFormData } from '@/presentation/components/forms/campaign/types';
 
 /**

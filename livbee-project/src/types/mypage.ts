@@ -1,5 +1,4 @@
 import type React from 'react';
-import type { UserType } from '@/domain/entities/User';
 
 /**
  * 마이페이지 관련 타입 정의

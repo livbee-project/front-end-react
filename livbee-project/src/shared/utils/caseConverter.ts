@@ -25,7 +25,7 @@ export const camelToSnake = (str: string): string => {
 /**
  * 객체의 모든 키를 snake_case에서 camelCase로 변환
  */
-export const convertKeysToCamelCase = <T extends Record<string, unknown>>(obj: T): Record<string, unknown> => {
+export const convertKeysToCamelCase = <T extends Record<string, unknown>>(obj: T): Record<string, unknown> | Record<string, unknown>[] => {
   if (!isObject(obj) && !isArray(obj)) {
     return obj as Record<string, unknown>;
   }
@@ -57,7 +57,7 @@ export const convertKeysToCamelCase = <T extends Record<string, unknown>>(obj: T
 /**
  * 객체의 모든 키를 camelCase에서 snake_case로 변환
  */
-export const convertKeysToSnakeCase = <T extends Record<string, unknown>>(obj: T): Record<string, unknown> => {
+export const convertKeysToSnakeCase = <T extends Record<string, unknown>>(obj: T): Record<string, unknown> | Record<string, unknown>[] => {
   if (!isObject(obj) && !isArray(obj)) {
     return obj as Record<string, unknown>;
   }

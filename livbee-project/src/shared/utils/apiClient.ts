@@ -5,7 +5,6 @@
 
 import { extractErrorMessage, isSuccessResponse, extractData, type ApiResponse } from '@/shared/utils/apiResponseHandler';
 import { emitApiErrorEvent } from '@/shared/utils/apiEvents';
-import { sendDebugLog } from '@/shared/utils/debugLogger';
 
 export class ApiError extends Error {
   status?: number;

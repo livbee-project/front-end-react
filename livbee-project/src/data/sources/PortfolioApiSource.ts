@@ -82,7 +82,7 @@ export class PortfolioApiSource implements IPortfolioApiSource {
     const headers = getAuthHeaders();
     
     // undefined 필드 제거 (공통 유틸리티 사용)
-    const cleanedRequest = removeUndefinedFields(request) as CreatePortfolioRequest;
+    const cleanedRequest = removeUndefinedFields(request as Record<string, unknown>) as CreatePortfolioRequest;
     
     const requestBody = JSON.stringify(cleanedRequest, null, 2);
     
@@ -115,7 +115,7 @@ export class PortfolioApiSource implements IPortfolioApiSource {
         if ('id' in result && typeof (result as { id: unknown }).id === 'string') {
           return {
             ok: true,
-            data: result as CreatePortfolioResponse['data'],
+            data: result as unknown as CreatePortfolioResponse['data'],
           };
         }
       }
