@@ -92,9 +92,13 @@ export type FormArrayFieldChangeHandler<T extends string> = (
 export interface ImageUploadProps {
   imageUrl?: string | null;
   onSelectImage: (file: File) => void;
+  onImageSelect?: (file: File) => void; // onSelectImage의 별칭
   onRemoveImage?: () => void;
   accept?: string;
   maxSize?: number;
+  size?: number;
+  aspectRatio?: string;
+  enableCrop?: boolean;
 }
 
 /**

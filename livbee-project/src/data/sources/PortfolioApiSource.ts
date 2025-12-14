@@ -129,7 +129,7 @@ export class PortfolioApiSource implements IPortfolioApiSource {
             message: 'message' in result && typeof (result as { message: unknown }).message === 'string' 
               ? (result as { message: string }).message 
               : undefined,
-            data: responseData as CreatePortfolioResponse['data'],
+            data: responseData as unknown as CreatePortfolioResponse['data'],
           };
         }
       }
@@ -140,7 +140,7 @@ export class PortfolioApiSource implements IPortfolioApiSource {
       if (result && typeof result === 'object' && 'id' in result) {
         return {
           ok: true,
-          data: result as CreatePortfolioResponse['data'],
+          data: result as unknown as CreatePortfolioResponse['data'],
         };
       }
       

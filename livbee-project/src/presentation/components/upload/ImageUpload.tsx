@@ -23,9 +23,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   size = 100,
   aspectRatio,
   onImageSelect,
+  onSelectImage,
   enableCrop = true,
   imageUrl,
 }) => {
+  // onImageSelect와 onSelectImage 중 하나를 사용
+  const handleImageSelect = onImageSelect || onSelectImage;
   const navigate = useNavigate();
   const location = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -48,18 +51,18 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       
       // 콜백을 전역 이벤트로 등록
       let callbackKey: string | undefined;
-      if (onImageSelect) {
+      if (handleImageSelect) {
         callbackKey = `imageCrop_${Date.now()}_${Math.random()}`;
         if (!window.__imageCropCallbacks) {
           window.__imageCropCallbacks = {};
         }
-        // onImageSelect는 이미 (file) => handleImageSelect(file, type) 형태로 래핑되어 있으므로
+        // handleImageSelect는 이미 (file) => handleImageSelect(file, type) 형태로 래핑되어 있으므로
         // 그대로 등록하면 됨
-        window.__imageCropCallbacks[callbackKey] = onImageSelect;
+        window.__imageCropCallbacks[callbackKey] = handleImageSelect;
         console.log('[ImageUpload] 📝 콜백 등록', {
           callbackKey,
-          hasCallback: !!onImageSelect,
-          callbackType: typeof onImageSelect,
+          hasCallback: !!handleImageSelect,
+          callbackType: typeof handleImageSelect,
         });
       }
       
@@ -80,8 +83,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       });
     } else {
       // 크롭 기능이 비활성화되어 있으면 바로 콜백 호출
-      if (onImageSelect) {
-        onImageSelect(file);
+      if (handleImageSelect) {
+        handleImageSelect(file);
       }
     }
 
