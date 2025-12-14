@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
-import HomeTopTabs from './HomeTopTabs';
+import HomeTopTabs from '@/presentation/components/navigation/HomeTopTabs';
 import { ToastProvider } from '@/presentation/contexts/ToastContext';
 
 const meta: Meta<typeof HomeTopTabs> = {

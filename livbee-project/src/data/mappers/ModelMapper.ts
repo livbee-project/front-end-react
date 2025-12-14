@@ -4,6 +4,7 @@
  */
 
 import type { ModelDetail, ModelDetailResponse } from '@/domain/entities/Model';
+import { isObject } from '@/shared/utils/typeGuards';
 
 /**
  * ModelDetail 응답을 프론트엔드에서 사용하는 ModelDetail로 변환합니다.
@@ -12,10 +13,17 @@ export const transformModelDetailResponse = (
   result: unknown,
   id: string
 ): ModelDetail => {
-  const payload =
-    ((result as ModelDetailResponse)?.data ??
-      (result as ModelDetail) ??
-      {}) as Partial<ModelDetail> & Record<string, unknown>;
+  let payload: Partial<ModelDetail> & Record<string, unknown> = {};
+  
+  if (isObject(result)) {
+    // ModelDetailResponse 형식인 경우
+    if ('data' in result && isObject(result.data)) {
+      payload = result.data as Partial<ModelDetail> & Record<string, unknown>;
+    } else {
+      // ModelDetail 형식인 경우
+      payload = result as Partial<ModelDetail> & Record<string, unknown>;
+    }
+  }
 
   const baseDetail: ModelDetail = {
     id,
@@ -49,12 +57,21 @@ export const transformModelDetailResponse = (
     updatedAt: '',
   };
 
-  const merged = {
+  const merged: ModelDetail = {
     ...baseDetail,
-    ...(payload as Partial<ModelDetail>),
   };
 
-  merged.id = (typeof payload.id === 'string' && payload.id) || (typeof payload._id === 'string' && payload._id) || id;
+  // id 필드 처리
+  if (typeof payload.id === 'string' && payload.id) {
+    merged.id = payload.id;
+  } else if (typeof payload._id === 'string' && payload._id) {
+    merged.id = payload._id;
+  } else {
+    merged.id = id;
+  }
+  
+  // 나머지 필드 병합 (타입 안전하게)
+  Object.assign(merged, payload);
 
   return merged;
 };

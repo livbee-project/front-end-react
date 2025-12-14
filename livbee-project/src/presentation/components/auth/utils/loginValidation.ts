@@ -1,3 +1,5 @@
+import { validateRequiredFields, type ValidationResult } from '@/shared/utils/formValidation';
+
 interface LoginFormState {
   email: string;
   password: string;
@@ -11,16 +13,24 @@ export const loginMessages = {
 
 /**
  * 로그인 폼 유효성 검사
+ * @returns 에러 메시지 또는 null
  */
 export const validateLoginForm = ({ email, password }: LoginFormState): string | null => {
-  if (!email.trim()) {
-    return loginMessages.EMPTY_EMAIL;
-  }
+  const result = validateRequiredFields([
+    { value: email, message: loginMessages.EMPTY_EMAIL },
+    { value: password, message: loginMessages.EMPTY_PASSWORD },
+  ]);
+  
+  return result.isValid ? null : result.errorMessage || null;
+};
 
-  if (!password.trim()) {
-    return loginMessages.EMPTY_PASSWORD;
-  }
-
-  return null;
+/**
+ * 로그인 폼 유효성 검사 (ValidationResult 반환)
+ */
+export const validateLoginFormResult = ({ email, password }: LoginFormState): ValidationResult => {
+  return validateRequiredFields([
+    { value: email, message: loginMessages.EMPTY_EMAIL },
+    { value: password, message: loginMessages.EMPTY_PASSWORD },
+  ]);
 };
 

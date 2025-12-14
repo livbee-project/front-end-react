@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { UserType } from '@/types/auth';
+import type { UserRole as UserType } from '@/domain/entities/User';
 import { useAuth } from '@/presentation/hooks/auth/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { getAuthRedirectPath } from '@/shared/utils/authRedirect';

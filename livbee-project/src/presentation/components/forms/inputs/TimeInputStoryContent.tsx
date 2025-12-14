@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import TimeInput from './TimeInput';
+import TimeInput from '@/presentation/components/forms/inputs/TimeInput';
 
 const Container = styled.div`
   display: flex;

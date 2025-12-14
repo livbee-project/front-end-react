@@ -1,4 +1,4 @@
-import { extractErrorMessage } from '@/shared/utils/apiResponseHandler';
+import { extractErrorMessageFromResult, getDefaultErrorMessageByStatus, isAuthenticationError, isAuthorizationError } from '@/shared/utils/errorUtils';
 
 type ErrorSource = Response | { status?: number };
 
@@ -12,15 +12,20 @@ export const handleShowhostEntityError = (
 ): Error => {
   const status = source instanceof Response ? source.status : source.status ?? 0;
 
-  if (status === 401) {
+  // 인증 에러 처리
+  if (isAuthenticationError(status)) {
     return new Error('인증이 필요합니다.');
   }
 
-  if (status === 403) {
+  // 권한 에러 처리
+  if (isAuthorizationError(status)) {
     return new Error('권한이 없습니다. 쇼호스트 역할만 등록 가능합니다.');
   }
 
-  const errorMessage = extractErrorMessage(result as never);
-  return new Error(errorMessage || defaultMessage);
+  // 상태 코드에 따른 기본 메시지 또는 추출된 메시지 사용
+  const statusMessage = getDefaultErrorMessageByStatus(status);
+  const extractedMessage = extractErrorMessageFromResult(result, defaultMessage);
+  
+  return new Error(statusMessage || extractedMessage);
 };
 

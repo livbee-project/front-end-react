@@ -1,8 +1,8 @@
 import React from 'react';
 import Button from '@/presentation/components/ui/Button';
-import { LoginFormInputs } from './LoginFormInputs';
-import { LoginFormFooter } from './LoginFormFooter';
-import { FormContainer, ErrorText, ButtonSpacer } from './styled/LoginFormStyles';
+import { LoginFormInputs } from '@/presentation/components/auth/LoginFormInputs';
+import { LoginFormFooter } from '@/presentation/components/auth/LoginFormFooter';
+import { FormContainer, ErrorText, ButtonSpacer } from '@/presentation/components/auth/styled/LoginFormStyles';
 
 interface LoginFormProps {
   email: string;

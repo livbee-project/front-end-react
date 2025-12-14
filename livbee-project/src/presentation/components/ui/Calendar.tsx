@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import 'react-day-picker/dist/style.css';
-import { useCalendarDOM } from './Calendar.hooks';
+import { useCalendarDOM } from '@/presentation/components/ui/Calendar.hooks';
 import {
   CalendarContainer,
   CalendarOverlay,
@@ -8,8 +8,8 @@ import {
   CalendarFooter,
   CancelButton,
   ConfirmButton,
-} from './Calendar.styles';
-import { formatDateToString, parseDateString } from './Calendar.utils';
+} from '@/presentation/components/ui/Calendar.styles';
+import { formatDateToString, parseDateString } from '@/presentation/components/ui/Calendar.utils';
 
 interface CalendarProps {
   value?: string; // YYYY-MM-DD 형식

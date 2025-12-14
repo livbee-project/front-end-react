@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import ClipCard from './ClipCard';
-import { ClipCardList, ClipCardLongText } from './ClipCardStoryContent';
+import ClipCard from '@/presentation/components/cards/ClipCard';
+import { ClipCardList, ClipCardLongText } from '@/presentation/components/cards/ClipCardStoryContent';
 
 const meta: Meta<typeof ClipCard> = {
   title: 'Cards/ClipCard',

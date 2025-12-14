@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { render, screen } from '@testing-library/react';
-import { AuthGuard } from '../AuthGuard';
+import { AuthGuard } from '@/presentation/routes/AuthGuard';
 
 const mockUseAuth = vi.fn();
 

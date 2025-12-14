@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { LoadingState } from './LoadingState';
-import { EmptyState } from './EmptyState';
-import { ErrorState } from './ErrorState';
+import { LoadingState } from '@/presentation/components/states/LoadingState';
+import { EmptyState } from '@/presentation/components/states/EmptyState';
+import { ErrorState } from '@/presentation/components/states/ErrorState';
 
 export const LoadingStatesSection: React.FC = () => (
   <StateContainer>

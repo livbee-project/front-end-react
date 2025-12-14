@@ -4,8 +4,8 @@
 
 import React from 'react';
 import styled from 'styled-components';
-import { H1, H2, H3, P, PMuted, Small, Caption, ButtonText, Highlight } from '../Typography';
-import { StoryContainer, ComponentItem } from './StoryComponents';
+import { H1, H2, H3, P, PMuted, Small, Caption, ButtonText, Highlight } from '@/presentation/components/styled/Typography';
+import { StoryContainer, ComponentItem } from '@/presentation/components/styled/sections/StoryComponents';
 
 export const UsageSection: React.FC = () => (
   <StoryContainer title="실제 사용 예시">

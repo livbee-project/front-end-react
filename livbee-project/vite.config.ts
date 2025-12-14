@@ -76,6 +76,9 @@ export default defineConfig({
     host: 'localhost', // IPv4만 사용하도록 설정
     port: 5173,
     open: false, // 기본 브라우저 열기 비활성화 (하이퍼링크 클릭 시 내부 브라우저로 열리는 것 방지)
+    hmr: {
+      overlay: true, // 에러 오버레이 활성화
+    },
   },
   build: {
     rollupOptions: {

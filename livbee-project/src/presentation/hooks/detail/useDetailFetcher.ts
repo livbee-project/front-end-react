@@ -1,6 +1,6 @@
 import { useDetailData } from '@/presentation/hooks/detail/useDetailData';
-import { useRepositoryMethod } from './useRepositoryMethod';
-import { useErrorHandler } from './useErrorHandler';
+import { useRepositoryMethod } from '@/presentation/hooks/detail/useRepositoryMethod';
+import { useErrorHandler } from '@/presentation/hooks/detail/useErrorHandler';
 
 interface UseDetailFetcherOptions<R extends object> {
   repository: R;

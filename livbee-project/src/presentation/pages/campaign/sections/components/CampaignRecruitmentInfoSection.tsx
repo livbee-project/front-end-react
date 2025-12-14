@@ -6,7 +6,7 @@ import {
   InputGroup,
 } from '@/presentation/components/forms/portfolio/PortfolioRegisterStyles';
 import styled from 'styled-components';
-import { recruitmentTypeOptions, categoryOptions } from '../constants/campaignRegisterOptions';
+import { recruitmentTypeOptions, categoryOptions } from '@/presentation/pages/campaign/sections/constants/campaignRegisterOptions';
 
 const FormSection = styled(BaseFormSection)`
   margin-bottom: 24px;

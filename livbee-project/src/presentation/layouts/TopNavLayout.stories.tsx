@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import TopNavLayout from './TopNavLayout';
+import TopNavLayout from '@/presentation/layouts/TopNavLayout';
 import { ToastProvider } from '@/presentation/contexts/ToastContext';
 import styled from 'styled-components';
 

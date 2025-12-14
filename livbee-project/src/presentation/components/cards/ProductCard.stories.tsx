@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import ProductCard from './ProductCard';
+import ProductCard from '@/presentation/components/cards/ProductCard';
 import {
   ProductCardExamplesSection,
   ProductCardListSection,
   ProductCardLongNameSection,
-} from './ProductCardStoryContent';
+} from '@/presentation/components/cards/ProductCardStoryContent';
 
 const meta: Meta<typeof ProductCard> = {
   title: 'Cards/ProductCard',

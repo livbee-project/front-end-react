@@ -3,8 +3,8 @@
  */
 
 import React from 'react';
-import { Caption, CaptionMedium } from '../Typography';
-import { StoryContainer, ComponentItem } from './StoryComponents';
+import { Caption, CaptionMedium } from '@/presentation/components/styled/Typography';
+import { StoryContainer, ComponentItem } from '@/presentation/components/styled/sections/StoryComponents';
 
 export const CaptionSection: React.FC = () => (
   <StoryContainer title="캡션 컴포넌트 (Captions)">

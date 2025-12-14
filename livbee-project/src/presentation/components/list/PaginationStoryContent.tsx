@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Pagination from './Pagination';
+import Pagination from '@/presentation/components/list/Pagination';
 
 export const PaginationCountsDemo: React.FC = () => {
   const [page1, setPage1] = useState(1);

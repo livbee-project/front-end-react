@@ -5,6 +5,7 @@
 
 import { extractErrorMessage, isSuccessResponse, extractData, type ApiResponse } from '@/shared/utils/apiResponseHandler';
 import { emitApiErrorEvent } from '@/shared/utils/apiEvents';
+import { sendDebugLog } from '@/shared/utils/debugLogger';
 
 export class ApiError extends Error {
   status?: number;
@@ -98,10 +99,6 @@ export async function fetchApi<T>(
 
   // 3. 에러 응답 처리
   if (!response.ok || !isSuccessResponse(result as ApiResponse<T>)) {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/0f91d27f-d165-4cdf-82ab-ecb2f2648200',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'apiClient.ts:100',message:'에러 응답 감지',data:{status:response.status,statusText:response.statusText,resultType:typeof result,resultKeys:result&&typeof result==='object'?Object.keys(result):undefined,resultString:JSON.stringify(result).substring(0,500)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
-    // #endregion
-    
     const errorMessage = extractErrorMessage(result);
     const apiError = new ApiError(errorMessage || `${errorContext}에 실패했습니다.`, response.status, result);
     notifyApiError(apiError.message, apiError.status, errorContext);
@@ -115,7 +112,10 @@ export async function fetchApi<T>(
   }
 
   // 5. data 필드가 없는 경우 (기존 응답 형식)
-  return result as unknown as T;
+  // result 자체가 T 타입인 경우
+  // 타입 시스템의 한계로 인해 타입 단언이 필요하지만,
+  // 런타임에서는 result가 이미 올바른 형식임을 보장합니다.
+  return result as T;
 }
 
 /**

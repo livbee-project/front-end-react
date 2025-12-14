@@ -3,8 +3,8 @@
  */
 
 import React from 'react';
-import { H1, H2, H3 } from '../Typography';
-import { StoryContainer, ComponentItem } from './StoryComponents';
+import { H1, H2, H3 } from '@/presentation/components/styled/Typography';
+import { StoryContainer, ComponentItem } from '@/presentation/components/styled/sections/StoryComponents';
 
 export const HeadingsSection: React.FC = () => (
   <StoryContainer title="제목 컴포넌트 (Headings)">

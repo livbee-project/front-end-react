@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import ToggleSwitch from './ToggleSwitch';
+import ToggleSwitch from '@/presentation/components/ui/ToggleSwitch';
 import { P } from '@/presentation/components/styled/Typography';
 
 const Row = styled.div`

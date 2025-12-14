@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import BottomNavBar from './BottomNavBar';
+import BottomNavBar from '@/presentation/components/navigation/BottomNavBar';
 import { ToastProvider } from '@/presentation/contexts/ToastContext';
 import { AuthContext, type UseAuthReturn } from '@/presentation/hooks/auth/useAuth';
 

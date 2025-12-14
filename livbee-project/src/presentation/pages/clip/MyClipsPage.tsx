@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Plus } from 'lucide-react';
 import { debug } from '@/shared/utils/logger';
 import type { Clip } from '@/domain/entities/Clip';
-import ClipCard from './components/ClipCard';
+import ClipCard from '@/presentation/pages/clip/components/ClipCard';
 import {
   AddCard,
   AddIcon,
@@ -15,7 +15,7 @@ import {
   PageContainer,
   PageSubtitle,
   PageTitle,
-} from './styled/MyClipsPageStyles';
+} from '@/presentation/pages/clip/styled/MyClipsPageStyles';
 
 const mockClips: Clip[] = [
     {

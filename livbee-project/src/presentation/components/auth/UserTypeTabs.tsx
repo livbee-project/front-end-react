@@ -1,7 +1,7 @@
 import React from 'react';
 import type { RefObject } from 'react';
 import styled, { keyframes } from 'styled-components';
-import type { UserType } from '@/types/auth';
+import type { UserRole as UserType } from '@/domain/entities/User';
 
 interface UserTypeTabsProps {
   userType: UserType;

@@ -1,4 +1,5 @@
-import type { UserType, ProfileData, MenuItemData } from '@/types/mypage';
+import type { UserType } from '@/domain/entities/User';
+import type { ProfileData, MenuItemData } from '@/types/mypage';
 import {
   Briefcase,
   Users,

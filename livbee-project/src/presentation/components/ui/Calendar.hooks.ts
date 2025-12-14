@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import type { RefObject } from 'react';
-import { WEEKDAYS, CALENDAR_TIMING, WEEKDAY_STYLES } from './Calendar.constants';
-import { formatMonthYearToKorean } from './Calendar.utils';
+import { WEEKDAYS, CALENDAR_TIMING, WEEKDAY_STYLES } from '@/presentation/components/ui/Calendar.constants';
+import { formatMonthYearToKorean } from '@/presentation/components/ui/Calendar.utils';
 
 interface UseCalendarDOMProps {
   calendarRef: RefObject<HTMLDivElement | null>;

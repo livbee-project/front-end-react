@@ -8,7 +8,7 @@ import type {
   MeResponse,
 } from '@/domain/entities/User';
 
-import type { IUserApiSource } from './interfaces/IUserApiSource';
+import type { IUserApiSource } from '@/data/sources/interfaces/IUserApiSource';
 
 /**
  * 사용자 API 소스

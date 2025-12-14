@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import ToggleSwitch from './ToggleSwitch';
+import ToggleSwitch from '@/presentation/components/ui/ToggleSwitch';
 import {
   ToggleSwitchDefaultStory,
   ToggleSwitchStatesStory,
   ToggleSwitchUsageExamples,
-} from './ToggleSwitchStoryContent';
+} from '@/presentation/components/ui/ToggleSwitchStoryContent';
 
 const meta: Meta<typeof ToggleSwitch> = {
   title: 'UI Components/ToggleSwitch',

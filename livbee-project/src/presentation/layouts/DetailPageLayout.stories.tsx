@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import DetailPageLayout from './DetailPageLayout';
+import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import {
   CampaignDetailLayoutExample,
   DetailLayoutDefaultChildren,
   LongContentLayoutExample,
   PortfolioDetailLayoutExample,
-} from './DetailPageLayoutStoryContent';
+} from '@/presentation/layouts/DetailPageLayoutStoryContent';
 
 const meta: Meta<typeof DetailPageLayout> = {
   title: 'Layouts/DetailPageLayout',

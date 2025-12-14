@@ -1,5 +1,5 @@
 import type { CreateModelRequest } from '@/domain/entities/Model';
-import type { ModelFormData } from '../types';
+import type { ModelFormData } from '@/presentation/components/forms/model/types';
 
 /**
  * 숫자 문자열을 파싱하여 숫자로 변환 (NaN인 경우 undefined 반환)

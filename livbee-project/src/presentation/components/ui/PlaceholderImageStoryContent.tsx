@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import PlaceholderImage from './PlaceholderImage';
+import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
 
 export const PlaceholderSizesSection: React.FC = () => (
   <SizeContainer>

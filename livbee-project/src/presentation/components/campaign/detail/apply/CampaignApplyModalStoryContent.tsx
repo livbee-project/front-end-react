@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { MemoryRouter } from 'react-router-dom';
-import CampaignApplyModal from './CampaignApplyModal';
+import CampaignApplyModal from '@/presentation/components/campaign/detail/apply/CampaignApplyModal';
 import Button from '@/presentation/components/ui/Button';
 import { ToastProvider } from '@/presentation/contexts/ToastContext';
 

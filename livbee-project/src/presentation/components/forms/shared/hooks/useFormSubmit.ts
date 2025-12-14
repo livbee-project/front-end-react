@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { useFormImageUpload } from '@/presentation/components/forms/shared/hooks/useFormImageUpload';
 import { useFormFileUpload } from '@/presentation/components/forms/shared/hooks/useFormFileUpload';
-import type { UseFormSubmitOptions } from './types/useFormSubmitTypes';
+import type { UseFormSubmitOptions } from '@/presentation/components/forms/shared/hooks/types/useFormSubmitTypes';
 
 /**
  * 폼 제출 로직을 처리하는 공통 훅

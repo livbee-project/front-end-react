@@ -1,5 +1,6 @@
 import React from 'react';
-import { GlobalErrorFallback } from './GlobalErrorFallback';
+import { GlobalErrorFallback } from '@/presentation/components/error/GlobalErrorFallback';
+import { error as logError } from '@/shared/utils/logger';
 
 interface GlobalErrorBoundaryProps {
   children: React.ReactNode;
@@ -21,15 +22,15 @@ export class GlobalErrorBoundary extends React.Component<GlobalErrorBoundaryProp
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // 전체 에러 정보를 자세히 출력
-    console.group('🚨 [GlobalErrorBoundary] 에러 발생');
-    console.error('에러 메시지:', error.message);
-    console.error('에러 스택:', error.stack);
-    console.error('에러 이름:', error.name);
-    console.error('컴포넌트 스택:', errorInfo.componentStack);
-    console.error('전체 에러 객체:', error);
-    console.error('에러 정보:', errorInfo);
-    console.groupEnd();
+    // 전체 에러 정보를 자세히 로깅
+    logError('GlobalErrorBoundary', '에러 발생', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      componentStack: errorInfo.componentStack,
+      error: error,
+      errorInfo,
+    });
   }
 
   handleReset = () => {

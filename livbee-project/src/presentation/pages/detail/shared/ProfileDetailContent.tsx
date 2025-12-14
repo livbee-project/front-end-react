@@ -12,7 +12,7 @@ import type {
   GalleryData,
   ProfileActions,
   HeaderData,
-} from './types/ProfileDetailContentTypes';
+} from '@/presentation/pages/detail/shared/types/ProfileDetailContentTypes';
 
 const GallerySection = styled.div`
   padding: ${({ theme }) => theme.spacing.xl} 0;

@@ -4,12 +4,12 @@
  */
 
 import React from 'react';
-import { HeadingsSection } from './sections/HeadingsSection';
-import { BodySection } from './sections/BodySection';
-import { CaptionSection } from './sections/CaptionSection';
-import { ButtonTextSection } from './sections/ButtonTextSection';
-import { HighlightSection } from './sections/HighlightSection';
-import { UsageSection } from './sections/UsageSection';
+import { HeadingsSection } from '@/presentation/components/styled/sections/HeadingsSection';
+import { BodySection } from '@/presentation/components/styled/sections/BodySection';
+import { CaptionSection } from '@/presentation/components/styled/sections/CaptionSection';
+import { ButtonTextSection } from '@/presentation/components/styled/sections/ButtonTextSection';
+import { HighlightSection } from '@/presentation/components/styled/sections/HighlightSection';
+import { UsageSection } from '@/presentation/components/styled/sections/UsageSection';
 
 export const TypographyStoryContent: React.FC = () => (
   <>
@@ -23,10 +23,10 @@ export const TypographyStoryContent: React.FC = () => (
 );
 
 // 개별 섹션 export (Storybook에서 사용)
-export { HeadingsSection } from './sections/HeadingsSection';
-export { BodySection } from './sections/BodySection';
-export { CaptionSection } from './sections/CaptionSection';
-export { ButtonTextSection } from './sections/ButtonTextSection';
-export { HighlightSection } from './sections/HighlightSection';
-export { UsageSection } from './sections/UsageSection';
+export { HeadingsSection } from '@/presentation/components/styled/sections/HeadingsSection';
+export { BodySection } from '@/presentation/components/styled/sections/BodySection';
+export { CaptionSection } from '@/presentation/components/styled/sections/CaptionSection';
+export { ButtonTextSection } from '@/presentation/components/styled/sections/ButtonTextSection';
+export { HighlightSection } from '@/presentation/components/styled/sections/HighlightSection';
+export { UsageSection } from '@/presentation/components/styled/sections/UsageSection';
 

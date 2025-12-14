@@ -13,9 +13,9 @@ import { setAuthRedirectPath, setOriginPage } from '@/shared/utils/authRedirect'
 import LoginRequiredModal from '@/presentation/components/navigation/LoginRequiredModal';
 import { ModelSearchSection } from '@/presentation/components/model/ModelSearchSection';
 import { ModelFilterRow } from '@/presentation/components/model/ModelFilterRow';
-import { ModelCard } from './components/ModelCard';
-import { useModelFilter } from './hooks/useModelFilter';
-import { mockModels, modelFilters } from './mock/mockModels';
+import { ModelCard } from '@/presentation/pages/model/components/ModelCard';
+import { useModelFilter } from '@/presentation/pages/model/hooks/useModelFilter';
+import { mockModels, modelFilters } from '@/presentation/pages/model/mock/mockModels';
 
 const ModelsPage: React.FC = () => {
   const navigate = useNavigate();

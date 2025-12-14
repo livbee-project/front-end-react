@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import FormField from './FormField';
-import TextInput from '../inputs/TextInput';
-import SelectInput from '../inputs/SelectInput';
-import DateInput from '../inputs/DateInput';
+import FormField from '@/presentation/components/forms/common/FormField';
+import TextInput from '@/presentation/components/forms/inputs/TextInput';
+import SelectInput from '@/presentation/components/forms/inputs/SelectInput';
+import DateInput from '@/presentation/components/forms/inputs/DateInput';
 import Button from '@/presentation/components/ui/Button';
 
 export const FormFieldActionExample: React.FC = () => (

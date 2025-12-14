@@ -3,8 +3,8 @@
  */
 
 import React from 'react';
-import { P, PMuted, Small } from '../Typography';
-import { StoryContainer, ComponentItem } from './StoryComponents';
+import { P, PMuted, Small } from '@/presentation/components/styled/Typography';
+import { StoryContainer, ComponentItem } from '@/presentation/components/styled/sections/StoryComponents';
 
 export const BodySection: React.FC = () => (
   <StoryContainer title="본문 컴포넌트 (Body Text)">

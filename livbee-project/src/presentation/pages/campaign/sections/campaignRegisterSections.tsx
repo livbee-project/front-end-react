@@ -3,10 +3,10 @@
  */
 
 import React from 'react';
-import { CampaignBasicInfoSection } from './components/CampaignBasicInfoSection';
-import { CampaignRecruitmentInfoSection } from './components/CampaignRecruitmentInfoSection';
-import { CampaignFilmingInfoSection } from './components/CampaignFilmingInfoSection';
-import { CampaignProductInfoSection } from './components/CampaignProductInfoSection';
+import { CampaignBasicInfoSection } from '@/presentation/pages/campaign/sections/components/CampaignBasicInfoSection';
+import { CampaignRecruitmentInfoSection } from '@/presentation/pages/campaign/sections/components/CampaignRecruitmentInfoSection';
+import { CampaignFilmingInfoSection } from '@/presentation/pages/campaign/sections/components/CampaignFilmingInfoSection';
+import { CampaignProductInfoSection } from '@/presentation/pages/campaign/sections/components/CampaignProductInfoSection';
 
 export interface CampaignRegisterSection {
   key: string;

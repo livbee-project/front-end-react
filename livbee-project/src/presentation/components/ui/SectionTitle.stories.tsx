@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import SectionTitle from './SectionTitle';
+import SectionTitle from '@/presentation/components/ui/SectionTitle';
 import {
   SectionTitleMargins,
   SectionTitleUsageExamples,
   SectionTitleVariants,
   SectionTitleWithBullet,
-} from './SectionTitleStoryContent';
+} from '@/presentation/components/ui/SectionTitleStoryContent';
 
 const meta: Meta<typeof SectionTitle> = {
   title: 'UI Components/SectionTitle',

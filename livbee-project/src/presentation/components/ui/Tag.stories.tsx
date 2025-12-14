@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import Tag from './Tag';
-import { TagVariantsSection, TagClickableSection, TagUsageSection } from './TagStoryContent';
+import Tag from '@/presentation/components/ui/Tag';
+import { TagVariantsSection, TagClickableSection, TagUsageSection } from '@/presentation/components/ui/TagStoryContent';
 
 const meta: Meta<typeof Tag> = {
   title: 'UI Components/Tag',

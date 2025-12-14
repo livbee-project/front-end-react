@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import DetailPageLayout from './DetailPageLayout';
+import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import { H1, H2, P } from '@/presentation/components/styled/Typography';
 
 const ContentSection = styled.div`

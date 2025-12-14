@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import DateInput from './DateInput';
+import DateInput from '@/presentation/components/forms/inputs/DateInput';
 
 const Container = styled.div`
   max-width: 400px;

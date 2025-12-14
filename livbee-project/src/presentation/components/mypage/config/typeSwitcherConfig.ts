@@ -1,4 +1,4 @@
-import type { UserType } from '@/types/mypage';
+import type { UserType } from '@/domain/entities/User';
 
 /**
  * 타입 스위처 설정 인터페이스

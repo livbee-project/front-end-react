@@ -1,6 +1,6 @@
 import React from 'react';
 import InputWrapper from '@/presentation/components/forms/inputs/InputWrapper';
-import { StyledInput } from './styled/LoginFormStyles';
+import { StyledInput } from '@/presentation/components/auth/styled/LoginFormStyles';
 
 interface LoginFormInputsProps {
   email: string;

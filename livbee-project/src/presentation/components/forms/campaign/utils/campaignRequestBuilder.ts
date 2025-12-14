@@ -1,6 +1,6 @@
 import type { CreateCampaignRequest } from '@/domain/entities/Campaign';
-import type { CampaignFormData } from '../types';
-import { mapRecruitmentType } from '../config/recruitmentTypeConfig';
+import type { CampaignFormData } from '@/presentation/components/forms/campaign/types';
+import { mapRecruitmentType } from '@/presentation/components/forms/campaign/config/recruitmentTypeConfig';
 
 /**
  * 날짜 문자열을 YYYY-MM-DD 형식으로 변환 (백엔드 date 타입에 맞춤)

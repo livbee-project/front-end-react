@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React from 'react';
 import styled from 'styled-components';
-import MyClipCard from './MyClipCard';
+import MyClipCard from '@/presentation/components/cards/MyClipCard';
 
 export const MyClipCardList: React.FC = () => (
   <Container>

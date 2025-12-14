@@ -1,5 +1,5 @@
 import React from 'react';
-import { SignUpRow, SignUpLink } from './styled/LoginFormStyles';
+import { SignUpRow, SignUpLink } from '@/presentation/components/auth/styled/LoginFormStyles';
 
 interface LoginFormFooterProps {
   onSignUp: () => void;

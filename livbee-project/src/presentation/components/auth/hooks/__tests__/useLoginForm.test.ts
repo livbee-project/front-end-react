@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useLoginForm } from '../useLoginForm';
+import { useLoginForm } from '@/presentation/components/auth/hooks/useLoginForm';
 
 vi.mock('@/presentation/hooks/useAuth', () => ({
   useAuth: () => ({

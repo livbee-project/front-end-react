@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { CampaignInfoSection } from './CampaignInfoSection';
+import { CampaignInfoSection } from '@/presentation/components/campaign/detail/CampaignInfoSection';
 
 const meta: Meta<typeof CampaignInfoSection> = {
   title: 'Campaign/InfoSection',

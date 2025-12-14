@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import FormField from './FormField';
-import TextInput from '../inputs/TextInput';
+import FormField from '@/presentation/components/forms/common/FormField';
+import TextInput from '@/presentation/components/forms/inputs/TextInput';
 import {
   FormFieldActionExample,
   FormFieldInputsExample,
   FormFieldUsageExample,
-} from './FormFieldStoryExamples';
+} from '@/presentation/components/forms/common/FormFieldStoryExamples';
 
 const meta: Meta<typeof FormField> = {
   title: 'Forms/FormField',

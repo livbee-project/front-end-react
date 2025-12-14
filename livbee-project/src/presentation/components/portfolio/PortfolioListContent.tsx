@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Pagination from '@/presentation/components/list/Pagination';
 import { ListStatePlaceholder } from '@/presentation/components/list/ListStatePlaceholder';
-import { PortfolioCard } from './PortfolioCard';
+import { PortfolioCard } from '@/presentation/components/portfolio/PortfolioCard';
 import type { Portfolio } from '@/domain/entities/Portfolio';
 
 interface PortfolioListContentProps {

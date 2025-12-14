@@ -6,7 +6,7 @@ import {
   HeadingsSection,
   HighlightSection,
   UsageSection,
-} from './TypographyStoryContent';
+} from '@/presentation/components/styled/TypographyStoryContent';
 
 const meta: Meta = {
   title: 'Design System/Typography',

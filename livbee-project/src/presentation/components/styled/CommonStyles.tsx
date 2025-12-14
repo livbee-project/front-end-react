@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { H2, PMuted } from './Typography';
+import { H2, PMuted } from '@/presentation/components/styled/Typography';
 
 /**
  * CommonStyles - 공통 스타일 컴포넌트

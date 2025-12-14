@@ -2,7 +2,7 @@ import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 import Modal from '@/presentation/components/ui/Modal';
 import Button from '@/presentation/components/ui/Button';
-import { useCampaignApplyForm, MAX_MESSAGE_LENGTH } from './hooks/useCampaignApplyForm';
+import { useCampaignApplyForm, MAX_MESSAGE_LENGTH } from '@/presentation/components/campaign/detail/apply/hooks/useCampaignApplyForm';
 import {
   ModalContainer,
   ModalHeader,
@@ -33,7 +33,7 @@ import {
   WarningTitle,
   WarningText,
   ActionRow,
-} from './styles/CampaignApplyModal.styles';
+} from '@/presentation/components/campaign/detail/apply/styles/CampaignApplyModal.styles';
 
 interface CampaignApplyModalProps {
   isOpen: boolean;

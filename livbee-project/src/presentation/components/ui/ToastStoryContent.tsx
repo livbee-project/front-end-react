@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Button from './Button';
-import Toast from './Toast';
+import Button from '@/presentation/components/ui/Button';
+import Toast from '@/presentation/components/ui/Toast';
 
 const Container = styled.div`
   display: flex;

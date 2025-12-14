@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import PortraitCard from './PortraitCard';
+import PortraitCard from '@/presentation/components/cards/PortraitCard';
 
 export const PortraitCardSizesSection: React.FC = () => (
   <SizeContainer>

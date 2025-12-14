@@ -1,5 +1,5 @@
 import type { CreatePortfolioRequest } from '@/domain/entities/Portfolio';
-import type { PortfolioFormData } from '../types';
+import type { PortfolioFormData } from '@/presentation/components/forms/portfolio/types';
 
 /**
  * 숫자 문자열을 파싱하여 숫자로 변환 (NaN인 경우 undefined 반환)
@@ -73,10 +73,6 @@ export const buildPortfolioRequest = (
     isSizingPublic: true,
     isReceivingOffers: true,
   };
-  
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/0f91d27f-d165-4cdf-82ab-ecb2f2648200',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'portfolioRequestBuilder.ts:75',message:'요청 객체 생성 완료',data:{requestKeys:Object.keys(request),hasNickname:!!request.nickname,hasRegistrationType:!!request.registrationType,hasMainThumbnail:!!request.mainThumbnailUrl,subThumbnailCount:request.subThumbnailUrls?.length||0,undefinedFields:Object.entries(request).filter(([,v])=>v===undefined).map(([k])=>k)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
-  // #endregion
   
   return request;
 };

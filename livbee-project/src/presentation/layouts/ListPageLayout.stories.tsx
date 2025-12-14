@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import ListPageLayout from './ListPageLayout';
+import ListPageLayout from '@/presentation/layouts/ListPageLayout';
 import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import {
   CampaignPageDemo,
   ListContentWrapper,
   PortfolioPageDemo,
-} from './ListPageLayoutStoryContent';
+} from '@/presentation/layouts/ListPageLayoutStoryContent';
 import { CampaignCard } from '@/presentation/components/campaign/CampaignCard';
 import { createMockCampaign } from '@/presentation/stories/mocks/campaign';
 

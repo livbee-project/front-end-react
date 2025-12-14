@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { DayPicker } from 'react-day-picker';
-import { CALENDAR_COLORS, CALENDAR_OPACITY } from './Calendar.constants';
+import { CALENDAR_COLORS, CALENDAR_OPACITY } from '@/presentation/components/ui/Calendar.constants';
 
 /**
  * 공통 버튼 스타일 베이스

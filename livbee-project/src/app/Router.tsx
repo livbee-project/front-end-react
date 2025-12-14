@@ -7,6 +7,7 @@ import { AuthProvider } from '@/presentation/hooks/auth/useAuth';
 import { AuthGuard } from '@/presentation/routes/AuthGuard';
 import { ROUTE_PATHS, ROUTE_ROLE_PERMISSIONS } from '@/app/routes/routeMeta';
 import { RouteFallback } from '@/presentation/components/states/RouteFallback';
+import { error as logError } from '@/shared/utils/logger';
 
 // 동적 임포트에 에러 핸들링 추가 (Vite HMR 이슈 대응)
 const lazyWithRetry = <T extends React.ComponentType<any>>(
@@ -14,14 +15,14 @@ const lazyWithRetry = <T extends React.ComponentType<any>>(
 ): React.LazyExoticComponent<T> => {
   return lazy(() =>
     importFn().catch((error) => {
-      console.error('Failed to load module:', error);
+      logError('Router', 'Failed to load module:', error);
       // 재시도 로직: 1초 후 다시 시도
       return new Promise((resolve) => {
         setTimeout(() => {
           importFn()
             .then(resolve)
             .catch((retryError) => {
-              console.error('Retry failed:', retryError);
+              logError('Router', 'Retry failed:', retryError);
               throw retryError;
             });
         }, 1000);

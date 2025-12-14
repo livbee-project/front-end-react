@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Tag from './Tag';
+import Tag from '@/presentation/components/ui/Tag';
 
 export const TagVariantsSection: React.FC = () => (
   <VariantContainer>

@@ -1,3 +1,3 @@
 export * from '@/presentation/components/forms/shared/sections';
-export { PortfolioFilesSection } from './PortfolioFilesSection';
+export { PortfolioFilesSection } from '@/presentation/components/forms/portfolio/sections/PortfolioFilesSection';
 

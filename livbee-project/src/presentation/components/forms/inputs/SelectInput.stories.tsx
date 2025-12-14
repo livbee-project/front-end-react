@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import SelectInput from './SelectInput';
+import SelectInput from '@/presentation/components/forms/inputs/SelectInput';
 import {
   selectSampleOptions,
   SelectInputOptionsDemo,
   SelectInputStatesDemo,
   SelectInputUsageDemo,
-} from './SelectInputStoryContent';
+} from '@/presentation/components/forms/inputs/SelectInputStoryContent';
 
 const meta: Meta<typeof SelectInput> = {
   title: 'Forms/SelectInput',

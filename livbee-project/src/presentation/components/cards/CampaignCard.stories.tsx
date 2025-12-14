@@ -4,7 +4,7 @@ import {
   CampaignCardExamples,
   CampaignCardListExample,
   CampaignCardLongText,
-} from './CampaignCardStoryContent';
+} from '@/presentation/components/cards/CampaignCardStoryContent';
 import { createMockCampaign } from '@/presentation/stories/mocks/campaign';
 
 const meta: Meta<typeof CampaignCard> = {

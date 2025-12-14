@@ -39,7 +39,10 @@ export const extractData = <T>(response: ApiResponse<T>): T | null => {
       return response.data as T;
     }
     // 기존 형식: { ok: true, ...data }
-    return response as unknown as T;
+    // response 자체가 T 타입인 경우 (data 필드가 없는 경우)
+    // 이 경우는 타입 시스템의 한계로 인해 타입 단언이 필요합니다.
+    // 하지만 런타임에서는 response가 이미 올바른 형식임을 보장합니다.
+    return response as T;
   }
   return null;
 };

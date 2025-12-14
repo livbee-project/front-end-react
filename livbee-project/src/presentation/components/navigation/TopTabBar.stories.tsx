@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import TopTabBar from './TopTabBar';
+import TopTabBar from '@/presentation/components/navigation/TopTabBar';
 import { MemoryRouter } from 'react-router-dom';
 import { ToastProvider } from '@/presentation/contexts/ToastContext';
 

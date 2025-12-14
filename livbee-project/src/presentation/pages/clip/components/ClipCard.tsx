@@ -12,7 +12,7 @@ import {
   EditButton,
   ImageContainer,
   VideoIcon,
-} from '../styled/MyClipsPageStyles';
+} from '@/presentation/pages/clip/styled/MyClipsPageStyles';
 
 interface ClipCardProps {
   clip: Clip;

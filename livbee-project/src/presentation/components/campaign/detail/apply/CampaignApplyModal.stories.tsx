@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import CampaignApplyModal from './CampaignApplyModal';
+import CampaignApplyModal from '@/presentation/components/campaign/detail/apply/CampaignApplyModal';
 import {
   CampaignApplyModalDefaultStory,
   CampaignApplyModalLongTitleStory,
   CampaignApplyModalVariantsStory,
-} from './CampaignApplyModalStoryContent';
+} from '@/presentation/components/campaign/detail/apply/CampaignApplyModalStoryContent';
 
 const meta: Meta<typeof CampaignApplyModal> = {
   title: 'Campaign/Detail/CampaignApplyModal',

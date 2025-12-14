@@ -3,8 +3,8 @@
  */
 
 import React from 'react';
-import { P, Highlight } from '../Typography';
-import { StoryContainer, ComponentItem } from './StoryComponents';
+import { P, Highlight } from '@/presentation/components/styled/Typography';
+import { StoryContainer, ComponentItem } from '@/presentation/components/styled/sections/StoryComponents';
 
 export const HighlightSection: React.FC = () => (
   <StoryContainer title="강조 컴포넌트 (Highlight)">

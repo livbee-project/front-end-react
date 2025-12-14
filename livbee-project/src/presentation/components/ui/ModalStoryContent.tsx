@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { H2, P } from '@/presentation/components/styled/Typography';
-import Button from './Button';
-import Modal from './Modal';
+import Button from '@/presentation/components/ui/Button';
+import Modal from '@/presentation/components/ui/Modal';
 
 export const BasicModalDemo: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);

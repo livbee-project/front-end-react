@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Button from '@/presentation/components/ui/Button';
 import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
-import RecruitCard from './RecruitCard';
+import RecruitCard from '@/presentation/components/cards/RecruitCard';
 
 interface RecruitCardScrollProps {
   children: React.ReactNode;

@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
-import { useFormStorageRestore } from './useFormStorageRestore';
-import { useFormStorageSave } from './useFormStorageSave';
+import { useFormStorageRestore } from '@/presentation/hooks/form/useFormStorageRestore';
+import { useFormStorageSave } from '@/presentation/hooks/form/useFormStorageSave';
 
 /**
  * 범용 폼 상태를 관리하는 훅

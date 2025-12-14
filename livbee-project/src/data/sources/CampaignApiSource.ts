@@ -17,8 +17,10 @@ import { debug } from '@/shared/utils/logger';
 import { normalizeCampaignApplyResponse, normalizeApplicationActionResponse } from '@/shared/utils/apiNormalizer';
 import { transformCampaignDetailResponse } from '@/data/mappers/CampaignMapper';
 import { convertKeysToCamelCase } from '@/shared/utils/caseConverter';
+import { logApiRequest } from '@/shared/utils/apiRequestLogger';
+import { isObject } from '@/shared/utils/typeGuards';
 
-import type { ICampaignApiSource } from './interfaces/ICampaignApiSource';
+import type { ICampaignApiSource } from '@/data/sources/interfaces/ICampaignApiSource';
 
 /**
  * 캠페인 API 소스
@@ -64,9 +66,12 @@ export class CampaignApiSource implements ICampaignApiSource {
 
     // 백엔드가 snake_case로 응답하는 경우 items 배열의 각 항목을 camelCase로 변환
     if (result.items && Array.isArray(result.items)) {
-      const convertedItems = result.items.map((item) => 
-        convertKeysToCamelCase(item as unknown as Record<string, unknown>)
-      ) as unknown as CampaignListResponse['items'];
+      const convertedItems = result.items.map((item) => {
+        if (item && typeof item === 'object' && !Array.isArray(item)) {
+          return convertKeysToCamelCase(item as Record<string, unknown>);
+        }
+        return item;
+      }) as CampaignListResponse['items'];
       
       return {
         ...result,
@@ -87,13 +92,15 @@ export class CampaignApiSource implements ICampaignApiSource {
     const url = buildApiUrl('/campaigns');
     const headers = getAuthHeaders();
 
-    // 디버깅: 실제로 전송되는 JSON 데이터 확인
     const requestBody = JSON.stringify(request);
-    console.log('[CampaignApiSource] 📤 API 요청 데이터:', {
+    
+    // API 요청 로깅 (개발 환경에서만)
+    logApiRequest({
       url,
       method: 'POST',
+      headers,
       body: requestBody,
-      parsedBody: JSON.parse(requestBody),
+      context: '모집 공고 등록',
     });
 
     const result = await fetchApi<ApiResponse<CreateCampaignResponse['data']>>(
@@ -119,9 +126,9 @@ export class CampaignApiSource implements ICampaignApiSource {
     }
 
     // 전체 응답이 반환된 경우
-    const response = result as unknown as CreateCampaignResponse;
-    if (response.data) {
-      const convertedData = convertKeysToCamelCase(response.data as Record<string, unknown>);
+    // result가 CreateCampaignResponse 형식인지 확인
+    if (isObject(result) && 'data' in result && result.data) {
+      const convertedData = convertKeysToCamelCase(result.data as Record<string, unknown>);
       return {
         ok: true, // 201 응답이므로 명시적으로 ok: true 설정
         data: convertedData as CreateCampaignResponse['data'],

@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import PlaceholderImage from './PlaceholderImage';
+import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
 import {
   PlaceholderOpacitySection,
   PlaceholderSizesSection,
   PlaceholderUsageSection,
-} from './PlaceholderImageStoryContent';
+} from '@/presentation/components/ui/PlaceholderImageStoryContent';
 
 const meta: Meta<typeof PlaceholderImage> = {
   title: 'UI Components/PlaceholderImage',

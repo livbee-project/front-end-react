@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { UserType } from '@/types/mypage';
+import type { UserType } from '@/domain/entities/User';
 import type { UserRole } from '@/domain/entities/User';
 
 export const useMyPageType = (role?: UserRole | null) => {

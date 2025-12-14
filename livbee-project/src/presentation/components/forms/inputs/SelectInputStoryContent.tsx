@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import SelectInput from './SelectInput';
+import SelectInput from '@/presentation/components/forms/inputs/SelectInput';
 
 export const selectSampleOptions = [
   { value: '', label: '선택하세요' },

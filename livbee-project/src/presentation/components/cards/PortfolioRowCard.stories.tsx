@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import PortfolioRowCard from './PortfolioRowCard';
+import PortfolioRowCard from '@/presentation/components/cards/PortfolioRowCard';
 import {
   PortfolioRowExamplesSection,
   PortfolioRowListSection,
   PortfolioRowLongTextSection,
-} from './PortfolioRowCardStoryContent';
+} from '@/presentation/components/cards/PortfolioRowCardStoryContent';
 
 const meta: Meta<typeof PortfolioRowCard> = {
   title: 'Cards/PortfolioRowCard',

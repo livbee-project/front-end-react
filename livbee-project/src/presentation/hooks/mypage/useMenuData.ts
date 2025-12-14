@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { UserType, MenuItemData } from '@/types/mypage';
+import type { UserType } from '@/domain/entities/User';
+import type { MenuItemData } from '@/types/mypage';
 import {
   UserTypeStrategyFactory,
   createCommonMenu,
-} from './strategies/UserTypeStrategy';
+} from '@/presentation/hooks/mypage/strategies/UserTypeStrategy';
 
 /**
  * 메뉴 데이터를 생성하는 커스텀 훅

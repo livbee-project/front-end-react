@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import DetailSection from './DetailSection';
+import DetailSection from '@/presentation/layouts/DetailSection';
 import styled from 'styled-components';
 
 const meta: Meta<typeof DetailSection> = {

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import React from 'react';
-import { CampaignInfoSection } from '../CampaignInfoSection';
+import { CampaignInfoSection } from '@/presentation/components/campaign/detail/CampaignInfoSection';
 
 describe('CampaignInfoSection', () => {
   it('캠페인 정보와 자격 요건을 렌더링한다', () => {

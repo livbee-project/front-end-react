@@ -1,10 +1,10 @@
 import React from 'react';
-import { DetailContent, Separator } from './styles/CampaignInfoSection.styles';
-import { BrandIntroductionSection } from './sections/BrandIntroductionSection';
-import { CampaignIntroSection } from './sections/CampaignIntroSection';
-import { QualificationsSection } from './sections/QualificationsSection';
-import { ShootInfoSection } from './sections/ShootInfoSection';
-import { ProductInfoSection } from './sections/ProductInfoSection';
+import { DetailContent, Separator } from '@/presentation/components/campaign/detail/styles/CampaignInfoSection.styles';
+import { BrandIntroductionSection } from '@/presentation/components/campaign/detail/sections/BrandIntroductionSection';
+import { CampaignIntroSection } from '@/presentation/components/campaign/detail/sections/CampaignIntroSection';
+import { QualificationsSection } from '@/presentation/components/campaign/detail/sections/QualificationsSection';
+import { ShootInfoSection } from '@/presentation/components/campaign/detail/sections/ShootInfoSection';
+import { ProductInfoSection } from '@/presentation/components/campaign/detail/sections/ProductInfoSection';
 
 interface CampaignInfoSectionProps {
   brandIntroduction?: string;

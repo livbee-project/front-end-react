@@ -4,7 +4,7 @@ import {
   EmptyStatesSection,
   ErrorStatesSection,
   StatesUsageExamples,
-} from './StatesStoryContent';
+} from '@/presentation/components/states/StatesStoryContent';
 
 const meta: Meta = {
   title: 'UI Components/States',

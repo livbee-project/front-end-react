@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import SectionTitle from './SectionTitle';
+import SectionTitle from '@/presentation/components/ui/SectionTitle';
 
 const VariantContainer = styled.div`
   display: flex;

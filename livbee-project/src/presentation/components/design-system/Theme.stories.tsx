@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { ColorsSection } from './sections/ColorsSection';
-import { SpacingSection } from './sections/SpacingSection';
-import { RadiusSection } from './sections/RadiusSection';
-import { TypographySection } from './sections/TypographySection';
-import { BreakpointSection } from './sections/BreakpointSection';
+import { ColorsSection } from '@/presentation/components/design-system/sections/ColorsSection';
+import { SpacingSection } from '@/presentation/components/design-system/sections/SpacingSection';
+import { RadiusSection } from '@/presentation/components/design-system/sections/RadiusSection';
+import { TypographySection } from '@/presentation/components/design-system/sections/TypographySection';
+import { BreakpointSection } from '@/presentation/components/design-system/sections/BreakpointSection';
 
 const meta: Meta = {
   title: 'Design System/Theme',

@@ -6,7 +6,7 @@ import {
   CheckboxContainer,
   CheckboxInput,
   CheckboxLabel,
-} from '../styles/campaignRegisterSectionStyles';
+} from '@/presentation/pages/campaign/sections/styles/campaignRegisterSectionStyles';
 
 interface FeeSectionProps {
   fee: string;

@@ -4,7 +4,7 @@ import FormSection from '@/presentation/components/forms/sections/FormSection';
 import { FormSubmitSection } from '@/presentation/components/forms/common/FormSubmitSection';
 import { RegisterPageHeader } from '@/presentation/components/forms/common/RegisterPageHeader';
 import { useCampaignRegisterForm } from '@/presentation/components/forms/campaign/useCampaignRegisterForm';
-import { createCampaignRegisterSections } from './sections/campaignRegisterSections';
+import { createCampaignRegisterSections } from '@/presentation/pages/campaign/sections/campaignRegisterSections';
 
 const CampaignRegisterPage: React.FC = () => {
   const {

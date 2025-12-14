@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import ApplicationCard from './ApplicationCard';
-import PaymentRequestCard from './PaymentRequestCard';
+import ApplicationCard from '@/presentation/components/chat/ApplicationCard';
+import PaymentRequestCard from '@/presentation/components/chat/PaymentRequestCard';
 import type { ChatMessage, ChatRoomDetail } from '@/domain/entities/Chat';
 import type { ApplicationCardData } from '@/shared/utils/chatUtils';
 import { formatTimestamp, formatDateLabel } from '@/shared/utils/chatUtils';

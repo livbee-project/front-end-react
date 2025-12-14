@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import ClipCard from './ClipCard';
+import ClipCard from '@/presentation/components/cards/ClipCard';
 
 export const ClipCardList: React.FC = () => (
   <Container>

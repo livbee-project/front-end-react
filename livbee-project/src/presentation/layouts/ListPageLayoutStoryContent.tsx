@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import ListPageLayout from './ListPageLayout';
+import ListPageLayout from '@/presentation/layouts/ListPageLayout';
 import { CampaignCard } from '@/presentation/components/campaign/CampaignCard';
 import Pagination from '@/presentation/components/list/Pagination';
 import { createMockCampaign } from '@/presentation/stories/mocks/campaign';

@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { HomeCard } from './HomeCard';
+import { HomeCard } from '@/presentation/components/cards/HomeCard';
 import {
   HomeCardDefaultContent,
   HomeCardExamplesSection,
   HomeCardLongText,
   HomeCardNoImage,
-} from './HomeCardStoryContent';
+} from '@/presentation/components/cards/HomeCardStoryContent';
 
 const meta: Meta<typeof HomeCard> = {
   title: 'Cards/HomeCard',

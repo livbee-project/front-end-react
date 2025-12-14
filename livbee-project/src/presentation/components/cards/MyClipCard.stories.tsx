@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import MyClipCard from './MyClipCard';
+import MyClipCard from '@/presentation/components/cards/MyClipCard';
 import {
   MyClipCardDefaultArgs,
   MyClipCardList,
   MyClipCardLongTextArgs,
   MyClipCardWithoutButtonsArgs,
   MyClipCardWithoutImageArgs,
-} from './MyClipCardStoryContent';
+} from '@/presentation/components/cards/MyClipCardStoryContent';
 
 const meta: Meta<typeof MyClipCard> = {
   title: 'Cards/MyClipCard',

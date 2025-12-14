@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import type { UserType } from '@/types/mypage';
-import { TYPE_SWITCHER_CONFIGS } from './config/typeSwitcherConfig';
+import type { UserType } from '@/domain/entities/User';
+import { TYPE_SWITCHER_CONFIGS } from '@/presentation/components/mypage/config/typeSwitcherConfig';
 
 interface TypeSwitcherProps {
   availableTypes: UserType[];

@@ -32,7 +32,7 @@ type ChatRoomDetailApiData = {
   pagination?: ChatRoomDetail['pagination'];
 };
 
-import type { IChatApiSource } from './interfaces/IChatApiSource';
+import type { IChatApiSource } from '@/data/sources/interfaces/IChatApiSource';
 
 export class ChatApiSource implements IChatApiSource {
   async getRooms(params?: { page?: number; size?: number }): Promise<ChatRoomSummary[]> {

@@ -1,4 +1,4 @@
-import type { CampaignFormData } from '../types';
+import type { CampaignFormData } from '@/presentation/components/forms/campaign/types';
 
 /**
  * 모집구분 타입 매핑 설정

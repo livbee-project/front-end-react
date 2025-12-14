@@ -1,14 +1,13 @@
-import { validateRequiredFields, validateTimeRange } from '@/shared/utils/validation';
-import type { CampaignFormData } from '../types';
+import { validateTimeRange } from '@/shared/utils/validation';
+import { validateRequiredFields, validateAll, type ValidationResult } from '@/shared/utils/formValidation';
+import type { CampaignFormData } from '@/presentation/components/forms/campaign/types';
 
 /**
  * 캠페인 폼 데이터 유효성 검사
  */
 export const validateCampaignForm = (
   formData: CampaignFormData
-): { isValid: boolean; errorMessage?: string } => {
-  let errorMessage: string | undefined;
-
+): ValidationResult => {
   const requiredFields = [
     { value: formData.brandName, message: '브랜드명을 입력해주세요.' },
     { value: formData.title, message: '공고 제목을 입력해주세요.' },
@@ -17,20 +16,20 @@ export const validateCampaignForm = (
     { value: formData.deadline, message: '마감일을 입력해주세요.' },
   ];
 
-  const requiredValid = validateRequiredFields(requiredFields, (message) => {
-    errorMessage = message;
-  });
-
-  if (!requiredValid) {
-    return { isValid: false, errorMessage };
+  // 필수 필드 검증
+  const requiredResult = validateRequiredFields(requiredFields);
+  if (!requiredResult.isValid) {
+    return requiredResult;
   }
 
+  // 시간 범위 검증 (조건부)
   if (formData.startTime && formData.endTime) {
+    let timeErrorMessage: string | undefined;
     const timeValid = validateTimeRange(formData.startTime, formData.endTime, (message) => {
-      errorMessage = message;
+      timeErrorMessage = message;
     });
     if (!timeValid) {
-      return { isValid: false, errorMessage };
+      return { isValid: false, errorMessage: timeErrorMessage };
     }
   }
 

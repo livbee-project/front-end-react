@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { type MouseEvent } from 'react';
 import styled from 'styled-components';
-import { PortfolioCard } from './PortfolioCard';
+import { PortfolioCard } from '@/presentation/components/portfolio/PortfolioCard';
 import type { Portfolio } from '@/domain/entities/Portfolio';
 
 const createPortfolio = (overrides: Partial<Portfolio>): Portfolio => ({

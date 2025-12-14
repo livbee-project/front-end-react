@@ -179,7 +179,16 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images, onSelect
         input.type = 'file';
         input.accept = 'image/*';
         input.style.display = 'none';
-        input.onchange = (e) => handleFileChange(e as unknown as React.ChangeEvent<HTMLInputElement>, index);
+        input.onchange = (e) => {
+          // HTMLInputElement의 onchange 이벤트를 React.ChangeEvent로 변환
+          if (e && e.target && 'files' in e.target) {
+            const reactEvent = {
+              target: e.target,
+              currentTarget: e.currentTarget || e.target,
+            } as React.ChangeEvent<HTMLInputElement>;
+            handleFileChange(reactEvent, index);
+          }
+        };
         document.body.appendChild(input);
         replaceInputRefs.current[index] = input;
       }

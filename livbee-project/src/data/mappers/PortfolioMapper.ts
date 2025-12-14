@@ -4,6 +4,7 @@
  */
 
 import type { PortfolioDetail, PortfolioDetailResponse } from '@/domain/entities/Portfolio';
+import { isObject } from '@/shared/utils/typeGuards';
 
 /**
  * PortfolioDetail 응답을 프론트엔드에서 사용하는 PortfolioDetail로 변환합니다.
@@ -12,10 +13,17 @@ export const transformPortfolioDetailResponse = (
   result: unknown,
   id: string
 ): PortfolioDetail => {
-  const payload =
-    ((result as PortfolioDetailResponse)?.data ??
-      (result as PortfolioDetail) ??
-      {}) as Partial<PortfolioDetail> & Record<string, unknown>;
+  let payload: Partial<PortfolioDetail> & Record<string, unknown> = {};
+  
+  if (isObject(result)) {
+    // PortfolioDetailResponse 형식인 경우
+    if ('data' in result && isObject(result.data)) {
+      payload = result.data as Partial<PortfolioDetail> & Record<string, unknown>;
+    } else {
+      // PortfolioDetail 형식인 경우
+      payload = result as Partial<PortfolioDetail> & Record<string, unknown>;
+    }
+  }
 
   const baseDetail: PortfolioDetail = {
     id,
@@ -50,12 +58,19 @@ export const transformPortfolioDetailResponse = (
     updatedAt: '',
   };
 
-  const merged = {
+  const merged: PortfolioDetail = {
     ...baseDetail,
-    ...(payload as Partial<PortfolioDetail>),
   };
 
-  merged.id = (typeof payload.id === 'string' && payload.id) || id;
+  // id 필드 처리
+  if (typeof payload.id === 'string' && payload.id) {
+    merged.id = payload.id;
+  } else {
+    merged.id = id;
+  }
+  
+  // 나머지 필드 병합 (타입 안전하게)
+  Object.assign(merged, payload);
 
   return merged;
 };

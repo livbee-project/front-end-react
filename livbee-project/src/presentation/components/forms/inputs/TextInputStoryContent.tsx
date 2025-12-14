@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import TextInput from './TextInput';
+import TextInput from '@/presentation/components/forms/inputs/TextInput';
 
 const StateContainer = styled.div`
   display: flex;

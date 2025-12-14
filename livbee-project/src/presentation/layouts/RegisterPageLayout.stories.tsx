@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import RegisterPageLayout from './RegisterPageLayout';
+import RegisterPageLayout from '@/presentation/layouts/RegisterPageLayout';
 import styled from 'styled-components';
 
 const meta: Meta<typeof RegisterPageLayout> = {

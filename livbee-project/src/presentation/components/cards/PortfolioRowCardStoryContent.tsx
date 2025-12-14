@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import PortfolioRowCard from './PortfolioRowCard';
+import PortfolioRowCard from '@/presentation/components/cards/PortfolioRowCard';
 
 export const PortfolioRowExamplesSection: React.FC = () => (
   <CardContainer>

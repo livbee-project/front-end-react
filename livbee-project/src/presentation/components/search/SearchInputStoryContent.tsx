@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import SearchInput from './SearchInput';
+import SearchInput from '@/presentation/components/search/SearchInput';
 
 export const SearchPlaceholderDemo: React.FC = () => (
   <PlaceholderContainer>

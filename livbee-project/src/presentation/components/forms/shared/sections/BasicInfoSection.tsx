@@ -35,7 +35,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
         </FormField>
         <FormField
           label="한줄 소개"
-          helper={<LabelNote>최대 50자까지 입력 가능</LabelNote> as unknown as string}
+          helper={<LabelNote>최대 50자까지 입력 가능</LabelNote>}
         >
           <StyledInput
             value={oneLineIntro}

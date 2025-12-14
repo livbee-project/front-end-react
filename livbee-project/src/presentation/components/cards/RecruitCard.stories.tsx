@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import RecruitCard from './RecruitCard';
+import RecruitCard from '@/presentation/components/cards/RecruitCard';
 import {
   RecruitCardBottomVariations,
   RecruitCardDefaultArgs,
@@ -7,7 +7,7 @@ import {
   RecruitCardNonClickableArgs,
   RecruitCardScroll,
   RecruitCardWithoutImageArgs,
-} from './RecruitCardStoryContent';
+} from '@/presentation/components/cards/RecruitCardStoryContent';
 
 const meta: Meta<typeof RecruitCard> = {
   title: 'Cards/RecruitCard',

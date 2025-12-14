@@ -6,7 +6,7 @@ import {
   SectionTitle,
   SectionDescription,
   HiddenInput,
-} from '../PortfolioRegisterStyles';
+} from '@/presentation/components/forms/portfolio/PortfolioRegisterStyles';
 import { MAX_FILE_SIZE, formatFileSize } from '@/shared/constants/fileUpload';
 
 interface PortfolioFilesSectionProps {

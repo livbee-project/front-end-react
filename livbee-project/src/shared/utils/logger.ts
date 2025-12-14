@@ -65,6 +65,22 @@ export const error = (prefix: string, ...args: unknown[]): void => {
 };
 
 /**
+ * 개발 환경에서만 그룹 로그를 출력하는 함수
+ * @param groupName - 그룹 이름
+ * @param callback - 그룹 내에서 실행할 콜백 함수
+ */
+export const group = (groupName: string, callback: () => void): void => {
+  if (isDevelopment) {
+    console.group(groupName);
+    try {
+      callback();
+    } finally {
+      console.groupEnd();
+    }
+  }
+};
+
+/**
  * 레거시 호환성을 위한 함수들 (deprecated)
  * @deprecated debug, info, warn, error를 사용하세요
  */

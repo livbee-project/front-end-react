@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Pagination from '@/presentation/components/list/Pagination';
 import { ListStatePlaceholder } from '@/presentation/components/list/ListStatePlaceholder';
-import { CampaignCard } from './CampaignCard';
+import { CampaignCard } from '@/presentation/components/campaign/CampaignCard';
 import type { Campaign } from '@/domain/entities/Campaign';
 
 interface CampaignListContentProps {

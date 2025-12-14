@@ -6,6 +6,15 @@
 import type { CampaignDetail, CampaignDetailResponse } from '@/domain/entities/Campaign';
 import { mapPrefixToKorean, mapCategoryToKorean } from '@/shared/utils/campaignUtils';
 import { convertKeysToCamelCase } from '@/shared/utils/caseConverter';
+import { isObject } from '@/shared/utils/typeGuards';
+import {
+  getStringField,
+  getNumberField,
+  getBooleanField,
+  getNullableField,
+  getArrayField,
+  getObjectField,
+} from '@/data/mappers/mapperUtils';
 
 /**
  * CampaignDetailResponse를 CampaignDetail로 변환
@@ -16,10 +25,17 @@ export const transformCampaignDetailResponse = (
   id: string
 ): CampaignDetail => {
   // 백엔드 응답이 snake_case일 수 있으므로 camelCase로 변환
-  const rawPayload =
-    ((result as CampaignDetailResponse)?.data ??
-      (result as CampaignDetail) ??
-      {}) as Record<string, unknown>;
+  let rawPayload: Record<string, unknown> = {};
+  
+  if (isObject(result)) {
+    // CampaignDetailResponse 형식인 경우
+    if ('data' in result && isObject(result.data)) {
+      rawPayload = result.data as Record<string, unknown>;
+    } else {
+      // CampaignDetail 형식인 경우
+      rawPayload = result as Record<string, unknown>;
+    }
+  }
   
   // snake_case를 camelCase로 변환
   const payload = convertKeysToCamelCase(rawPayload) as Partial<CampaignDetail> & Record<string, unknown>;
@@ -65,150 +81,79 @@ export const transformCampaignDetailResponse = (
     isApplied: false,
   };
 
-  const merged = {
+  const merged: CampaignDetail = {
     ...baseDetail,
-    ...(payload as Partial<CampaignDetail>),
   };
 
-  merged.id = (typeof payload.id === 'string' && payload.id) || (typeof payload._id === 'string' && payload._id) || id;
-  
-  // 필드 매핑 (snake_case와 camelCase 모두 처리)
-  if (typeof payload.brandName === 'string' || typeof (payload as Record<string, unknown>).brand_name === 'string') {
-    merged.brandName = (payload.brandName as string) || ((payload as Record<string, unknown>).brand_name as string) || '';
+  // id 필드 처리
+  if (typeof payload.id === 'string' && payload.id) {
+    merged.id = payload.id;
+  } else if (typeof payload._id === 'string' && payload._id) {
+    merged.id = payload._id;
+  } else {
+    merged.id = id;
   }
   
-  if (typeof payload.brandIntroduction === 'string' || typeof (payload as Record<string, unknown>).brand_introduction === 'string') {
-    merged.brandIntroduction = (payload.brandIntroduction as string) || ((payload as Record<string, unknown>).brand_introduction as string) || '';
+  // 필드 매핑 (snake_case와 camelCase 모두 처리) - 유틸리티 함수 사용으로 중복 제거
+  merged.brandName = getStringField(payload, 'brandName', '', 'brand_name');
+  merged.brandIntroduction = getStringField(payload, 'brandIntroduction', '', 'brand_introduction');
+  merged.title = getStringField(payload, 'title');
+  merged.content = getStringField(payload, 'content');
+  merged.detailedContent = getStringField(payload, 'detailedContent', '', 'detailed_content');
+  
+  // prefix 필드 처리 (타입 안전하게)
+  const prefixValue = payload.prefix;
+  if (prefixValue !== null && prefixValue !== undefined) {
+    const prefixStr = String(prefixValue);
+    merged.prefix = mapPrefixToKorean(prefixStr as CampaignDetailResponse['data']['prefix']);
   }
   
-  if (typeof payload.title === 'string') {
-    merged.title = payload.title;
+  merged.prefixName = getNullableField<string>(payload, 'prefixName', 'prefix_name');
+  
+  // category 필드 처리 (타입 안전하게)
+  const categoryValue = payload.category;
+  if (categoryValue !== null && categoryValue !== undefined) {
+    const categoryStr = String(categoryValue);
+    merged.category = mapCategoryToKorean(categoryStr as CampaignDetailResponse['data']['category']);
   }
   
-  if (typeof payload.content === 'string') {
-    merged.content = payload.content;
-  }
+  merged.categoryName = getNullableField<string>(payload, 'categoryName', 'category_name');
+  merged.location = getNullableField<string>(payload, 'location');
+  merged.shootDate = getStringField(payload, 'shootDate', '', 'shoot_date');
+  merged.closeAt = getStringField(payload, 'closeAt', '', 'close_at');
+  merged.durationHours = getNumberField(payload, 'durationHours', 0, 'duration_hours');
+  merged.startTime = getStringField(payload, 'startTime', '', 'start_time');
+  merged.endTime = getStringField(payload, 'endTime', '', 'end_time');
+  merged.fee = getNullableField<number>(payload, 'fee');
+  merged.feeNegotiable = getBooleanField(payload, 'feeNegotiable', false, 'fee_negotiable');
+  merged.coverImageUrl = getNullableField<string>(payload, 'coverImageUrl', 'cover_image_url');
+  merged.imageUrl = getStringField(payload, 'imageUrl', '', 'image_url');
+  merged.thumbnailUrl = getStringField(payload, 'thumbnailUrl', '', 'thumbnail_url');
+  merged.liveVerticalCoverUrl = getNullableField<string>(payload, 'liveVerticalCoverUrl', 'live_vertical_cover_url');
+  merged.productThumbnailUrl = getNullableField<string>(payload, 'productThumbnailUrl', 'product_thumbnail_url');
+  merged.productImageUrl = getStringField(payload, 'productImageUrl', '', 'product_image_url');
+  merged.productName = getNullableField<string>(payload, 'productName', 'product_name');
+  merged.recruitmentSection = getStringField(payload, 'recruitmentSection', '', 'recruitment_section');
+  merged.qualifications = getArrayField<string>(payload, 'qualifications', []);
+  merged.preferredQualifications = getArrayField<string>(payload, 'preferredQualifications', [], 'preferred_qualifications');
+  merged.isPublic = getBooleanField(payload, 'isPublic', false, 'is_public');
+  merged.createdAt = getStringField(payload, 'createdAt', '', 'created_at');
+  merged.updatedAt = getStringField(payload, 'updatedAt', '', 'updated_at');
+  merged.createdBy = getStringField(payload, 'createdBy', '', 'created_by');
   
-  if (typeof payload.detailedContent === 'string' || typeof (payload as Record<string, unknown>).detailed_content === 'string') {
-    merged.detailedContent = (payload.detailedContent as string) || ((payload as Record<string, unknown>).detailed_content as string) || '';
-  }
+  // metrics 객체 처리
+  const metricsPayload = getObjectField<Record<string, unknown>>(
+    payload,
+    'metrics',
+    { views: 0, clicks: 0, applications: 0 }
+  );
+  merged.metrics = {
+    views: getNumberField(metricsPayload, 'views', 0),
+    clicks: getNumberField(metricsPayload, 'clicks', 0),
+    applications: getNumberField(metricsPayload, 'applications', 0),
+  };
   
-  if (payload.prefix) {
-    merged.prefix = mapPrefixToKorean(payload.prefix as CampaignDetailResponse['data']['prefix']);
-  }
-  
-  if (payload.prefixName || (payload as Record<string, unknown>).prefix_name) {
-    merged.prefixName = (payload.prefixName as string) || ((payload as Record<string, unknown>).prefix_name as string) || null;
-  }
-  
-  if (payload.category) {
-    merged.category = mapCategoryToKorean(payload.category as CampaignDetailResponse['data']['category']);
-  }
-  
-  if (payload.categoryName || (payload as Record<string, unknown>).category_name) {
-    merged.categoryName = (payload.categoryName as string) || ((payload as Record<string, unknown>).category_name as string) || null;
-  }
-  
-  if (typeof payload.location === 'string' || typeof (payload as Record<string, unknown>).location === 'string') {
-    merged.location = (payload.location as string) || ((payload as Record<string, unknown>).location as string) || null;
-  }
-  
-  if (typeof payload.shootDate === 'string' || typeof (payload as Record<string, unknown>).shoot_date === 'string') {
-    merged.shootDate = (payload.shootDate as string) || ((payload as Record<string, unknown>).shoot_date as string) || '';
-  }
-  
-  if (typeof payload.closeAt === 'string' || typeof (payload as Record<string, unknown>).close_at === 'string') {
-    merged.closeAt = (payload.closeAt as string) || ((payload as Record<string, unknown>).close_at as string) || '';
-  }
-  
-  if (typeof payload.durationHours === 'number' || typeof (payload as Record<string, unknown>).duration_hours === 'number') {
-    merged.durationHours = (payload.durationHours as number) || ((payload as Record<string, unknown>).duration_hours as number) || 0;
-  }
-  
-  if (typeof payload.startTime === 'string' || typeof (payload as Record<string, unknown>).start_time === 'string') {
-    merged.startTime = (payload.startTime as string) || ((payload as Record<string, unknown>).start_time as string) || '';
-  }
-  
-  if (typeof payload.endTime === 'string' || typeof (payload as Record<string, unknown>).end_time === 'string') {
-    merged.endTime = (payload.endTime as string) || ((payload as Record<string, unknown>).end_time as string) || '';
-  }
-  
-  if (typeof payload.fee === 'number' || typeof (payload as Record<string, unknown>).fee === 'number' || payload.fee === null) {
-    merged.fee = (payload.fee as number | null) || ((payload as Record<string, unknown>).fee as number | null) || null;
-  }
-  
-  if (typeof payload.feeNegotiable === 'boolean' || typeof (payload as Record<string, unknown>).fee_negotiable === 'boolean') {
-    merged.feeNegotiable = (payload.feeNegotiable as boolean) ?? ((payload as Record<string, unknown>).fee_negotiable as boolean) ?? false;
-  }
-  
-  if (typeof payload.coverImageUrl === 'string' || typeof (payload as Record<string, unknown>).cover_image_url === 'string' || payload.coverImageUrl === null) {
-    merged.coverImageUrl = (payload.coverImageUrl as string | null) || ((payload as Record<string, unknown>).cover_image_url as string | null) || null;
-  }
-  
-  if (typeof payload.imageUrl === 'string' || typeof (payload as Record<string, unknown>).image_url === 'string') {
-    merged.imageUrl = (payload.imageUrl as string) || ((payload as Record<string, unknown>).image_url as string) || '';
-  }
-  
-  if (typeof payload.thumbnailUrl === 'string' || typeof (payload as Record<string, unknown>).thumbnail_url === 'string') {
-    merged.thumbnailUrl = (payload.thumbnailUrl as string) || ((payload as Record<string, unknown>).thumbnail_url as string) || '';
-  }
-  
-  if (typeof payload.liveVerticalCoverUrl === 'string' || typeof (payload as Record<string, unknown>).live_vertical_cover_url === 'string' || payload.liveVerticalCoverUrl === null) {
-    merged.liveVerticalCoverUrl = (payload.liveVerticalCoverUrl as string | null) || ((payload as Record<string, unknown>).live_vertical_cover_url as string | null) || null;
-  }
-  
-  if (typeof payload.productThumbnailUrl === 'string' || typeof (payload as Record<string, unknown>).product_thumbnail_url === 'string' || payload.productThumbnailUrl === null) {
-    merged.productThumbnailUrl = (payload.productThumbnailUrl as string | null) || ((payload as Record<string, unknown>).product_thumbnail_url as string | null) || null;
-  }
-  
-  if (typeof payload.productImageUrl === 'string' || typeof (payload as Record<string, unknown>).product_image_url === 'string') {
-    merged.productImageUrl = (payload.productImageUrl as string) || ((payload as Record<string, unknown>).product_image_url as string) || '';
-  }
-  
-  if (typeof payload.productName === 'string' || typeof (payload as Record<string, unknown>).product_name === 'string' || payload.productName === null) {
-    merged.productName = (payload.productName as string | null) || ((payload as Record<string, unknown>).product_name as string | null) || null;
-  }
-  
-  if (typeof payload.recruitmentSection === 'string' || typeof (payload as Record<string, unknown>).recruitment_section === 'string') {
-    merged.recruitmentSection = (payload.recruitmentSection as string) || ((payload as Record<string, unknown>).recruitment_section as string) || '';
-  }
-  
-  if (Array.isArray(payload.qualifications) || Array.isArray((payload as Record<string, unknown>).qualifications)) {
-    merged.qualifications = (payload.qualifications as string[]) || ((payload as Record<string, unknown>).qualifications as string[]) || [];
-  }
-  
-  if (Array.isArray(payload.preferredQualifications) || Array.isArray((payload as Record<string, unknown>).preferred_qualifications)) {
-    merged.preferredQualifications = (payload.preferredQualifications as string[]) || ((payload as Record<string, unknown>).preferred_qualifications as string[]) || [];
-  }
-  
-  if (typeof payload.isPublic === 'boolean' || typeof (payload as Record<string, unknown>).is_public === 'boolean') {
-    merged.isPublic = (payload.isPublic as boolean) ?? ((payload as Record<string, unknown>).is_public as boolean) ?? false;
-  }
-  
-  if (typeof payload.createdAt === 'string' || typeof (payload as Record<string, unknown>).created_at === 'string') {
-    merged.createdAt = (payload.createdAt as string) || ((payload as Record<string, unknown>).created_at as string) || '';
-  }
-  
-  if (typeof payload.updatedAt === 'string' || typeof (payload as Record<string, unknown>).updated_at === 'string') {
-    merged.updatedAt = (payload.updatedAt as string) || ((payload as Record<string, unknown>).updated_at as string) || '';
-  }
-  
-  if (typeof payload.createdBy === 'string' || typeof (payload as Record<string, unknown>).created_by === 'string') {
-    merged.createdBy = (payload.createdBy as string) || ((payload as Record<string, unknown>).created_by as string) || '';
-  }
-  
-  if (payload.metrics && typeof payload.metrics === 'object') {
-    const metrics = payload.metrics as Record<string, unknown>;
-    merged.metrics = {
-      views: (typeof metrics.views === 'number' ? metrics.views : 0) || (typeof (metrics as Record<string, unknown>).views === 'number' ? (metrics as Record<string, unknown>).views as number : 0) || 0,
-      clicks: (typeof metrics.clicks === 'number' ? metrics.clicks : 0) || (typeof (metrics as Record<string, unknown>).clicks === 'number' ? (metrics as Record<string, unknown>).clicks as number : 0) || 0,
-      applications: (typeof metrics.applications === 'number' ? metrics.applications : 0) || (typeof (metrics as Record<string, unknown>).applications === 'number' ? (metrics as Record<string, unknown>).applications as number : 0) || 0,
-    };
-  }
-  
-  if (typeof payload.isApplied === 'boolean' || typeof (payload as Record<string, unknown>).is_applied === 'boolean') {
-    merged.isApplied = (payload.isApplied as boolean) ?? ((payload as Record<string, unknown>).is_applied as boolean) ?? false;
-  }
+  merged.isApplied = getBooleanField(payload, 'isApplied', false, 'is_applied');
 
   return merged;
 };

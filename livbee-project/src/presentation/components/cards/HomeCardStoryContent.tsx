@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { HomeCard } from './HomeCard';
-import { HomeCardImage } from './HomeCardImage';
+import { HomeCard } from '@/presentation/components/cards/HomeCard';
+import { HomeCardImage } from '@/presentation/components/cards/HomeCardImage';
 import {
   HomeCardBody,
   HomeCardBrand,
@@ -9,7 +9,7 @@ import {
   HomeCardDescription,
   HomeCardMetaRow,
   CTAButton,
-} from './HomeCardBody';
+} from '@/presentation/components/cards/HomeCardBody';
 import { Caption } from '@/presentation/components/styled/Typography';
 
 export const HomeCardDefaultContent = (

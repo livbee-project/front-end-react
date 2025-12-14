@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { validateCampaignApplyForm } from '../campaignApplyValidation';
-import { buildCampaignApplyRequest } from '../campaignApplyRequestBuilder';
+import { validateCampaignApplyForm } from '@/presentation/components/campaign/detail/apply/campaignApplyValidation';
+import { buildCampaignApplyRequest } from '@/presentation/components/campaign/detail/apply/campaignApplyRequestBuilder';
 
 describe('campaignApplyValidation', () => {
   it('should pass validation when all fields are valid', () => {

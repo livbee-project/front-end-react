@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { LoginForm } from './LoginForm';
+import { LoginForm } from '@/presentation/components/auth/LoginForm';
 import {
   DefaultLoginDemo,
   ErrorLoginDemo,
   LoadingLoginDemo,
   LoginInputStatesDemo,
-} from './LoginFormStoryContent';
+} from '@/presentation/components/auth/LoginFormStoryContent';
 
 const meta: Meta<typeof LoginForm> = {
   title: 'Auth/LoginForm',

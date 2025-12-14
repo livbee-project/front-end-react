@@ -13,7 +13,7 @@ import {
   CheckboxContainer,
   CheckboxInput,
   CheckboxLabel,
-} from '../styles/campaignRegisterSectionStyles';
+} from '@/presentation/pages/campaign/sections/styles/campaignRegisterSectionStyles';
 import Calendar from '@/presentation/components/ui/Calendar';
 import TimePicker from '@/presentation/components/ui/TimePicker';
 

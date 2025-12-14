@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import HomeSectionHeader from './HomeSectionHeader';
+import HomeSectionHeader from '@/presentation/components/home/sections/HomeSectionHeader';
 
 const meta: Meta<typeof HomeSectionHeader> = {
   title: 'Sections/HomeSectionHeader',

@@ -9,7 +9,7 @@ import {
   StyledTextarea,
 } from '@/presentation/components/forms/portfolio/PortfolioRegisterStyles';
 import styled from 'styled-components';
-import { QualificationsSection } from './QualificationsSection';
+import { QualificationsSection } from '@/presentation/pages/campaign/sections/components/QualificationsSection';
 import { ArrowUp } from 'lucide-react';
 import { saveScrollPositionBeforeCrop } from '@/shared/utils/scrollPosition';
 

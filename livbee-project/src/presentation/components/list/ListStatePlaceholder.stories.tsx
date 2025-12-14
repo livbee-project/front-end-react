@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { ListStatePlaceholder } from './ListStatePlaceholder';
+import { ListStatePlaceholder } from '@/presentation/components/list/ListStatePlaceholder';
 
 const meta: Meta<typeof ListStatePlaceholder> = {
   title: 'Components/List/ListStatePlaceholder',

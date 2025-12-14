@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import TextInput from './TextInput';
-import { TextInputStatesStory, TextInputUsageExamplesStory } from './TextInputStoryContent';
+import TextInput from '@/presentation/components/forms/inputs/TextInput';
+import { TextInputStatesStory, TextInputUsageExamplesStory } from '@/presentation/components/forms/inputs/TextInputStoryContent';
 
 const meta: Meta<typeof TextInput> = {
   title: 'Forms/TextInput',

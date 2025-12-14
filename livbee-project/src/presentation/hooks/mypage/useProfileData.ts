@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { UserType, ProfileData } from '@/types/mypage';
-import { UserTypeStrategyFactory } from './strategies/UserTypeStrategy';
+import type { UserType } from '@/domain/entities/User';
+import type { ProfileData } from '@/types/mypage';
+import { UserTypeStrategyFactory } from '@/presentation/hooks/mypage/strategies/UserTypeStrategy';
 
 /**
  * 프로필 데이터를 생성하는 커스텀 훅

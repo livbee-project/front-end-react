@@ -1,5 +1,5 @@
 import { useListData } from '@/presentation/hooks/list/useListData';
-import { useRepositoryListMethod } from './useRepositoryListMethod';
+import { useRepositoryListMethod } from '@/presentation/hooks/list/useRepositoryListMethod';
 
 interface UseListFetcherOptions<Q, R extends object> {
   repository: R;

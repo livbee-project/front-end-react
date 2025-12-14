@@ -1,6 +1,6 @@
-import type { UserType } from '@/types/mypage';
-import { useProfileData } from './useProfileData';
-import { useMenuData } from './useMenuData';
+import type { UserType } from '@/domain/entities/User';
+import { useProfileData } from '@/presentation/hooks/mypage/useProfileData';
+import { useMenuData } from '@/presentation/hooks/mypage/useMenuData';
 
 /**
  * 마이페이지 데이터를 생성하는 커스텀 훅

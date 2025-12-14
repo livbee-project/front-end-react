@@ -3,8 +3,8 @@
  */
 
 import React from 'react';
-import { ButtonText } from '../Typography';
-import { StoryContainer, ComponentItem } from './StoryComponents';
+import { ButtonText } from '@/presentation/components/styled/Typography';
+import { StoryContainer, ComponentItem } from '@/presentation/components/styled/sections/StoryComponents';
 
 export const ButtonTextSection: React.FC = () => (
   <StoryContainer title="버튼 텍스트 (Button Text)">

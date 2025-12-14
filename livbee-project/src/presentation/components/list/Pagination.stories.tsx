@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import Pagination from './Pagination';
+import Pagination from '@/presentation/components/list/Pagination';
 import React from 'react';
 import {
   PaginationActiveDemo,
   PaginationCountsDemo,
   PaginationUsageDemo,
-} from './PaginationStoryContent';
+} from '@/presentation/components/list/PaginationStoryContent';
 
 const meta: Meta<typeof Pagination> = {
   title: 'UI Components/Pagination',

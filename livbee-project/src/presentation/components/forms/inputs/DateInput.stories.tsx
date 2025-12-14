@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import DateInput from './DateInput';
+import DateInput from '@/presentation/components/forms/inputs/DateInput';
 import {
   BasicDateInput,
   DateInputStates,
   DateInputUsageExamples,
   DateInputWithMinMax,
-} from './DateInputStoryContent';
+} from '@/presentation/components/forms/inputs/DateInputStoryContent';
 
 const meta: Meta<typeof DateInput> = {
   title: 'Forms/DateInput',
