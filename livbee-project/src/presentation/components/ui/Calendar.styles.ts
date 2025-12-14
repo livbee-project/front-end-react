@@ -16,14 +16,20 @@ const NavButtonBase = styled.button`
   background: transparent !important;
   color: ${CALENDAR_COLORS.BLACK} !important;
   cursor: pointer !important;
-  transition: all 0.2s !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
   flex-shrink: 0 !important;
   padding: 0 !important;
   margin: 0 !important;
   line-height: 1 !important;
+  position: relative !important;
 
   &:hover:not(:disabled) {
     background: ${({ theme }) => theme.colors.secondary} !important;
+    transform: scale(1.1) !important;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.95) !important;
   }
 
   &:focus {
@@ -56,7 +62,7 @@ const NavButtonBase = styled.button`
   }
 `;
 
-export const CalendarOverlay = styled.div`
+export const CalendarOverlay = styled.div<{ $isClosing?: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
@@ -68,13 +74,32 @@ export const CalendarOverlay = styled.div`
   z-index: 99999;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   box-sizing: border-box;
+  animation: ${({ $isClosing }) => ($isClosing ? 'fadeOut' : 'fadeIn')} 0.2s ease-out;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
 
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     display: none;
   }
 `;
 
-export const CalendarContainer = styled.div`
+export const CalendarContainer = styled.div<{ $isClosing?: boolean }>`
   position: fixed;
   top: 50%;
   left: 50%;
@@ -92,6 +117,30 @@ export const CalendarContainer = styled.div`
   overflow-y: auto;
   box-sizing: border-box;
   overscroll-behavior: contain;
+  animation: ${({ $isClosing }) => ($isClosing ? 'slideUpFadeOut' : 'slideUpFadeIn')} 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+
+  @keyframes slideUpFadeIn {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -45%);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  @keyframes slideUpFadeOut {
+    from {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+    }
+    to {
+      opacity: 0;
+      transform: translate(-50%, -45%);
+    }
+  }
   
   /* 모바일에서 화면 하단이 잘리지 않도록 위치 및 크기 조정 */
   @media (max-width: 767px) {
@@ -117,6 +166,29 @@ export const CalendarContainer = styled.div`
     max-width: none;
     max-height: none;
     overflow-y: visible;
+    animation: ${({ $isClosing }) => ($isClosing ? 'slideDownFadeOut' : 'slideDownFadeIn')} 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+    @keyframes slideDownFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideDownFadeOut {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+    }
   }
 `;
 
@@ -274,14 +346,37 @@ export const StyledDayPicker = styled(DayPicker)`
     font-size: 14px;
     font-weight: 400;
     color: ${({ theme }) => theme.colors.foreground};
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     border: none;
     background: transparent;
     cursor: pointer;
     opacity: 1;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: ${({ theme }) => theme.colors.primary};
+      opacity: 0.2;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+    }
+
+    &:active:not(:disabled)::before {
+      width: 200%;
+      height: 200%;
+      opacity: 0.1;
+    }
 
     &:hover:not(:disabled) {
       background: ${({ theme }) => theme.colors.secondary};
+      transform: scale(1.05);
     }
 
     &:focus {
@@ -303,6 +398,19 @@ export const StyledDayPicker = styled(DayPicker)`
     border: none !important;
     outline: none !important;
     opacity: 1 !important;
+    animation: dateSelectPulse 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    @keyframes dateSelectPulse {
+      0% {
+        transform: scale(0.8);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
   }
 
   .rdp-today:not(.rdp-selected) .rdp-day_button {
@@ -371,7 +479,27 @@ const ButtonBase = styled.button`
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+  }
+
+  &:active::before {
+    width: 300px;
+    height: 300px;
+  }
 
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     padding: 12px;
@@ -388,6 +516,11 @@ export const CancelButton = styled(ButtonBase)`
     background: ${({ theme }) => theme.colors.secondary};
     border-color: ${({ theme }) => theme.colors.muted};
     color: ${({ theme }) => theme.colors.foreground};
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 `;
 
@@ -398,6 +531,13 @@ export const ConfirmButton = styled(ButtonBase)`
 
   &:hover:not(:disabled) {
     background: ${({ theme }) => theme.colors.primaryHover};
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   &:disabled {

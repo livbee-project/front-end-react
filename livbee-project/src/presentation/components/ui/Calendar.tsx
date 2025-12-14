@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import 'react-day-picker/dist/style.css';
 import { useCalendarDOM } from '@/presentation/components/ui/Calendar.hooks';
 import {
@@ -29,12 +29,14 @@ const Calendar: React.FC<CalendarProps> = ({
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(() =>
     parseDateString(value)
   );
+  const [isClosing, setIsClosing] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
 
-  // value prop이 변경될 때 selectedDate 업데이트
+  // value prop이 변경될 때 selectedDate 업데이트 (메모이제이션)
+  const parsedValue = useMemo(() => parseDateString(value), [value]);
   useEffect(() => {
-    setSelectedDate(parseDateString(value));
-  }, [value]);
+    setSelectedDate(parsedValue);
+  }, [parsedValue]);
 
   // 배경 스크롤 비활성화 (body scroll lock)
   useEffect(() => {
@@ -50,7 +52,10 @@ const Calendar: React.FC<CalendarProps> = ({
   const handleClickOutside = useCallback(
     (event: MouseEvent) => {
       if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
-        onClose();
+        setIsClosing(true);
+        setTimeout(() => {
+          onClose();
+        }, 200); // 애니메이션 시간과 맞춤
       }
     },
     [onClose]
@@ -70,6 +75,10 @@ const Calendar: React.FC<CalendarProps> = ({
     // 날짜 선택 시 임시로 상태만 업데이트 (적용은 하지 않음)
     if (date) {
       setSelectedDate(date);
+      // 햅틱 피드백 (지원되는 경우)
+      if ('vibrate' in navigator) {
+        navigator.vibrate(10);
+      }
     }
   }, []);
 
@@ -78,17 +87,36 @@ const Calendar: React.FC<CalendarProps> = ({
     if (selectedDate) {
       onChange(formatDateToString(selectedDate));
     }
-    onClose();
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 200); // 애니메이션 시간과 맞춤
   }, [selectedDate, onChange, onClose]);
 
   const handleCancelClick = useCallback(() => {
-    onClose();
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 200); // 애니메이션 시간과 맞춤
   }, [onClose]);
+
+  // 키보드 이벤트 처리 (ESC 키로 닫기)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        handleCancelClick();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleCancelClick]);
 
   return (
     <>
-      <CalendarOverlay onClick={handleCancelClick} />
-      <CalendarContainer ref={calendarRef}>
+      <CalendarOverlay onClick={handleCancelClick} $isClosing={isClosing} />
+      <CalendarContainer ref={calendarRef} $isClosing={isClosing}>
         <StyledDayPicker
           mode="single"
           selected={selectedDate}
@@ -99,8 +127,10 @@ const Calendar: React.FC<CalendarProps> = ({
           toDate={maxDate}
         />
         <CalendarFooter>
-          <CancelButton onClick={handleCancelClick}>취소</CancelButton>
-          <ConfirmButton onClick={handleConfirmClick} disabled={!selectedDate}>
+          <CancelButton onClick={handleCancelClick} type="button">
+            취소
+          </CancelButton>
+          <ConfirmButton onClick={handleConfirmClick} disabled={!selectedDate} type="button">
             선택
           </ConfirmButton>
         </CalendarFooter>
@@ -109,5 +139,6 @@ const Calendar: React.FC<CalendarProps> = ({
   );
 };
 
-export default Calendar;
+// React.memo로 불필요한 리렌더링 방지
+export default React.memo(Calendar);
 

@@ -73,12 +73,19 @@ export const useCalendarDOM = ({ calendarRef }: UseCalendarDOMProps) => {
           
           const existingText = navElement.querySelector('.custom-month-year');
           if (existingText) {
-            existingText.remove();
+            // 페이드 아웃 애니메이션
+            (existingText as HTMLElement).style.transition = 'opacity 0.15s ease-out';
+            (existingText as HTMLElement).style.opacity = '0';
+            setTimeout(() => {
+              existingText.remove();
+            }, 150);
           }
           
           const monthYearSpan = document.createElement('span');
           monthYearSpan.className = 'custom-month-year';
           monthYearSpan.textContent = koreanText;
+          monthYearSpan.style.opacity = '0';
+          monthYearSpan.style.transition = 'opacity 0.15s ease-in';
           
           const nextButton = navElement.querySelector('.rdp-button_next');
           if (nextButton) {
@@ -86,6 +93,11 @@ export const useCalendarDOM = ({ calendarRef }: UseCalendarDOMProps) => {
           } else {
             navElement.appendChild(monthYearSpan);
           }
+          
+          // 페이드 인 애니메이션
+          requestAnimationFrame(() => {
+            monthYearSpan.style.opacity = '1';
+          });
         }
         isUpdating = false;
       });
