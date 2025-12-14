@@ -196,6 +196,10 @@ export const StyledTextarea = styled.textarea`
   min-height: 100px;
   font-family: inherit;
   transition: all 0.2s;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.5;
 
   &::placeholder {
     color: #9CA3AF;
