@@ -199,7 +199,14 @@ export const StyledTextarea = styled.textarea`
   white-space: normal;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  overflow: auto;
   line-height: 1.5;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 
   &::placeholder {
     color: #9CA3AF;
@@ -214,6 +221,12 @@ export const StyledTextarea = styled.textarea`
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  @media (max-width: 768px) {
+    resize: none;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 `;
 
