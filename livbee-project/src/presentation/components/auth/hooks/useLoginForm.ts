@@ -1,10 +1,9 @@
 import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import type { UserRole as UserType } from '@/domain/entities/User';
 import { useAuth } from '@/presentation/hooks/auth/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { getAuthRedirectPath } from '@/shared/utils/authRedirect';
-import { ROUTE_ROLE_PERMISSIONS, ROUTE_PATHS } from '@/app/routes/routeMeta';
+import { ROUTE_ROLE_PERMISSIONS } from '@/app/routes/routeMeta';
 import { validateLoginForm } from '@/presentation/components/auth/utils/loginValidation';
 
 interface UseLoginFormOptions {
@@ -30,7 +29,6 @@ export const useLoginForm = ({
 }: UseLoginFormOptions = {}): UseLoginFormReturn => {
   const { login, logout } = useAuth();
   const { showToast } = useToast();
-  const navigate = useNavigate();
 
   const [userType, setUserType] = useState<UserType>(defaultUserType);
   const [email, setEmail] = useState('');
