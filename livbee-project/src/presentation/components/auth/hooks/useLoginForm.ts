@@ -1,9 +1,10 @@
 import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { UserRole as UserType } from '@/domain/entities/User';
 import { useAuth } from '@/presentation/hooks/auth/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { getAuthRedirectPath } from '@/shared/utils/authRedirect';
-import { ROUTE_ROLE_PERMISSIONS } from '@/app/routes/routeMeta';
+import { ROUTE_PATHS, ROUTE_ROLE_PERMISSIONS } from '@/app/routes/routeMeta';
 import { validateLoginForm } from '@/presentation/components/auth/utils/loginValidation';
 
 interface UseLoginFormOptions {
@@ -29,6 +30,7 @@ export const useLoginForm = ({
 }: UseLoginFormOptions = {}): UseLoginFormReturn => {
   const { login, logout } = useAuth();
   const { showToast } = useToast();
+  const navigate = useNavigate();
 
   const [userType, setUserType] = useState<UserType>(defaultUserType);
   const [email, setEmail] = useState('');
@@ -98,9 +100,9 @@ export const useLoginForm = ({
   }, [email, password, userType, login, logout, showToast, onSuccess]);
 
   const handleSignUpClick = useCallback(() => {
-    // 회원가입 기능이 제거됨
-    // TODO: 회원가입 기능이 필요하면 다시 구현
-  }, []);
+    const userTypeParam = userType === 'showhost' ? 'showhost' : 'brand';
+    navigate(`${ROUTE_PATHS.signup}?userType=${userTypeParam}`, { replace: true });
+  }, [navigate, userType]);
 
   return {
     userType,

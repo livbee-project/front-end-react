@@ -20,6 +20,7 @@ export const ROUTE_PATHS = {
   chat: '/chat',
   chatRoom: '/chat/:roomId',
   login: '/login',
+  signup: '/signup',
   news: '/news',
   live: '/live',
   event: '/event',
@@ -41,7 +42,7 @@ export const PROTECTED_ROUTES = new Set<string>([
 
 export const PROTECTED_ROUTE_PREFIXES = ['/chat/'];
 
-export const GUEST_ONLY_ROUTES = new Set<string>([ROUTE_PATHS.login]);
+export const GUEST_ONLY_ROUTES = new Set<string>([ROUTE_PATHS.login, ROUTE_PATHS.signup]);
 
 export const ROUTE_ROLE_PERMISSIONS: Partial<Record<string, UserRole[]>> = {
   [ROUTE_PATHS.campaignRegister]: ['brand'],

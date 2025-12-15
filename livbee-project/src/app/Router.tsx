@@ -48,6 +48,7 @@ const MyClipsPage = lazyWithRetry(() => import('@/presentation/pages/clip/MyClip
 const MyAppliedCampaignsPage = lazyWithRetry(() => import('@/presentation/pages/mypage/MyAppliedCampaignsPage'));
 const MessagesPage = lazyWithRetry(() => import('@/presentation/pages/message/MessagesPage'));
 const LoginPage = lazyWithRetry(() => import('@/presentation/pages/auth/LoginPage'));
+const SignupPage = lazyWithRetry(() => import('@/presentation/pages/auth/SignupPage'));
 const ImageCropPage = lazyWithRetry(() => import('@/presentation/pages/image/ImageCropPage'));
 const ChatRoomPage = lazyWithRetry(() => import('@/presentation/pages/chat/ChatRoomPage'));
 
@@ -185,6 +186,15 @@ const AppRouter = () => (
             element={
               <AuthGuard requireAuth={false} guestOnly redirectTo={ROUTE_PATHS.myPage}>
                 <LoginPage />
+              </AuthGuard>
+            }
+          />
+          {/* 회원가입 페이지 - 하단 네비게이션 표시 */}
+          <Route
+            path={ROUTE_PATHS.signup}
+            element={
+              <AuthGuard requireAuth={false} guestOnly redirectTo={ROUTE_PATHS.myPage}>
+                <SignupPage />
               </AuthGuard>
             }
           />
