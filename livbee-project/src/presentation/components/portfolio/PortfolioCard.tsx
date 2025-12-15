@@ -4,7 +4,7 @@ import { Star } from 'lucide-react';
 import { H3, PMuted, Caption } from '@/presentation/components/styled/Typography';
 import { Badge } from '@/presentation/components/styled/CommonStyles';
 import { Card } from '@/presentation/components/styled/SectionStyles';
-import { buildPortfolioBadgeItems, formatExperience } from '@/shared/utils/badgeUtils';
+import { formatExperience } from '@/shared/utils/badgeUtils';
 import type { Portfolio } from '@/domain/entities/Portfolio';
 
 interface PortfolioCardProps {
@@ -22,16 +22,24 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
 }) => {
   return (
     <CardContainer onClick={onCardClick}>
-      <TopSection>
-        <ProfileImageContainer>
-          {portfolio.mainThumbnailUrl ? (
-            <ProfileImage src={portfolio.mainThumbnailUrl} alt={portfolio.nickname || '프로필'} loading="lazy" decoding="async" />
-          ) : (
-            <PlaceholderImage />
-          )}
-        </ProfileImageContainer>
+      <ContentSection>
+        {/* 왼쪽: 프로필 사진 + 태그 */}
+        <LeftSection>
+          <ProfileImageContainer>
+            {portfolio.mainThumbnailUrl ? (
+              <ProfileImage src={portfolio.mainThumbnailUrl} alt={portfolio.nickname || '프로필'} loading="lazy" decoding="async" />
+            ) : (
+              <PlaceholderImage />
+            )}
+          </ProfileImageContainer>
+          <TagsContainer>
+            <TagBadge $variant="secondary" as="span">패션</TagBadge>
+            <TagBadge $variant="secondary" as="span">뷰티</TagBadge>
+          </TagsContainer>
+        </LeftSection>
 
-        <HostContent>
+        {/* 오른쪽: 이름, 한줄 소개, 경력 */}
+        <RightSection>
           <HostNameRow>
             <HostName as={H3}>{portfolio.nickname || '이름 없음'}</HostName>
             <ScrapButton
@@ -43,21 +51,12 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
               <StyledStar size={16} $active={isScrapped} aria-hidden="true" />
             </ScrapButton>
           </HostNameRow>
-
           <HostIntro as={PMuted}>{portfolio.oneLineIntro || '소개 없음'}</HostIntro>
-        </HostContent>
-      </TopSection>
-
-      <BadgeContainer>
-        {buildPortfolioBadgeItems(portfolio).map((badge, index) => (
-          <Badge key={`${portfolio.id}-${index}`} $variant="secondary" as="span">
-            {badge}
-          </Badge>
-        ))}
-        {portfolio.experienceYears != null && portfolio.experienceYears > 0 && (
-          <InfoText as={Caption}>{formatExperience(portfolio.experienceYears)}</InfoText>
-        )}
-      </BadgeContainer>
+          {portfolio.experienceYears != null && portfolio.experienceYears > 0 && (
+            <ExperienceText as={Caption}>{formatExperience(portfolio.experienceYears)}</ExperienceText>
+          )}
+        </RightSection>
+      </ContentSection>
     </CardContainer>
   );
 };
@@ -73,10 +72,17 @@ const CardContainer = styled(Card)`
   }
 `;
 
-const TopSection = styled.div`
+const ContentSection = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing.lg};
-  margin-bottom: ${({ theme }) => theme.spacing.md};
+`;
+
+const LeftSection = styled.div`
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.md};
+  align-items: center;
 `;
 
 const ProfileImageContainer = styled.div`
@@ -100,12 +106,26 @@ const PlaceholderImage = styled.div`
   background: ${({ theme }) => theme.colors.secondary};
 `;
 
-const HostContent = styled.div`
+const TagsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: ${({ theme }) => theme.spacing.xs};
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+`;
+
+const TagBadge = styled(Badge)`
+  width: fit-content;
+`;
+
+const RightSection = styled.div`
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.sm};
+  align-items: flex-start;
 `;
 
 const HostNameRow = styled.div`
@@ -113,10 +133,12 @@ const HostNameRow = styled.div`
   justify-content: space-between;
   align-items: center;
   gap: ${({ theme }) => theme.spacing.sm};
-  margin-bottom: ${({ theme }) => theme.spacing.xs};
+  width: 100%;
 `;
 
-const HostName = styled(H3)``;
+const HostName = styled(H3)`
+  text-align: left;
+`;
 
 const ScrapButton = styled.button`
   flex-shrink: 0;
@@ -155,25 +177,12 @@ const HostIntro = styled(PMuted)`
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-`;
-
-const BadgeContainer = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.sm};
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  align-items: center;
-  min-width: 0;
+  text-align: left;
   width: 100%;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
 `;
 
-const InfoText = styled(Caption)`
-  white-space: nowrap;
-  flex-shrink: 0;
+const ExperienceText = styled(Caption)`
+  text-align: left;
+  color: ${({ theme }) => theme.colors.muted};
 `;
 
