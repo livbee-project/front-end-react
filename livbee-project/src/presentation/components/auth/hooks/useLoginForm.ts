@@ -100,10 +100,9 @@ export const useLoginForm = ({
   }, [email, password, userType, login, logout, showToast, onSuccess]);
 
   const handleSignUpClick = useCallback(() => {
-    // 현재 선택된 userType을 쿼리 파라미터로 전달
-    const userTypeParam = userType === 'showhost' ? 'showhost' : 'brand';
-    navigate(`${ROUTE_PATHS.signup}?userType=${userTypeParam}`, { replace: true });
-  }, [navigate, userType]);
+    // 회원가입 기능이 제거됨
+    // TODO: 회원가입 기능이 필요하면 다시 구현
+  }, []);
 
   return {
     userType,
