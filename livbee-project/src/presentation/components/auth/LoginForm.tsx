@@ -2,13 +2,12 @@ import React from 'react';
 import Button from '@/presentation/components/ui/Button';
 import { LoginFormInputs } from '@/presentation/components/auth/LoginFormInputs';
 import { LoginFormFooter } from '@/presentation/components/auth/LoginFormFooter';
-import { FormContainer, ErrorText, ButtonSpacer } from '@/presentation/components/auth/styled/LoginFormStyles';
+import { FormContainer, ButtonSpacer } from '@/presentation/components/auth/styled/LoginFormStyles';
 
 interface LoginFormProps {
   email: string;
   password: string;
   isLoading: boolean;
-  error: string | null;
   onEmailChange: (value: string) => void;
   onPasswordChange: (value: string) => void;
   onLogin: () => void;
@@ -19,7 +18,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   email,
   password,
   isLoading,
-  error,
   onEmailChange,
   onPasswordChange,
   onLogin,
@@ -34,8 +32,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       onPasswordChange={onPasswordChange}
       onEnterPress={onLogin}
     />
-
-    {error && <ErrorText>{error}</ErrorText>}
 
     <ButtonSpacer>
       <Button variant="primary" fullWidth onClick={onLogin} disabled={isLoading}>

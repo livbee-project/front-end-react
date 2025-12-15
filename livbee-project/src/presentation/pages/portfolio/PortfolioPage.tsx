@@ -142,7 +142,7 @@ const PortfolioPage: React.FC = () => {
           // 등록 페이지 경로 저장 (로그인 성공 시 이동할 페이지)
           setAuthRedirectPath('/portfolios/register');
           setIsLoginModalOpen(false);
-          navigate('/login', { replace: true });
+          navigate('/login?userType=showhost', { replace: true });
         }}
       />
     </PageWrapper>

@@ -26,7 +26,7 @@ interface LoginOptions {
 }
 
 export interface UseAuthReturn extends AuthState {
-  login: (request: LoginRequest, options?: LoginOptions) => Promise<void>;
+  login: (request: LoginRequest, options?: LoginOptions) => Promise<User>;
   signup: (request: SignupRequest) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
@@ -114,7 +114,7 @@ const useAuthValue = (): UseAuthReturn => {
    * 로그인
    */
   const login = useCallback(
-    async (request: LoginRequest, options?: LoginOptions) => {
+    async (request: LoginRequest, options?: LoginOptions): Promise<User> => {
       try {
         const result = await loginUseCase.execute(request);
 
@@ -139,6 +139,9 @@ const useAuthValue = (): UseAuthReturn => {
         // AuthGuard에서 리다이렉트 경로가 있으면 리다이렉트하지 않으므로
         // 여기서 리다이렉트 경로로 이동
         navigate(redirectPath, { replace: true });
+
+        // 사용자 정보 반환 (role 검증을 위해)
+        return result.user;
       } catch (error) {
         setAuthState((prev) => ({ ...prev, isLoading: false }));
         throw error;

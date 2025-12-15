@@ -4,7 +4,7 @@ import { useAuth } from '@/presentation/hooks/auth/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { getAuthRedirectPath } from '@/shared/utils/authRedirect';
 import { ROUTE_ROLE_PERMISSIONS } from '@/app/routes/routeMeta';
-import { validateLoginForm, loginMessages } from '@/presentation/components/auth/utils/loginValidation';
+import { validateLoginForm } from '@/presentation/components/auth/utils/loginValidation';
 
 interface UseLoginFormOptions {
   defaultUserType?: UserType;
@@ -16,7 +16,6 @@ interface UseLoginFormReturn {
   email: string;
   password: string;
   isLoading: boolean;
-  error: string | null;
   setUserType: (type: UserType) => void;
   setEmail: (value: string) => void;
   setPassword: (value: string) => void;
@@ -28,25 +27,22 @@ export const useLoginForm = ({
   defaultUserType = 'brand',
   onSuccess,
 }: UseLoginFormOptions = {}): UseLoginFormReturn => {
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
   const { showToast } = useToast();
 
   const [userType, setUserType] = useState<UserType>(defaultUserType);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = useCallback(async () => {
     const validationError = validateLoginForm({ email, password });
     if (validationError) {
-      setError(validationError);
       showToast(validationError, undefined, 'error');
       return;
     }
 
     setIsLoading(true);
-    setError(null);
 
     try {
       // 리다이렉트 경로가 등록 페이지인지 확인
@@ -64,11 +60,25 @@ export const useLoginForm = ({
         }
       }
 
-      await login({
+      const loggedInUser = await login({
         email: email.trim(),
         password,
         role: userType,
       });
+
+      // 선택한 탭의 role과 실제 로그인한 사용자의 role이 일치하는지 확인
+      if (loggedInUser.role !== userType) {
+        // role이 일치하지 않으면 로그아웃 처리
+        logout();
+        
+        const roleMismatchMessage = userType === 'brand' 
+          ? '브랜드 계정으로 로그인해주세요.'
+          : '쇼호스트 계정으로 로그인해주세요.';
+        
+        showToast(roleMismatchMessage, undefined, 'error');
+        setIsLoading(false);
+        return;
+      }
 
       // 등록 페이지로 리다이렉트하는 경우:
       // - 권한이 일치하면 성공 토스트 표시 (초록색)
@@ -80,13 +90,12 @@ export const useLoginForm = ({
       }
       onSuccess?.();
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : loginMessages.GENERIC_ERROR;
-      setError(errorMessage);
-      showToast(errorMessage, undefined, 'error');
+      // API 에러는 ApiErrorToastListener에서 처리하므로 여기서는 토스트를 표시하지 않음
+      // 단, API 에러가 아닌 경우를 대비해 에러를 다시 throw하지 않음 (이미 ApiErrorToastListener가 처리)
     } finally {
       setIsLoading(false);
     }
-  }, [email, password, userType, login, showToast, onSuccess]);
+  }, [email, password, userType, login, logout, showToast, onSuccess]);
 
   const handleSignUpClick = useCallback(() => {
     showToast('회원가입은 아직 준비 중입니다.', undefined, 'info');
@@ -97,7 +106,6 @@ export const useLoginForm = ({
     email,
     password,
     isLoading,
-    error,
     setUserType,
     setEmail,
     setPassword,

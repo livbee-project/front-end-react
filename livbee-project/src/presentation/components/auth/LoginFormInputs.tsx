@@ -30,7 +30,7 @@ export const LoginFormInputs: React.FC<LoginFormInputsProps> = ({
       <InputWrapper>
         <StyledInput
           type="email"
-          placeholder="you@example.com"
+          placeholder="이메일을 입력해주세요."
           value={email}
           onChange={(event) => onEmailChange(event.target.value)}
           onKeyPress={handleKeyPress}
@@ -41,7 +41,7 @@ export const LoginFormInputs: React.FC<LoginFormInputsProps> = ({
       <InputWrapper>
         <StyledInput
           type="password"
-          placeholder="비밀번호"
+          placeholder="비밀번호를 입력해주세요."
           value={password}
           onChange={(event) => onPasswordChange(event.target.value)}
           onKeyPress={handleKeyPress}
