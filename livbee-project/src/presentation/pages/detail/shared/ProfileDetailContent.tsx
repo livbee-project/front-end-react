@@ -19,11 +19,13 @@ const GallerySection = styled.div`
 `;
 
 const GalleryHeaderWrapper = styled.div`
+  margin-left: -16px;
+  margin-right: -16px;
   padding: 0 16px;
   
   /* HomeSectionHeader 내부 HeaderWrapper의 margin 오버라이드 */
   > * {
-    margin: ${({ theme }) => `${theme.spacing['2xl']} 0 ${theme.spacing.xl}`} !important;
+    margin: ${({ theme }) => `${theme.spacing['2xl']} 0 ${theme.spacing.xl} 0`} !important;
   }
 `;
 
@@ -31,6 +33,7 @@ const GalleryWrapper = styled.div`
   margin-top: ${({ theme }) => theme.spacing.lg};
   margin-left: -16px;
   margin-right: -16px;
+  padding: 0 16px;
 `;
 
 interface ProfileDetailContentProps {
@@ -63,7 +66,7 @@ export const ProfileDetailContent: React.FC<ProfileDetailContentProps> = ({
         name={profileInfo.name || defaults.name}
         description={profileInfo.description || defaults.description}
         detailedIntro={profileInfo.detailedIntro || defaults.detailedIntro}
-        profileImageUrl={profileInfo.profileImageUrl || defaults.profileImageUrl}
+        profileImageUrl={profileInfo.profileImageUrl && profileInfo.profileImageUrl.trim() ? profileInfo.profileImageUrl : undefined}
         type={profileInfo.type}
         categories={profileInfo.categories.length > 0 ? profileInfo.categories : defaults.categories}
         tags={profileInfo.tags.length > 0 ? profileInfo.tags : defaults.tags}

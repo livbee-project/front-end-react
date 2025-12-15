@@ -8,7 +8,7 @@ import type {
 } from '@/domain/entities/Portfolio';
 import { buildApiUrl, getAuthHeaders } from '@/shared/config/apiConfig';
 import { ApiError, fetchApi } from '@/shared/utils/apiClient';
-import { transformPortfolioDetailResponse } from '@/data/mappers/PortfolioMapper';
+import { transformPortfolioDetailResponse, transformPortfolioListResponse } from '@/data/mappers/PortfolioMapper';
 import { handleShowhostEntityError } from '@/data/errorHandlers/showhostEntityErrorHandler';
 import { removeUndefinedFields } from '@/shared/utils/objectUtils';
 import { logApiRequest, logApiError } from '@/shared/utils/apiRequestLogger';
@@ -37,7 +37,7 @@ export class PortfolioApiSource implements IPortfolioApiSource {
     const url = buildApiUrl('/portfolios', params);
     const headers = getAuthHeaders();
 
-    return fetchApi<PortfolioListResponse>(
+    const response = await fetchApi<unknown>(
       url,
       {
         method: 'GET',
@@ -46,6 +46,8 @@ export class PortfolioApiSource implements IPortfolioApiSource {
       },
       '포트폴리오 목록 조회'
     );
+
+    return transformPortfolioListResponse(response);
   }
 
   /**

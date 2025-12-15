@@ -30,7 +30,15 @@ export const useProfileDetailPage = <T extends ProfileDetailData>({
   data,
   defaultData,
 }: UseProfileDetailPageOptions) => {
-  const displayData = (data || defaultData) as T;
+  // 데이터가 있으면 사용, 없으면 기본값 사용
+  // mainThumbnailUrl은 API 응답 그대로 사용 (기본값으로 대체하지 않음)
+  const displayData = useMemo(() => {
+    if (!data) {
+      return defaultData as T;
+    }
+    // API 응답 데이터를 그대로 사용 (기본값으로 대체하지 않음)
+    return data as T;
+  }, [data, defaultData]);
 
   const gallery = useImageGallery(displayData.subThumbnailUrls ?? []);
 

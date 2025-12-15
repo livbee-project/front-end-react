@@ -7,7 +7,7 @@ export interface ProfileInfo {
   name: string;
   description: string;
   detailedIntro: string;
-  profileImageUrl: string;
+  profileImageUrl: string | null;
   type: 'model' | 'showhost';
   categories: string[];
   tags: string[];

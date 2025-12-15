@@ -117,7 +117,7 @@ const PortfolioDetailPage: React.FC = () => {
           name: displayPortfolio.nickname || '',
           description: displayPortfolio.oneLineIntro || '',
           detailedIntro: displayPortfolio.detailedIntro || '',
-          profileImageUrl: displayPortfolio.mainThumbnailUrl || '',
+          profileImageUrl: displayPortfolio.mainThumbnailUrl || null,
           type: 'showhost',
           categories,
           tags,

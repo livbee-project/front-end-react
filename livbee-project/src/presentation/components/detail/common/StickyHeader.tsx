@@ -12,6 +12,9 @@ const HeaderContainer = styled.header`
   z-index: 100;
   background-color: ${({ theme }) => theme.colors.background};
   border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+  margin-left: -16px;
+  margin-right: -16px;
+  width: calc(100% + 32px);
 `;
 
 const HeaderInner = styled.div`
