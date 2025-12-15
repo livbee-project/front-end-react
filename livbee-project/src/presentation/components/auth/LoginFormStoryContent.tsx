@@ -12,17 +12,15 @@ export const DefaultLoginDemo: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = () => {
     setIsLoading(true);
-    setError(null);
     setTimeout(() => {
       setIsLoading(false);
       if (email && password) {
         alert('로그인 성공!');
       } else {
-        setError('이메일과 비밀번호를 입력해주세요.');
+        alert('이메일과 비밀번호를 입력해주세요.');
       }
     }, 1000);
   };
@@ -33,7 +31,6 @@ export const DefaultLoginDemo: React.FC = () => {
         email={email}
         password={password}
         isLoading={isLoading}
-        error={error}
         onEmailChange={setEmail}
         onPasswordChange={setPassword}
         onLogin={handleLogin}
@@ -53,7 +50,6 @@ export const LoadingLoginDemo: React.FC = () => {
         email={email}
         password={password}
         isLoading
-        error={null}
         onEmailChange={setEmail}
         onPasswordChange={setPassword}
         onLogin={() => {}}
@@ -66,7 +62,6 @@ export const LoadingLoginDemo: React.FC = () => {
 export const ErrorLoginDemo: React.FC = () => {
   const [email, setEmail] = useState('user@example.com');
   const [password, setPassword] = useState('wrongpassword');
-  const [error, setError] = useState<string | null>('이메일 또는 비밀번호가 올바르지 않습니다.');
 
   return (
     <Container>
@@ -74,10 +69,9 @@ export const ErrorLoginDemo: React.FC = () => {
         email={email}
         password={password}
         isLoading={false}
-        error={error}
         onEmailChange={setEmail}
         onPasswordChange={setPassword}
-        onLogin={() => setError('로그인에 실패했습니다.')}
+        onLogin={() => alert('로그인에 실패했습니다.')}
         onSignUp={() => {}}
       />
     </Container>
@@ -93,7 +87,6 @@ export const LoginInputStatesDemo: React.FC = () => (
           email=""
           password=""
           isLoading={false}
-          error={null}
           onEmailChange={() => {}}
           onPasswordChange={() => {}}
           onLogin={() => {}}
@@ -108,7 +101,6 @@ export const LoginInputStatesDemo: React.FC = () => (
           email="user@example.com"
           password="password123"
           isLoading={false}
-          error={null}
           onEmailChange={() => {}}
           onPasswordChange={() => {}}
           onLogin={() => {}}
