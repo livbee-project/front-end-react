@@ -17,6 +17,14 @@ export interface User {
   name: string;
   role: UserRole;
   email?: string;
+  /**
+   * 이 계정이 브랜드 역할을 보유하는지 여부
+   */
+  isBrand?: boolean;
+  /**
+   * 이 계정이 쇼호스트 역할을 보유하는지 여부
+   */
+  isShowhost?: boolean;
 }
 
 /**
@@ -37,6 +45,14 @@ export interface LoginResponse {
   name: string;
   role: UserRole;
   userId?: string; // 백엔드 응답의 user.id (선택사항)
+  /**
+   * 브랜드 역할 보유 여부 (백엔드 user.isBrand 플래그)
+   */
+  isBrand?: boolean;
+  /**
+   * 쇼호스트 역할 보유 여부 (백엔드 user.isShowhost 플래그)
+   */
+  isShowhost?: boolean;
 }
 
 /**
@@ -89,6 +105,14 @@ export interface MeResponse {
   id: string;
   name: string;
   role: UserRole;
+  /**
+   * 브랜드 역할 보유 여부
+   */
+  isBrand?: boolean;
+  /**
+   * 쇼호스트 역할 보유 여부
+   */
+  isShowhost?: boolean;
 }
 
 /**
@@ -100,4 +124,3 @@ export interface ApiErrorResponse {
   message: string;
   userMessage?: string;
 }
-

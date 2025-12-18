@@ -92,7 +92,19 @@ export const useSignupForm = ({
       showToast('회원가입이 완료되었습니다. 로그인해주세요.', undefined, 'success');
       navigate('/login', { replace: true });
       onSuccess?.();
-    } catch (err) {
+    } catch (err: unknown) {
+      // 409 에러인 경우 (중복 이메일 + 같은 역할)
+      if (err && typeof err === 'object' && 'status' in err && err.status === 409) {
+        const apiError = err as { status: number; payload?: { userMessage?: string } };
+        const userMessage = apiError.payload?.userMessage || '이미 해당 역할로 가입된 이메일입니다.';
+        
+        // 다른 역할로 가입 가능하다는 안내 추가
+        const otherRole = userType === 'brand' ? '쇼호스트' : '브랜드';
+        const fullMessage = `${userMessage}\n같은 이메일로 ${otherRole} 역할로는 가입할 수 있습니다.`;
+        
+        showToast(fullMessage, undefined, 'error');
+      }
+      // 다른 에러는 ApiErrorToastListener에서 처리
       console.error('회원가입 실패:', err);
     } finally {
       setIsLoading(false);

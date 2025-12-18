@@ -41,6 +41,8 @@ export class GetCurrentUserUseCase {
         id: meResponse.id,
         name: meResponse.name,
         role: meResponse.role,
+        isBrand: meResponse.isBrand,
+        isShowhost: meResponse.isShowhost,
       };
 
       return {
@@ -57,4 +59,3 @@ export class GetCurrentUserUseCase {
     }
   }
 }
-

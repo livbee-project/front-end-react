@@ -30,11 +30,13 @@ export class LoginUseCase {
     // 토큰 저장
     setToken(loginResponse.token);
 
-    // 사용자 정보 구성
+    // 사용자 정보 구성 (다중 역할 플래그 포함)
     const user: User = {
       id: loginResponse.userId || '',
       name: loginResponse.name,
       role: loginResponse.role,
+      isBrand: loginResponse.isBrand,
+      isShowhost: loginResponse.isShowhost,
     };
 
     return {
@@ -43,4 +45,3 @@ export class LoginUseCase {
     };
   }
 }
-
