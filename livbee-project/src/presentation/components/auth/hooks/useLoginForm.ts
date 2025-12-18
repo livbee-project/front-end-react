@@ -68,9 +68,14 @@ export const useLoginForm = ({
         role: userType,
       });
 
-      // 선택한 탭의 role과 실제 로그인한 사용자의 role이 일치하는지 확인
-      if (loggedInUser.role !== userType) {
-        // role이 일치하지 않으면 로그아웃 처리
+      // 다중 역할 계정 지원: 선택한 탭의 역할을 보유하는지 확인
+      // isBrand/isShowhost 플래그를 우선 확인하고, 없으면 기존 role 필드로 확인 (하위 호환)
+      const hasRequestedRole = userType === 'brand' 
+        ? (loggedInUser.isBrand === true || (loggedInUser.isBrand === undefined && loggedInUser.role === 'brand'))
+        : (loggedInUser.isShowhost === true || (loggedInUser.isShowhost === undefined && loggedInUser.role === 'showhost'));
+
+      if (!hasRequestedRole) {
+        // 요청한 역할을 보유하지 않으면 로그아웃 처리
         logout();
         
         const roleMismatchMessage = userType === 'brand' 
