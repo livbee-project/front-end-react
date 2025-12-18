@@ -128,7 +128,9 @@ const CampaignsPage: React.FC = () => {
             return;
           }
           // 브랜드 권한이 아닌 경우 권한 오류 토스트
-          if (user?.role !== 'brand') {
+          // 다중 역할 계정 지원: isBrand 플래그를 우선 확인하고, 없으면 기존 role 필드로 확인 (하위 호환)
+          const hasBrandRole = user?.isBrand === true || (user?.isBrand === undefined && user?.role === 'brand');
+          if (!hasBrandRole) {
             showToast('브랜드 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
             return;
           }

@@ -25,8 +25,16 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   const { isLoggedIn, isLoading, user } = useAuth();
   const { showToast } = useToast();
 
-  // Role mismatch 체크
-  const hasRoleMismatch = allowedRoles && allowedRoles.length > 0 && (!user || !allowedRoles.includes(user.role));
+  // Role mismatch 체크 (다중 역할 계정 지원)
+  const hasRoleMismatch = allowedRoles && allowedRoles.length > 0 && (!user || !allowedRoles.some((allowedRole) => {
+    if (allowedRole === 'brand') {
+      return user.isBrand === true || (user.isBrand === undefined && user.role === 'brand');
+    }
+    if (allowedRole === 'showhost') {
+      return user.isShowhost === true || (user.isShowhost === undefined && user.role === 'showhost');
+    }
+    return user.role === allowedRole;
+  }));
 
   // Role mismatch 시 적절한 Toast 메시지 표시
   // 단, 로딩 중이거나 실제로 리다이렉트가 발생할 때만 표시

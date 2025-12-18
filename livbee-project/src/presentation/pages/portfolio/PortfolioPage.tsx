@@ -122,7 +122,9 @@ const PortfolioPage: React.FC = () => {
             return;
           }
           // 쇼호스트 권한이 아닌 경우 권한 오류 토스트
-          if (user?.role !== 'showhost') {
+          // 다중 역할 계정 지원: isShowhost 플래그를 우선 확인하고, 없으면 기존 role 필드로 확인 (하위 호환)
+          const hasShowhostRole = user?.isShowhost === true || (user?.isShowhost === undefined && user?.role === 'showhost');
+          if (!hasShowhostRole) {
             showToast('쇼호스트 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
             return;
           }
