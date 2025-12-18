@@ -32,6 +32,8 @@ export class UserApiSource implements IUserApiSource {
         name: string;
         email: string;
         role: string;
+        isBrand?: boolean;
+        isShowhost?: boolean;
       };
     }>(
       url,
@@ -46,7 +48,7 @@ export class UserApiSource implements IUserApiSource {
       '로그인'
     );
 
-    // 백엔드 응답 형식: { ok: true, data: { token: "...", user: { id, name, email, role } } }
+    // 백엔드 응답 형식: { ok: true, data: { token: "...", user: { id, name, email, role, isBrand, isShowhost } } }
     if (result && typeof result === 'object' && 'token' in result) {
       return {
         ok: true,
@@ -54,6 +56,8 @@ export class UserApiSource implements IUserApiSource {
         name: result.user?.name || '',
         role: (result.user?.role || request.role || 'showhost') as 'brand' | 'showhost',
         userId: result.user?.id,
+        isBrand: result.user?.isBrand,
+        isShowhost: result.user?.isShowhost,
       };
     }
 
@@ -117,6 +121,8 @@ export class UserApiSource implements IUserApiSource {
         id: string;
         name: string;
         role: string;
+        isBrand?: boolean;
+        isShowhost?: boolean;
       }>(
         url,
         {
@@ -134,6 +140,8 @@ export class UserApiSource implements IUserApiSource {
           id: result.id,
           name: result.name,
           role: result.role as 'brand' | 'showhost',
+          isBrand: result.isBrand,
+          isShowhost: result.isShowhost,
         };
       }
 
