@@ -19,7 +19,7 @@ import { mockModels, modelFilters } from '@/presentation/pages/model/mock/mockMo
 
 const ModelsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isLoggedIn } = useAuth();
+  const { user, isLoggedIn, currentRole } = useAuth();
   const { showToast } = useToast();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const modelRepository = useRepository(ModelRepository);
@@ -149,6 +149,12 @@ const ModelsPage: React.FC = () => {
           // 비회원인 경우 로그인 모달 표시
           if (!isLoggedIn) {
             setIsLoginModalOpen(true);
+            return;
+          }
+          // 다중 역할 계정 지원: currentRole이 있으면 currentRole도 확인
+          // currentRole이 'showhost'가 아니면 접근 불가
+          if (currentRole && currentRole !== 'showhost') {
+            showToast('쇼호스트 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
             return;
           }
           // 쇼호스트 권한이 아닌 경우 권한 오류 토스트

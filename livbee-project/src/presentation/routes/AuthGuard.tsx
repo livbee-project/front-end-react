@@ -22,11 +22,28 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   allowedRoles,
 }) => {
   const location = useLocation();
-  const { isLoggedIn, isLoading, user } = useAuth();
+  const { isLoggedIn, isLoading, user, currentRole } = useAuth();
   const { showToast } = useToast();
 
   // Role mismatch 체크 (다중 역할 계정 지원)
+  // currentRole이 있으면 현재 활성화된 역할도 확인
   const hasRoleMismatch = allowedRoles && allowedRoles.length > 0 && (!user || !allowedRoles.some((allowedRole) => {
+    // currentRole이 있고 다중 역할 계정인 경우, currentRole도 확인
+    if (currentRole) {
+      if (allowedRole === currentRole) {
+        // currentRole이 허용된 역할과 일치하는지 확인
+        if (allowedRole === 'brand') {
+          return user.isBrand === true || (user.isBrand === undefined && user.role === 'brand');
+        }
+        if (allowedRole === 'showhost') {
+          return user.isShowhost === true || (user.isShowhost === undefined && user.role === 'showhost');
+        }
+      }
+      // currentRole이 허용된 역할과 일치하지 않으면 false 반환
+      return false;
+    }
+    
+    // currentRole이 없는 경우 기존 로직 사용 (하위 호환)
     if (allowedRole === 'brand') {
       return user.isBrand === true || (user.isBrand === undefined && user.role === 'brand');
     }

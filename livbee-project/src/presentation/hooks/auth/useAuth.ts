@@ -2,12 +2,14 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { useNavigate } from 'react-router-dom';
 import { UserRepository } from '@/data/repositories/UserRepository';
 import { useRepository } from '@/presentation/hooks/common/useRepository';
-import type { LoginRequest, SignupRequest, User } from '@/domain/entities/User';
+import type { LoginRequest, SignupRequest, User, UserRole } from '@/domain/entities/User';
 import { consumeAuthRedirectPath, setAuthRedirectPath } from '@/shared/utils/authRedirect';
 import { LoginUseCase } from '@/domain/usecases/auth/LoginUseCase';
 import { SignupUseCase } from '@/domain/usecases/auth/SignupUseCase';
 import { LogoutUseCase } from '@/domain/usecases/auth/LogoutUseCase';
 import { GetCurrentUserUseCase } from '@/domain/usecases/auth/GetCurrentUserUseCase';
+
+const CURRENT_ROLE_STORAGE_KEY = 'livbee_current_role';
 
 /**
  * 인증 상태 타입
@@ -26,6 +28,7 @@ interface LoginOptions {
 }
 
 export interface UseAuthReturn extends AuthState {
+  currentRole: UserRole | null;
   login: (request: LoginRequest, options?: LoginOptions) => Promise<User>;
   signup: (request: SignupRequest) => Promise<void>;
   logout: () => void;
@@ -44,6 +47,15 @@ const useAuthValue = (): UseAuthReturn => {
     isLoggedIn: false,
     user: null,
     isLoading: true,
+  });
+  
+  // 로그인 시 선택한 역할 저장 (localStorage에서 초기값 로드)
+  const [currentRole, setCurrentRole] = useState<UserRole | null>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(CURRENT_ROLE_STORAGE_KEY);
+      return (stored === 'brand' || stored === 'showhost') ? stored : null;
+    }
+    return null;
   });
 
   // userRepository를 useRepository 훅으로 관리
@@ -128,6 +140,13 @@ const useAuthValue = (): UseAuthReturn => {
           setAuthRedirectPath(redirectPath);
         }
 
+        // 로그인 시 선택한 역할 저장
+        const selectedRole = request.role || 'brand';
+        setCurrentRole(selectedRole);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(CURRENT_ROLE_STORAGE_KEY, selectedRole);
+        }
+
         // 사용자 정보 업데이트
         setAuthState({
           isLoggedIn: true,
@@ -171,11 +190,16 @@ const useAuthValue = (): UseAuthReturn => {
       user: null,
       isLoading: false,
     });
+    setCurrentRole(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(CURRENT_ROLE_STORAGE_KEY);
+    }
     navigate('/login', { replace: true });
   }, [logoutUseCase, navigate]);
 
   return {
     ...authState,
+    currentRole,
     login,
     signup,
     logout,

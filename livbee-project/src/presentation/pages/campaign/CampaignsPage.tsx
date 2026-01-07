@@ -21,7 +21,7 @@ type FilterValue = '전체' | Campaign['category'];
 
 const CampaignsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isLoggedIn } = useAuth();
+  const { user, isLoggedIn, currentRole } = useAuth();
   const { showToast } = useToast();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -125,6 +125,12 @@ const CampaignsPage: React.FC = () => {
           // 비회원인 경우 로그인 모달 표시
           if (!isLoggedIn) {
             setIsLoginModalOpen(true);
+            return;
+          }
+          // 다중 역할 계정 지원: currentRole이 있으면 currentRole도 확인
+          // currentRole이 'brand'가 아니면 접근 불가
+          if (currentRole && currentRole !== 'brand') {
+            showToast('브랜드 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
             return;
           }
           // 브랜드 권한이 아닌 경우 권한 오류 토스트
