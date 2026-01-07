@@ -20,8 +20,8 @@ export const ActionSection = styled.section`
     ${({ theme }) => theme.colors.secondary}33,
     transparent
   );
-  margin-left: 12px;
-  margin-right: 12px;
+  margin-left: 0;
+  margin-right: 0;
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.lg};

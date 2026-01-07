@@ -21,36 +21,34 @@ export const CampaignDetailHeader: React.FC<CampaignDetailHeaderProps> = ({
 }) => {
   return (
     <HeaderWrapper>
-      <DetailCard>
-        <HeaderImage>
-          {imageUrl && <HeaderImageContent src={imageUrl} alt={title} loading="eager" decoding="async" />}
-          {dDay && <DDayBadge>{dDay}</DDayBadge>}
-        </HeaderImage>
+      <HeaderImage>
+        {imageUrl && <HeaderImageContent src={imageUrl} alt={title} loading="eager" decoding="async" />}
+        {dDay && <DDayBadge>{dDay}</DDayBadge>}
+      </HeaderImage>
 
-        <HeaderInfo>
-          <BrandName>{brandName}</BrandName>
-          <TitleRow>
-            <Title>{title}</Title>
-            <IconButtons>
-              <IconButton aria-label="찜하기">
-                <Heart size={20} />
-              </IconButton>
-              <IconButton aria-label="공유하기">
-                <Share2 size={20} />
-              </IconButton>
-            </IconButtons>
-          </TitleRow>
-          <TagGroup>
-            {tags.map((tag, index) => (
-              <TagBadge key={`${tag}-${index}`} $variant={index === 0 ? 'primary' : 'secondary'}>
-                {tag}
-              </TagBadge>
-            ))}
-          </TagGroup>
-        </HeaderInfo>
+      <HeaderInfo>
+        <BrandName>{brandName}</BrandName>
+        <TitleRow>
+          <Title>{title}</Title>
+          <IconButtons>
+            <IconButton aria-label="찜하기">
+              <Heart size={20} />
+            </IconButton>
+            <IconButton aria-label="공유하기">
+              <Share2 size={20} />
+            </IconButton>
+          </IconButtons>
+        </TitleRow>
+        <TagGroup>
+          {tags.map((tag, index) => (
+            <TagBadge key={`${tag}-${index}`} $variant={index === 0 ? 'primary' : 'secondary'}>
+              {tag}
+            </TagBadge>
+          ))}
+        </TagGroup>
+      </HeaderInfo>
 
-        {children}
-      </DetailCard>
+      {children}
     </HeaderWrapper>
   );
 };
@@ -60,25 +58,14 @@ const HeaderWrapper = styled.div`
   flex-direction: column;
 `;
 
-const DetailCard = styled.div`
-  background: ${({ theme }) => theme.colors.card};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.xl};
-  overflow: hidden;
-  transition: box-shadow 0.3s;
-  margin: 0 12px;
-
-  &:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  }
-`;
-
 const HeaderImage = styled.div`
-  width: 100%;
+  width: calc(100% + 32px);
   aspect-ratio: 4 / 3;
   background-color: ${({ theme }) => theme.colors.secondary};
   position: relative;
   overflow: hidden;
+  margin-left: -16px;
+  margin-right: -16px;
 `;
 
 const HeaderImageContent = styled.img`
@@ -105,8 +92,7 @@ const DDayBadge = styled.div`
 `;
 
 const HeaderInfo = styled.div`
-  background: ${({ theme }) => theme.colors.background};
-  padding: 1.5rem;
+  padding: 1.5rem 0;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
