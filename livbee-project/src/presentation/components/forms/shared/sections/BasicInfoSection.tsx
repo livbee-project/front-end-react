@@ -26,17 +26,14 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
     <FormSection>
       <SectionTitle>기본 정보</SectionTitle>
       <InputGroup>
-        <FormField label="이름" required helper="실제 계약에 사용되는 이름입니다.">
+        <FormField label="이름" required>
           <StyledInput
             value={name}
             onChange={(event) => onChange('name', event.target.value)}
             placeholder="이름을 입력하세요"
           />
         </FormField>
-        <FormField
-          label="한줄 소개"
-          helper={<LabelNote>최대 50자까지 입력 가능</LabelNote>}
-        >
+        <FormField label="한줄 소개">
           <StyledInput
             value={oneLineIntro}
             onChange={(event) => onChange('oneLineIntro', event.target.value.slice(0, 50))}

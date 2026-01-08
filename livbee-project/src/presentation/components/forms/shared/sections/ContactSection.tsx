@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import ToggleSwitch from '@/presentation/components/ui/ToggleSwitch';
 import FormField from '@/presentation/components/forms/common/FormField';
 import {
@@ -33,7 +34,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
         <FormField
           label={
             <>
-              연락처<LabelNote> * 계약 완료 시 브랜드에 전달됩니다</LabelNote>
+              연락처 <RequiredBadge>*</RequiredBadge> <LabelNote>계약 완료 시 브랜드에 전달됩니다</LabelNote>
             </>
           }
           action={<ToggleSwitch checked={contactEnabled} onChange={() => onToggleChange('contact')} />}
@@ -66,3 +67,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   );
 };
 
+const RequiredBadge = styled.span`
+  color: ${({ theme }) => theme.colors.error};
+  margin-left: ${({ theme }) => theme.spacing.xs};
+`;

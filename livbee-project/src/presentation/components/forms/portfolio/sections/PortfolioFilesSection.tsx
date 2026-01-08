@@ -211,7 +211,7 @@ export const PortfolioFilesSection: React.FC<PortfolioFilesSectionProps> = ({
   return (
     <FormSection>
       <SectionTitle>포트폴리오</SectionTitle>
-      <SectionDescription>PDF, 영상 파일 등을 첨부할 수 있습니다 (최대 {formatFileSize(MAX_FILE_SIZE)})</SectionDescription>
+      <SectionDescription>PDF, 영상 파일 등을 첨부할 수 있습니다</SectionDescription>
       <HiddenInput
         ref={fileInputRef}
         type="file"
