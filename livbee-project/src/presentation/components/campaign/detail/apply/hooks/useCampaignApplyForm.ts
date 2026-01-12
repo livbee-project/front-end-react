@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import { ChatRepository } from '@/data/repositories/ChatRepository';
