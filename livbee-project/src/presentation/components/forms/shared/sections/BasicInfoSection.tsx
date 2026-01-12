@@ -4,7 +4,6 @@ import {
   FormSection,
   SectionTitle,
   InputGroup,
-  LabelNote,
   StyledInput,
   StyledTextarea,
 } from '@/presentation/components/forms/portfolio/PortfolioRegisterStyles';
