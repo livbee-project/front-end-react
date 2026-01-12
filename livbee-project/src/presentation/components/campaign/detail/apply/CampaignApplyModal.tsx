@@ -33,6 +33,8 @@ import {
   WarningTitle,
   WarningText,
   ActionRow,
+  TypeSelector,
+  TypeButton,
 } from '@/presentation/components/campaign/detail/apply/styles/CampaignApplyModal.styles';
 
 interface CampaignApplyModalProps {
@@ -51,9 +53,13 @@ const CampaignApplyModal: React.FC<CampaignApplyModalProps> = ({
   onApplied,
 }) => {
   const {
-    portfolioOptions,
+    targetType,
+    setTargetType,
+    currentOptions,
     selectedPortfolio,
     setSelectedPortfolio,
+    selectedModel,
+    setSelectedModel,
     message,
     setMessage,
     availableDate,
@@ -61,6 +67,8 @@ const CampaignApplyModal: React.FC<CampaignApplyModalProps> = ({
     availableTime,
     setAvailableTime,
     isSubmitting,
+    isLoadingPortfolios,
+    isLoadingModels,
     handleSubmit,
     isSubmitDisabled,
   } = useCampaignApplyForm({
@@ -87,36 +95,93 @@ const CampaignApplyModal: React.FC<CampaignApplyModalProps> = ({
         </Section>
 
         <Section>
-          <SectionLabel>포트폴리오 선택 *</SectionLabel>
-          <PortfolioList>
-            {portfolioOptions.map((portfolio) => (
-              <PortfolioCard
-                key={portfolio.id}
-                $selected={selectedPortfolio === portfolio.id}
-                onClick={() => setSelectedPortfolio(portfolio.id)}
-              >
-                <PortfolioHeader>
-                  <Thumbnail>
-                    {portfolio.imageUrl ? <img src={portfolio.imageUrl} alt={portfolio.title} /> : <span>?</span>}
-                  </Thumbnail>
-                  <Indicator $selected={selectedPortfolio === portfolio.id} aria-hidden="true" />
-                </PortfolioHeader>
-                <PortfolioInfo>
-                  <PortfolioTitle>{portfolio.title}</PortfolioTitle>
-                  <PortfolioSummary>{portfolio.summary || '포트폴리오 설명이 없습니다.'}</PortfolioSummary>
-                  <TagGroup>
-                    {(portfolio.tags?.length ? portfolio.tags : ['등록된 태그 없음']).map((tag) => (
-                      <TagBadge key={`${portfolio.id}-${tag}`} $variant="secondary">
-                        {tag}
-                      </TagBadge>
-                    ))}
-                  </TagGroup>
-                </PortfolioInfo>
-              </PortfolioCard>
-            ))}
-          </PortfolioList>
-          {portfolioOptions.length === 0 && (
-            <HelperText>등록된 포트폴리오가 없습니다. 먼저 포트폴리오를 등록해 주세요.</HelperText>
+          <SectionLabel>프로필 타입 선택 *</SectionLabel>
+          <TypeSelector>
+            <TypeButton
+              type="button"
+              $active={targetType === 'portfolio'}
+              onClick={() => {
+                setTargetType('portfolio');
+                setSelectedModel(null);
+              }}
+            >
+              포트폴리오
+            </TypeButton>
+            <TypeButton
+              type="button"
+              $active={targetType === 'model'}
+              onClick={() => {
+                setTargetType('model');
+                setSelectedPortfolio(null);
+              }}
+            >
+              모델
+            </TypeButton>
+          </TypeSelector>
+        </Section>
+
+        <Section>
+          <SectionLabel>
+            {targetType === 'portfolio' ? '포트폴리오' : '모델'} 선택 *
+          </SectionLabel>
+          {isLoadingPortfolios || isLoadingModels ? (
+            <HelperText>로딩 중...</HelperText>
+          ) : (
+            <>
+              <PortfolioList>
+                {currentOptions.map((profile) => {
+                  const isSelected =
+                    targetType === 'portfolio'
+                      ? selectedPortfolio === profile.id
+                      : selectedModel === profile.id;
+
+                  return (
+                    <PortfolioCard
+                      key={profile.id}
+                      $selected={isSelected}
+                      onClick={() => {
+                        if (targetType === 'portfolio') {
+                          setSelectedPortfolio(profile.id);
+                        } else {
+                          setSelectedModel(profile.id);
+                        }
+                      }}
+                    >
+                      <PortfolioHeader>
+                        <Thumbnail>
+                          {profile.imageUrl ? (
+                            <img src={profile.imageUrl} alt={profile.title} />
+                          ) : (
+                            <span>?</span>
+                          )}
+                        </Thumbnail>
+                        <Indicator $selected={isSelected} aria-hidden="true" />
+                      </PortfolioHeader>
+                      <PortfolioInfo>
+                        <PortfolioTitle>{profile.title}</PortfolioTitle>
+                        <PortfolioSummary>
+                          {profile.summary || `${targetType === 'portfolio' ? '포트폴리오' : '모델'} 설명이 없습니다.`}
+                        </PortfolioSummary>
+                        {profile.tags && profile.tags.length > 0 && (
+                          <TagGroup>
+                            {profile.tags.map((tag) => (
+                              <TagBadge key={`${profile.id}-${tag}`} $variant="secondary">
+                                {tag}
+                              </TagBadge>
+                            ))}
+                          </TagGroup>
+                        )}
+                      </PortfolioInfo>
+                    </PortfolioCard>
+                  );
+                })}
+              </PortfolioList>
+              {currentOptions.length === 0 && (
+                <HelperText>
+                  등록된 {targetType === 'portfolio' ? '포트폴리오' : '모델'}가 없습니다. 먼저 {targetType === 'portfolio' ? '포트폴리오' : '모델'}를 등록해 주세요.
+                </HelperText>
+              )}
+            </>
           )}
         </Section>
 

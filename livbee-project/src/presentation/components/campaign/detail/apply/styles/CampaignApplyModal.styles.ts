@@ -196,3 +196,25 @@ export const ActionRow = styled.div`
   gap: ${({ theme }) => theme.spacing.sm};
 `;
 
+export const TypeSelector = styled.div`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+export const TypeButton = styled.button<{ $active: boolean }>`
+  flex: 1;
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  border: 2px solid ${({ theme, $active }) => ($active ? theme.colors.primary : theme.colors.border)};
+  background: ${({ theme, $active }) => ($active ? theme.colors.primary : theme.colors.card)};
+  color: ${({ theme, $active }) => ($active ? theme.colors.background : theme.colors.foreground)};
+  font: ${({ theme }) => theme.fonts.body};
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary};
+    opacity: 0.8;
+  }
+`;

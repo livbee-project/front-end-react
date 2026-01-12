@@ -2,46 +2,25 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
 import { ChatRepository } from '@/data/repositories/ChatRepository';
+import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
+import { ModelRepository } from '@/data/repositories/ModelRepository';
 import { useRepository } from '@/presentation/hooks/common/useRepository';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { debug, warn } from '@/shared/utils/logger';
 import type { SnakeCaseResponse } from '@/shared/types/api';
-import { MOCK_PORTFOLIOS } from '@/shared/constants/portfolio';
 import { validateCampaignApplyForm } from '@/presentation/components/campaign/detail/apply/utils/campaignApplyValidation';
 import { buildCampaignApplyRequest } from '@/presentation/components/campaign/detail/apply/utils/campaignApplyRequestBuilder';
 import { handleCampaignApplyError } from '@/presentation/components/campaign/detail/apply/utils/campaignApplyErrorHandler';
 
-export interface PortfolioOption {
-  id: number;
+export interface ProfileOption {
+  id: string;
   title: string;
   summary: string;
   imageUrl?: string;
   tags: string[];
+  type: 'portfolio' | 'model';
 }
 
-const FALLBACK_PORTFOLIOS: PortfolioOption[] = [
-  {
-    id: 1,
-    title: '패션 쇼핑라이브 포트폴리오',
-    summary: '봄/여름 시즌 패션 아이템 라이브 영상 모음',
-    imageUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=200&q=80',
-    tags: ['패션', '뷰티'],
-  },
-  {
-    id: 2,
-    title: '뷰티 제품 리뷰',
-    summary: '스킨케어 및 메이크업 제품 상세 리뷰',
-    imageUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=200&q=80',
-    tags: ['뷰티'],
-  },
-  {
-    id: 3,
-    title: '홈리빙 큐레이션',
-    summary: '인테리어 소품 및 생활용품 소개 라이브',
-    imageUrl: 'https://images.unsplash.com/photo-1493666438817-866a91353ca9?auto=format&fit=crop&w=200&q=80',
-    tags: ['리빙', '홈데코'],
-  },
-];
 
 export const MAX_MESSAGE_LENGTH = 400;
 
@@ -63,32 +42,88 @@ export const useCampaignApplyForm = ({
   const { showToast } = useToast();
   const campaignRepository = useRepository(CampaignRepository);
   const chatRepository = useRepository(ChatRepository);
+  const portfolioRepository = useRepository(PortfolioRepository);
+  const modelRepository = useRepository(ModelRepository);
   const navigate = useNavigate();
 
-  const [selectedPortfolio, setSelectedPortfolio] = useState<number | null>(null);
+  const [targetType, setTargetType] = useState<'portfolio' | 'model'>('portfolio');
+  const [selectedPortfolio, setSelectedPortfolio] = useState<string | null>(null);
+  const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [availableDate, setAvailableDate] = useState('');
   const [availableTime, setAvailableTime] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingPortfolios, setIsLoadingPortfolios] = useState(false);
+  const [isLoadingModels, setIsLoadingModels] = useState(false);
 
-  const portfolioOptions: PortfolioOption[] = useMemo(
-    () =>
-      (MOCK_PORTFOLIOS ?? FALLBACK_PORTFOLIOS).map((portfolio) => ({
-        id: portfolio.id,
-        title: portfolio.title,
-        summary: portfolio.summary,
-        imageUrl: portfolio.imageUrl,
-        tags: portfolio.categories || [],
-      })),
-    []
-  );
+  // 포트폴리오 목록 조회
+  const [portfolioOptions, setPortfolioOptions] = useState<ProfileOption[]>([]);
+  useEffect(() => {
+    if (isOpen && targetType === 'portfolio') {
+      setIsLoadingPortfolios(true);
+      portfolioRepository
+        .getPortfolioList({ page: 1, limit: 100 })
+        .then((response) => {
+          if (response.ok) {
+            const options: ProfileOption[] = response.items.map((portfolio) => ({
+              id: portfolio.id,
+              title: portfolio.nickname || '포트폴리오',
+              summary: portfolio.oneLineIntro || '',
+              imageUrl: portfolio.mainThumbnailUrl || undefined,
+              tags: [],
+              type: 'portfolio' as const,
+            }));
+            setPortfolioOptions(options);
+          }
+        })
+        .catch((error) => {
+          warn('useCampaignApplyForm', '포트폴리오 목록 조회 실패:', error);
+        })
+        .finally(() => {
+          setIsLoadingPortfolios(false);
+        });
+    }
+  }, [isOpen, targetType, portfolioRepository]);
 
-  const selectedPortfolioData = selectedPortfolio
-    ? portfolioOptions.find((portfolio) => portfolio.id === selectedPortfolio)
-    : null;
+  // 모델 목록 조회
+  const [modelOptions, setModelOptions] = useState<ProfileOption[]>([]);
+  useEffect(() => {
+    if (isOpen && targetType === 'model') {
+      setIsLoadingModels(true);
+      modelRepository
+        .getModelList({ page: 1, limit: 100 })
+        .then((response) => {
+          if (response.ok) {
+            const options: ProfileOption[] = response.items.map((model) => ({
+              id: model.id,
+              title: model.nickname || '모델',
+              summary: model.oneLineIntro || '',
+              imageUrl: model.mainThumbnailUrl || undefined,
+              tags: model.categories || [],
+              type: 'model' as const,
+            }));
+            setModelOptions(options);
+          }
+        })
+        .catch((error) => {
+          warn('useCampaignApplyForm', '모델 목록 조회 실패:', error);
+        })
+        .finally(() => {
+          setIsLoadingModels(false);
+        });
+    }
+  }, [isOpen, targetType, modelRepository]);
+
+  const currentOptions = targetType === 'portfolio' ? portfolioOptions : modelOptions;
+  const selectedProfileData =
+    targetType === 'portfolio'
+      ? portfolioOptions.find((p) => p.id === selectedPortfolio)
+      : modelOptions.find((m) => m.id === selectedModel);
 
   const resetForm = useCallback(() => {
+    setTargetType('portfolio');
     setSelectedPortfolio(null);
+    setSelectedModel(null);
     setMessage('');
     setAvailableDate('');
     setAvailableTime('');
@@ -105,6 +140,7 @@ export const useCampaignApplyForm = ({
     const validation = validateCampaignApplyForm({
       campaignId,
       selectedPortfolio,
+      selectedModel,
       message,
       availableDate,
       availableTime,
@@ -115,14 +151,10 @@ export const useCampaignApplyForm = ({
       return;
     }
 
-    if (!selectedPortfolio) {
-      showToast('포트폴리오를 선택해주세요.', undefined, 'error');
-      return;
-    }
-
     const requestPayload = buildCampaignApplyRequest({
       campaignId,
-      selectedPortfolio,
+      selectedPortfolio: targetType === 'portfolio' ? selectedPortfolio : null,
+      selectedModel: targetType === 'model' ? selectedModel : null,
       message,
       availableDate,
       availableTime,
@@ -154,7 +186,7 @@ export const useCampaignApplyForm = ({
         navigate(`/chat/${chatRoomId}`, {
           state: {
             campaignTitle,
-            portfolioTitle: selectedPortfolioData?.title,
+            portfolioTitle: selectedProfileData?.title,
             availableDate,
             availableTime,
             message: requestPayload.message,
@@ -166,7 +198,7 @@ export const useCampaignApplyForm = ({
         navigate('/mypage/messages', {
           state: {
             campaignTitle,
-            portfolioTitle: selectedPortfolioData?.title,
+            portfolioTitle: selectedProfileData?.title,
             availableDate,
             availableTime,
             message: requestPayload.message,
@@ -201,17 +233,29 @@ export const useCampaignApplyForm = ({
     onApplied,
     onClose,
     selectedPortfolio,
-    selectedPortfolioData?.title,
+    selectedModel,
+    targetType,
+    selectedProfileData?.title,
     showToast,
   ]);
 
   const isSubmitDisabled =
-    isSubmitting || !selectedPortfolio || !message.trim() || !availableDate || !availableTime;
+    isSubmitting ||
+    (targetType === 'portfolio' ? !selectedPortfolio : !selectedModel) ||
+    !message.trim() ||
+    !availableDate ||
+    !availableTime;
 
   return {
+    targetType,
+    setTargetType,
     portfolioOptions,
+    modelOptions,
+    currentOptions,
     selectedPortfolio,
     setSelectedPortfolio,
+    selectedModel,
+    setSelectedModel,
     message,
     setMessage,
     availableDate,
@@ -219,8 +263,10 @@ export const useCampaignApplyForm = ({
     availableTime,
     setAvailableTime,
     isSubmitting,
+    isLoadingPortfolios,
+    isLoadingModels,
     handleSubmit,
-    selectedPortfolioData,
+    selectedProfileData,
     isSubmitDisabled,
     messageLength: message.trim().length,
   };

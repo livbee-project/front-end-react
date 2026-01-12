@@ -9,7 +9,8 @@ const MAX_MESSAGE_LENGTH = 400;
 
 export interface CampaignApplyFormData {
   campaignId: string;
-  selectedPortfolio: number | null;
+  selectedPortfolio: string | null;
+  selectedModel: string | null;
   message: string;
   availableDate: string;
   availableTime: string;
@@ -23,6 +24,7 @@ export type CampaignApplyValidationResult = ValidationResult;
 export const validateCampaignApplyForm = ({
   campaignId,
   selectedPortfolio,
+  selectedModel,
   message,
   availableDate,
   availableTime,
@@ -30,8 +32,9 @@ export const validateCampaignApplyForm = ({
   return validateAll(
     () => validateRequired(campaignId, '캠페인 정보가 올바르지 않습니다.'),
     () => {
-      if (!selectedPortfolio) {
-        return { isValid: false, errorMessage: '포트폴리오를 선택해주세요.' };
+      // portfolioId와 modelId 둘 다 없으면 에러
+      if (!selectedPortfolio && !selectedModel) {
+        return { isValid: false, errorMessage: '포트폴리오 또는 모델을 선택해주세요.' };
       }
       return { isValid: true };
     },

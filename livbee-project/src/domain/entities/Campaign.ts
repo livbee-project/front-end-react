@@ -227,7 +227,8 @@ export interface CampaignDetail {
 
 export interface CampaignApplyRequest {
   campaignId: string;
-  portfolioId: string;
+  portfolioId?: string; // optional (하위 호환성 유지)
+  modelId?: string; // 신규 추가
   message: string;
   availableDate: string;
   availableTime: string;
