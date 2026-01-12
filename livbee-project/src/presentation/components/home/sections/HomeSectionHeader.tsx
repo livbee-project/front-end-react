@@ -8,7 +8,7 @@ const highlightMap: Record<string, string> = {
   '라이비 뉴스': '뉴스',
   '이런 쇼호스트는 어떠세요?': '쇼호스트는 어떠세요?',
   '컨셉에 맞는 모델 찾기': '모델 찾기',
-  'HOT CLIP': 'CLIP',
+  'HOT CLIP': 'HOT',
 };
 
 const HeaderWrapper = styled.div`
