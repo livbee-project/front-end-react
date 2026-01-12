@@ -12,6 +12,7 @@ import { transformPortfolioDetailResponse, transformPortfolioListResponse } from
 import { handleShowhostEntityError } from '@/data/errorHandlers/showhostEntityErrorHandler';
 import { removeUndefinedFields } from '@/shared/utils/objectUtils';
 import { logApiRequest, logApiError } from '@/shared/utils/apiRequestLogger';
+import { isObject } from '@/shared/utils/typeGuards';
 
 import type { IPortfolioApiSource } from '@/data/sources/interfaces/IPortfolioApiSource';
 
@@ -60,7 +61,7 @@ export class PortfolioApiSource implements IPortfolioApiSource {
   async getPortfolioById(id: string, signal?: AbortSignal): Promise<PortfolioDetail> {
     const url = buildApiUrl(`/portfolios/${id}`);
     const headers = getAuthHeaders();
-    const result = await fetchApi<PortfolioDetailResponse['data']>(
+    const result = await fetchApi<PortfolioDetailResponse['data'] | { data: PortfolioDetailResponse['data'] }>(
       url,
       {
         method: 'GET',
@@ -70,7 +71,18 @@ export class PortfolioApiSource implements IPortfolioApiSource {
       '포트폴리오 상세 조회'
     );
 
-    return transformPortfolioDetailResponse({ ok: true, data: result }, id);
+    // API 응답이 { data: { data: {...} } } 형태인 경우 중첩된 data 추출
+    // fetchApi의 extractData가 첫 번째 data만 추출하므로, 중첩된 data가 있으면 한 번 더 추출
+    let portfolioData: PortfolioDetailResponse['data'];
+    if (isObject(result) && 'data' in result && isObject(result.data) && 'subThumbnailUrls' in result.data) {
+      // 중첩된 data 구조: { data: { subThumbnailUrls: [...] } }
+      portfolioData = result.data as PortfolioDetailResponse['data'];
+    } else {
+      // 일반 구조: { subThumbnailUrls: [...] }
+      portfolioData = result as PortfolioDetailResponse['data'];
+    }
+
+    return transformPortfolioDetailResponse({ ok: true, data: portfolioData }, id);
   }
 
   /**
