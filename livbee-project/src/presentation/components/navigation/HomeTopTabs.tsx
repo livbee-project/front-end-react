@@ -19,7 +19,6 @@ const TabsWrapper = styled.div`
   top: 4rem;
   z-index: 40;
   background-color: ${({ theme }) => theme.colors.background};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
 const TabsInner = styled.div`

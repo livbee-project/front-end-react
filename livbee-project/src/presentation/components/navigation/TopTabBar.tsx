@@ -76,7 +76,6 @@ const TopTabBar: React.FC = () => {
 const Container = styled.div`
     width: 100%;
     background-color: ${({ theme }) => theme.colors.background};
-    border-bottom: 1px solid ${({ theme }) => theme.colors.secondary};
     display: flex;
     overflow-x: auto;
     overflow-y: hidden;

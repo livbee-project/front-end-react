@@ -9,7 +9,6 @@ const NavBar = styled.nav`
   top: 0;
   z-index: 50;
   background-color: ${({ theme }) => theme.colors.background};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
 const NavInner = styled.div`
