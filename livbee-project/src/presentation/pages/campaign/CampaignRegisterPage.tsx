@@ -5,6 +5,7 @@ import { FormSubmitSection } from '@/presentation/components/forms/common/FormSu
 import { RegisterPageHeader } from '@/presentation/components/forms/common/RegisterPageHeader';
 import { useCampaignRegisterForm } from '@/presentation/components/forms/campaign/useCampaignRegisterForm';
 import { createCampaignRegisterSections } from '@/presentation/pages/campaign/sections/campaignRegisterSections';
+import { LoadingOverlay } from '@/presentation/components/states/LoadingOverlay';
 
 const CampaignRegisterPage: React.FC = () => {
   const {
@@ -68,6 +69,7 @@ const CampaignRegisterPage: React.FC = () => {
         disabled={isSubmitting || isImageUploading}
         isSubmitting={isSubmitting}
       />
+      {isSubmitting && <LoadingOverlay message="등록 중..." />}
     </RegisterPageLayout>
   );
 };

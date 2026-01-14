@@ -34,12 +34,12 @@ export const PortfolioListContent: React.FC<PortfolioListContentProps> = ({
 }) => {
   return (
     <ListStatePlaceholder
-      data={portfolios}
+      data={filteredPortfolios}
       loading={loading}
       error={error}
       onRetry={onRetry}
       emptyMessage="등록된 쇼호스트가 없습니다."
-      showEmptyState={filteredPortfolios.length === 0}
+      showEmptyState={true}
     >
       <>
         <CardsColumn>

@@ -4,9 +4,19 @@ import type { ModelFormData } from '@/presentation/components/forms/model/types'
 /**
  * 숫자 문자열을 파싱하여 숫자로 변환 (NaN인 경우 undefined 반환)
  */
-const parseNumber = (value: string): number | undefined => {
+const parseNumber = (value: string | undefined | null): number | undefined => {
+  if (!value) return undefined;
   const num = parseFloat(value.trim());
   return Number.isNaN(num) ? undefined : num;
+};
+
+/**
+ * 안전하게 문자열을 trim하고 빈 문자열인 경우 undefined 반환
+ */
+const safeTrim = (value: string | undefined | null): string | undefined => {
+  if (!value) return undefined;
+  const trimmed = value.trim();
+  return trimmed === '' ? undefined : trimmed;
 };
 
 /**
@@ -18,39 +28,44 @@ export const buildModelRequest = (
   uploadedGalleryUrls: string[] = [],
   uploadedPortfolioFileUrl?: string
 ): CreateModelRequest => {
-  const websiteUrl = formData.websites[0]?.content.trim() || undefined;
-  const instagramUrl = formData.websites[1]?.content.trim() || undefined;
-  const tiktokUrl = formData.websites[2]?.content.trim() || undefined;
+  const websiteUrl = safeTrim(formData.websites[0]?.content);
+  const instagramUrl = safeTrim(formData.websites[1]?.content);
+  const tiktokUrl = safeTrim(formData.websites[2]?.content);
 
-  const height = parseNumber(formData.tags[0]?.value || '');
-  const weight = parseNumber(formData.tags[1]?.value || '');
-  const topSize = formData.tags[2]?.value.trim() || undefined;
-  const experienceYears = parseNumber(formData.tags[3]?.value || '');
-  const age = parseNumber(formData.tags[4]?.value || '');
+  const height = parseNumber(formData.tags[0]?.value);
+  const weight = parseNumber(formData.tags[1]?.value);
+  const topSize = safeTrim(formData.tags[2]?.value);
+  const experienceYears = parseNumber(formData.tags[3]?.value);
+  const age = parseNumber(formData.tags[4]?.value);
 
-  return {
-    nickname: formData.name.trim() || undefined,
-    oneLineIntro: formData.oneLineIntro.trim() || undefined,
-    detailedIntro: formData.detailedIntro.trim() || undefined,
+  // undefined를 null로 변환하여 서버에 명시적으로 전송
+  // 서버가 null을 기대하거나 필수 필드로 처리할 수 있음
+  // 타입 단언을 사용하여 null 허용 (서버가 null을 기대할 수 있음)
+  const request = {
+    nickname: safeTrim(formData.name),
+    oneLineIntro: safeTrim(formData.oneLineIntro),
+    detailedIntro: safeTrim(formData.detailedIntro),
     mainThumbnailUrl: uploadedMainThumbnailUrl,
     subThumbnailUrls: uploadedGalleryUrls.length > 0 ? uploadedGalleryUrls : undefined,
     websiteUrl,
     instagramUrl,
     tiktokUrl,
-    contact: formData.contact.trim() || undefined,
-    openChat: formData.openChat.trim() || undefined,
-    registrationType: formData.registrationType.trim() || undefined,
+    contact: safeTrim(formData.contact),
+    openChat: safeTrim(formData.openChat),
+    registrationType: safeTrim(formData.registrationType),
     attachedFileUrl: uploadedPortfolioFileUrl,
-    height,
-    weight,
-    topSize,
-    experienceYears,
-    age,
+    height: height ?? (null as any),
+    weight: weight ?? (null as any),
+    topSize: topSize ?? (null as any),
+    experienceYears: experienceYears ?? (null as any),
+    age: age ?? (null as any),
     status: 'published',
     publicScope: '전체공개',
     isAgePublic: true,
     isSizingPublic: true,
     isReceivingOffers: true,
-  };
+  } as CreateModelRequest;
+
+  return request;
 };
 

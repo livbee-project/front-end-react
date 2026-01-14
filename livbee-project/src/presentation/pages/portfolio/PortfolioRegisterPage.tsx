@@ -19,6 +19,7 @@ import {
 } from '@/presentation/components/forms/portfolio/sections';
 import { usePortfolioRegisterForm } from '@/presentation/components/forms/portfolio/usePortfolioRegisterForm';
 import { useNavigate } from 'react-router-dom';
+import { LoadingOverlay } from '@/presentation/components/states/LoadingOverlay';
 
 const PortfolioRegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -107,6 +108,7 @@ const PortfolioRegisterPage: React.FC = () => {
           </ButtonGroup>
         </RegisterForm>
       </FormContainer>
+      {isSubmitting && <LoadingOverlay message="등록 중..." />}
     </PageWrapper>
   );
 };

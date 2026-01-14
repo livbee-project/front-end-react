@@ -16,6 +16,7 @@ import { ModelFilterRow } from '@/presentation/components/model/ModelFilterRow';
 import { ModelCard } from '@/presentation/pages/model/components/ModelCard';
 import { useModelFilter } from '@/presentation/pages/model/hooks/useModelFilter';
 import { modelFilters } from '@/presentation/pages/model/mock/mockModels';
+import { EmptyState } from '@/presentation/components/states/EmptyState';
 
 const ModelsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -123,21 +124,25 @@ const ModelsPage: React.FC = () => {
           onFilterChange={setSelectedFilter}
         />
 
-        <ModelsGrid>
-          {filteredModels.map((model) => (
-            <ModelCard
-              key={model.id}
-              id={model.id}
-              nickname={model.nickname || ''}
-              mainThumbnailUrl={model.mainThumbnailUrl || ''}
-              height={model.height || 0}
-              concept={model.concept || null}
-              categories={model.categories || []}
-              onCardClick={handleModelClick}
-              onCastingProposal={handleCastingProposal}
-            />
-          ))}
-        </ModelsGrid>
+        {filteredModels.length === 0 ? (
+          <EmptyState message="등록된 모델이 없습니다." />
+        ) : (
+          <ModelsGrid>
+            {filteredModels.map((model) => (
+              <ModelCard
+                key={model.id}
+                id={model.id}
+                nickname={model.nickname || ''}
+                mainThumbnailUrl={model.mainThumbnailUrl || ''}
+                height={model.height || 0}
+                concept={model.concept || null}
+                categories={model.categories || []}
+                onCardClick={handleModelClick}
+                onCastingProposal={handleCastingProposal}
+              />
+            ))}
+          </ModelsGrid>
+        )}
       </PageInner>
 
       <RegisterFab

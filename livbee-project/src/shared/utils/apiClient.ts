@@ -87,6 +87,19 @@ export async function fetchApi<T>(
   } catch {
     // JSON 파싱 실패 시
     if (!response.ok) {
+      // 에러 응답 본문을 텍스트로 읽기 시도
+      let errorText = '';
+      try {
+        const clonedResponse = response.clone();
+        errorText = await clonedResponse.text();
+      } catch {
+        // 텍스트 읽기 실패 시 무시
+      }
+      console.error(`[fetchApi] ❌ ${errorContext} 실패 - JSON 파싱 불가:`, {
+        status: response.status,
+        statusText: response.statusText,
+        errorText,
+      });
       const parsingError = new Error(`${errorContext}에 실패했습니다. (${response.status})`);
       notifyApiError(parsingError.message, response.status, errorContext);
       throw parsingError;
@@ -99,6 +112,27 @@ export async function fetchApi<T>(
   // 3. 에러 응답 처리
   if (!response.ok || !isSuccessResponse(result as ApiResponse<T>)) {
     const errorMessage = extractErrorMessage(result);
+    // 에러 응답을 자세히 로그로 출력
+    console.error(`[fetchApi] ❌ ${errorContext} 실패:`, {
+      status: response.status,
+      statusText: response.statusText,
+      errorMessage,
+      errorResponse: result,
+    });
+    // 에러 응답의 모든 필드를 펼쳐서 출력
+    if (result && typeof result === 'object') {
+      console.error(`[fetchApi] ❌ ${errorContext} 에러 응답 상세:`, JSON.stringify(result, null, 2));
+      // detail, message, userMessage 등 주요 필드 확인
+      const errorObj = result as Record<string, unknown>;
+      console.error(`[fetchApi] ❌ ${errorContext} 에러 필드:`, {
+        detail: errorObj.detail,
+        message: errorObj.message,
+        userMessage: errorObj.userMessage,
+        error: errorObj.error,
+        code: errorObj.code,
+        allKeys: Object.keys(errorObj),
+      });
+    }
     const apiError = new ApiError(errorMessage || `${errorContext}에 실패했습니다.`, response.status, result);
     notifyApiError(apiError.message, apiError.status, errorContext);
     throw apiError;

@@ -34,12 +34,12 @@ export const CampaignListContent: React.FC<CampaignListContentProps> = ({
 }) => {
   return (
     <ListStatePlaceholder
-      data={campaigns}
+      data={filteredCampaigns}
       loading={loading}
       error={error}
       onRetry={onRetry}
       emptyMessage="등록된 공고가 없습니다."
-      showEmptyState={filteredCampaigns.length === 0}
+      showEmptyState={true}
     >
       <>
         <CardsColumn>

@@ -81,6 +81,13 @@ export class ModelApiSource implements IModelApiSource {
     const url = buildApiUrl('/models');
     const headers = getAuthHeaders();
     try {
+      console.log('[ModelApiSource] 📤 모델 등록 요청:', {
+        url,
+        method: 'POST',
+        headers: Object.fromEntries(new Headers(headers).entries()),
+        body: JSON.stringify(request),
+      });
+      
       const result = await fetchApi<{ message?: string; data?: CreateModelResponse['data'] }>(
         url,
         {
@@ -91,50 +98,82 @@ export class ModelApiSource implements IModelApiSource {
         '모델 등록'
       );
       
+      console.log('[ModelApiSource] ✅ createModel 응답 result:', result);
+      
       // fetchApi가 성공 응답을 받으면 extractData를 통해 data만 반환하거나 전체 응답을 반환할 수 있음
       // 201 Created 응답이므로 성공으로 간주하고 ok: true를 명시적으로 추가
       
-      // data만 반환된 경우 (extractData가 data 필드를 추출한 경우)
-      if (result && typeof result === 'object' && '_id' in result && !('ok' in result)) {
-        // result가 CreateModelResponse['data'] 형식인지 확인
-        if ('_id' in result && typeof (result as { _id: unknown })._id === 'string') {
-          return {
-            ok: true,
-            data: result as unknown as CreateModelResponse['data'],
-          };
+      // 응답 데이터를 정규화하는 헬퍼 함수 (id를 _id로 변환)
+      const normalizeModelData = (data: unknown): CreateModelResponse['data'] | null => {
+        if (!data || typeof data !== 'object') return null;
+        const dataObj = data as Record<string, unknown>;
+        // id 필드가 있으면 _id로 변환
+        if ('id' in dataObj && !('_id' in dataObj)) {
+          dataObj._id = dataObj.id;
         }
-      }
+        // user, nickname 등 필수 필드 확인
+        if (('_id' in dataObj || 'id' in dataObj) && 'user' in dataObj) {
+          return dataObj as unknown as CreateModelResponse['data'];
+        }
+        return null;
+      };
       
-      // 전체 응답이 반환된 경우 ({ message, data } 형식)
+      // 중첩된 data 필드 처리: { data: { data: {...} } } 형식
       if (result && typeof result === 'object' && 'data' in result) {
         const responseData = (result as { data: unknown }).data;
-        if (responseData && typeof responseData === 'object' && '_id' in responseData) {
+        // 중첩된 data 필드 확인
+        if (responseData && typeof responseData === 'object' && 'data' in responseData) {
+          const nestedData = (responseData as { data: unknown }).data;
+          const normalized = normalizeModelData(nestedData);
+          if (normalized) {
+            return {
+              ok: true,
+              message: 'message' in result && typeof (result as { message: unknown }).message === 'string' 
+                ? (result as { message: string }).message 
+                : undefined,
+              data: normalized,
+            };
+          }
+        }
+        // 일반 data 필드 확인
+        const normalized = normalizeModelData(responseData);
+        if (normalized) {
           return {
             ok: true,
             message: 'message' in result && typeof (result as { message: unknown }).message === 'string' 
               ? (result as { message: string }).message 
               : undefined,
-            data: responseData as unknown as CreateModelResponse['data'],
+            data: normalized,
           };
         }
       }
       
-      // data 필드가 없는 경우 (기존 응답 형식)
-      // 201 응답이므로 성공으로 간주
-      // result가 CreateModelResponse['data'] 형식인지 확인
-      if (result && typeof result === 'object' && '_id' in result) {
-        return {
-          ok: true,
-          data: result as unknown as CreateModelResponse['data'],
-        };
+      // data만 반환된 경우 (extractData가 data 필드를 추출한 경우)
+      // id 또는 _id 필드 확인
+      if (result && typeof result === 'object' && !('ok' in result)) {
+        const normalized = normalizeModelData(result);
+        if (normalized) {
+          return {
+            ok: true,
+            data: normalized,
+          };
+        }
       }
       
-      // 예상치 못한 형식인 경우 기본값 반환
-      throw new Error('예상치 못한 응답 형식입니다.');
+      // 예상치 못한 형식인 경우 - 로그를 남기고 에러 발생
+      console.error('[ModelApiSource] ❌ 예상치 못한 응답 형식:', result);
+      throw new Error(`예상치 못한 응답 형식입니다. 응답: ${JSON.stringify(result)}`);
     } catch (error) {
       if (error instanceof ApiError) {
+        console.error('[ModelApiSource] ❌ 모델 등록 에러:', {
+          status: error.status,
+          message: error.message,
+          payload: error.payload,
+          fullError: error,
+        });
         throw handleShowhostEntityError({ status: error.status }, error.payload, '모델 등록에 실패했습니다.');
       }
+      console.error('[ModelApiSource] ❌ 모델 등록 예상치 못한 에러:', error);
       throw error;
     }
   }

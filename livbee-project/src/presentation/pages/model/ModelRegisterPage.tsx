@@ -16,6 +16,7 @@ import {
 import { FormSubmitSection } from '@/presentation/components/forms/common/FormSubmitSection';
 import { RegisterPageHeader } from '@/presentation/components/forms/common/RegisterPageHeader';
 import { useModelRegisterForm } from '@/presentation/components/forms/model/useModelRegisterForm';
+import { LoadingOverlay } from '@/presentation/components/states/LoadingOverlay';
 
 const ModelRegisterPage: React.FC = () => {
   const {
@@ -106,6 +107,7 @@ const ModelRegisterPage: React.FC = () => {
           />
           </RegisterForm>
         </FormContainer>
+      {isSubmitting && <LoadingOverlay message="등록 중..." />}
       </PageWrapper>
   );
 };

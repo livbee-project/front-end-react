@@ -264,7 +264,31 @@ export const useModelRegisterForm = () => {
         uploadedPortfolioFileUrl
       );
 
+      console.log('[useModelRegisterForm] 📤 모델 등록 요청 데이터:', JSON.stringify(request, null, 2));
+      console.log('[useModelRegisterForm] 📋 요청 데이터 상세:', {
+        nickname: request.nickname,
+        oneLineIntro: request.oneLineIntro,
+        detailedIntro: request.detailedIntro?.substring(0, 50) + '...',
+        mainThumbnailUrl: request.mainThumbnailUrl,
+        subThumbnailUrls: request.subThumbnailUrls,
+        websiteUrl: request.websiteUrl,
+        instagramUrl: request.instagramUrl,
+        tiktokUrl: request.tiktokUrl,
+        contact: request.contact,
+        openChat: request.openChat,
+        registrationType: request.registrationType,
+        attachedFileUrl: request.attachedFileUrl,
+        height: request.height,
+        weight: request.weight,
+        topSize: request.topSize,
+        experienceYears: request.experienceYears,
+        age: request.age,
+        status: request.status,
+        publicScope: request.publicScope,
+      });
+
       const response = await modelRepository.createModel(request);
+      console.log('[useModelRegisterForm] 📥 모델 등록 응답:', response);
 
       if (response.ok) {
         // 제출 성공 시 sessionStorage 삭제
@@ -275,10 +299,12 @@ export const useModelRegisterForm = () => {
       } else {
         const errorMessage = '모델 등록에 실패했습니다.';
         showToast(errorMessage, undefined, 'error');
+        setIsSubmitting(false);
       }
     } catch (error) {
       console.error('모델 등록 실패:', error);
-    } finally {
+      const errorMessage = error instanceof Error ? error.message : '모델 등록 중 오류가 발생했습니다.';
+      showToast(errorMessage, undefined, 'error');
       setIsSubmitting(false);
     }
   }, [
