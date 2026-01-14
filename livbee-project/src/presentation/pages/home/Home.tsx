@@ -27,16 +27,10 @@ const Content = styled.main`
   }
 `;
 
-const BannerWrapper = styled.div`
-  margin: ${({ theme }) => theme.spacing.lg} 0;
-`;
-
 const Home: React.FC = () => (
   <Page>
+    <BannerSliderSection />
     <Content>
-      <BannerWrapper>
-        <BannerSliderSection />
-      </BannerWrapper>
       {/* <StoryHighlightsSection /> */}
       <ShoppingLiveSection />
       <RecommendedLiveSection />
