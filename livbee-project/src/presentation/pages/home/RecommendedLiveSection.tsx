@@ -30,6 +30,11 @@ const StyledBadge = styled(Badge)`
   top: ${({ theme }) => theme.spacing.md};
   right: ${({ theme }) => theme.spacing.md};
   padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
+  color: #FFFFFF;
+
+  ${CaptionMedium} {
+    color: #FFFFFF;
+  }
 `;
 
 const RecommendedLiveSection: React.FC = React.memo(() => {

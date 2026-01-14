@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
 
-const ImageWrapper = styled.div<{ $aspectRatio: string }>`
+export const ImageWrapper = styled.div<{ $aspectRatio: string }>`
   width: 100%;
   aspect-ratio: ${({ $aspectRatio }) => $aspectRatio};
   position: relative;
@@ -10,15 +10,13 @@ const ImageWrapper = styled.div<{ $aspectRatio: string }>`
   background-color: ${({ theme }) => theme.colors.secondary};
 `;
 
-const ImageElement = styled.img`
+export const ImageElement = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.2s ease;
-
-  ${ImageWrapper}:hover & {
-    transform: scale(1.05);
-  }
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  transition: transform 0.3s;
 `;
 
 export interface HomeCardImageProps {

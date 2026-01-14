@@ -69,7 +69,8 @@ export const HorizontalScroll = styled.div`
   display: flex;
   gap: 10px;
   overflow-x: auto;
-  padding-bottom: 0.5rem;
+  overflow-y: visible;
+  padding: 0.5rem 0;
   -ms-overflow-style: none;
   scrollbar-width: none;
 
