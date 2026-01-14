@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import { useToast } from '@/presentation/contexts/ToastContext';
@@ -14,7 +14,7 @@ import { usePortfolioFormStorage } from '@/presentation/components/forms/portfol
 import { formatFileSize } from '@/shared/constants/fileUpload';
 
 const INITIAL_FORM_DATA: PortfolioFormData = {
-  registrationType: '',
+  registrationType: 'showhost',
   name: '',
   oneLineIntro: '',
   detailedIntro: '',
@@ -132,6 +132,13 @@ export const usePortfolioRegisterForm = () => {
     },
     [toggles, updateToggleArrayField, updateToggleField]
   );
+
+  // registrationType이 비어있으면 기본값 'showhost'로 설정
+  useEffect(() => {
+    if (!formData.registrationType || formData.registrationType.trim() === '') {
+      updateField('registrationType', 'showhost');
+    }
+  }, [formData.registrationType, updateField]);
 
   const handleGalleryImageSelectWithToast = useCallback(
     (file: File) => {

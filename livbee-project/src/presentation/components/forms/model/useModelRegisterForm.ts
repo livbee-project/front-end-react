@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
 import { useRepository } from '@/presentation/hooks/common/useRepository';
@@ -15,7 +15,7 @@ import { formatFileSize } from '@/shared/constants/fileUpload';
 
 const INITIAL_FORM_DATA: ModelFormData = {
   name: '',
-  registrationType: '',
+  registrationType: 'model',
   oneLineIntro: '',
   detailedIntro: '',
   websites: [
@@ -148,6 +148,13 @@ export const useModelRegisterForm = () => {
     },
     [toggles, updateToggleArrayField, updateToggleField]
   );
+
+  // registrationType이 비어있으면 기본값 'model'로 설정
+  useEffect(() => {
+    if (!formData.registrationType || formData.registrationType.trim() === '') {
+      updateField('registrationType', 'model');
+    }
+  }, [formData.registrationType, updateField]);
 
   const handleGalleryImageSelectWithToast = useCallback(
     (file: File) => {

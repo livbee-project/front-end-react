@@ -6,7 +6,7 @@ const FORM_STORAGE_KEY = 'portfolio-register-form';
 const TOGGLE_STORAGE_KEY = 'portfolio-register-toggles';
 
 const INITIAL_FORM_DATA: PortfolioFormData = {
-  registrationType: '',
+  registrationType: 'showhost',
   name: '',
   oneLineIntro: '',
   detailedIntro: '',

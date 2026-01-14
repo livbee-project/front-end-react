@@ -7,7 +7,7 @@ const TOGGLE_STORAGE_KEY = 'model-register-toggles';
 
 const INITIAL_FORM_DATA: ModelFormData = {
   name: '',
-  registrationType: '',
+  registrationType: 'model',
   oneLineIntro: '',
   detailedIntro: '',
   websites: [

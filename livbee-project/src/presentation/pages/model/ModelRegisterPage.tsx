@@ -6,7 +6,6 @@ import {
 } from '@/presentation/components/forms/portfolio/PortfolioRegisterStyles';
 import {
   ProfileImageSection,
-  RegistrationTypeSection,
   BasicInfoSection,
   ContactSection,
   SnsSection,
@@ -55,10 +54,6 @@ const ModelRegisterPage: React.FC = () => {
           <ProfileImageSection
             thumbnailUrl={mainThumbnailUrl}
             onSelectImage={handleProfileImageSelect}
-          />
-          <RegistrationTypeSection
-            value={formData.registrationType}
-            onChange={(value) => handleInputChange('registrationType', value)}
           />
           <BasicInfoSection
             name={formData.name}
