@@ -22,9 +22,19 @@ const Card = styled.article`
   align-items: center;
   gap: ${({ theme }) => theme.spacing.lg};
   padding: ${({ theme }) => theme.spacing.lg};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  background-color: ${({ theme }) => theme.colors.card};
+  border-radius: 12px;
+  background-color: #FFFFFF;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  will-change: transform;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    z-index: 1;
+  }
 `;
 
 const Avatar = styled.div`
@@ -34,12 +44,18 @@ const Avatar = styled.div`
   overflow: hidden;
   background-color: ${({ theme }) => theme.colors.secondary};
   flex-shrink: 0;
+  border: 1px solid #E5E7EB;
 `;
 
 const AvatarImage = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s;
+
+  ${Card}:hover & {
+    transform: scale(1.05);
+  }
 `;
 
 const Info = styled.div`

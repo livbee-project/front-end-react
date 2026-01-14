@@ -39,6 +39,8 @@ const ScrollArea = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing.sm};
   overflow-x: auto;
+  overflow-y: visible;
+  padding: 0.5rem 0;
   -ms-overflow-style: none;
   scrollbar-width: none;
 
@@ -49,10 +51,20 @@ const ScrollArea = styled.div`
 
 const Card = styled.article`
   flex: 0 0 180px;
-  background-color: ${({ theme }) => theme.colors.card};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  border: 1px solid ${({ theme }) => theme.colors.border};
+  background-color: #FFFFFF;
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  will-change: transform;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    z-index: 1;
+  }
 `;
 
 const Thumbnail = styled.div`
@@ -66,7 +78,9 @@ const ClipImage = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  transition: transform 0.3s;
 
   ${Card}:hover & {
     transform: scale(1.05);
