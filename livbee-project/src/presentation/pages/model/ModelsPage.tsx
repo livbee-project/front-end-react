@@ -15,7 +15,7 @@ import { ModelSearchSection } from '@/presentation/components/model/ModelSearchS
 import { ModelFilterRow } from '@/presentation/components/model/ModelFilterRow';
 import { ModelCard } from '@/presentation/pages/model/components/ModelCard';
 import { useModelFilter } from '@/presentation/pages/model/hooks/useModelFilter';
-import { mockModels, modelFilters } from '@/presentation/pages/model/mock/mockModels';
+import { modelFilters } from '@/presentation/pages/model/mock/mockModels';
 
 const ModelsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -49,15 +49,12 @@ const ModelsPage: React.FC = () => {
     showEmptyState: false,
   });
 
-  const modelsList = useMemo<Model[]>(() => {
-    if (models && Array.isArray(models) && models.length > 0) {
-      return models;
-    }
-    return mockModels;
-  }, [models]);
-
   const displayModels = useMemo<Model[]>(() => {
-    return modelsList.map((model) => ({
+    if (!models || !Array.isArray(models)) {
+      return [];
+    }
+    
+    return models.map((model) => ({
       id: model.id,
       nickname: model.nickname ?? null,
       oneLineIntro: model.oneLineIntro ?? null,
@@ -73,7 +70,7 @@ const ModelsPage: React.FC = () => {
           ? [model.categories as string]
           : [],
     }));
-  }, [modelsList]);
+  }, [models]);
 
   const { selectedFilter, setSelectedFilter, searchQuery, setSearchQuery, filteredModels } = useModelFilter<Model>({
     models: displayModels,

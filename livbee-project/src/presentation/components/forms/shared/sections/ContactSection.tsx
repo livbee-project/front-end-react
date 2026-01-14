@@ -9,6 +9,7 @@ import {
   LabelNote,
   StyledInput,
 } from '@/presentation/components/forms/portfolio/PortfolioRegisterStyles';
+import { formatPhoneNumber, removePhoneHyphens } from '@/shared/utils/formatUtils';
 
 interface ContactSectionProps {
   contact: string;
@@ -40,8 +41,8 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
           action={<ToggleSwitch checked={contactEnabled} onChange={() => onToggleChange('contact')} />}
         >
           <StyledInput
-            value={contact}
-            onChange={(event) => onInputChange('contact', event.target.value)}
+            value={formatPhoneNumber(contact)}
+            onChange={(event) => onInputChange('contact', removePhoneHyphens(event.target.value))}
             placeholder="010-1234-5678"
             disabled={!contactEnabled}
           />

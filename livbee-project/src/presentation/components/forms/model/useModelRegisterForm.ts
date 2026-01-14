@@ -271,7 +271,7 @@ export const useModelRegisterForm = () => {
         clearStorage();
         clearImageUrls();
         showToast('모델이 등록되었습니다.', undefined, 'success');
-        navigate('/models', { replace: true });
+        navigate(-1);
       } else {
         const errorMessage = '모델 등록에 실패했습니다.';
         showToast(errorMessage, undefined, 'error');
