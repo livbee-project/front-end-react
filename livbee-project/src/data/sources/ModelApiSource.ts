@@ -10,6 +10,7 @@ import { buildApiUrl, getAuthHeaders } from '@/shared/config/apiConfig';
 import { ApiError, fetchApi } from '@/shared/utils/apiClient';
 import { transformModelDetailResponse, transformModelListResponse } from '@/data/mappers/ModelMapper';
 import { handleShowhostEntityError } from '@/data/errorHandlers/showhostEntityErrorHandler';
+import { isObject } from '@/shared/utils/typeGuards';
 
 import type { IModelApiSource } from '@/data/sources/interfaces/IModelApiSource';
 
@@ -58,7 +59,7 @@ export class ModelApiSource implements IModelApiSource {
   async getModelById(id: string, signal?: AbortSignal): Promise<ModelDetail> {
     const url = buildApiUrl(`/models/${id}`);
     const headers = getAuthHeaders();
-    const result = await fetchApi<ModelDetailResponse['data']>(
+    const result = await fetchApi<ModelDetailResponse['data'] | { data: ModelDetailResponse['data'] }>(
       url,
       {
         method: 'GET',
@@ -68,7 +69,18 @@ export class ModelApiSource implements IModelApiSource {
       '모델 상세 조회'
     );
 
-    return transformModelDetailResponse({ ok: true, data: result }, id);
+    // API 응답이 { data: { data: {...} } } 형태인 경우 중첩된 data 추출
+    // fetchApi의 extractData가 첫 번째 data만 추출하므로, 중첩된 data가 있으면 한 번 더 추출
+    let modelData: ModelDetailResponse['data'];
+    if (isObject(result) && 'data' in result && isObject(result.data) && 'subThumbnailUrls' in result.data) {
+      // 중첩된 data 구조: { data: { subThumbnailUrls: [...] } }
+      modelData = result.data as ModelDetailResponse['data'];
+    } else {
+      // 일반 구조: { subThumbnailUrls: [...] }
+      modelData = result as ModelDetailResponse['data'];
+    }
+
+    return transformModelDetailResponse({ ok: true, data: modelData }, id);
   }
 
   /**

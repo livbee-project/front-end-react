@@ -131,6 +131,13 @@ export const transformModelDetailResponse = (
     merged.id = id;
   }
   
+  // 배열 필드 명시적 처리 (subThumbnailUrls)
+  if (Array.isArray(payload.subThumbnailUrls)) {
+    merged.subThumbnailUrls = payload.subThumbnailUrls.filter(
+      (url): url is string => typeof url === 'string'
+    );
+  }
+  
   // 나머지 필드 병합 (타입 안전하게)
   Object.assign(merged, payload);
 
