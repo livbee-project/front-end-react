@@ -47,27 +47,37 @@ export const extractData = <T>(response: ApiResponse<T>): T | null => {
   return null;
 };
 
+/** extractErrorMessage에서 추출 실패 시 반환하는 기본 메시지 */
+export const DEFAULT_ERROR_MESSAGE = '알 수 없는 오류가 발생했습니다.';
+
 /**
  * API 응답에서 에러 메시지 추출
+ * 백엔드 통일 형식: { ok: false, error, message, userMessage } (최상위 필드)
  */
 export const extractErrorMessage = (response: ApiResponse | FastApiErrorResponse): string => {
-  // FastAPI 에러 형식: { detail: "..." }
-  const fastApiError = response as FastApiErrorResponse;
-  if (fastApiError.detail) {
-    return fastApiError.detail;
+  const result = response as Record<string, unknown>;
+
+  // 통일된 형식: userMessage, message, error가 최상위에 있음
+  if (typeof result.userMessage === 'string') {
+    return result.userMessage;
   }
-  
-  const apiResponse = response as ApiResponse;
-  if (apiResponse.userMessage) {
-    return apiResponse.userMessage;
+  if (typeof result.message === 'string') {
+    return result.message;
   }
-  if (apiResponse.message) {
-    return apiResponse.message;
+  if (typeof result.error === 'string') {
+    return result.error;
   }
-  if (apiResponse.error) {
-    return apiResponse.error;
+
+  // 레거시: detail이 문자열인 경우
+  if (typeof result.detail === 'string') {
+    return result.detail;
   }
-  return '알 수 없는 오류가 발생했습니다.';
+  // 레거시: detail이 객체인 경우 (과거 FastAPI 형식)
+  if (result.detail && typeof result.detail === 'object' && typeof (result.detail as Record<string, unknown>).userMessage === 'string') {
+    return (result.detail as Record<string, unknown>).userMessage as string;
+  }
+
+  return DEFAULT_ERROR_MESSAGE;
 };
 
 /**
