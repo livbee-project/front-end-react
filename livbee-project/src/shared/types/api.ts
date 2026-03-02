@@ -4,11 +4,19 @@
 
 /**
  * 검증 에러 항목 (Pydantic/FastAPI 스타일)
+ * - loc/msg/type: 백엔드 통일 형식 (예: ["body", "email"])
+ * - param/location: 레거시 호환용 (선택)
  */
 export interface ValidationErrorItem {
+  /** 백엔드 형식: 경로 배열 (예: ["body", "email"]) */
+  loc?: string[];
   msg: string;
-  param: string;
-  location: string;
+  /** 백엔드 형식: 에러 타입 */
+  type?: string;
+  /** 레거시: 필드명 */
+  param?: string;
+  /** 레거시: 위치 */
+  location?: string;
 }
 
 /**

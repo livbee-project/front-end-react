@@ -258,6 +258,16 @@ export const CampaignFilmingInfoSection: React.FC<CampaignFilmingInfoSectionProp
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  // 공고마감일 maxDate: 촬영일 이전이어야 하므로 filmingDate - 1일
+  const deadlineMaxDate = (() => {
+    if (!filmingDate) return undefined;
+    const [y, m, d] = filmingDate.split('-').map(Number);
+    if (!y || !m || !d) return undefined;
+    const filmingDateObj = new Date(y, m - 1, d);
+    filmingDateObj.setDate(filmingDateObj.getDate() - 1);
+    return filmingDateObj;
+  })();
+
   return (
     <FormSection>
       <SectionTitle>촬영 정보</SectionTitle>
@@ -367,6 +377,7 @@ export const CampaignFilmingInfoSection: React.FC<CampaignFilmingInfoSectionProp
                 onChange={handleDeadlineChange}
                 onClose={() => setOpenCalendar(null)}
                 minDate={today}
+                maxDate={deadlineMaxDate}
               />
             )}
           </DateInputWrapper>

@@ -79,6 +79,17 @@ export const extractErrorMessage = (
     return (result.detail as Record<string, unknown>).userMessage as string;
   }
 
+  // errors 배열 fallback: 각 항목의 msg를 ", "로 join
+  const errors = result.errors;
+  if (Array.isArray(errors) && errors.length > 0) {
+    const messages = errors
+      .map((item: { msg?: string }) => (typeof item?.msg === 'string' ? item.msg : ''))
+      .filter(Boolean);
+    if (messages.length > 0) {
+      return messages.join(', ');
+    }
+  }
+
   return DEFAULT_ERROR_MESSAGE;
 };
 

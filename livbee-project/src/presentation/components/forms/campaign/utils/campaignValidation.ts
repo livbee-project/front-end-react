@@ -33,6 +33,28 @@ export const validateCampaignForm = (
     }
   }
 
+  // 촬영일은 오늘 이후여야 함
+  if (formData.filmingDate) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const filmingDateObj = new Date(formData.filmingDate);
+    filmingDateObj.setHours(0, 0, 0, 0);
+    if (filmingDateObj < today) {
+      return {
+        isValid: false,
+        errorMessage: '촬영일은 오늘 이후여야 합니다.',
+      };
+    }
+  }
+
+  // 마감일은 촬영일보다 이전이어야 함 (같은 날 불가)
+  if (formData.deadline >= formData.filmingDate) {
+    return {
+      isValid: false,
+      errorMessage: '마감일은 촬영일보다 이전이어야 합니다. 같은 날은 허용되지 않습니다.',
+    };
+  }
+
   return { isValid: true };
 };
 

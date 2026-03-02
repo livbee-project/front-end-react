@@ -22,6 +22,8 @@ export function getDefaultErrorMessageByStatus(status: number): string | undefin
       return '권한이 없습니다.';
     case 404:
       return '요청한 리소스를 찾을 수 없습니다.';
+    case 429:
+      return '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.';
     case 500:
       return '서버 오류가 발생했습니다.';
     case 502:
@@ -99,6 +101,16 @@ export function isAuthenticationError(status: number): boolean {
  */
 export function isAuthorizationError(status: number): boolean {
   return status === 403;
+}
+
+/**
+ * Rate Limit 에러인지 확인합니다 (429).
+ *
+ * @param status - HTTP 상태 코드
+ * @returns Rate Limit 에러 여부
+ */
+export function isRateLimitError(status: number): boolean {
+  return status === 429;
 }
 
 /**

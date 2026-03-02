@@ -111,7 +111,11 @@ export async function fetchApi<T>(
 
   // 3. 에러 응답 처리
   if (!response.ok || !isSuccessResponse(result as ApiResponse<T>)) {
-    const errorMessage = extractErrorMessage(result);
+    let errorMessage = extractErrorMessage(result);
+    // 429 Rate Limit: userMessage 없을 때 기본 메시지 사용
+    if (response.status === 429 && !(result && typeof result === 'object' && typeof (result as Record<string, unknown>).userMessage === 'string')) {
+      errorMessage = '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.';
+    }
     // 에러 응답을 자세히 로그로 출력
     console.error(`[fetchApi] ❌ ${errorContext} 실패:`, {
       status: response.status,
