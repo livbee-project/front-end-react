@@ -53,5 +53,5 @@ alwaysApply: true
 3. **UI/레이아웃** (`presentation/pages`, `components`, `layouts`, `styles`)
    - 페이지/컴포넌트 구조, 레이아웃, 상태표시(로딩/에러/빈 상태)를 구현한다.
 4. **품질 확인**
-   - ESLint/테스트/Storybook(필요 시)을 실행하거나, 최소한 빌드 에러와 눈에 보이는 경고는 제거한다.
+   - `npm run build`가 통과한 뒤 ESLint, 테스트, Storybook(필요 시)을 실행한다.
 

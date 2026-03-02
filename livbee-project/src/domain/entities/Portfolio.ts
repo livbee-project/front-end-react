@@ -1,3 +1,5 @@
+import type { UnifiedApiErrorResponse } from '@/shared/types/api';
+
 /**
  * 포트폴리오(쇼호스트) 엔티티 타입 정의
  */
@@ -216,12 +218,7 @@ export interface CreatePortfolioResponse {
 }
 
 /**
- * API 에러 응답 타입
+ * API 에러 응답 타입 (UnifiedApiErrorResponse 별칭)
  */
-export interface PortfolioApiErrorResponse {
-  ok: false;
-  error: string;
-  message: string;
-  userMessage?: string;
-}
+export type PortfolioApiErrorResponse = UnifiedApiErrorResponse;
 

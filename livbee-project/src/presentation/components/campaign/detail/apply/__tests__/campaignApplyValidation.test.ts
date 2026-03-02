@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { validateCampaignApplyForm } from '@/presentation/components/campaign/detail/apply/campaignApplyValidation';
-import { buildCampaignApplyRequest } from '@/presentation/components/campaign/detail/apply/campaignApplyRequestBuilder';
+import { validateCampaignApplyForm } from '@/presentation/components/campaign/detail/apply/utils/campaignApplyValidation';
+import { buildCampaignApplyRequest } from '@/presentation/components/campaign/detail/apply/utils/campaignApplyRequestBuilder';
 
 describe('campaignApplyValidation', () => {
   it('should pass validation when all fields are valid', () => {
@@ -45,10 +45,10 @@ describe('campaignApplyValidation', () => {
 });
 
 describe('buildCampaignApplyRequest', () => {
-  it('should trim message and convert portfolioId to string', () => {
+  it('should trim message and set portfolioId', () => {
     const payload = buildCampaignApplyRequest({
       campaignId: 'campaign-1',
-      selectedPortfolio: 123,
+      selectedPortfolio: '123',
       message: '  지원합니다.  ',
       availableDate: '2025-11-30',
       availableTime: '10:00',

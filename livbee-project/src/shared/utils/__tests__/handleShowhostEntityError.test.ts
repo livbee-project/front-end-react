@@ -18,9 +18,9 @@ describe('handleShowhostEntityError', () => {
     expect(error.message).toBe('잘못된 요청입니다.');
   });
 
-  it('uses default message when no error payload provided', () => {
+  it('uses status-specific message for 500 when no error payload provided', () => {
     const error = handleShowhostEntityError({ status: 500 }, {}, '기본 메시지');
-    expect(error.message).toBe('기본 메시지');
+    expect(error.message).toBe('서버 오류가 발생했습니다.');
   });
 });
 

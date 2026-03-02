@@ -1,3 +1,5 @@
+import type { UnifiedApiErrorResponse } from '@/shared/types/api';
+
 /**
  * 캠페인(모집 공고) 엔티티 타입 정의
  */
@@ -96,20 +98,9 @@ export interface CreateCampaignResponse {
 }
 
 /**
- * API 에러 응답 타입
+ * API 에러 응답 타입 (UnifiedApiErrorResponse 별칭)
  */
-export interface CampaignApiErrorResponse {
-  ok: false;
-  code?: string;
-  error?: string; // 백엔드에서 error 필드로 응답할 수 있음
-  message: string;
-  userMessage?: string;
-  errors?: Array<{
-    msg: string;
-    param: string;
-    location: string;
-  }>;
-}
+export type CampaignApiErrorResponse = UnifiedApiErrorResponse;
 
 /**
  * 캠페인 목록 조회 응답 타입

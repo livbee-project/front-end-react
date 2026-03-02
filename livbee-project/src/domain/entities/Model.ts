@@ -1,3 +1,5 @@
+import type { UnifiedApiErrorResponse } from '@/shared/types/api';
+
 /**
  * 모델 엔티티 타입 정의
  */
@@ -198,12 +200,7 @@ export interface CreateModelResponse {
 }
 
 /**
- * API 에러 응답 타입
+ * API 에러 응답 타입 (UnifiedApiErrorResponse 별칭)
  */
-export interface ModelApiErrorResponse {
-  ok: false;
-  error: string;
-  message: string;
-  userMessage: string;
-}
+export type ModelApiErrorResponse = UnifiedApiErrorResponse;
 

@@ -95,6 +95,15 @@ export default defineConfig({
   // @ts-expect-error - UserConfigExport에 test 속성 확장 (vitest)
   test: {
     projects: [
+      // unit: *.test.ts만 실행, Node 환경, Storybook 미사용
+      {
+        test: {
+          name: 'unit',
+          include: ['**/*.test.ts'],
+          environment: 'node',
+        },
+      },
+      // storybook: Storybook 스토리 기반 테스트, Playwright 브라우저
       {
         extends: true,
         plugins: [
@@ -106,6 +115,7 @@ export default defineConfig({
         ],
         test: {
           name: 'storybook',
+          exclude: ['**/*.test.ts'],
           browser: {
             enabled: true,
             headless: true,

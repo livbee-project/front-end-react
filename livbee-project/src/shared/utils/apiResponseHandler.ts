@@ -3,7 +3,7 @@
  * FastAPI와 기존 Express API 응답 형식을 모두 처리합니다.
  */
 
-import type { FastApiErrorResponse } from '@/shared/types/api';
+import type { FastApiErrorResponse, UnifiedApiErrorResponse } from '@/shared/types/api';
 
 /**
  * API 응답 타입 (성공/실패 모두 포함)
@@ -54,7 +54,9 @@ export const DEFAULT_ERROR_MESSAGE = '알 수 없는 오류가 발생했습니�
  * API 응답에서 에러 메시지 추출
  * 백엔드 통일 형식: { ok: false, error, message, userMessage } (최상위 필드)
  */
-export const extractErrorMessage = (response: ApiResponse | FastApiErrorResponse): string => {
+export const extractErrorMessage = (
+  response: ApiResponse | UnifiedApiErrorResponse | FastApiErrorResponse
+): string => {
   const result = response as Record<string, unknown>;
 
   // 통일된 형식: userMessage, message, error가 최상위에 있음

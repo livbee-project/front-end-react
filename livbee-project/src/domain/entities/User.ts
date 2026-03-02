@@ -115,12 +115,9 @@ export interface MeResponse {
   isShowhost?: boolean;
 }
 
+import type { UnifiedApiErrorResponse } from '@/shared/types/api';
+
 /**
- * API 에러 응답 타입
+ * API 에러 응답 타입 (UnifiedApiErrorResponse 별칭)
  */
-export interface ApiErrorResponse {
-  ok: false;
-  code: string;
-  message: string;
-  userMessage?: string;
-}
+export type ApiErrorResponse = UnifiedApiErrorResponse;

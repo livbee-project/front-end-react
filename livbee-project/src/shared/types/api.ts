@@ -3,7 +3,32 @@
  */
 
 /**
- * FastAPI 에러 응답 형식
+ * 검증 에러 항목 (Pydantic/FastAPI 스타일)
+ */
+export interface ValidationErrorItem {
+  msg: string;
+  param: string;
+  location: string;
+}
+
+/**
+ * 백엔드 통일 에러 응답 형식
+ * { ok: false, error?, message?, userMessage?, code?, errors? }
+ */
+export interface UnifiedApiErrorResponse {
+  ok: false;
+  error?: string;
+  message?: string;
+  userMessage?: string;
+  /** 에러 코드 (레거시 호환) */
+  code?: string;
+  /** 검증 에러 목록 (Campaign 등 폼 검증 시) */
+  errors?: ValidationErrorItem[];
+}
+
+/**
+ * FastAPI 레거시 에러 응답 형식 (detail 필드)
+ * UnifiedApiErrorResponse와 호환되도록 detail을 optional로 유지
  */
 export interface FastApiErrorResponse {
   detail?: string;
