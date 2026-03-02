@@ -1,0 +1,57 @@
+---
+description: Core frontend agent constitution and workflow for Livbee React/Vite project
+alwaysApply: true
+---
+
+# 프론트엔드 에이전트 헌법
+
+## 1. 역할 범위
+
+- 이 에이전트는 **React/Vite 프론트엔드 코드만** 직접 수정한다.
+- 백엔드, 인프라, 배포, 디자인 관련 변경이 필요해 보이는 경우:
+  - 직접 수정하지 않고, 사용자가 전달할 수 있도록 **요약 메모**만 남긴다.
+  - 메모에는 이슈 요약, 필요한 변경 방향, 참고할 만한 파일/엔드포인트 정도만 간단히 정리한다.
+
+## 2. 아키텍처 및 레이어 규칙
+
+- `src` 내부의 레이어 구조를 유지한다:
+  - `presentation` (pages, components, layouts, hooks, contexts, styles)
+  - `domain` (entities, usecases)
+  - `data` (sources, mappers, repositories, errorHandlers)
+  - `shared` (utils, config, 공통 타입)
+- 새로운 기능도 위 레이어 안에서 추가하며, 레이어 간 의존 방향을 지킨다:
+  - `presentation` → `domain` → `data` → `shared` 방향만 허용한다.
+- 편의를 위한 지름길 유틸(API 호출을 직접 때리는 등)로 레이어를 우회하는 코드는 추가하지 않는다.
+
+## 3. 언어·명명·스타일 규칙
+
+- **TypeScript 필수**: 새 로직은 TypeScript로 작성하고 `any` 사용은 불가피한 경우로 제한한다.
+- **명명 규칙**:
+  - React 컴포넌트: `PascalCase.tsx`
+  - 커스텀 훅: `useCamelCase.ts`
+  - 유틸/상수: `camelCase.ts`
+- **스타일링**:
+  - `styled-components`를 사용한다.
+  - 단순 스타일은 컴포넌트 파일 하단에, 복잡하거나 재사용이 필요한 경우 `*.styles.ts`로 분리한다.
+- 새 UI 컴포넌트는 재사용성이 높거나 복잡한 경우 Storybook 스토리 파일(`.stories.tsx`)을 가능하면 함께 작성한다.
+
+## 4. 도메인 우선 설계
+
+- 프론트의 도메인 타입은 **`domain/entities`에 정의된 타입**을 기준으로 설계한다.
+- API 응답 형태와 뷰 모델이 다르면:
+  - `data/mappers`에서 응답 → 도메인 엔티티로 변환한다.
+  - `presentation` 계층에서는 도메인 엔티티를 기반으로 화면용 데이터만 가볍게 가공한다.
+
+## 5. 작업 플로우 (서브 역할 관점)
+
+하나의 기능을 구현할 때 아래 순서를 기본으로 따른다:
+
+1. **API/데이터** (`data`, `shared/utils/apiClient`, `shared/config`)
+   - 필요한 엔드포인트를 확인하고, `ApiSource`/매퍼/리포지토리 레이어를 먼저 맞춘다.
+2. **도메인/상태** (`domain`, `presentation/hooks`, `contexts`)
+   - 유스케이스와 훅을 설계해 비즈니스 로직과 화면 상태를 캡슐화한다.
+3. **UI/레이아웃** (`presentation/pages`, `components`, `layouts`, `styles`)
+   - 페이지/컴포넌트 구조, 레이아웃, 상태표시(로딩/에러/빈 상태)를 구현한다.
+4. **품질 확인**
+   - ESLint/테스트/Storybook(필요 시)을 실행하거나, 최소한 빌드 에러와 눈에 보이는 경고는 제거한다.
+

@@ -27,3 +27,6 @@ dist-ssr
 storybook-static
 # Antigravity rules (local only)
 .antigravity/
+
+# Local docs (학습용 사전 등, 원격에 올리지 않음)
+docs/
