@@ -6,7 +6,6 @@ import { PortfolioCard } from '@/presentation/components/portfolio/PortfolioCard
 import type { Portfolio } from '@/domain/entities/Portfolio';
 
 interface PortfolioListContentProps {
-  portfolios: Portfolio[];
   filteredPortfolios: Portfolio[];
   loading: boolean;
   error: string | null;
@@ -20,7 +19,6 @@ interface PortfolioListContentProps {
 }
 
 export const PortfolioListContent: React.FC<PortfolioListContentProps> = ({
-  portfolios,
   filteredPortfolios,
   loading,
   error,

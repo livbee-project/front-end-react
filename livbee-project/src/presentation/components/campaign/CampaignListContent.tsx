@@ -6,7 +6,6 @@ import { CampaignCard } from '@/presentation/components/campaign/CampaignCard';
 import type { Campaign } from '@/domain/entities/Campaign';
 
 interface CampaignListContentProps {
-  campaigns: Campaign[];
   filteredCampaigns: Campaign[];
   loading: boolean;
   error: string | null;
@@ -20,7 +19,6 @@ interface CampaignListContentProps {
 }
 
 export const CampaignListContent: React.FC<CampaignListContentProps> = ({
-  campaigns,
   filteredCampaigns,
   loading,
   error,

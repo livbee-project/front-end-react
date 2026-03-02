@@ -96,7 +96,7 @@ export interface ModelDetail {
  * 모델 목록 조회 응답 타입
  */
 export interface ModelListResponse {
-  ok: true;
+  ok: boolean;
   items: Model[];
   currentPage: number;
   totalPages: number;

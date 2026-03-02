@@ -99,7 +99,6 @@ const PortfolioPage: React.FC = () => {
         <PortfolioFilterRow activeFilter={activeFilter} onFilterChange={handleFilterChange} />
 
         <PortfolioListContent
-          portfolios={portfolios}
           filteredPortfolios={filteredPortfolios}
           loading={loading}
           error={error}

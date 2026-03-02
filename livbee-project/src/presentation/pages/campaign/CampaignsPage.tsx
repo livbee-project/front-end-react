@@ -105,7 +105,6 @@ const CampaignsPage: React.FC = () => {
         <CampaignFilterRow activeFilter={activeFilter} onFilterChange={handleFilterChange} />
 
         <CampaignListContent
-          campaigns={campaigns}
           filteredCampaigns={filteredCampaigns}
           loading={loading}
           error={error}

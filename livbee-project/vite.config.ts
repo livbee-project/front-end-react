@@ -91,6 +91,8 @@ export default defineConfig({
       },
     },
   },
+  // Vitest 옵션 (vitest/config 타입 확장)
+  // @ts-expect-error - UserConfigExport에 test 속성 확장 (vitest)
   test: {
     projects: [
       {
