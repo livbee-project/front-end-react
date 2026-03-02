@@ -10,6 +10,8 @@ import { useListFilters } from '@/presentation/hooks/list/useListFilters';
 import { useListSearch } from '@/presentation/hooks/list/useListSearch';
 import { useScrapToggle } from '@/presentation/hooks/common/useScrapToggle';
 import { useAuth } from '@/presentation/hooks/auth/useAuth';
+import { useRoleAccess } from '@/presentation/hooks/common/useRoleAccess';
+import { useRegisterFabVisibility } from '@/presentation/hooks/common/useRegisterFabVisibility';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { setAuthRedirectPath, setOriginPage } from '@/shared/utils/authRedirect';
 import LoginRequiredModal from '@/presentation/components/navigation/LoginRequiredModal';
@@ -21,7 +23,9 @@ type FilterValue = '전체' | Campaign['category'];
 
 const CampaignsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isLoggedIn, currentRole } = useAuth();
+  const { isLoggedIn, currentRole } = useAuth();
+  const { hasBrandRole } = useRoleAccess();
+  const { shouldHideRegisterFab } = useRegisterFabVisibility('brand');
   const { showToast } = useToast();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -118,33 +122,29 @@ const CampaignsPage: React.FC = () => {
         />
       </PageInner>
 
-      <RegisterFab
-        type="button"
-        onClick={() => {
-          // 비회원인 경우 로그인 모달 표시
-          if (!isLoggedIn) {
-            setIsLoginModalOpen(true);
-            return;
-          }
-          // 다중 역할 계정 지원: currentRole이 있으면 currentRole도 확인
-          // currentRole이 'brand'가 아니면 접근 불가
-          if (currentRole && currentRole !== 'brand') {
-            showToast('브랜드 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
-            return;
-          }
-          // 브랜드 권한이 아닌 경우 권한 오류 토스트
-          // 다중 역할 계정 지원: isBrand 플래그를 우선 확인하고, 없으면 기존 role 필드로 확인 (하위 호환)
-          const hasBrandRole = user?.isBrand === true || (user?.isBrand === undefined && user?.role === 'brand');
-          if (!hasBrandRole) {
-            showToast('브랜드 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
-            return;
-          }
-          navigate('/campaigns/register');
-        }}
-        aria-label="모집공고 등록"
-      >
-        <Plus size={24} strokeWidth={2.5} />
-      </RegisterFab>
+      {!shouldHideRegisterFab && (
+        <RegisterFab
+          type="button"
+          onClick={() => {
+            if (!isLoggedIn) {
+              setIsLoginModalOpen(true);
+              return;
+            }
+            if (currentRole && currentRole !== 'brand') {
+              showToast('브랜드 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
+              return;
+            }
+            if (!hasBrandRole) {
+              showToast('브랜드 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
+              return;
+            }
+            navigate('/campaigns/register');
+          }}
+          aria-label="모집공고 등록"
+        >
+          <Plus size={24} strokeWidth={2.5} />
+        </RegisterFab>
+      )}
 
       <LoginRequiredModal
         isOpen={isLoginModalOpen}

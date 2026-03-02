@@ -10,6 +10,8 @@ import { useListFilters } from '@/presentation/hooks/list/useListFilters';
 import { useListSearch } from '@/presentation/hooks/list/useListSearch';
 import { useScrapToggle } from '@/presentation/hooks/common/useScrapToggle';
 import { useAuth } from '@/presentation/hooks/auth/useAuth';
+import { useRoleAccess } from '@/presentation/hooks/common/useRoleAccess';
+import { useRegisterFabVisibility } from '@/presentation/hooks/common/useRegisterFabVisibility';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { setAuthRedirectPath, setOriginPage } from '@/shared/utils/authRedirect';
 import LoginRequiredModal from '@/presentation/components/navigation/LoginRequiredModal';
@@ -19,7 +21,9 @@ import { PortfolioListContent } from '@/presentation/components/portfolio/Portfo
 
 const PortfolioPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isLoggedIn } = useAuth();
+  const { isLoggedIn } = useAuth();
+  const { hasShowhostRole } = useRoleAccess();
+  const { shouldHideRegisterFab } = useRegisterFabVisibility('showhost');
   const { showToast } = useToast();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -112,27 +116,25 @@ const PortfolioPage: React.FC = () => {
         />
       </PageInner>
 
-      <RegisterFab
-        type="button"
-        onClick={() => {
-          // 비회원인 경우 로그인 모달 표시
-          if (!isLoggedIn) {
-            setIsLoginModalOpen(true);
-            return;
-          }
-          // 쇼호스트 권한이 아닌 경우 권한 오류 토스트
-          // 다중 역할 계정 지원: isShowhost 플래그를 우선 확인하고, 없으면 기존 role 필드로 확인 (하위 호환)
-          const hasShowhostRole = user?.isShowhost === true || (user?.isShowhost === undefined && user?.role === 'showhost');
-          if (!hasShowhostRole) {
-            showToast('쇼호스트 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
-            return;
-          }
-          navigate('/portfolios/register');
-        }}
+      {!shouldHideRegisterFab && (
+        <RegisterFab
+          type="button"
+          onClick={() => {
+            if (!isLoggedIn) {
+              setIsLoginModalOpen(true);
+              return;
+            }
+            if (!hasShowhostRole) {
+              showToast('쇼호스트 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
+              return;
+            }
+            navigate('/portfolios/register');
+          }}
         aria-label="쇼호스트 등록"
       >
         <Plus size={24} strokeWidth={2.5} />
       </RegisterFab>
+      )}
 
       <LoginRequiredModal
         isOpen={isLoginModalOpen}

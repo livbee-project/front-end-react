@@ -1,9 +1,19 @@
+import { useMemo } from 'react';
 import type { UserRole } from '@/domain/entities/User';
 import { useAuth } from '@/presentation/hooks/auth/useAuth';
 
 export const useRoleAccess = () => {
-  const { user } = useAuth();
+  const { user, currentRole } = useAuth();
   const role = user?.role;
+
+  const hasBrandRole = useMemo(
+    () => user?.isBrand === true || (user?.isBrand === undefined && user?.role === 'brand'),
+    [user?.isBrand, user?.role]
+  );
+  const hasShowhostRole = useMemo(
+    () => user?.isShowhost === true || (user?.isShowhost === undefined && user?.role === 'showhost'),
+    [user?.isShowhost, user?.role]
+  );
 
   const hasRole = (allowedRoles?: UserRole[]) => {
     if (!allowedRoles || allowedRoles.length === 0) {
@@ -27,7 +37,10 @@ export const useRoleAccess = () => {
 
   return {
     role,
+    currentRole,
     hasRole,
+    hasBrandRole,
+    hasShowhostRole,
   };
 };
 

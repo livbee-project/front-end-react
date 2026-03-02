@@ -49,15 +49,17 @@ export class UserApiSource implements IUserApiSource {
     );
 
     // 백엔드 응답 형식: { ok: true, data: { token: "...", user: { id, name, email, role, isBrand, isShowhost } } }
+    // 백엔드가 snake_case(is_brand, is_showhost)로 응답할 수 있음
     if (result && typeof result === 'object' && 'token' in result) {
+      const u = result.user as Record<string, unknown> | undefined;
       return {
         ok: true,
         token: result.token,
-        name: result.user?.name || '',
+        name: (result.user?.name as string) || '',
         role: (result.user?.role || request.role || 'showhost') as 'brand' | 'showhost',
-        userId: result.user?.id,
-        isBrand: result.user?.isBrand,
-        isShowhost: result.user?.isShowhost,
+        userId: result.user?.id as string | undefined,
+        isBrand: (u?.isBrand ?? u?.is_brand) as boolean | undefined,
+        isShowhost: (u?.isShowhost ?? u?.is_showhost) as boolean | undefined,
       };
     }
 
@@ -134,14 +136,16 @@ export class UserApiSource implements IUserApiSource {
       );
 
       // FastAPI 응답 형식: { ok: true, data: {...} } 또는 { success: true, data: {...} }
+      // 백엔드가 snake_case(is_brand, is_showhost)로 응답할 수 있음
       if (result && typeof result === 'object' && 'id' in result) {
+        const r = result as Record<string, unknown>;
         return {
           ok: true,
           id: result.id,
           name: result.name,
           role: result.role as 'brand' | 'showhost',
-          isBrand: result.isBrand,
-          isShowhost: result.isShowhost,
+          isBrand: (r.isBrand ?? r.is_brand) as boolean | undefined,
+          isShowhost: (r.isShowhost ?? r.is_showhost) as boolean | undefined,
         };
       }
 
