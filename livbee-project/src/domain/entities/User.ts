@@ -57,30 +57,34 @@ export interface LoginResponse {
 
 /**
  * 회원가입 요청 타입 (Brand)
+ * password: 카카오 가입(kakaoId 있음) 시 생략 가능
  */
 export interface SignupRequestBrand {
   name: string;
   email: string;
-  password: string;
+  password?: string;
   role: 'brand';
   phone: string;
   brandName: string;
   companyName?: string;
   businessNumber?: string;
+  kakaoId?: string;
 }
 
 /**
  * 회원가입 요청 타입 (Showhost)
+ * password: 카카오 가입(kakaoId 있음) 시 생략 가능
  */
 export interface SignupRequestShowhost {
   name: string;
   email: string;
-  password: string;
+  password?: string;
   role: 'showhost';
   phone: string;
   nickname?: string;
   snsLink?: string;
   introduction?: string;
+  kakaoId?: string;
 }
 
 /**
@@ -113,6 +117,15 @@ export interface MeResponse {
    * 쇼호스트 역할 보유 여부
    */
   isShowhost?: boolean;
+}
+
+/**
+ * 카카오 사용자 정보 타입
+ */
+export interface KakaoUserInfo {
+  name: string;
+  email: string;
+  kakaoId?: string;
 }
 
 import type { UnifiedApiErrorResponse } from '@/shared/types/api';

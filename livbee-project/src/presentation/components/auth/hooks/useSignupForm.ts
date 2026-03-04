@@ -1,9 +1,14 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { UserRole } from '@/domain/entities/User';
+import type { UserRole, KakaoUserInfo } from '@/domain/entities/User';
 import { useAuth } from '@/presentation/hooks/auth/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { validateSignupForm, buildSignupRequest } from '@/presentation/components/auth/utils/signupValidation';
+import { UserRepository } from '@/data/repositories/UserRepository';
+import { useRepository } from '@/presentation/hooks/common/useRepository';
+import { useTimer } from '@/presentation/hooks/useTimer';
+import { useKakaoAuth } from '@/presentation/hooks/auth/useKakaoAuth';
+import { removePhoneHyphens } from '@/shared/utils/formatUtils';
 
 interface UseSignupFormOptions {
   defaultUserType?: UserRole;
@@ -17,6 +22,9 @@ interface UseSignupFormReturn {
   password: string;
   passwordConfirm: string;
   phone: string;
+  /** 카카오로 진입해 가입하는 경우 (이메일 readOnly, 비밀번호 필드 비노출) */
+  isFromKakao: boolean;
+  kakaoId: string;
   brandName: string;
   companyName: string;
   businessNumber: string;
@@ -24,12 +32,17 @@ interface UseSignupFormReturn {
   snsLink: string;
   introduction: string;
   isLoading: boolean;
+  isPhoneVerified: boolean;
+  verificationCode: string;
+  setVerificationCode: (value: string) => void;
+  timer: { secondsLeft: number; isRunning: boolean; start: () => void; reset: () => void };
   setUserType: (type: UserRole) => void;
   setName: (value: string) => void;
   setEmail: (value: string) => void;
   setPassword: (value: string) => void;
   setPasswordConfirm: (value: string) => void;
   setPhone: (value: string) => void;
+  setKakaoId: (value: string) => void;
   setBrandName: (value: string) => void;
   setCompanyName: (value: string) => void;
   setBusinessNumber: (value: string) => void;
@@ -37,6 +50,10 @@ interface UseSignupFormReturn {
   setSnsLink: (value: string) => void;
   setIntroduction: (value: string) => void;
   handleSignup: () => Promise<void>;
+  handleSendSmsCode: () => Promise<void>;
+  handleVerifyCode: () => Promise<void>;
+  handleKakaoSuccess: (info: KakaoUserInfo) => void;
+  kakaoAuth: { loginWithKakao: () => Promise<KakaoUserInfo>; isLoading: boolean };
 }
 
 export const useSignupForm = ({
@@ -46,13 +63,16 @@ export const useSignupForm = ({
   const { signup } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const userRepository = useRepository(UserRepository);
+  const timer = useTimer(180);
+  const { loginWithKakao, isLoading: isLoadingKakao } = useKakaoAuth();
 
   const [userType, setUserType] = useState<UserRole>(defaultUserType);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhoneState] = useState('');
   const [brandName, setBrandName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [businessNumber, setBusinessNumber] = useState('');
@@ -60,14 +80,67 @@ export const useSignupForm = ({
   const [snsLink, setSnsLink] = useState('');
   const [introduction, setIntroduction] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [kakaoId, setKakaoId] = useState('');
+
+  const setPhone = useCallback(
+    (value: string) => {
+      setPhoneState(value);
+      setIsPhoneVerified(false);
+      setVerificationCode('');
+      timer.reset();
+    },
+    [timer]
+  );
+
+  const handleSendSmsCode = useCallback(async () => {
+    const digits = removePhoneHyphens(phone);
+    if (digits.length < 10 || digits.length > 11) {
+      showToast('휴대폰 번호를 10~11자리로 입력해 주세요.', undefined, 'error');
+      return;
+    }
+    try {
+      await userRepository.sendSms(digits);
+      timer.start();
+      showToast('인증번호가 발송되었습니다.', undefined, 'success');
+    } catch {
+      showToast('인증번호 발송에 실패했습니다.', undefined, 'error');
+    }
+  }, [phone, userRepository, timer, showToast]);
+
+  const handleVerifyCode = useCallback(async () => {
+    const digits = removePhoneHyphens(phone);
+    try {
+      await userRepository.verifySms(digits, verificationCode);
+      setIsPhoneVerified(true);
+      showToast('인증이 완료되었습니다.', undefined, 'success');
+    } catch {
+      showToast('인증번호가 일치하지 않습니다.', undefined, 'error');
+    }
+  }, [phone, verificationCode, userRepository, showToast]);
+
+  const handleKakaoSuccess = useCallback((info: KakaoUserInfo) => {
+    setName(info.name);
+    setEmail(info.email);
+    if (info.kakaoId) {
+      setKakaoId(info.kakaoId);
+    }
+  }, []);
 
   const handleSignup = useCallback(async () => {
+    if (!isPhoneVerified) {
+      showToast('휴대폰 인증을 완료해 주세요.', undefined, 'error');
+      return;
+    }
+
     const formData = {
       name,
       email,
       password,
       passwordConfirm,
       phone,
+      kakaoId,
       brandName,
       companyName,
       businessNumber,
@@ -110,11 +183,13 @@ export const useSignupForm = ({
       setIsLoading(false);
     }
   }, [
+    isPhoneVerified,
     name,
     email,
     password,
     passwordConfirm,
     phone,
+    kakaoId,
     brandName,
     companyName,
     businessNumber,
@@ -135,6 +210,8 @@ export const useSignupForm = ({
     password,
     passwordConfirm,
     phone,
+    isFromKakao: Boolean(kakaoId),
+    kakaoId,
     brandName,
     companyName,
     businessNumber,
@@ -142,12 +219,17 @@ export const useSignupForm = ({
     snsLink,
     introduction,
     isLoading,
+    isPhoneVerified,
+    verificationCode,
+    setVerificationCode,
+    timer,
     setUserType,
     setName,
     setEmail,
     setPassword,
     setPasswordConfirm,
     setPhone,
+    setKakaoId,
     setBrandName,
     setCompanyName,
     setBusinessNumber,
@@ -155,5 +237,9 @@ export const useSignupForm = ({
     setSnsLink,
     setIntroduction,
     handleSignup,
+    handleSendSmsCode,
+    handleVerifyCode,
+    handleKakaoSuccess,
+    kakaoAuth: { loginWithKakao, isLoading: isLoadingKakao },
   };
 };

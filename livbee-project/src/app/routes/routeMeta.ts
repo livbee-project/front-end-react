@@ -21,6 +21,7 @@ export const ROUTE_PATHS = {
   chatRoom: '/chat/:roomId',
   login: '/login',
   signup: '/signup',
+  kakaoCallback: '/kakao-callback',
   news: '/news',
   live: '/live',
   event: '/event',

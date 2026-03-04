@@ -19,6 +19,13 @@ interface SignupFormProps {
   snsLink?: string;
   introduction?: string;
   isLoading: boolean;
+  isFromKakao?: boolean;
+  isPhoneVerified?: boolean;
+  verificationCode?: string;
+  onVerificationCodeChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  timer?: { secondsLeft: number; isRunning: boolean };
+  onSendSmsCode?: () => void;
+  onVerifyCode?: () => void;
   onNameChange: (value: string) => void;
   onEmailChange: (value: string) => void;
   onPasswordChange: (value: string) => void;
@@ -46,9 +53,16 @@ export const SignupForm: React.FC<SignupFormProps> = ({
   businessNumber,
   nickname,
   snsLink,
-    introduction,
-    isLoading,
-    onNameChange,
+  introduction,
+  isLoading,
+  isFromKakao,
+  isPhoneVerified,
+  verificationCode,
+  onVerificationCodeChange,
+  timer,
+  onSendSmsCode,
+  onVerifyCode,
+  onNameChange,
   onEmailChange,
   onPasswordChange,
   onPasswordConfirmChange,
@@ -82,6 +96,13 @@ export const SignupForm: React.FC<SignupFormProps> = ({
         snsLink={snsLink}
         introduction={introduction}
         isLoading={isLoading}
+        isFromKakao={isFromKakao}
+        isPhoneVerified={isPhoneVerified}
+        verificationCode={verificationCode}
+        onVerificationCodeChange={onVerificationCodeChange}
+        timer={timer}
+        onSendSmsCode={onSendSmsCode}
+        onVerifyCode={onVerifyCode}
         onNameChange={onNameChange}
         onEmailChange={onEmailChange}
         onPasswordChange={onPasswordChange}
@@ -97,7 +118,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({
       />
 
       <ButtonSpacer>
-        <Button variant="primary" fullWidth onClick={onSignup} disabled={isLoading}>
+        <Button variant="primary" fullWidth onClick={onSignup} disabled={isLoading || !isPhoneVerified}>
           {isLoading ? '가입 중...' : '회원가입'}
         </Button>
       </ButtonSpacer>

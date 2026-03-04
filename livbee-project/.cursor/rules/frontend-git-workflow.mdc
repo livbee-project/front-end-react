@@ -21,8 +21,10 @@ alwaysApply: true
   - `YYMMDD > front-end > react > 작업내용 한줄 요약`
 - 예시:
   - `260226 > front-end > react > 캠페인 상세 지원 폼 검증 추가`
-- 날짜는 반드시 현재 날짜를 기준으로 하며, Windows 환경에서는 예를 들어 다음과 같이 확인한다고 가정한다:
-  - `Get-Date -Format "yyMMdd"`
+- **날짜(YYMMDD) 규칙 (필수)**:
+  - 커밋 메시지를 제안하거나 커밋을 실행할 때마다 **반드시** 터미널에서 현재 날짜를 조회해 사용한다.
+  - Windows(PowerShell): `Get-Date -Format "yyMMdd"` 실행 결과를 YYMMDD로 사용한다.
+  - user_info, 대화 맥락, 추측으로 날짜를 넣지 않는다. 항상 실행 시점의 시스템 날짜를 사용한다.
 
 ## 3. "커밋 준비" 단계
 
@@ -33,8 +35,10 @@ alwaysApply: true
 2. 스테이징된 내용을 확인한다:
    - `git status`
    - 필요 시 `git diff --staged --stat`
-3. 스테이징된 변경을 종합해 위 포맷에 맞는 커밋 메시지 한 줄을 **제안만 한다**.
-4. 사용자가 메시지를 보고 승인하기 전까지는 `git commit`, `git push`를 실행하지 않는다.
+3. **커밋 메시지에 쓸 YYMMDD를 확정한다:**
+   - 터미널에서 `Get-Date -Format "yyMMdd"`(Windows)를 실행하고, 그 결과를 YYMMDD로 사용한다. 다른 출처의 날짜는 사용하지 않는다.
+4. 스테이징된 변경을 종합해 위 포맷(2번의 YYMMDD 포함)에 맞는 커밋 메시지 한 줄을 **제안만 한다**.
+5. 사용자가 메시지를 보고 승인하기 전까지는 `git commit`, `git push`를 실행하지 않는다.
 
 ## 4. "진행하자" / "커밋해줘" / "푸시해줘" / "커밋/푸시 진행해줘" 승인 시
 

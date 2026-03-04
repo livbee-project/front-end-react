@@ -24,6 +24,10 @@ export const ButtonSpacer = styled.div`
   margin-top: ${({ theme }) => theme.spacing.md};
 `;
 
+export const KakaoButtonWrapper = styled.div`
+  margin-top: ${({ theme }) => theme.spacing.md};
+`;
+
 export const SignUpRow = styled.div`
   display: flex;
   justify-content: center;

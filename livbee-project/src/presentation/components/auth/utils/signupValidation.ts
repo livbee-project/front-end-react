@@ -7,6 +7,7 @@ interface SignupFormData {
   password: string;
   passwordConfirm: string;
   phone: string;
+  kakaoId?: string;
   brandName?: string;
   companyName?: string;
   businessNumber?: string;
@@ -30,16 +31,17 @@ export const validateSignupForm = (data: SignupFormData): string | null => {
     return '올바른 이메일 형식을 입력해주세요.';
   }
 
-  if (!data.password || data.password.length === 0) {
-    return '비밀번호를 입력해주세요.';
-  }
-
-  if (data.password.length < 8) {
-    return '비밀번호는 8자 이상이어야 합니다.';
-  }
-
-  if (data.password !== data.passwordConfirm) {
-    return '비밀번호가 일치하지 않습니다.';
+  const isKakaoSignup = Boolean(data.kakaoId?.trim());
+  if (!isKakaoSignup) {
+    if (!data.password || data.password.length === 0) {
+      return '비밀번호를 입력해주세요.';
+    }
+    if (data.password.length < 8) {
+      return '비밀번호는 8자 이상이어야 합니다.';
+    }
+    if (data.password !== data.passwordConfirm) {
+      return '비밀번호가 일치하지 않습니다.';
+    }
   }
 
   if (!data.phone || data.phone.trim().length === 0) {
@@ -68,27 +70,32 @@ export const buildSignupRequest = (data: SignupFormData): SignupRequest => {
     return trimmed && trimmed.length > 0 ? trimmed : undefined;
   };
 
+  const isKakaoSignup = Boolean(trimOrUndefined(data.kakaoId));
+  const passwordOrUndefined = isKakaoSignup ? undefined : data.password;
+
   if (data.role === 'brand') {
     return {
       name: data.name.trim(),
       email: data.email.trim().toLowerCase(),
-      password: data.password,
+      ...(passwordOrUndefined !== undefined && { password: passwordOrUndefined }),
       role: 'brand',
       phone: phoneWithoutHyphens,
       brandName: data.brandName?.trim() || '',
       companyName: trimOrUndefined(data.companyName),
       businessNumber: trimOrUndefined(data.businessNumber),
+      kakaoId: trimOrUndefined(data.kakaoId),
     };
   }
 
   return {
     name: data.name.trim(),
     email: data.email.trim().toLowerCase(),
-    password: data.password,
+    ...(passwordOrUndefined !== undefined && { password: passwordOrUndefined }),
     role: 'showhost',
     phone: phoneWithoutHyphens,
     nickname: trimOrUndefined(data.nickname),
     snsLink: trimOrUndefined(data.snsLink),
     introduction: trimOrUndefined(data.introduction),
+    kakaoId: trimOrUndefined(data.kakaoId),
   };
 };

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useLoginBubblePosition } from '@/presentation/hooks/common/useLoginBubblePosition';
 import { LoginLogo } from '@/presentation/components/auth/LoginLogo';
@@ -6,7 +6,7 @@ import { UserTypeTabs } from '@/presentation/components/auth/UserTypeTabs';
 import { SignupForm } from '@/presentation/components/auth/SignupForm';
 import { useSignupForm } from '@/presentation/components/auth/hooks/useSignupForm';
 import { PageWrapper } from '@/presentation/pages/auth/styled/LoginPageStyles';
-import type { UserRole } from '@/domain/entities/User';
+import type { UserRole, KakaoUserInfo } from '@/domain/entities/User';
 
 const SignupPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -31,6 +31,14 @@ const SignupPage: React.FC = () => {
     snsLink,
     introduction,
     isLoading,
+    isFromKakao,
+    isPhoneVerified,
+    verificationCode,
+    setVerificationCode,
+    timer,
+    handleSendSmsCode,
+    handleVerifyCode,
+    handleKakaoSuccess,
     setUserType,
     setName,
     setEmail,
@@ -47,6 +55,23 @@ const SignupPage: React.FC = () => {
   } = useSignupForm({
     defaultUserType,
   });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const stored = window.sessionStorage.getItem('kakao_signup_info');
+    if (!stored) return;
+
+    try {
+      const info = JSON.parse(stored) as KakaoUserInfo;
+      handleKakaoSuccess(info);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to parse kakao_signup_info:', error);
+    } finally {
+      window.sessionStorage.removeItem('kakao_signup_info');
+    }
+  }, [handleKakaoSuccess]);
 
   const bubbleLeft = useLoginBubblePosition({
     showhostButtonRef,
@@ -84,6 +109,13 @@ const SignupPage: React.FC = () => {
         snsLink={snsLink}
         introduction={introduction}
         isLoading={isLoading}
+        isFromKakao={isFromKakao}
+        isPhoneVerified={isPhoneVerified}
+        verificationCode={verificationCode}
+        onVerificationCodeChange={(e) => setVerificationCode(e.target.value)}
+        timer={timer}
+        onSendSmsCode={handleSendSmsCode}
+        onVerifyCode={handleVerifyCode}
         onNameChange={setName}
         onEmailChange={setEmail}
         onPasswordChange={setPassword}

@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import Button from '@/presentation/components/ui/Button';
 import InputWrapper from '@/presentation/components/forms/inputs/InputWrapper';
 import { StyledInput } from '@/presentation/components/auth/styled/LoginFormStyles';
 import { PMuted } from '@/presentation/components/styled/Typography';
@@ -45,6 +46,32 @@ const StyledTextarea = styled.textarea`
   }
 `;
 
+const VerificationRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+  margin-top: ${({ theme }) => theme.spacing.sm};
+  flex-wrap: wrap;
+`;
+
+const TimerText = styled.span`
+  font: ${({ theme }) => theme.fonts.caption};
+  color: ${({ theme }) => theme.colors.muted};
+  min-width: 2.5em;
+`;
+
+const VerificationInputRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+  margin-top: ${({ theme }) => theme.spacing.sm};
+`;
+
+const VerificationInput = styled(StyledInput)`
+  flex: 1;
+  min-width: 0;
+`;
+
 interface SignupFormInputsProps {
   userType: UserRole;
   name: string;
@@ -59,6 +86,13 @@ interface SignupFormInputsProps {
   snsLink?: string;
   introduction?: string;
   isLoading: boolean;
+  isFromKakao?: boolean;
+  isPhoneVerified?: boolean;
+  verificationCode?: string;
+  onVerificationCodeChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  timer?: { secondsLeft: number; isRunning: boolean };
+  onSendSmsCode?: () => void;
+  onVerifyCode?: () => void;
   onNameChange: (value: string) => void;
   onEmailChange: (value: string) => void;
   onPasswordChange: (value: string) => void;
@@ -87,6 +121,13 @@ export const SignupFormInputs: React.FC<SignupFormInputsProps> = ({
   snsLink,
   introduction,
   isLoading,
+  isFromKakao,
+  isPhoneVerified,
+  verificationCode = '',
+  onVerificationCodeChange,
+  timer,
+  onSendSmsCode,
+  onVerifyCode,
   onNameChange,
   onEmailChange,
   onPasswordChange,
@@ -105,6 +146,13 @@ export const SignupFormInputs: React.FC<SignupFormInputsProps> = ({
       onEnterPress();
     }
   };
+
+  const timerDisplay =
+    timer?.isRunning && timer.secondsLeft != null
+      ? `${Math.floor(timer.secondsLeft / 60)}:${(timer.secondsLeft % 60).toString().padStart(2, '0')}`
+      : null;
+
+  const showVerificationInput = (timer?.isRunning ?? false) || isPhoneVerified === true;
 
   return (
     <>
@@ -134,39 +182,44 @@ export const SignupFormInputs: React.FC<SignupFormInputsProps> = ({
           value={email}
           onChange={(event) => onEmailChange(event.target.value)}
           onKeyPress={handleKeyPress}
+          readOnly={isFromKakao === true}
           disabled={isLoading}
         />
       </InputWrapper>
 
-      <InputWrapper>
-        <FieldLabel>
-          비밀번호
-          <RequiredBadge>*</RequiredBadge>
-        </FieldLabel>
-        <StyledInput
-          type="password"
-          placeholder="비밀번호를 입력해주세요."
-          value={password}
-          onChange={(event) => onPasswordChange(event.target.value)}
-          onKeyPress={handleKeyPress}
-          disabled={isLoading}
-        />
-      </InputWrapper>
+      {!isFromKakao && (
+        <>
+          <InputWrapper>
+            <FieldLabel>
+              비밀번호
+              <RequiredBadge>*</RequiredBadge>
+            </FieldLabel>
+            <StyledInput
+              type="password"
+              placeholder="비밀번호를 입력해주세요."
+              value={password}
+              onChange={(event) => onPasswordChange(event.target.value)}
+              onKeyPress={handleKeyPress}
+              disabled={isLoading}
+            />
+          </InputWrapper>
 
-      <InputWrapper>
-        <FieldLabel>
-          비밀번호 확인
-          <RequiredBadge>*</RequiredBadge>
-        </FieldLabel>
-        <StyledInput
-          type="password"
-          placeholder="비밀번호를 다시 입력해주세요."
-          value={passwordConfirm}
-          onChange={(event) => onPasswordConfirmChange(event.target.value)}
-          onKeyPress={handleKeyPress}
-          disabled={isLoading}
-        />
-      </InputWrapper>
+          <InputWrapper>
+            <FieldLabel>
+              비밀번호 확인
+              <RequiredBadge>*</RequiredBadge>
+            </FieldLabel>
+            <StyledInput
+              type="password"
+              placeholder="비밀번호를 다시 입력해주세요."
+              value={passwordConfirm}
+              onChange={(event) => onPasswordConfirmChange(event.target.value)}
+              onKeyPress={handleKeyPress}
+              disabled={isLoading}
+            />
+          </InputWrapper>
+        </>
+      )}
 
       <InputWrapper>
         <FieldLabel>
@@ -178,13 +231,49 @@ export const SignupFormInputs: React.FC<SignupFormInputsProps> = ({
           placeholder="전화번호를 입력해주세요. (예: 010-1234-5678)"
           value={formatPhoneNumber(phone)}
           onChange={(event) => {
-            // 입력값에서 숫자만 추출하여 저장 (하이픈 제거)
             const digitsOnly = removePhoneHyphens(event.target.value);
             onPhoneChange(digitsOnly);
           }}
           onKeyPress={handleKeyPress}
           disabled={isLoading}
         />
+        {onSendSmsCode != null && (
+          <>
+            <VerificationRow>
+              <Button
+                variant="outline"
+                size="small"
+                onClick={onSendSmsCode}
+                disabled={isPhoneVerified === true || timer?.isRunning === true || isLoading}
+                type="button"
+              >
+                인증번호 받기
+              </Button>
+              {timerDisplay != null && <TimerText>{timerDisplay}</TimerText>}
+            </VerificationRow>
+            {showVerificationInput && onVerifyCode != null && onVerificationCodeChange != null && (
+              <VerificationInputRow>
+                <VerificationInput
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="인증번호 6자리"
+                  value={verificationCode}
+                  onChange={onVerificationCodeChange}
+                  disabled={isLoading}
+                />
+                <Button
+                  variant="primary"
+                  size="small"
+                  onClick={onVerifyCode}
+                  disabled={!verificationCode.trim() || isLoading}
+                  type="button"
+                >
+                  인증하기
+                </Button>
+              </VerificationInputRow>
+            )}
+          </>
+        )}
       </InputWrapper>
 
       {userType === 'brand' && (

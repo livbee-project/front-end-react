@@ -1,4 +1,4 @@
-import { buildApiUrl, getAuthHeaders } from '@/shared/config/apiConfig';
+import { buildApiUrl, DEFAULT_HEADERS, getAuthHeaders } from '@/shared/config/apiConfig';
 import { fetchApi, handleAuthError } from '@/shared/utils/apiClient';
 import type {
   LoginRequest,
@@ -154,6 +154,41 @@ export class UserApiSource implements IUserApiSource {
     } catch (error) {
       throw handleAuthError(error, '내 정보 조회에 실패했습니다.');
     }
+  }
+
+  /**
+   * 인증번호 발송 (비인증 공개 엔드포인트)
+   * @param phone - 휴대폰 번호
+   */
+  async sendSms(phone: string): Promise<void> {
+    const url = buildApiUrl('/auth/send-sms');
+    await fetchApi<void>(
+      url,
+      {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify({ phoneNumber: phone }),
+      },
+      '인증번호 발송'
+    );
+  }
+
+  /**
+   * 인증번호 확인 (비인증 공개 엔드포인트)
+   * @param phone - 휴대폰 번호
+   * @param code - 인증번호
+   */
+  async verifySms(phone: string, code: string): Promise<void> {
+    const url = buildApiUrl('/auth/verify-sms');
+    await fetchApi<void>(
+      url,
+      {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify({ phoneNumber: phone, code }),
+      },
+      '인증번호 확인'
+    );
   }
 }
 

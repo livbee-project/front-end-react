@@ -13,5 +13,7 @@ export interface IUserApiSource {
   login(request: LoginRequest): Promise<LoginResponse>;
   signup(request: SignupRequest): Promise<SignupResponse>;
   getMe(signal?: AbortSignal): Promise<MeResponse>;
+  sendSms(phone: string): Promise<void>;
+  verifySms(phone: string, code: string): Promise<void>;
 }
 

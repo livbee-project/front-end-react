@@ -54,5 +54,27 @@ export class UserRepository extends BaseRepository {
       '내 정보 조회'
     );
   }
+
+  /**
+   * 인증번호 발송
+   */
+  async sendSms(phone: string): Promise<void> {
+    return this.handleError(
+      () => this.apiSource.sendSms(phone),
+      'UserRepository',
+      '인증번호 발송'
+    );
+  }
+
+  /**
+   * 인증번호 확인
+   */
+  async verifySms(phone: string, code: string): Promise<void> {
+    return this.handleError(
+      () => this.apiSource.verifySms(phone, code),
+      'UserRepository',
+      '인증번호 확인'
+    );
+  }
 }
 

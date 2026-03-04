@@ -49,6 +49,7 @@ const MyAppliedCampaignsPage = lazyWithRetry(() => import('@/presentation/pages/
 const MessagesPage = lazyWithRetry(() => import('@/presentation/pages/message/MessagesPage'));
 const LoginPage = lazyWithRetry(() => import('@/presentation/pages/auth/LoginPage'));
 const SignupPage = lazyWithRetry(() => import('@/presentation/pages/auth/SignupPage'));
+const KakaoCallbackPage = lazyWithRetry(() => import('@/presentation/pages/auth/KakaoCallbackPage'));
 const ImageCropPage = lazyWithRetry(() => import('@/presentation/pages/image/ImageCropPage'));
 const ChatRoomPage = lazyWithRetry(() => import('@/presentation/pages/chat/ChatRoomPage'));
 
@@ -198,6 +199,9 @@ const AppRouter = () => (
               </AuthGuard>
             }
           />
+          {/* 카카오 로그인 팝업 콜백 (회원가입 플로우) - 레이아웃 없이 표시 */}
+          <Route path={ROUTE_PATHS.kakaoCallback} element={<KakaoCallbackPage />} />
+          <Route path="/signup/kakao-callback" element={<KakaoCallbackPage />} />
         </Route>
 
         {/* 이미지 크롭 페이지 - 레이아웃 없이 전체 화면 (하단 네비게이션 없음) */}

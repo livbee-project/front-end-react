@@ -12,6 +12,8 @@ interface LoginFormProps {
   onPasswordChange: (value: string) => void;
   onLogin: () => void;
   onSignUp: () => void;
+  onKakaoClick?: () => void;
+  isKakaoLoading?: boolean;
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({
@@ -22,6 +24,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   onPasswordChange,
   onLogin,
   onSignUp,
+  onKakaoClick,
+  isKakaoLoading,
 }) => (
   <FormContainer>
     <LoginFormInputs
@@ -39,7 +43,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       </Button>
     </ButtonSpacer>
 
-    <LoginFormFooter onSignUp={onSignUp} />
+    <LoginFormFooter
+      onSignUp={onSignUp}
+      onKakaoClick={onKakaoClick}
+      isKakaoLoading={isKakaoLoading}
+    />
   </FormContainer>
 );
 
