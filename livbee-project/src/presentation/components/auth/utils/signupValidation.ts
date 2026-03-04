@@ -1,5 +1,5 @@
 import type { SignupRequest } from '@/domain/entities/User';
-import { removePhoneHyphens } from '@/shared/utils/formatUtils';
+import { getBusinessNumberDigits, removePhoneHyphens } from '@/shared/utils/formatUtils';
 
 interface SignupFormData {
   name: string;
@@ -56,6 +56,13 @@ export const validateSignupForm = (data: SignupFormData): string | null => {
   if (data.role === 'brand') {
     if (!data.brandName || data.brandName.trim().length === 0) {
       return '브랜드명을 입력해주세요.';
+    }
+
+    if (data.businessNumber) {
+      const businessDigits = getBusinessNumberDigits(data.businessNumber);
+      if (businessDigits.length > 0 && businessDigits.length !== 10) {
+        return '사업자등록번호를 10자리로 입력해주세요.';
+      }
     }
   }
 

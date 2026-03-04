@@ -4,6 +4,7 @@ import type {
   SignupRequest,
   SignupResponse,
   MeResponse,
+  BusinessVerificationResult,
 } from '@/domain/entities/User';
 
 /**
@@ -15,5 +16,10 @@ export interface IUserApiSource {
   getMe(signal?: AbortSignal): Promise<MeResponse>;
   sendSms(phone: string): Promise<void>;
   verifySms(phone: string, code: string): Promise<void>;
+  verifyBusiness(
+    businessNumber: string,
+    openingDate?: string,
+    representativeName?: string
+  ): Promise<BusinessVerificationResult>;
 }
 

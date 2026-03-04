@@ -4,8 +4,8 @@ import Button from '@/presentation/components/ui/Button';
 import InputWrapper from '@/presentation/components/forms/inputs/InputWrapper';
 import { StyledInput } from '@/presentation/components/auth/styled/LoginFormStyles';
 import { PMuted } from '@/presentation/components/styled/Typography';
-import { formatPhoneNumber, removePhoneHyphens } from '@/shared/utils/formatUtils';
-import type { UserRole } from '@/domain/entities/User';
+import { formatBusinessNumber, formatPhoneNumber, removePhoneHyphens } from '@/shared/utils/formatUtils';
+import type { UserRole, BusinessVerificationResult } from '@/domain/entities/User';
 
 const FieldLabel = styled(PMuted)`
   font-weight: 600;
@@ -100,6 +100,33 @@ const VerifySubmitButton = styled(Button)`
   font-size: ${({ theme }) => theme.input.fontSize};
 `;
 
+/** 사업자 진위 확인 버튼 */
+const BusinessVerifyButton = styled(Button)`
+  font-size: ${({ theme }) => theme.input.fontSize};
+  &:disabled {
+    background-color: ${({ theme }) => theme.colors.border};
+    color: ${({ theme }) => theme.colors.muted};
+    cursor: not-allowed;
+  }
+`;
+
+const BusinessNumberRow = styled.div`
+  display: flex;
+  align-items: stretch;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const BusinessNumberInput = styled(StyledInput)`
+  flex: 1;
+  min-width: 0;
+`;
+
+const BusinessVerificationMessage = styled.div<{ $valid?: boolean }>`
+  margin-top: ${({ theme }) => theme.spacing.sm};
+  font-size: 13px;
+  color: ${({ theme, $valid }) => ($valid === true ? theme.colors.primary : $valid === false ? theme.colors.error : theme.colors.muted)};
+`;
+
 interface SignupFormInputsProps {
   userType: UserRole;
   name: string;
@@ -130,6 +157,13 @@ interface SignupFormInputsProps {
   onBrandNameChange?: (value: string) => void;
   onCompanyNameChange?: (value: string) => void;
   onBusinessNumberChange?: (value: string) => void;
+  openingDate?: string;
+  representativeName?: string;
+  onOpeningDateChange?: (value: string) => void;
+  onRepresentativeNameChange?: (value: string) => void;
+  businessVerificationResult?: BusinessVerificationResult | null;
+  onVerifyBusiness?: () => void;
+  isVerifyingBusiness?: boolean;
   onNicknameChange?: (value: string) => void;
   onSnsLinkChange?: (value: string) => void;
   onIntroductionChange?: (value: string) => void;
@@ -166,6 +200,13 @@ export const SignupFormInputs: React.FC<SignupFormInputsProps> = ({
   onBrandNameChange,
   onCompanyNameChange,
   onBusinessNumberChange,
+  openingDate = '',
+  representativeName = '',
+  onOpeningDateChange,
+  onRepresentativeNameChange,
+  businessVerificationResult = null,
+  onVerifyBusiness,
+  isVerifyingBusiness = false,
   onNicknameChange,
   onSnsLinkChange,
   onIntroductionChange,
@@ -192,6 +233,15 @@ export const SignupFormInputs: React.FC<SignupFormInputsProps> = ({
   const requestButtonLabel = isPhoneVerified ? '인증 완료' : hasRequestedCode ? '재요청' : '인증요청';
   const requestButtonDisabled =
     isPhoneVerified || !isPhoneValid || (timer?.isRunning === true) || isLoading;
+
+  const isBusinessVerified = businessVerificationResult?.valid === true;
+  const businessVerifyButtonLabel = isBusinessVerified
+    ? '완료'
+    : isVerifyingBusiness
+      ? '확인 중...'
+      : '확인';
+  const businessVerifyButtonDisabled =
+    isVerifyingBusiness || isLoading || businessNumber?.length !== 10 || isBusinessVerified;
 
   return (
     <>
@@ -353,15 +403,35 @@ export const SignupFormInputs: React.FC<SignupFormInputsProps> = ({
 
           <InputWrapper>
             <FieldLabel>사업자등록번호</FieldLabel>
-            <StyledInput
-              type="text"
-              placeholder="사업자등록번호를 입력해주세요."
-              value={businessNumber || ''}
-              onChange={(event) => onBusinessNumberChange?.(event.target.value)}
-              onKeyPress={handleKeyPress}
-              disabled={isLoading}
-            />
+            <BusinessNumberRow>
+              <BusinessNumberInput
+                type="text"
+                inputMode="numeric"
+                placeholder="사업자등록번호 10자리"
+                value={formatBusinessNumber(businessNumber || '')}
+                onChange={(event) => onBusinessNumberChange?.(event.target.value)}
+                onKeyPress={handleKeyPress}
+                disabled={isLoading}
+              />
+              {onVerifyBusiness != null && (
+                <BusinessVerifyButton
+                  variant="primary"
+                  size="small"
+                  onClick={onVerifyBusiness}
+                  disabled={businessVerifyButtonDisabled}
+                  type="button"
+                >
+                  {businessVerifyButtonLabel}
+                </BusinessVerifyButton>
+              )}
+            </BusinessNumberRow>
+            {businessVerificationResult != null && businessVerificationResult.valid === false && (
+              <BusinessVerificationMessage $valid={false}>
+                국세청 기준으로 등록이 없거나, 폐업/휴업 상태일 수 있습니다.
+              </BusinessVerificationMessage>
+            )}
           </InputWrapper>
+
         </>
       )}
 

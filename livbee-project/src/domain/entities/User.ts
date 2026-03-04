@@ -102,6 +102,38 @@ export interface SignupResponse {
 }
 
 /**
+ * 사업자등록번호 진위 확인/상태 조회 결과
+ */
+export interface BusinessVerificationResult {
+  /**
+   * 국세청 기준 유효한 계속사업자인지 여부
+   * - true: 계속사업자(활성)
+   * - false: 폐업/휴업 등 비활성 또는 조회 결과 없음
+   */
+  valid: boolean;
+  /**
+   * 숫자만 포함된 10자리 사업자등록번호
+   */
+  businessNumber: string;
+  /**
+   * 사업자 상태 설명 (예: "계속사업자")
+   */
+  status?: string;
+  /**
+   * 사업자 상태 코드 (예: "01")
+   */
+  statusCode?: string;
+  /**
+   * 과세유형 설명 (예: "부가가치세 일반과세자")
+   */
+  taxType?: string;
+  /**
+   * 과세유형 코드 (예: "01")
+   */
+  taxTypeCode?: string;
+}
+
+/**
  * 내 정보 조회 응답 타입
  */
 export interface MeResponse {

@@ -3,7 +3,7 @@ import Button from '@/presentation/components/ui/Button';
 import { SignupFormInputs } from '@/presentation/components/auth/SignupFormInputs';
 import { SignupFormFooter } from '@/presentation/components/auth/SignupFormFooter';
 import { FormContainer, ButtonSpacer } from '@/presentation/components/auth/styled/LoginFormStyles';
-import type { UserRole } from '@/domain/entities/User';
+import type { UserRole, BusinessVerificationResult } from '@/domain/entities/User';
 
 interface SignupFormProps {
   userType: UserRole;
@@ -35,6 +35,13 @@ interface SignupFormProps {
   onBrandNameChange?: (value: string) => void;
   onCompanyNameChange?: (value: string) => void;
   onBusinessNumberChange?: (value: string) => void;
+  openingDate?: string;
+  representativeName?: string;
+  onOpeningDateChange?: (value: string) => void;
+  onRepresentativeNameChange?: (value: string) => void;
+  businessVerificationResult?: BusinessVerificationResult | null;
+  onVerifyBusiness?: () => void;
+  isVerifyingBusiness?: boolean;
   onNicknameChange?: (value: string) => void;
   onSnsLinkChange?: (value: string) => void;
   onIntroductionChange?: (value: string) => void;
@@ -52,6 +59,13 @@ export const SignupForm: React.FC<SignupFormProps> = ({
   brandName,
   companyName,
   businessNumber,
+  openingDate,
+  representativeName,
+  onOpeningDateChange,
+  onRepresentativeNameChange,
+  businessVerificationResult,
+  onVerifyBusiness,
+  isVerifyingBusiness,
   nickname,
   snsLink,
   introduction,
@@ -82,6 +96,11 @@ export const SignupForm: React.FC<SignupFormProps> = ({
     onLoginClick();
   };
 
+  const isBusinessVerificationRequired = userType === 'brand' && Boolean(businessNumber);
+  const isBusinessVerified = businessVerificationResult?.valid === true;
+  const isSignupDisabled =
+    isLoading || !isPhoneVerified || (isBusinessVerificationRequired && !isBusinessVerified);
+
   return (
     <FormContainer>
       <SignupFormInputs
@@ -94,6 +113,13 @@ export const SignupForm: React.FC<SignupFormProps> = ({
         brandName={brandName}
         companyName={companyName}
         businessNumber={businessNumber}
+        openingDate={openingDate}
+        representativeName={representativeName}
+        onOpeningDateChange={onOpeningDateChange}
+        onRepresentativeNameChange={onRepresentativeNameChange}
+        businessVerificationResult={businessVerificationResult}
+        onVerifyBusiness={onVerifyBusiness}
+        isVerifyingBusiness={isVerifyingBusiness}
         nickname={nickname}
         snsLink={snsLink}
         introduction={introduction}
@@ -121,7 +147,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({
       />
 
       <ButtonSpacer>
-        <Button variant="primary" fullWidth onClick={onSignup} disabled={isLoading || !isPhoneVerified}>
+        <Button variant="primary" fullWidth onClick={onSignup} disabled={isSignupDisabled}>
           {isLoading ? '가입 중...' : '회원가입'}
         </Button>
       </ButtonSpacer>

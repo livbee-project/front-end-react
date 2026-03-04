@@ -66,6 +66,32 @@ export const removePhoneHyphens = (value: string): string => {
 };
 
 /**
+ * 사업자등록번호에서 숫자만 추출 (최대 10자리)
+ * @param value - 사업자등록번호 문자열 (하이픈 포함 가능)
+ * @returns 숫자만 포함된 문자열
+ */
+export const getBusinessNumberDigits = (value: string): string => {
+  return value.replace(/\D/g, '').slice(0, 10);
+};
+
+/**
+ * 사업자등록번호를 하이픈이 포함된 형식으로 포맷팅 (3-2-5 형식)
+ * @param value - 사업자등록번호 문자열
+ * @returns 포맷팅된 사업자등록번호 (예: 123-45-67890)
+ */
+export const formatBusinessNumber = (value: string): string => {
+  const digits = getBusinessNumberDigits(value);
+
+  if (digits.length <= 3) {
+    return digits;
+  }
+  if (digits.length <= 5) {
+    return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  }
+  return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5)}`;
+};
+
+/**
  * 수수료를 포맷팅합니다.
  * @param fee - 수수료 (원 단위)
  * @returns 포맷팅된 수수료 문자열

@@ -27,6 +27,13 @@ const SignupPage: React.FC = () => {
     brandName,
     companyName,
     businessNumber,
+    openingDate,
+    representativeName,
+    setOpeningDate,
+    setRepresentativeName,
+    businessVerificationResult,
+    handleVerifyBusiness,
+    isVerifyingBusiness,
     nickname,
     snsLink,
     introduction,
@@ -106,6 +113,13 @@ const SignupPage: React.FC = () => {
         brandName={brandName}
         companyName={companyName}
         businessNumber={businessNumber}
+        openingDate={openingDate}
+        representativeName={representativeName}
+        onOpeningDateChange={setOpeningDate}
+        onRepresentativeNameChange={setRepresentativeName}
+        businessVerificationResult={businessVerificationResult}
+        onVerifyBusiness={handleVerifyBusiness}
+        isVerifyingBusiness={isVerifyingBusiness}
         nickname={nickname}
         snsLink={snsLink}
         introduction={introduction}

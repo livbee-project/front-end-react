@@ -6,6 +6,7 @@ import type {
   SignupRequest,
   SignupResponse,
   MeResponse,
+  BusinessVerificationResult,
 } from '@/domain/entities/User';
 
 import type { IUserApiSource } from '@/data/sources/interfaces/IUserApiSource';
@@ -188,6 +189,44 @@ export class UserApiSource implements IUserApiSource {
         body: JSON.stringify({ phoneNumber: phone, code }),
       },
       '인증번호 확인'
+    );
+  }
+
+  /**
+   * 사업자등록번호 진위 확인 / 상태조회 (비인증 공개 엔드포인트)
+   * @param businessNumber - 사업자등록번호 (숫자 10자리 또는 하이픈 포함)
+   * @param openingDate - 개업일자(YYYYMMDD, 선택)
+   * @param representativeName - 대표자명(선택)
+   */
+  async verifyBusiness(
+    businessNumber: string,
+    openingDate?: string,
+    representativeName?: string
+  ): Promise<BusinessVerificationResult> {
+    const url = buildApiUrl('/auth/verify-business');
+    const payload: {
+      businessNumber: string;
+      openingDate?: string;
+      representativeName?: string;
+    } = {
+      businessNumber,
+    };
+
+    if (openingDate) {
+      payload.openingDate = openingDate;
+    }
+    if (representativeName) {
+      payload.representativeName = representativeName;
+    }
+
+    return await fetchApi<BusinessVerificationResult>(
+      url,
+      {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify(payload),
+      },
+      '사업자 진위 확인'
     );
   }
 }

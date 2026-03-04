@@ -6,6 +6,7 @@ import type {
   SignupRequest,
   SignupResponse,
   MeResponse,
+  BusinessVerificationResult,
 } from '@/domain/entities/User';
 import { BaseRepository } from '@/data/repositories/BaseRepository';
 
@@ -74,6 +75,21 @@ export class UserRepository extends BaseRepository {
       () => this.apiSource.verifySms(phone, code),
       'UserRepository',
       '인증번호 확인'
+    );
+  }
+
+  /**
+   * 사업자등록번호 진위 확인 / 상태조회
+   */
+  async verifyBusiness(
+    businessNumber: string,
+    openingDate?: string,
+    representativeName?: string
+  ): Promise<BusinessVerificationResult> {
+    return this.handleError(
+      () => this.apiSource.verifyBusiness(businessNumber, openingDate, representativeName),
+      'UserRepository',
+      '사업자 진위 확인'
     );
   }
 }
