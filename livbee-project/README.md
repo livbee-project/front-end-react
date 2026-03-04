@@ -158,6 +158,9 @@ npm run dev
 # 개발 서버 실행
 npm run dev
 
+# 타입 체크 + 빌드 (CI와 동일 수준 사전 점검)
+npm run check
+
 # 프로덕션 빌드
 npm run build
 
@@ -196,6 +199,20 @@ import { Button } from '../../../components/ui/Button';
 - **TypeScript**: 엄격한 타입 체크 사용
 - **ESLint**: 코드 품질 검사
 - **Prettier**: 코드 포맷팅 (설정 파일 참조)
+
+### 배포 전 체크 리스트 (재발 방지)
+
+- **1️⃣ 타입/빌드 오류 사전 확인**
+  - `dev` 브랜치로 푸시하기 전에 항상 아래 명령을 한 번씩 실행합니다.
+  - `npm run check` → 내부에서 `npm run lint && npm run build`를 순서대로 실행합니다.
+  - Vercel에서 실행되는 타입 체크/빌드와 동일 수준이라, 여기서 통과하면 TS6133 같은 오류가 배포 단계에서 새로 터질 가능성이 거의 없습니다.
+
+- **2️⃣ 사용하지 않는 변수/props 처리 규칙**
+  - TypeScript 설정에서 `noUnusedLocals`, `noUnusedParameters`가 **강하게 활성화**되어 있어,
+    사용되지 않는 변수/파라미터/props는 모두 에러로 잡힙니다.
+  - 의도적으로 아직 쓰지 않는 props/파라미터는 다음처럼 언더스코어(`_`)를 접두사로 붙여 주세요.
+    - 예: `function MyComponent({ _openingDate }: Props) { ... }`
+  - 이렇게 하면 "나중에 사용할 의도"는 남기면서도, TS 빌드 에러 없이 코드를 점진적으로 추가할 수 있습니다.
 
 ## 🏗 아키텍처
 
