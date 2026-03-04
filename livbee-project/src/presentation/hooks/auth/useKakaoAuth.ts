@@ -108,7 +108,7 @@ export interface UseKakaoAuthReturn {
  * 호출 측에서 setName/setEmail 등으로 폼에 반영하면 됩니다.
  */
 export function useKakaoAuth(): UseKakaoAuthReturn {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const sdkReadyRef = useRef(false);
   const { showToast } = useToast();
 
@@ -126,18 +126,25 @@ export function useKakaoAuth(): UseKakaoAuthReturn {
       });
   }, []);
 
-  const loginWithKakao = useCallback((): Promise<KakaoUserInfo> => {
+  const loginWithKakao = useCallback(async (): Promise<KakaoUserInfo> => {
     const apiKey = import.meta.env.VITE_KAKAO_JS_KEY as string | undefined;
     if (!apiKey?.trim()) {
       const err = new Error('VITE_KAKAO_JS_KEY가 설정되지 않았습니다.');
       showToast(err.message, undefined, 'error');
-      return Promise.reject(err);
+      throw err;
     }
 
     if (!sdkReadyRef.current || !window.Kakao) {
-      const err = new Error('카카오 SDK가 준비되지 않았습니다. 잠시 후 다시 시도해 주세요.');
-      showToast(err.message, undefined, 'error');
-      return Promise.reject(err);
+      setIsLoading(true);
+      try {
+        await ensureKakaoReady(apiKey);
+        sdkReadyRef.current = true;
+      } catch (err) {
+        setIsLoading(false);
+        const message = err instanceof Error ? err.message : '카카오 SDK 준비에 실패했습니다.';
+        showToast(message, undefined, 'error');
+        throw err;
+      }
     }
 
     setIsLoading(true);
