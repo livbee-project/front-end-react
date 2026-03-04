@@ -24,6 +24,7 @@ interface SignupFormProps {
   verificationCode?: string;
   onVerificationCodeChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   timer?: { secondsLeft: number; isRunning: boolean };
+  hasRequestedCode?: boolean;
   onSendSmsCode?: () => void;
   onVerifyCode?: () => void;
   onNameChange: (value: string) => void;
@@ -60,6 +61,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({
   verificationCode,
   onVerificationCodeChange,
   timer,
+  hasRequestedCode,
   onSendSmsCode,
   onVerifyCode,
   onNameChange,
@@ -101,6 +103,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({
         verificationCode={verificationCode}
         onVerificationCodeChange={onVerificationCodeChange}
         timer={timer}
+        hasRequestedCode={hasRequestedCode}
         onSendSmsCode={onSendSmsCode}
         onVerifyCode={onVerifyCode}
         onNameChange={onNameChange}

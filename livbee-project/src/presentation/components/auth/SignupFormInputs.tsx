@@ -46,30 +46,58 @@ const StyledTextarea = styled.textarea`
   }
 `;
 
-const VerificationRow = styled.div`
+const PhoneInputRow = styled.div`
+  display: flex;
+  align-items: stretch;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const PhoneInput = styled(StyledInput)`
+  flex: 1;
+  min-width: 0;
+`;
+
+/** 전화번호 인증 요청 버튼 - 전화번호 입력 필드와 동일한 글자 크기, 비활성화 시 색상 구분 */
+const VerifyRequestButton = styled(Button)`
+  font-size: ${({ theme }) => theme.input.fontSize};
+  &:disabled {
+    background-color: ${({ theme }) => theme.colors.border};
+    color: ${({ theme }) => theme.colors.muted};
+    cursor: not-allowed;
+  }
+`;
+
+/** 인증번호 발송 안내 + 타이머 (인증번호 입력 필드 위) */
+const VerificationMessageRow = styled.div`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing.sm};
   margin-top: ${({ theme }) => theme.spacing.sm};
-  flex-wrap: wrap;
-`;
-
-const TimerText = styled.span`
   font: ${({ theme }) => theme.fonts.caption};
   color: ${({ theme }) => theme.colors.muted};
+`;
+
+const TimerTextRed = styled.span`
+  font: ${({ theme }) => theme.fonts.caption};
+  color: ${({ theme }) => theme.colors.error};
   min-width: 2.5em;
 `;
 
 const VerificationInputRow = styled.div`
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: ${({ theme }) => theme.spacing.sm};
-  margin-top: ${({ theme }) => theme.spacing.sm};
+  margin-top: ${({ theme }) => theme.spacing.xs};
 `;
 
 const VerificationInput = styled(StyledInput)`
   flex: 1;
   min-width: 0;
+`;
+
+/** 인증하기 버튼 - 인증요청 버튼과 동일한 글자 크기·높이 */
+const VerifySubmitButton = styled(Button)`
+  font-size: ${({ theme }) => theme.input.fontSize};
 `;
 
 interface SignupFormInputsProps {
@@ -91,6 +119,7 @@ interface SignupFormInputsProps {
   verificationCode?: string;
   onVerificationCodeChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   timer?: { secondsLeft: number; isRunning: boolean };
+  hasRequestedCode?: boolean;
   onSendSmsCode?: () => void;
   onVerifyCode?: () => void;
   onNameChange: (value: string) => void;
@@ -126,6 +155,7 @@ export const SignupFormInputs: React.FC<SignupFormInputsProps> = ({
   verificationCode = '',
   onVerificationCodeChange,
   timer,
+  hasRequestedCode = false,
   onSendSmsCode,
   onVerifyCode,
   onNameChange,
@@ -148,11 +178,20 @@ export const SignupFormInputs: React.FC<SignupFormInputsProps> = ({
   };
 
   const timerDisplay =
-    timer?.isRunning && timer.secondsLeft != null
+    timer != null && timer.secondsLeft != null
       ? `${Math.floor(timer.secondsLeft / 60)}:${(timer.secondsLeft % 60).toString().padStart(2, '0')}`
       : null;
 
-  const showVerificationInput = (timer?.isRunning ?? false) || isPhoneVerified === true;
+  const phoneDigits = removePhoneHyphens(phone.trim());
+  const isPhoneValid = phoneDigits.length >= 10 && phoneDigits.length <= 11;
+
+  const showVerificationBlock = hasRequestedCode;
+  const showMessageAndTimer = hasRequestedCode && !isPhoneVerified;
+  const showInputAndVerifyButton = hasRequestedCode && !isPhoneVerified;
+
+  const requestButtonLabel = isPhoneVerified ? '인증 완료' : hasRequestedCode ? '재요청' : '인증요청';
+  const requestButtonDisabled =
+    isPhoneVerified || !isPhoneValid || (timer?.isRunning === true) || isLoading;
 
   return (
     <>
@@ -226,32 +265,39 @@ export const SignupFormInputs: React.FC<SignupFormInputsProps> = ({
           전화번호
           <RequiredBadge>*</RequiredBadge>
         </FieldLabel>
-        <StyledInput
-          type="tel"
-          placeholder="전화번호를 입력해주세요. (예: 010-1234-5678)"
-          value={formatPhoneNumber(phone)}
-          onChange={(event) => {
-            const digitsOnly = removePhoneHyphens(event.target.value);
-            onPhoneChange(digitsOnly);
-          }}
-          onKeyPress={handleKeyPress}
-          disabled={isLoading}
-        />
-        {onSendSmsCode != null && (
+        <PhoneInputRow>
+          <PhoneInput
+            type="tel"
+            placeholder="전화번호를 입력해주세요."
+            value={formatPhoneNumber(phone)}
+            onChange={(event) => {
+              const digitsOnly = removePhoneHyphens(event.target.value);
+              onPhoneChange(digitsOnly);
+            }}
+            onKeyPress={handleKeyPress}
+            disabled={isLoading}
+          />
+          {onSendSmsCode != null && (
+            <VerifyRequestButton
+              variant="primary"
+              size="small"
+              onClick={onSendSmsCode}
+              disabled={requestButtonDisabled}
+              type="button"
+            >
+              {requestButtonLabel}
+            </VerifyRequestButton>
+          )}
+        </PhoneInputRow>
+        {onSendSmsCode != null && showVerificationBlock && (
           <>
-            <VerificationRow>
-              <Button
-                variant="outline"
-                size="small"
-                onClick={onSendSmsCode}
-                disabled={isPhoneVerified === true || timer?.isRunning === true || isLoading}
-                type="button"
-              >
-                인증번호 받기
-              </Button>
-              {timerDisplay != null && <TimerText>{timerDisplay}</TimerText>}
-            </VerificationRow>
-            {showVerificationInput && onVerifyCode != null && onVerificationCodeChange != null && (
+            {showMessageAndTimer && (
+              <VerificationMessageRow>
+                <span>인증번호 발송했습니다.</span>
+                {timerDisplay != null && <TimerTextRed>{timerDisplay}</TimerTextRed>}
+              </VerificationMessageRow>
+            )}
+            {showInputAndVerifyButton && onVerifyCode != null && onVerificationCodeChange != null && (
               <VerificationInputRow>
                 <VerificationInput
                   type="text"
@@ -261,7 +307,7 @@ export const SignupFormInputs: React.FC<SignupFormInputsProps> = ({
                   onChange={onVerificationCodeChange}
                   disabled={isLoading}
                 />
-                <Button
+                <VerifySubmitButton
                   variant="primary"
                   size="small"
                   onClick={onVerifyCode}
@@ -269,7 +315,7 @@ export const SignupFormInputs: React.FC<SignupFormInputsProps> = ({
                   type="button"
                 >
                   인증하기
-                </Button>
+                </VerifySubmitButton>
               </VerificationInputRow>
             )}
           </>

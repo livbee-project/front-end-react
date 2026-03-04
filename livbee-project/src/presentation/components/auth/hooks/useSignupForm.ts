@@ -36,6 +36,8 @@ interface UseSignupFormReturn {
   verificationCode: string;
   setVerificationCode: (value: string) => void;
   timer: { secondsLeft: number; isRunning: boolean; start: () => void; reset: () => void };
+  /** 인증요청을 한 번이라도 했으면 true (재요청 문구·인증번호 필드 노출용) */
+  hasRequestedCode: boolean;
   setUserType: (type: UserRole) => void;
   setName: (value: string) => void;
   setEmail: (value: string) => void;
@@ -83,12 +85,14 @@ export const useSignupForm = ({
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
   const [kakaoId, setKakaoId] = useState('');
+  const [hasRequestedCode, setHasRequestedCode] = useState(false);
 
   const setPhone = useCallback(
     (value: string) => {
       setPhoneState(value);
       setIsPhoneVerified(false);
       setVerificationCode('');
+      setHasRequestedCode(false);
       timer.reset();
     },
     [timer]
@@ -102,6 +106,7 @@ export const useSignupForm = ({
     }
     try {
       await userRepository.sendSms(digits);
+      setHasRequestedCode(true);
       timer.start();
       showToast('인증번호가 발송되었습니다.', undefined, 'success');
     } catch {
@@ -223,6 +228,7 @@ export const useSignupForm = ({
     verificationCode,
     setVerificationCode,
     timer,
+    hasRequestedCode,
     setUserType,
     setName,
     setEmail,

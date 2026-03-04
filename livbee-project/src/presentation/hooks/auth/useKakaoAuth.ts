@@ -51,12 +51,31 @@ function getRedirectUri(): string {
   return '';
 }
 
-function loadScript(src: string): Promise<void> {
+/** 이미 삽입된 스크립트는 로드 완료 시점까지 대기(폴링). 첫 클릭 시 SDK 미준비 문제 방지. */
+function waitForKakaoReady(timeoutMs = 10000): Promise<void> {
+  const start = Date.now();
   return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) {
-      resolve();
-      return;
-    }
+    const tick = () => {
+      if (typeof window !== 'undefined' && window.Kakao) {
+        resolve();
+        return;
+      }
+      if (Date.now() - start >= timeoutMs) {
+        reject(new Error('카카오 SDK 로드 대기 시간이 초과되었습니다.'));
+        return;
+      }
+      setTimeout(tick, 50);
+    };
+    tick();
+  });
+}
+
+function loadScript(src: string): Promise<void> {
+  const existing = document.querySelector<HTMLScriptElement>(`script[src="${src}"]`);
+  if (existing) {
+    return waitForKakaoReady();
+  }
+  return new Promise((resolve, reject) => {
     const script = document.createElement('script');
     script.src = src;
     script.async = true;

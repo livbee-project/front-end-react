@@ -36,6 +36,7 @@ const SignupPage: React.FC = () => {
     verificationCode,
     setVerificationCode,
     timer,
+    hasRequestedCode,
     handleSendSmsCode,
     handleVerifyCode,
     handleKakaoSuccess,
@@ -114,6 +115,7 @@ const SignupPage: React.FC = () => {
         verificationCode={verificationCode}
         onVerificationCodeChange={(e) => setVerificationCode(e.target.value)}
         timer={timer}
+        hasRequestedCode={hasRequestedCode}
         onSendSmsCode={handleSendSmsCode}
         onVerifyCode={handleVerifyCode}
         onNameChange={setName}
