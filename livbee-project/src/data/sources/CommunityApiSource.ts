@@ -139,7 +139,7 @@ export class CommunityApiSource implements ICommunityApiSource {
     postId: string,
     payload: CreateCommunityCommentRequest,
     signal?: AbortSignal
-  ): Promise<CommunityCommentListResponse> {
+  ): Promise<void> {
     const url = buildApiUrl(`/community/posts/${postId}/comments`);
     const headers = getAuthHeaders();
 
@@ -160,7 +160,7 @@ export class CommunityApiSource implements ICommunityApiSource {
     commentId: string,
     payload: UpdateCommunityCommentRequest,
     signal?: AbortSignal
-  ): Promise<CommunityCommentListResponse> {
+  ): Promise<void> {
     const url = buildApiUrl(`/community/posts/comments/${commentId}`);
     const headers = getAuthHeaders();
 
@@ -176,7 +176,7 @@ export class CommunityApiSource implements ICommunityApiSource {
     );
   }
 
-  async deleteComment(commentId: string, signal?: AbortSignal): Promise<CommunityCommentListResponse> {
+  async deleteComment(commentId: string, signal?: AbortSignal): Promise<void> {
     const url = buildApiUrl(`/community/posts/comments/${commentId}`);
     const headers = getAuthHeaders();
 

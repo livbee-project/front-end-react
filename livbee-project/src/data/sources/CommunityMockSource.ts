@@ -65,10 +65,14 @@ export class CommunityMockSource implements ICommunityApiSource {
       topicTag: post.topicTag,
       isHot: post.isHot,
       authorName: post.authorName,
+      authorRole: post.authorRole,
+      thumbnailUrl: undefined,
       createdAt: post.createdAt,
       viewCount: post.viewCount,
       commentCount: post.commentCount,
       likeCount: post.likeCount,
+      isLiked: false,
+      isOwner: false,
     }));
 
     // 비동기 API 느낌을 위해 약간의 지연을 둡니다.
@@ -148,19 +152,21 @@ export class CommunityMockSource implements ICommunityApiSource {
 
   async createComment(
     _postId: string,
-    _payload: CreateCommunityCommentRequest
+    _payload: CreateCommunityCommentRequest,
+    _signal?: AbortSignal
   ): Promise<void> {
     return;
   }
 
   async updateComment(
     _commentId: string,
-    _payload: UpdateCommunityCommentRequest
+    _payload: UpdateCommunityCommentRequest,
+    _signal?: AbortSignal
   ): Promise<void> {
     return;
   }
 
-  async deleteComment(): Promise<void> {
+  async deleteComment(_commentId: string, _signal?: AbortSignal): Promise<void> {
     return;
   }
 
