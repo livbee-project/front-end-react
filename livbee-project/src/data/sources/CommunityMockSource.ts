@@ -1,12 +1,25 @@
 import type {
+  CommunityCategoryCode,
+  CommunityCategoryLabel,
   CommunityDetailResponse,
   CommunityListQuery,
   CommunityListResponse,
+  CommunityPostDetail,
+  CreateCommunityPostRequest,
+  CreateCommunityPostResponse,
 } from '@/domain/entities/Community';
 import type { ICommunityApiSource } from '@/data/sources/interfaces/ICommunityApiSource';
 import { COMMUNITY_POSTS } from '@/data/sources/mocks/communityMockData';
 
 const DEFAULT_PAGE_SIZE = 20;
+
+const CATEGORY_LABEL_MAP: Record<CommunityCategoryCode, CommunityCategoryLabel> = {
+  free: '자유게시판',
+  question: '질문',
+  info: '정보공유',
+  review: '후기',
+  knowhow: '탐소하우',
+};
 
 export class CommunityMockSource implements ICommunityApiSource {
   async getPostList(query: CommunityListQuery): Promise<CommunityListResponse> {
@@ -88,6 +101,45 @@ export class CommunityMockSource implements ICommunityApiSource {
     return {
       ok: true,
       data: found,
+    };
+  }
+
+  async createPost(payload: CreateCommunityPostRequest): Promise<CreateCommunityPostResponse> {
+    const now = new Date();
+    const id = now.getTime().toString();
+    const categoryLabel = CATEGORY_LABEL_MAP[payload.category];
+
+    const previewLength = 80;
+    const preview =
+      payload.content.length > previewLength
+        ? `${payload.content.slice(0, previewLength)}…`
+        : payload.content;
+
+    const newPost: CommunityPostDetail = {
+      id,
+      title: payload.title,
+      preview,
+      category: payload.category,
+      categoryLabel,
+      topicTag: payload.category === 'knowhow' ? '필요노하우' : undefined,
+      isHot: false,
+      authorName: '소소스트',
+      authorLevel: '소소스트',
+      createdAt: now.toISOString(),
+      viewCount: 0,
+      commentCount: 0,
+      likeCount: 0,
+      content: payload.content,
+      images: payload.images ?? [],
+    };
+
+    COMMUNITY_POSTS.unshift(newPost);
+
+    await new Promise((resolve) => setTimeout(resolve, 150));
+
+    return {
+      ok: true,
+      data: newPost,
     };
   }
 }

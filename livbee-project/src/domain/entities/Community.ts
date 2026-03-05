@@ -1,8 +1,8 @@
 import type { UnifiedApiErrorResponse } from '@/shared/types/api';
 
-export type CommunityCategoryCode = 'free' | 'question' | 'info' | 'review';
+export type CommunityCategoryCode = 'free' | 'question' | 'info' | 'review' | 'knowhow';
 
-export type CommunityCategoryLabel = '자유게시판' | '질문' | '정보공유' | '후기';
+export type CommunityCategoryLabel = '자유게시판' | '질문' | '정보공유' | '후기' | '탐소하우';
 
 export type CommunityTopicTag = '필요노하우' | '정보공유' | '공지';
 
@@ -55,4 +55,17 @@ export interface CommunityDetailResponse {
 }
 
 export type CommunityApiErrorResponse = UnifiedApiErrorResponse;
+
+export interface CreateCommunityPostRequest {
+  category: CommunityCategoryCode;
+  title: string;
+  content: string;
+  images?: string[];
+}
+
+export interface CreateCommunityPostResponse {
+  ok: boolean;
+  data: CommunityPostDetail;
+}
+
 

@@ -58,6 +58,12 @@ const CommunityDetailPage = lazyWithRetry(() => import('@/presentation/pages/com
 const CommunityDetailModal = lazyWithRetry(
   () => import('@/presentation/components/community/CommunityDetailModal')
 );
+const CommunityPostWritePage = lazyWithRetry(
+  () => import('@/presentation/pages/community/CommunityPostWritePage')
+);
+const CommunityPostWriteModal = lazyWithRetry(
+  () => import('@/presentation/components/community/CommunityPostWriteModal')
+);
 
 interface LocationState {
   backgroundLocation?: Location;
@@ -95,6 +101,14 @@ const AppRoutes: React.FC = () => {
             <Route path={ROUTE_PATHS.event} element={<div>이벤트 페이지</div>} />
             <Route path={ROUTE_PATHS.service} element={<div>서비스 페이지</div>} />
             <Route path={ROUTE_PATHS.community} element={<CommunityPage />} />
+            <Route
+              path={ROUTE_PATHS.communityWrite}
+              element={
+                <AuthGuard requireAuth>
+                  <CommunityPostWritePage />
+                </AuthGuard>
+              }
+            />
 
             {/* (추가) BottomNavBar의 탭 경로들을 추가합니다. */}
             <Route path={ROUTE_PATHS.campaigns} element={<CampaignsPage />} />
@@ -234,6 +248,14 @@ const AppRoutes: React.FC = () => {
       {state?.backgroundLocation && (
         <Routes>
           <Route path={ROUTE_PATHS.communityDetail} element={<CommunityDetailModal />} />
+          <Route
+            path={ROUTE_PATHS.communityWrite}
+            element={
+              <AuthGuard requireAuth>
+                <CommunityPostWriteModal />
+              </AuthGuard>
+            }
+          />
         </Routes>
       )}
     </>

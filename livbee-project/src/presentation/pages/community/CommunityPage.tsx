@@ -15,7 +15,6 @@ import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { ErrorState } from '@/presentation/components/states/ErrorState';
 import { EmptyState } from '@/presentation/components/states/EmptyState';
 import type { CommunityListResponse } from '@/domain/entities/Community';
-import { useToast } from '@/presentation/contexts/ToastContext';
 import { ROUTE_PATHS } from '@/app/routes/routeMeta';
 
 type FilterValue = 'all' | CommunityCategoryCode;
@@ -23,7 +22,6 @@ type FilterValue = 'all' | CommunityCategoryCode;
 const CommunityPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { showToast } = useToast();
   const communityRepository = useRepository(CommunityRepository);
 
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -78,7 +76,9 @@ const CommunityPage: React.FC = () => {
   };
 
   const handleFabClick = () => {
-    showToast('커뮤니티 글쓰기는 준비 중입니다.');
+    navigate(ROUTE_PATHS.communityWrite, {
+      state: { backgroundLocation: location },
+    });
   };
 
   const hasMore = currentPage < totalPages;

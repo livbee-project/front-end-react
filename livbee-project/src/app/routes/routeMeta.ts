@@ -4,6 +4,7 @@ export const ROUTE_PATHS = {
   home: '/',
   clips: '/clips',
   community: '/community',
+  communityWrite: '/community/write',
   campaigns: '/campaigns',
   campaignRegister: '/campaigns/register',
   campaignDetail: '/campaigns/:id',

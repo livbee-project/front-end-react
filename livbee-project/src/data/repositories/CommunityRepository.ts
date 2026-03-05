@@ -3,6 +3,8 @@ import type {
   CommunityDetailResponse,
   CommunityListQuery,
   CommunityListResponse,
+  CreateCommunityPostRequest,
+  CreateCommunityPostResponse,
 } from '@/domain/entities/Community';
 import type { ICommunityApiSource } from '@/data/sources/interfaces/ICommunityApiSource';
 import { CommunityMockSource } from '@/data/sources/CommunityMockSource';
@@ -31,6 +33,17 @@ export class CommunityRepository extends BaseRepository {
       () => this.apiSource.getPostDetail(id, signal),
       'CommunityRepository',
       '커뮤니티 게시글 상세 조회'
+    );
+  }
+
+  async createPost(
+    payload: CreateCommunityPostRequest,
+    signal?: AbortSignal
+  ): Promise<CreateCommunityPostResponse> {
+    return this.handleError(
+      () => this.apiSource.createPost(payload, signal),
+      'CommunityRepository',
+      '커뮤니티 게시글 생성'
     );
   }
 }
