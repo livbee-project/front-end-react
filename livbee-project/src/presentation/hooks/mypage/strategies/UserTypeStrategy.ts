@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { debug } from '@/shared/utils/logger';
+import { ROUTE_PATHS } from '@/app/routes/routeMeta';
 
 /**
  * 사용자 타입별 전략 인터페이스
@@ -52,8 +53,10 @@ const createCommonMenu = (navigate: ReturnType<typeof useNavigate>): MenuItemDat
  * 브랜드 타입 전략
  */
 export class BrandStrategy implements UserTypeStrategy {
-  constructor(_navigate: ReturnType<typeof useNavigate>) {
-    // BrandStrategy는 navigate를 사용하지 않음
+  private navigate: ReturnType<typeof useNavigate>;
+
+  constructor(navigate: ReturnType<typeof useNavigate>) {
+    this.navigate = navigate;
   }
 
   getProfileData(): ProfileData {
@@ -77,7 +80,10 @@ export class BrandStrategy implements UserTypeStrategy {
           icon: Briefcase,
           label: '캠페인 목록',
           description: '등록한 캠페인 관리',
-          onClick: () => debug('useMyPageData', '캠페인 목록 클릭'),
+          onClick: () => {
+            debug('useMyPageData', '캠페인 목록 클릭');
+            this.navigate(ROUTE_PATHS.campaigns, { state: { onlyMine: true } });
+          },
         },
         {
           icon: Users,

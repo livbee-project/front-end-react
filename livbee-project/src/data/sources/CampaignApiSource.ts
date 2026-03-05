@@ -83,6 +83,58 @@ export class CampaignApiSource implements ICampaignApiSource {
   }
 
   /**
+   * 내 캠페인 목록 조회 (브랜드 전용)
+   * - GET /campaigns/mine
+   * - 쿼리 스펙은 getCampaignList와 동일
+   */
+  async getMyCampaignList(query: CampaignListQuery = {}, signal?: AbortSignal): Promise<CampaignListResponse> {
+    const params: Record<string, string | number | undefined> = {};
+
+    if (query.page !== undefined) {
+      params.page = query.page;
+    }
+    if (query.limit !== undefined) {
+      params.limit = query.limit;
+    }
+    if (query.search) {
+      params.search = query.search;
+    }
+    if (query.sort === 'deadline') {
+      params.sort = 'deadline';
+    }
+
+    const url = buildApiUrl('/campaigns/mine', params);
+
+    const headers = getAuthHeaders();
+
+    const result = await fetchApi<CampaignListResponse>(
+      url,
+      {
+        method: 'GET',
+        headers,
+        signal,
+      },
+      '내 캠페인 목록 조회'
+    );
+
+    if (result.items && Array.isArray(result.items)) {
+      const convertedItems = result.items.map((item) => {
+        if (item && typeof item === 'object' && !Array.isArray(item)) {
+          return convertKeysToCamelCase(item as unknown as Record<string, unknown>);
+        }
+        return item;
+      }) as CampaignListResponse['items'];
+
+      return {
+        ...result,
+        items: convertedItems,
+      };
+    }
+
+    return result;
+  }
+
+  /**
    * 모집 공고 등록
    * @param request - 등록 요청 데이터
    * @returns 등록 응답

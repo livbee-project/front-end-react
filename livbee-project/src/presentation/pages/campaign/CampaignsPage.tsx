@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Plus } from 'lucide-react';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
@@ -23,6 +23,7 @@ type FilterValue = '전체' | Campaign['category'];
 
 const CampaignsPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isLoggedIn, currentRole } = useAuth();
   const { hasBrandRole } = useRoleAccess();
   const { shouldHideRegisterFab } = useRegisterFabVisibility('brand');
@@ -34,6 +35,10 @@ const CampaignsPage: React.FC = () => {
   const { handleScrapToggle, isScrapped } = useScrapToggle();
 
   const campaignRepository = useRepository(CampaignRepository);
+
+  const isMyCampaignsPage = Boolean(
+    location.state && typeof location.state === 'object' && (location.state as { onlyMine?: boolean }).onlyMine
+  );
 
   // query 객체 메모이제이션
   const query = useMemo(
@@ -59,11 +64,11 @@ const CampaignsPage: React.FC = () => {
     { items: Campaign[]; currentPage?: number; totalPages?: number; totalItems?: number }
   >({
     repository: campaignRepository,
-    method: 'getCampaignList',
+    method: isMyCampaignsPage ? 'getMyCampaignList' : 'getCampaignList',
     query,
-    dependencies: [currentPage, searchQuery],
+    dependencies: [currentPage, searchQuery, isMyCampaignsPage],
     errorMessage: '캠페인 목록을 불러오는 중 오류가 발생했습니다.',
-    cacheKey: `campaign-list-${JSON.stringify(query)}`,
+    cacheKey: `campaign-list-${isMyCampaignsPage ? 'mine' : 'all'}-${JSON.stringify(query)}`,
   });
 
   const filteredCampaigns = useMemo(() => {

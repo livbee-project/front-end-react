@@ -38,6 +38,17 @@ export class CampaignRepository extends BaseRepository {
   }
 
   /**
+   * 내 캠페인 목록 조회 (브랜드 전용)
+   */
+  async getMyCampaignList(query: CampaignListQuery = {}, signal?: AbortSignal): Promise<CampaignListResponse> {
+    return this.handleError(
+      () => this.apiSource.getMyCampaignList?.(query, signal) as Promise<CampaignListResponse>,
+      'CampaignRepository',
+      '내 캠페인 목록 조회'
+    );
+  }
+
+  /**
    * 모집 공고 등록
    */
   async createCampaign(request: CreateCampaignRequest): Promise<CreateCampaignResponse> {
