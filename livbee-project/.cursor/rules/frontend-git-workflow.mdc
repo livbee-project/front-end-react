@@ -44,11 +44,14 @@ alwaysApply: true
 
 사용자가 위와 같이 명시적으로 커밋/푸시를 요청하고, 제안한 메시지를 승인한 이후에만 다음을 수행한다:
 
-1. Windows 환경에서 한글 깨짐 방지를 위해, PowerShell 터미널의 인코딩을 UTF-8로 맞춘 뒤 Git 명령을 실행한다고 가정한다.
-2. 승인된 커밋 메시지를 `commit_message.txt` 파일로 생성할 때는:
-   - PowerShell의 `Out-File` 등 대신, 에이전트의 파일 쓰기 도구를 사용해 UTF-8(BOM 없음)로 저장한다.
-3. 다음과 같이 커밋을 실행한다:
-   - `git commit -F commit_message.txt`
+1. **한글 커밋 메시지 인코딩 (Windows 필수)**  
+   - `commit_message.txt` 는 반드시 **UTF-8, BOM 없음**으로 생성한다.  
+   - 권장: PowerShell 로 생성  
+     `$msg = "YYMMDD > front-end > react > 한줄요약"; [System.IO.File]::WriteAllText("$PWD\commit_message.txt", $msg, [System.Text.UTF8Encoding]::new($false))`  
+   - `git commit -F commit_message.txt` 실행 **직전**에 콘솔을 UTF-8로 맞춘다:  
+     `chcp 65001`  
+     그 다음 `git commit -F commit_message.txt` 실행. (한 줄로 하려면 `chcp 65001; git commit -F commit_message.txt`)
+2. 위와 같이 생성한 `commit_message.txt` 로 커밋을 실행한다.
 4. 커밋 메시지 파일은 커밋 후 정리한다:
    - 필요 시 삭제하거나 무시해도 되는 임시 파일로 취급한다.
 5. 푸시는 다음과 같이 실행한다:
