@@ -6,11 +6,12 @@ import { H2, PMuted, Caption } from '@/presentation/components/styled/Typography
 import { useCommunityDetail } from '@/presentation/hooks/community/useCommunityDetail';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { ErrorState } from '@/presentation/components/states/ErrorState';
+import { CommunityComments } from '@/presentation/components/community/CommunityComments';
 
 const CommunityDetailModal: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { post, loading, error } = useCommunityDetail(id);
+  const { post, loading, error, liking, toggleLike } = useCommunityDetail(id);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -64,10 +65,21 @@ const CommunityDetailModal: React.FC = () => {
                     <MessageCircle size={16} />
                     <MetricText>{post.commentCount}</MetricText>
                   </Metric>
-                  <Metric>
-                    <Heart size={16} />
+                  <LikeMetricButton
+                    type="button"
+                    onClick={() => {
+                      void toggleLike();
+                    }}
+                    disabled={liking}
+                    aria-pressed={post.isLiked === true}
+                  >
+                    <Heart
+                      size={16}
+                      color={post.isLiked ? '#ef4444' : undefined}
+                      fill={post.isLiked ? '#ef4444' : 'none'}
+                    />
                     <MetricText>{post.likeCount}</MetricText>
-                  </Metric>
+                  </LikeMetricButton>
                 </MetricsRow>
               </HeaderSection>
 
@@ -77,9 +89,7 @@ const CommunityDetailModal: React.FC = () => {
                 ))}
               </ContentSection>
 
-              <PlaceholderSection>
-                <PlaceholderText>댓글 기능은 추후 제공 예정입니다.</PlaceholderText>
-              </PlaceholderSection>
+              <CommunityComments postId={post.id} />
             </>
           )}
         </ModalBody>
@@ -232,6 +242,22 @@ const Metric = styled.div`
   color: ${({ theme }) => theme.colors.muted};
 `;
 
+const LikeMetricButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  padding: 0;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.muted};
+  cursor: pointer;
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.7;
+  }
+`;
+
 const MetricText = styled(Caption)`
   color: ${({ theme }) => theme.colors.muted};
 `;
@@ -245,17 +271,6 @@ const ContentSection = styled.section`
 
 const Paragraph = styled(PMuted)`
   white-space: pre-wrap;
-`;
-
-const PlaceholderSection = styled.section`
-  margin-top: ${({ theme }) => theme.spacing.xl};
-  padding: ${({ theme }) => theme.spacing.md};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  background: ${({ theme }) => theme.colors.secondary};
-`;
-
-const PlaceholderText = styled(PMuted)`
-  text-align: center;
 `;
 
 const formatRelativeTime = (isoDate: string): string => {

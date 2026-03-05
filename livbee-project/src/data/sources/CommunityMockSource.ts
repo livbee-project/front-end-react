@@ -1,25 +1,20 @@
 import type {
-  CommunityCategoryCode,
-  CommunityCategoryLabel,
+  CommunityCommentListResponse,
   CommunityDetailResponse,
+  CommunityLikeResponse,
   CommunityListQuery,
   CommunityListResponse,
   CommunityPostDetail,
   CreateCommunityPostRequest,
   CreateCommunityPostResponse,
+  CreateCommunityCommentRequest,
+  UpdateCommunityCommentRequest,
 } from '@/domain/entities/Community';
+import { COMMUNITY_CATEGORY_LABEL_MAP } from '@/domain/entities/Community';
 import type { ICommunityApiSource } from '@/data/sources/interfaces/ICommunityApiSource';
 import { COMMUNITY_POSTS } from '@/data/sources/mocks/communityMockData';
 
 const DEFAULT_PAGE_SIZE = 20;
-
-const CATEGORY_LABEL_MAP: Record<CommunityCategoryCode, CommunityCategoryLabel> = {
-  free: '자유게시판',
-  question: '질문',
-  info: '정보공유',
-  review: '후기',
-  knowhow: '탐소하우',
-};
 
 export class CommunityMockSource implements ICommunityApiSource {
   async getPostList(query: CommunityListQuery): Promise<CommunityListResponse> {
@@ -107,7 +102,7 @@ export class CommunityMockSource implements ICommunityApiSource {
   async createPost(payload: CreateCommunityPostRequest): Promise<CreateCommunityPostResponse> {
     const now = new Date();
     const id = now.getTime().toString();
-    const categoryLabel = CATEGORY_LABEL_MAP[payload.category];
+    const categoryLabel = COMMUNITY_CATEGORY_LABEL_MAP[payload.category];
 
     const previewLength = 80;
     const preview =
@@ -140,6 +135,60 @@ export class CommunityMockSource implements ICommunityApiSource {
     return {
       ok: true,
       data: newPost,
+    };
+  }
+
+  async getComments(): Promise<CommunityCommentListResponse> {
+    return {
+      ok: true,
+      items: [],
+    };
+  }
+
+  async createComment(
+    _postId: string,
+    _payload: CreateCommunityCommentRequest
+  ): Promise<CommunityCommentListResponse> {
+    return {
+      ok: true,
+      items: [],
+    };
+  }
+
+  async updateComment(
+    _commentId: string,
+    _payload: UpdateCommunityCommentRequest
+  ): Promise<CommunityCommentListResponse> {
+    return {
+      ok: true,
+      items: [],
+    };
+  }
+
+  async deleteComment(): Promise<CommunityCommentListResponse> {
+    return {
+      ok: true,
+      items: [],
+    };
+  }
+
+  async likePost(): Promise<CommunityLikeResponse> {
+    return {
+      ok: true,
+      data: {
+        likeCount: 0,
+        isLiked: false,
+      },
+    };
+  }
+
+  async unlikePost(): Promise<CommunityLikeResponse> {
+    return {
+      ok: true,
+      data: {
+        likeCount: 0,
+        isLiked: false,
+      },
     };
   }
 }

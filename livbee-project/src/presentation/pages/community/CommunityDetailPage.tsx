@@ -8,10 +8,11 @@ import { ErrorState } from '@/presentation/components/states/ErrorState';
 import { H2, PMuted, Caption } from '@/presentation/components/styled/Typography';
 import { Eye, MessageCircle, Heart } from 'lucide-react';
 import { useCommunityDetail } from '@/presentation/hooks/community/useCommunityDetail';
+import { CommunityComments } from '@/presentation/components/community/CommunityComments';
 
 const CommunityDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { post, loading, error } = useCommunityDetail(id);
+  const { post, loading, error, liking, toggleLike } = useCommunityDetail(id);
 
   if (loading && !post) {
     return (
@@ -70,10 +71,21 @@ const CommunityDetailPage: React.FC = () => {
               <MessageCircle size={16} />
               <MetricText>{post.commentCount}</MetricText>
             </Metric>
-            <Metric>
-              <Heart size={16} />
+            <LikeMetricButton
+              type="button"
+              onClick={() => {
+                void toggleLike();
+              }}
+              disabled={liking}
+              aria-pressed={post.isLiked === true}
+            >
+              <Heart
+                size={16}
+                color={post.isLiked ? '#ef4444' : undefined}
+                fill={post.isLiked ? '#ef4444' : 'none'}
+              />
               <MetricText>{post.likeCount}</MetricText>
-            </Metric>
+            </LikeMetricButton>
           </MetricsRow>
         </HeaderSection>
 
@@ -83,9 +95,7 @@ const CommunityDetailPage: React.FC = () => {
           ))}
         </ContentSection>
 
-        <PlaceholderSection>
-          <PlaceholderText>댓글 기능은 추후 제공 예정입니다.</PlaceholderText>
-        </PlaceholderSection>
+        <CommunityComments postId={post.id} />
       </DetailWrapper>
     </DetailPageLayout>
   );
@@ -176,6 +186,22 @@ const Metric = styled.div`
   color: ${({ theme }) => theme.colors.muted};
 `;
 
+const LikeMetricButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  padding: 0;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.muted};
+  cursor: pointer;
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.7;
+  }
+`;
+
 const MetricText = styled(Caption)`
   color: ${({ theme }) => theme.colors.muted};
 `;
@@ -188,17 +214,6 @@ const ContentSection = styled.section`
 
 const Paragraph = styled(PMuted)`
   white-space: pre-wrap;
-`;
-
-const PlaceholderSection = styled.section`
-  margin-top: ${({ theme }) => theme.spacing.xl};
-  padding: ${({ theme }) => theme.spacing.lg};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  background: ${({ theme }) => theme.colors.secondary};
-`;
-
-const PlaceholderText = styled(PMuted)`
-  text-align: center;
 `;
 
 const formatRelativeTime = (isoDate: string): string => {
