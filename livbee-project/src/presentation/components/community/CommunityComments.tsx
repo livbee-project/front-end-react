@@ -52,7 +52,12 @@ export const CommunityComments: React.FC<CommunityCommentsProps> = ({ postId }) 
         {comments.map((comment) => (
           <Item key={comment.id}>
             <Author>
-              <AuthorName>사용자</AuthorName>
+              <AuthorName>{comment.authorName ?? '작성자'}</AuthorName>
+              {comment.authorRole && (
+                <AuthorRoleBadge>
+                  {comment.authorRole === 'brand' ? '브랜드' : '쇼호스트'}
+                </AuthorRoleBadge>
+              )}
               <Dot>·</Dot>
               <CreatedAt>{formatRelativeTime(comment.createdAt)}</CreatedAt>
             </Author>
@@ -163,6 +168,10 @@ const Author = styled.div`
 const AuthorName = styled(Caption)`
   font-weight: 500;
   color: ${({ theme }) => theme.colors.foreground};
+`;
+
+const AuthorRoleBadge = styled(Caption)`
+  color: ${({ theme }) => theme.colors.muted};
 `;
 
 const Dot = styled.span`

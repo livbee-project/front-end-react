@@ -66,7 +66,7 @@ export class CommunityApiSource implements ICommunityApiSource {
 
     const headers = getAuthHeaders();
 
-    const result = await fetchApi<CommunityPostDetailDto>(
+    const result = await fetchApi<{ data: CommunityPostDetailDto }>(
       url,
       {
         method: 'GET',
@@ -78,7 +78,7 @@ export class CommunityApiSource implements ICommunityApiSource {
 
     return {
       ok: true,
-      data: mapPostDetailDtoToCommunityPostDetail(result),
+      data: mapPostDetailDtoToCommunityPostDetail(result.data),
     };
   }
 
@@ -96,7 +96,7 @@ export class CommunityApiSource implements ICommunityApiSource {
       thumbnailUrl: payload.images && payload.images.length > 0 ? payload.images[0] : undefined,
     };
 
-    const result = await fetchApi<CommunityPostDetailDto>(
+    const result = await fetchApi<{ data: CommunityPostDetailDto }>(
       url,
       {
         method: 'POST',
@@ -109,7 +109,7 @@ export class CommunityApiSource implements ICommunityApiSource {
 
     return {
       ok: true,
-      data: mapPostDetailDtoToCommunityPostDetail(result),
+      data: mapPostDetailDtoToCommunityPostDetail(result.data),
     };
   }
 
@@ -144,7 +144,7 @@ export class CommunityApiSource implements ICommunityApiSource {
     const headers = getAuthHeaders();
 
     // 대댓글 제도 폐지: parentId는 전송하지 않고 항상 최상위 댓글로 등록
-    const result = await fetchApi<{ items: CommunityCommentDto[] }>(
+    await fetchApi<{ data: CommunityCommentDto }>(
       url,
       {
         method: 'POST',
@@ -154,13 +154,6 @@ export class CommunityApiSource implements ICommunityApiSource {
       },
       '커뮤니티 댓글 작성'
     );
-
-    const items = Array.isArray(result.items) ? result.items.map(mapCommentDtoToCommunityComment) : [];
-
-    return {
-      ok: true,
-      items,
-    };
   }
 
   async updateComment(
@@ -171,7 +164,7 @@ export class CommunityApiSource implements ICommunityApiSource {
     const url = buildApiUrl(`/community/posts/comments/${commentId}`);
     const headers = getAuthHeaders();
 
-    const result = await fetchApi<{ items: CommunityCommentDto[] }>(
+    await fetchApi<{ data: CommunityCommentDto }>(
       url,
       {
         method: 'PUT',
@@ -181,20 +174,13 @@ export class CommunityApiSource implements ICommunityApiSource {
       },
       '커뮤니티 댓글 수정'
     );
-
-    const items = Array.isArray(result.items) ? result.items.map(mapCommentDtoToCommunityComment) : [];
-
-    return {
-      ok: true,
-      items,
-    };
   }
 
   async deleteComment(commentId: string, signal?: AbortSignal): Promise<CommunityCommentListResponse> {
     const url = buildApiUrl(`/community/posts/comments/${commentId}`);
     const headers = getAuthHeaders();
 
-    const result = await fetchApi<{ items: CommunityCommentDto[] }>(
+    await fetchApi<{ data: CommunityCommentDto }>(
       url,
       {
         method: 'DELETE',
@@ -203,13 +189,6 @@ export class CommunityApiSource implements ICommunityApiSource {
       },
       '커뮤니티 댓글 삭제'
     );
-
-    const items = Array.isArray(result.items) ? result.items.map(mapCommentDtoToCommunityComment) : [];
-
-    return {
-      ok: true,
-      items,
-    };
   }
 
   async likePost(postId: string, signal?: AbortSignal): Promise<CommunityLikeResponse> {

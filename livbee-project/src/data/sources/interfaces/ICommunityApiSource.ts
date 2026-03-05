@@ -26,15 +26,15 @@ export interface ICommunityApiSource {
     postId: string,
     payload: CreateCommunityCommentRequest,
     signal?: AbortSignal
-  ): Promise<CommunityCommentListResponse>;
+  ): Promise<void>;
 
   updateComment(
     commentId: string,
     payload: UpdateCommunityCommentRequest,
     signal?: AbortSignal
-  ): Promise<CommunityCommentListResponse>;
+  ): Promise<void>;
 
-  deleteComment(commentId: string, signal?: AbortSignal): Promise<CommunityCommentListResponse>;
+  deleteComment(commentId: string, signal?: AbortSignal): Promise<void>;
 
   likePost(postId: string, signal?: AbortSignal): Promise<CommunityLikeResponse>;
 

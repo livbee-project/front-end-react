@@ -38,8 +38,8 @@ export const CommunityPostCard: React.FC<CommunityPostCardProps> = ({ post, onCl
 
       <CardFooter>
         <AuthorInfo>
-          <AuthorName>{post.authorName}</AuthorName>
-          {post.authorLevel && <AuthorLevel>{post.authorLevel}</AuthorLevel>}
+          <AuthorName>{post.authorName ?? '작성자'}</AuthorName>
+          {post.authorRole && <AuthorRoleBadge>{post.authorRole === 'brand' ? '브랜드' : '쇼호스트'}</AuthorRoleBadge>}
           <Dot>·</Dot>
           <MetaText>{formatRelativeTime(post.createdAt)}</MetaText>
         </AuthorInfo>
@@ -161,7 +161,7 @@ const AuthorName = styled(Caption)`
   color: ${({ theme }) => theme.colors.foreground};
 `;
 
-const AuthorLevel = styled(Caption)`
+const AuthorRoleBadge = styled(Caption)`
   color: ${({ theme }) => theme.colors.muted};
 `;
 

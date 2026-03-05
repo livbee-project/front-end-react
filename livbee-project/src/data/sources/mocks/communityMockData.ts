@@ -10,8 +10,9 @@ export const COMMUNITY_POSTS: CommunityPostDetail[] = [
     categoryLabel: '정보공유',
     topicTag: '필요노하우',
     isHot: true,
+    authorId: 'user-1',
     authorName: '안정하실',
-    authorLevel: '소소스트',
+    authorRole: 'showhost',
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1일 전
     viewCount: 342,
     commentCount: 18,
@@ -29,8 +30,9 @@ export const COMMUNITY_POSTS: CommunityPostDetail[] = [
     categoryLabel: '질문',
     topicTag: '필요노하우',
     isHot: true,
+    authorId: 'user-2',
     authorName: '이서연',
-    authorLevel: '소소스트',
+    authorRole: 'showhost',
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // 5시간 전
     viewCount: 156,
     commentCount: 12,
@@ -48,8 +50,9 @@ export const COMMUNITY_POSTS: CommunityPostDetail[] = [
     categoryLabel: '자유게시판',
     topicTag: '공지',
     isHot: false,
+    authorId: 'user-3',
     authorName: '스케줄캡틴',
-    authorLevel: '브랜드',
+    authorRole: 'brand',
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(), // 3일 전
     viewCount: 421,
     commentCount: 5,
@@ -67,8 +70,9 @@ export const COMMUNITY_POSTS: CommunityPostDetail[] = [
     categoryLabel: '정보공유',
     topicTag: '정보공유',
     isHot: false,
+    authorId: 'user-4',
     authorName: '최유리',
-    authorLevel: '소소스트',
+    authorRole: 'showhost',
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString(), // 4일 전
     viewCount: 367,
     commentCount: 9,

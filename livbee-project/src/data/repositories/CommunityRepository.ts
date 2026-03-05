@@ -70,7 +70,7 @@ export class CommunityRepository extends BaseRepository {
     postId: string,
     payload: CreateCommunityCommentRequest,
     signal?: AbortSignal
-  ): Promise<CommunityCommentListResponse> {
+  ): Promise<void> {
     return this.handleError(
       () => this.apiSource.createComment(postId, payload, signal),
       'CommunityRepository',
@@ -82,7 +82,7 @@ export class CommunityRepository extends BaseRepository {
     commentId: string,
     payload: UpdateCommunityCommentRequest,
     signal?: AbortSignal
-  ): Promise<CommunityCommentListResponse> {
+  ): Promise<void> {
     return this.handleError(
       () => this.apiSource.updateComment(commentId, payload, signal),
       'CommunityRepository',
@@ -90,7 +90,7 @@ export class CommunityRepository extends BaseRepository {
     );
   }
 
-  async deleteComment(commentId: string, signal?: AbortSignal): Promise<CommunityCommentListResponse> {
+  async deleteComment(commentId: string, signal?: AbortSignal): Promise<void> {
     return this.handleError(
       () => this.apiSource.deleteComment(commentId, signal),
       'CommunityRepository',

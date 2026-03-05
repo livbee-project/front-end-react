@@ -12,6 +12,9 @@ export interface CommunityPostSummaryDto {
   title: string;
   summary: string;
   content?: string | null;
+  authorId: string;
+  authorName: string | null;
+  authorRole: 'brand' | 'showhost' | null;
   thumbnailUrl?: string | null;
   category?: string | null;
   likeCount: number;
@@ -19,7 +22,6 @@ export interface CommunityPostSummaryDto {
   viewCount: number;
   createdAt: string;
   updatedAt: string;
-  authorId: string;
   isLiked: boolean;
   isOwner: boolean;
 }
@@ -28,6 +30,9 @@ export interface CommunityPostDetailDto {
   id: string;
   title: string;
   content: string;
+  authorId: string;
+  authorName: string | null;
+  authorRole: 'brand' | 'showhost' | null;
   thumbnailUrl?: string | null;
   category?: string | null;
   likeCount: number;
@@ -35,7 +40,6 @@ export interface CommunityPostDetailDto {
   viewCount: number;
   createdAt: string;
   updatedAt: string;
-  authorId: string;
   isLiked: boolean;
   isOwner: boolean;
 }
@@ -58,6 +62,8 @@ export interface CommunityCommentDto {
   createdAt: string;
   updatedAt: string;
   authorId: string;
+  authorName: string | null;
+  authorRole: 'brand' | 'showhost' | null;
   replies?: CommunityCommentDto[];
 }
 
@@ -97,14 +103,15 @@ export const mapPostSummaryDtoToCommunityPost = (
 
   return {
     id: dto.id,
+    authorId: dto.authorId,
     title: dto.title,
     preview: resolvePreview(dto.summary, dto.content ?? undefined),
     category,
     categoryLabel: COMMUNITY_CATEGORY_LABEL_MAP[category],
     topicTag: undefined,
     isHot: false,
-    authorName: '작성자',
-    authorLevel: undefined,
+    authorName: dto.authorName,
+    authorRole: dto.authorRole,
     thumbnailUrl: dto.thumbnailUrl ?? null,
     createdAt: dto.createdAt,
     updatedAt: dto.updatedAt,
@@ -126,6 +133,8 @@ export const mapCommentDtoToCommunityComment = (
     createdAt: dto.createdAt,
     updatedAt: dto.updatedAt,
     authorId: dto.authorId,
+    authorName: dto.authorName,
+    authorRole: dto.authorRole,
   };
 };
 
@@ -136,14 +145,15 @@ export const mapPostDetailDtoToCommunityPostDetail = (
 
   const base: CommunityPost = {
     id: dto.id,
+    authorId: dto.authorId,
     title: dto.title,
     preview: resolvePreview(dto.content, dto.content),
     category,
     categoryLabel: COMMUNITY_CATEGORY_LABEL_MAP[category],
     topicTag: undefined,
     isHot: false,
-    authorName: '작성자',
-    authorLevel: undefined,
+    authorName: dto.authorName,
+    authorRole: dto.authorRole,
     thumbnailUrl: dto.thumbnailUrl ?? null,
     createdAt: dto.createdAt,
     updatedAt: dto.updatedAt,

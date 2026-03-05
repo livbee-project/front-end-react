@@ -51,8 +51,10 @@ const CommunityDetailModal: React.FC = () => {
                 </TagsRow>
                 <Title as={H2}>{post.title}</Title>
                 <MetaRow>
-                  <Author>{post.authorName}</Author>
-                  {post.authorLevel && <AuthorLevel>{post.authorLevel}</AuthorLevel>}
+                  <Author>{post.authorName ?? '작성자'}</Author>
+                  {post.authorRole && (
+                    <AuthorRoleBadge>{post.authorRole === 'brand' ? '브랜드' : '쇼호스트'}</AuthorRoleBadge>
+                  )}
                   <Dot>·</Dot>
                   <MetaText>{formatRelativeTime(post.createdAt)}</MetaText>
                 </MetaRow>
@@ -216,7 +218,7 @@ const Author = styled(Caption)`
   font-weight: 500;
 `;
 
-const AuthorLevel = styled(Caption)`
+const AuthorRoleBadge = styled(Caption)`
   color: ${({ theme }) => theme.colors.muted};
 `;
 

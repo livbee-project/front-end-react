@@ -57,6 +57,7 @@ export class CommunityMockSource implements ICommunityApiSource {
     const end = start + limit;
     const items = filtered.slice(start, end).map((post) => ({
       id: post.id,
+      authorId: post.authorId,
       title: post.title,
       preview: post.preview,
       category: post.category,
@@ -64,7 +65,6 @@ export class CommunityMockSource implements ICommunityApiSource {
       topicTag: post.topicTag,
       isHot: post.isHot,
       authorName: post.authorName,
-      authorLevel: post.authorLevel,
       createdAt: post.createdAt,
       viewCount: post.viewCount,
       commentCount: post.commentCount,
@@ -112,6 +112,7 @@ export class CommunityMockSource implements ICommunityApiSource {
 
     const newPost: CommunityPostDetail = {
       id,
+      authorId: 'mock-author',
       title: payload.title,
       preview,
       category: payload.category,
@@ -119,7 +120,7 @@ export class CommunityMockSource implements ICommunityApiSource {
       topicTag: payload.category === 'knowhow' ? '필요노하우' : undefined,
       isHot: false,
       authorName: '소소스트',
-      authorLevel: '소소스트',
+      authorRole: 'showhost',
       createdAt: now.toISOString(),
       viewCount: 0,
       commentCount: 0,
@@ -138,7 +139,7 @@ export class CommunityMockSource implements ICommunityApiSource {
     };
   }
 
-  async getComments(): Promise<CommunityCommentListResponse> {
+  async getComments(_postId: string, _signal?: AbortSignal): Promise<CommunityCommentListResponse> {
     return {
       ok: true,
       items: [],
@@ -148,28 +149,19 @@ export class CommunityMockSource implements ICommunityApiSource {
   async createComment(
     _postId: string,
     _payload: CreateCommunityCommentRequest
-  ): Promise<CommunityCommentListResponse> {
-    return {
-      ok: true,
-      items: [],
-    };
+  ): Promise<void> {
+    return;
   }
 
   async updateComment(
     _commentId: string,
     _payload: UpdateCommunityCommentRequest
-  ): Promise<CommunityCommentListResponse> {
-    return {
-      ok: true,
-      items: [],
-    };
+  ): Promise<void> {
+    return;
   }
 
-  async deleteComment(): Promise<CommunityCommentListResponse> {
-    return {
-      ok: true,
-      items: [],
-    };
+  async deleteComment(): Promise<void> {
+    return;
   }
 
   async likePost(): Promise<CommunityLikeResponse> {

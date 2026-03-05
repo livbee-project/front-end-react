@@ -19,14 +19,15 @@ export const COMMUNITY_CATEGORY_LABEL_MAP: Record<CommunityCategoryCode, Communi
  */
 export interface CommunityPost {
   id: string;
+  authorId: string;
   title: string;
   preview: string;
   category: CommunityCategoryCode;
   categoryLabel: CommunityCategoryLabel;
   topicTag?: CommunityTopicTag;
   isHot?: boolean;
-  authorName: string;
-  authorLevel?: string;
+  authorName: string | null;
+  authorRole: 'brand' | 'showhost' | null;
   thumbnailUrl?: string | null;
   createdAt: string;
   updatedAt?: string;
@@ -52,6 +53,8 @@ export interface CommunityComment {
   createdAt: string;
   updatedAt: string;
   authorId: string;
+  authorName: string | null;
+  authorRole: 'brand' | 'showhost' | null;
 }
 
 export interface CommunityCommentListResponse {
