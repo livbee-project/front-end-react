@@ -11,6 +11,8 @@ node_modules
 dist
 dist-ssr
 *.local
+coverage/
+commit_message.txt
 
 # Editor directories and files
 .vscode/*
@@ -30,3 +32,5 @@ storybook-static
 
 # Local docs (학습용 사전 등, 원격에 올리지 않음)
 docs/
+.env
+.env.local

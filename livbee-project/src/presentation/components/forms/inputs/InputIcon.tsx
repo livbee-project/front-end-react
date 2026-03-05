@@ -1,9 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import type { IconType } from 'react-icons';
 
 interface InputIconProps {
-  icon: IconType;
+  icon: React.ComponentType<{ size?: number; color?: string }>;
   color?: string;
   size?: number;
 }

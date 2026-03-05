@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { RiAddLine } from 'react-icons/ri';
+import { Plus as PlusIcon } from 'lucide-react';
 
 /**
  * FloatingActionButton가 받을 props 타입을 정의합니다.
@@ -51,7 +51,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
       aria-label="추가"
       $hasClick={!!onClick}
     >
-      <RiAddLine size={24} />
+      <PlusIcon size={24} />
     </Button>
   );
 };

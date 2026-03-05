@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { RiImageLine } from 'react-icons/ri';
+import { Image as ImageIconBase } from 'lucide-react';
 import type { ImageUploadProps } from '@/types/commonProps';
 import { saveScrollPositionBeforeCrop } from '@/shared/utils/scrollPosition';
 
@@ -142,7 +142,7 @@ const Container = styled.div<{ $width: number; $height: number; $isCircle: boole
   flex-shrink: 0;
 `;
 
-const ImageIcon = styled(RiImageLine)`
+const ImageIcon = styled(ImageIconBase)`
   color: ${({ theme }) => theme.colors.muted};
 `;
 

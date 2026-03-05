@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
-import { RiFileLine } from 'react-icons/ri';
+import { FileText as FileIconBase } from 'lucide-react';
 import { H3, Caption } from '@/presentation/components/styled/Typography';
 import type { FileUploadProps as BaseFileUploadProps } from '@/types/components';
 
@@ -59,7 +59,7 @@ const LabelRow = styled.div`
   gap: ${({ theme }) => theme.spacing.sm};
 `;
 
-const FileIcon = styled(RiFileLine)`
+const FileIcon = styled(FileIconBase)`
   color: ${({ theme }) => theme.colors.muted};
 `;
 

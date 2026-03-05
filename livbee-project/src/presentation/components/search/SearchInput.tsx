@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { RiSearchLine } from 'react-icons/ri';
+import { Search as SearchIconBase } from 'lucide-react';
 import { Input } from '@/presentation/components/styled/CommonStyles';
 
 /**
@@ -31,7 +31,7 @@ const SearchWrapper = styled.div`
 /**
  * 검색 아이콘 스타일
  */
-const SearchIcon = styled(RiSearchLine)`
+const SearchIcon = styled(SearchIconBase)`
   flex-shrink: 0;
   color: ${({ theme }) => theme.colors.muted};
 `;

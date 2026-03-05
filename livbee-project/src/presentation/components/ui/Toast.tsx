@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { RiInformationLine, RiErrorWarningLine } from 'react-icons/ri';
+import { Info as InfoIcon, AlertTriangle as ErrorIcon } from 'lucide-react';
 import { P } from '@/presentation/components/styled/Typography';
 
 /**
@@ -68,11 +68,11 @@ const Toast: React.FC<ToastProps> = ({ message, duration = 2000, variant = 'info
     <ToastContainer $variant={variant} $animationState={animationState}>
       {variant === 'error' ? (
         <IconWrapper>
-          <RiErrorWarningLine size={20} />
+          <ErrorIcon size={20} />
         </IconWrapper>
       ) : (
         <IconWrapper>
-          <RiInformationLine size={20} />
+          <InfoIcon size={20} />
         </IconWrapper>
       )}
       <MessageText>{message}</MessageText>
