@@ -7,6 +7,8 @@ import type {
   SignupResponse,
   MeResponse,
   BusinessVerificationResult,
+  KakaoUserInfo,
+  UserRole,
 } from '@/domain/entities/User';
 
 import type { IUserApiSource } from '@/data/sources/interfaces/IUserApiSource';
@@ -65,6 +67,60 @@ export class UserApiSource implements IUserApiSource {
     }
 
     // 기존 응답 형식: { ok: true, token: "...", name: "...", role: "..." }
+    return result as LoginResponse;
+  }
+
+  /**
+   * 카카오 로그인
+   * @param info - 카카오 사용자 정보
+   * @param role - 로그인하려는 역할
+   * @returns 로그인 응답
+   */
+  async loginWithKakao(
+    info: KakaoUserInfo,
+    role: UserRole
+  ): Promise<LoginResponse> {
+    const url = buildApiUrl('/auth/kakao/login');
+    const headers = getAuthHeaders();
+
+    const result = await fetchApi<{
+      token: string;
+      user?: {
+        id: string;
+        name: string;
+        email: string;
+        role: string;
+        isBrand?: boolean;
+        isShowhost?: boolean;
+      };
+    }>(
+      url,
+      {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          kakaoId: info.kakaoId,
+          email: info.email.toLowerCase(),
+          name: info.name,
+          role,
+        }),
+      },
+      '카카오 로그인'
+    );
+
+    if (result && typeof result === 'object' && 'token' in result) {
+      const u = result.user as Record<string, unknown> | undefined;
+      return {
+        ok: true,
+        token: result.token,
+        name: (result.user?.name as string) || '',
+        role: (result.user?.role || role || 'showhost') as 'brand' | 'showhost',
+        userId: result.user?.id as string | undefined,
+        isBrand: (u?.isBrand ?? u?.is_brand) as boolean | undefined,
+        isShowhost: (u?.isShowhost ?? u?.is_showhost) as boolean | undefined,
+      };
+    }
+
     return result as LoginResponse;
   }
 

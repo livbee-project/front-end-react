@@ -127,6 +127,11 @@ const BusinessVerificationMessage = styled.div<{ $valid?: boolean }>`
   color: ${({ theme, $valid }) => ($valid === true ? theme.colors.primary : $valid === false ? theme.colors.error : theme.colors.muted)};
 `;
 
+const KakaoNotice = styled(PMuted)`
+  margin-top: ${({ theme }) => theme.spacing.sm};
+  color: ${({ theme }) => theme.colors.muted};
+`;
+
 interface SignupFormInputsProps {
   userType: UserRole;
   name: string;
@@ -270,6 +275,11 @@ export const SignupFormInputs: React.FC<SignupFormInputsProps> = ({
           readOnly={isFromKakao === true}
           disabled={isLoading}
         />
+        {isFromKakao && (
+          <KakaoNotice>
+            선택하신 역할로는 아직 회원가입되지 않은 카카오 계정입니다. 정보를 확인하고 회원가입을 완료해 주세요.
+          </KakaoNotice>
+        )}
       </InputWrapper>
 
       {!isFromKakao && (

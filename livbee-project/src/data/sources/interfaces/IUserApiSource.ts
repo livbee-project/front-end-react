@@ -5,6 +5,8 @@ import type {
   SignupResponse,
   MeResponse,
   BusinessVerificationResult,
+  KakaoUserInfo,
+  UserRole,
 } from '@/domain/entities/User';
 
 /**
@@ -12,6 +14,10 @@ import type {
  */
 export interface IUserApiSource {
   login(request: LoginRequest): Promise<LoginResponse>;
+  loginWithKakao(
+    info: KakaoUserInfo,
+    role: UserRole
+  ): Promise<LoginResponse>;
   signup(request: SignupRequest): Promise<SignupResponse>;
   getMe(signal?: AbortSignal): Promise<MeResponse>;
   sendSms(phone: string): Promise<void>;

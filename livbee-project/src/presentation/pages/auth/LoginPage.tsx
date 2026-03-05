@@ -8,6 +8,7 @@ import { useLoginForm } from '@/presentation/components/auth/hooks/useLoginForm'
 import { PageWrapper } from '@/presentation/pages/auth/styled/LoginPageStyles';
 import type { UserRole } from '@/domain/entities/User';
 import { useKakaoAuth } from '@/presentation/hooks/auth/useKakaoAuth';
+import { useAuth } from '@/presentation/hooks/auth/useAuth';
 
 const LoginPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -35,16 +36,24 @@ const LoginPage: React.FC = () => {
   });
 
   const { loginWithKakao, isLoading: isKakaoLoading } = useKakaoAuth();
+  const { loginWithKakaoAccount } = useAuth();
 
   const handleKakaoClick = async () => {
     try {
       const info = await loginWithKakao();
-      if (typeof window !== 'undefined') {
-        window.sessionStorage.setItem('kakao_signup_info', JSON.stringify(info));
-      }
+      const role = userType === 'showhost' ? 'showhost' : 'brand';
 
-      const userTypeParamForSignup = userType === 'showhost' ? 'showhost' : 'brand';
-      navigate(`/signup?userType=${userTypeParamForSignup}`, { replace: true });
+      const loggedInUser = await loginWithKakaoAccount(info, role);
+
+      // 아직 우리 서비스에 가입되지 않은 카카오 계정인 경우 → 회원가입 플로우로 이동
+      if (!loggedInUser) {
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.setItem('kakao_signup_info', JSON.stringify(info));
+        }
+
+        const userTypeParamForSignup = userType === 'showhost' ? 'showhost' : 'brand';
+        navigate(`/signup?userType=${userTypeParamForSignup}`, { replace: true });
+      }
     } catch {
       // useKakaoAuth에서 토스트 처리
     }

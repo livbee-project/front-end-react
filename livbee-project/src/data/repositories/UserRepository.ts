@@ -7,8 +7,11 @@ import type {
   SignupResponse,
   MeResponse,
   BusinessVerificationResult,
+  KakaoUserInfo,
+  UserRole,
 } from '@/domain/entities/User';
 import { BaseRepository } from '@/data/repositories/BaseRepository';
+import { ApiError } from '@/shared/utils/apiClient';
 
 /**
  * 사용자 리포지토리
@@ -32,6 +35,28 @@ export class UserRepository extends BaseRepository {
       'UserRepository',
       '로그인'
     );
+  }
+
+  /**
+   * 카카오 로그인
+   * - 백엔드에서 이 카카오 계정이 현재 선택한 역할로 가입되지 않은 경우(null 반환)
+   */
+  async loginWithKakao(info: KakaoUserInfo, role: UserRole): Promise<LoginResponse | null> {
+    try {
+      const response = await this.apiSource.loginWithKakao(info, role);
+      return response;
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) {
+        const payload = (error.payload ?? {}) as { error?: string; code?: string };
+        const code = payload.code ?? payload.error;
+
+        if (code === 'USER_NOT_FOUND' || code === 'USER_NOT_FOUND_FOR_ROLE') {
+          // 이 카카오 계정은 현재 선택한 역할로는 아직 가입되지 않음 → 회원가입 플로우로 분기
+          return null;
+        }
+      }
+      throw error;
+    }
   }
 
   /**

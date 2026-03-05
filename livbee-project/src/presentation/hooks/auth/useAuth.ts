@@ -2,9 +2,10 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { useNavigate } from 'react-router-dom';
 import { UserRepository } from '@/data/repositories/UserRepository';
 import { useRepository } from '@/presentation/hooks/common/useRepository';
-import type { LoginRequest, SignupRequest, User, UserRole } from '@/domain/entities/User';
+import type { KakaoUserInfo, LoginRequest, SignupRequest, User, UserRole } from '@/domain/entities/User';
 import { consumeAuthRedirectPath, setAuthRedirectPath } from '@/shared/utils/authRedirect';
 import { LoginUseCase } from '@/domain/usecases/auth/LoginUseCase';
+import { KakaoLoginUseCase } from '@/domain/usecases/auth/KakaoLoginUseCase';
 import { SignupUseCase } from '@/domain/usecases/auth/SignupUseCase';
 import { LogoutUseCase } from '@/domain/usecases/auth/LogoutUseCase';
 import { GetCurrentUserUseCase } from '@/domain/usecases/auth/GetCurrentUserUseCase';
@@ -30,6 +31,7 @@ interface LoginOptions {
 export interface UseAuthReturn extends AuthState {
   currentRole: UserRole | null;
   login: (request: LoginRequest, options?: LoginOptions) => Promise<User>;
+  loginWithKakaoAccount: (info: KakaoUserInfo, role: UserRole, options?: LoginOptions) => Promise<User | null>;
   signup: (request: SignupRequest) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
@@ -63,6 +65,7 @@ const useAuthValue = (): UseAuthReturn => {
 
   // UseCase 인스턴스 생성 (메모이제이션)
   const loginUseCase = useMemo(() => new LoginUseCase(userRepository), [userRepository]);
+  const kakaoLoginUseCase = useMemo(() => new KakaoLoginUseCase(userRepository), [userRepository]);
   const signupUseCase = useMemo(() => new SignupUseCase(userRepository), [userRepository]);
   const logoutUseCase = useMemo(() => new LogoutUseCase(), []);
   const getCurrentUserUseCase = useMemo(() => new GetCurrentUserUseCase(userRepository), [userRepository]);
@@ -170,6 +173,49 @@ const useAuthValue = (): UseAuthReturn => {
   );
 
   /**
+   * 카카오 로그인
+   * - 이미 가입된 카카오 계정이면 일반 로그인과 동일하게 처리
+   * - 가입되지 않은 경우 null 반환 (UI에서 회원가입 플로우로 분기)
+   */
+  const loginWithKakaoAccount = useCallback(
+    async (info: KakaoUserInfo, role: UserRole, options?: LoginOptions): Promise<User | null> => {
+      try {
+        const result = await kakaoLoginUseCase.execute({ ...info, role });
+
+        if (!result) {
+          return null;
+        }
+
+        const redirectPath = options?.redirectTo || consumeAuthRedirectPath() || '/mypage';
+
+        if (redirectPath && redirectPath !== '/mypage' && !options?.redirectTo) {
+          setAuthRedirectPath(redirectPath);
+        }
+
+        const selectedRole = role || 'brand';
+        setCurrentRole(selectedRole);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(CURRENT_ROLE_STORAGE_KEY, selectedRole);
+        }
+
+        setAuthState({
+          isLoggedIn: true,
+          user: result.user,
+          isLoading: false,
+        });
+
+        navigate(redirectPath, { replace: true });
+
+        return result.user;
+      } catch (error) {
+        setAuthState((prev) => ({ ...prev, isLoading: false }));
+        throw error;
+      }
+    },
+    [kakaoLoginUseCase, navigate]
+  );
+
+  /**
    * 회원가입
    */
   const signup = useCallback(
@@ -201,6 +247,7 @@ const useAuthValue = (): UseAuthReturn => {
     ...authState,
     currentRole,
     login,
+    loginWithKakaoAccount,
     signup,
     logout,
     refreshUser,
