@@ -8,6 +8,7 @@ const TAB_ITEMS = [
   { label: '쇼핑라이브', path: '/live' },
   { label: '뉴스', path: '/news' },
   { label: '숏클립', path: '/clips' },
+  { label: '커뮤니티', path: '/community' },
   { label: '이벤트', path: '/event' },
   { label: '서비스', path: '/service' },
 ];

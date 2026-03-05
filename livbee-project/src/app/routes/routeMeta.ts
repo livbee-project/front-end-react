@@ -3,6 +3,7 @@ import type { UserRole } from '@/domain/entities/User';
 export const ROUTE_PATHS = {
   home: '/',
   clips: '/clips',
+  community: '/community',
   campaigns: '/campaigns',
   campaignRegister: '/campaigns/register',
   campaignDetail: '/campaigns/:id',
@@ -26,6 +27,7 @@ export const ROUTE_PATHS = {
   live: '/live',
   event: '/event',
   service: '/service',
+  communityDetail: '/community/:id',
   imageCrop: '/image/crop',
 };
 

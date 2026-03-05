@@ -52,6 +52,8 @@ const SignupPage = lazyWithRetry(() => import('@/presentation/pages/auth/SignupP
 const KakaoCallbackPage = lazyWithRetry(() => import('@/presentation/pages/auth/KakaoCallbackPage'));
 const ImageCropPage = lazyWithRetry(() => import('@/presentation/pages/image/ImageCropPage'));
 const ChatRoomPage = lazyWithRetry(() => import('@/presentation/pages/chat/ChatRoomPage'));
+const CommunityPage = lazyWithRetry(() => import('@/presentation/pages/community/CommunityPage'));
+const CommunityDetailPage = lazyWithRetry(() => import('@/presentation/pages/community/CommunityDetailPage'));
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -81,6 +83,7 @@ const AppRouter = () => (
             <Route path={ROUTE_PATHS.news} element={<div>뉴스 페이지</div>} />
             <Route path={ROUTE_PATHS.event} element={<div>이벤트 페이지</div>} />
             <Route path={ROUTE_PATHS.service} element={<div>서비스 페이지</div>} />
+            <Route path={ROUTE_PATHS.community} element={<CommunityPage />} />
 
             {/* (추가) BottomNavBar의 탭 경로들을 추가합니다. */}
             <Route path={ROUTE_PATHS.campaigns} element={<CampaignsPage />} />
@@ -180,6 +183,7 @@ const AppRouter = () => (
           <Route path={ROUTE_PATHS.campaignDetail} element={<CampaignDetailPage />} />
           <Route path={ROUTE_PATHS.modelDetail} element={<ModelDetailPage />} />
           <Route path={ROUTE_PATHS.portfolioDetail} element={<PortfolioDetailPage />} />
+          <Route path={ROUTE_PATHS.communityDetail} element={<CommunityDetailPage />} />
 
           {/* 로그인 페이지 - 하단 네비게이션 표시 */}
           <Route
