@@ -1,58 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import StickyHeader from '@/presentation/components/detail/common/StickyHeader';
-import { CommunityRepository } from '@/data/repositories/CommunityRepository';
-import type { CommunityPostDetail } from '@/domain/entities/Community';
-import { useRepository } from '@/presentation/hooks/common/useRepository';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { ErrorState } from '@/presentation/components/states/ErrorState';
 import { H2, PMuted, Caption } from '@/presentation/components/styled/Typography';
 import { Eye, MessageCircle, Heart } from 'lucide-react';
+import { useCommunityDetail } from '@/presentation/hooks/community/useCommunityDetail';
 
 const CommunityDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const communityRepository = useRepository(CommunityRepository);
-
-  const [post, setPost] = useState<CommunityPostDetail | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!id) {
-      setError('게시글 ID가 올바르지 않습니다.');
-      setLoading(false);
-      return;
-    }
-
-    const abortController = new AbortController();
-
-    const fetchDetail = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await communityRepository.getPostDetail(id, abortController.signal);
-        setPost(response.data);
-      } catch (err) {
-        if (err instanceof Error && err.name === 'AbortError') {
-          return;
-        }
-        setError('게시글을 불러오는 중 오류가 발생했습니다.');
-        setPost(null);
-      } finally {
-        if (!abortController.signal.aborted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchDetail();
-
-    return () => {
-      abortController.abort();
-    };
-  }, [communityRepository, id]);
+  const { post, loading, error } = useCommunityDetail(id);
 
   if (loading && !post) {
     return (

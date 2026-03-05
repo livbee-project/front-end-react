@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { CommunityRepository } from '@/data/repositories/CommunityRepository';
 import type { CommunityCategoryCode, CommunityListQuery, CommunityPost } from '@/domain/entities/Community';
 import { useRepository } from '@/presentation/hooks/common/useRepository';
@@ -22,6 +22,7 @@ type FilterValue = 'all' | CommunityCategoryCode;
 
 const CommunityPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { showToast } = useToast();
   const communityRepository = useRepository(CommunityRepository);
 
@@ -71,7 +72,9 @@ const CommunityPage: React.FC = () => {
   };
 
   const handleCardClick = (id: string) => {
-    navigate(ROUTE_PATHS.communityDetail.replace(':id', id));
+    navigate(ROUTE_PATHS.communityDetail.replace(':id', id), {
+      state: { backgroundLocation: location },
+    });
   };
 
   const handleFabClick = () => {

@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import type { Location } from 'react-router-dom';
 import React, { Suspense, lazy } from 'react';
 import '@/presentation/styles/global.css';
 import TopNavLayout from '@/presentation/layouts/TopNavLayout';
@@ -54,13 +55,23 @@ const ImageCropPage = lazyWithRetry(() => import('@/presentation/pages/image/Ima
 const ChatRoomPage = lazyWithRetry(() => import('@/presentation/pages/chat/ChatRoomPage'));
 const CommunityPage = lazyWithRetry(() => import('@/presentation/pages/community/CommunityPage'));
 const CommunityDetailPage = lazyWithRetry(() => import('@/presentation/pages/community/CommunityDetailPage'));
+const CommunityDetailModal = lazyWithRetry(
+  () => import('@/presentation/components/community/CommunityDetailModal')
+);
 
-const AppRouter = () => (
-  <BrowserRouter>
-    <AuthProvider>
-      <Suspense fallback={<RouteFallback />}>
-        <div className="app-container" style={{ height: '100vh' }}>
-          <Routes>
+interface LocationState {
+  backgroundLocation?: Location;
+}
+
+const AppRoutes: React.FC = () => {
+  const location = useLocation();
+  const state = (location.state as LocationState | undefined) ?? undefined;
+
+  const mainLocation = state?.backgroundLocation ?? location;
+
+  return (
+    <>
+      <Routes location={mainLocation}>
         {/*
           --- (수정) 최상위 Shell Route 적용 ---
 
@@ -218,6 +229,23 @@ const AppRouter = () => (
           }
         />
       </Routes>
+
+      {/* 모달 라우트: backgroundLocation 이 있을 때만 렌더링 (커뮤니티 상세 모달 등) */}
+      {state?.backgroundLocation && (
+        <Routes>
+          <Route path={ROUTE_PATHS.communityDetail} element={<CommunityDetailModal />} />
+        </Routes>
+      )}
+    </>
+  );
+};
+
+const AppRouter = () => (
+  <BrowserRouter>
+    <AuthProvider>
+      <Suspense fallback={<RouteFallback />}>
+        <div className="app-container" style={{ height: '100vh' }}>
+          <AppRoutes />
     </div>
       </Suspense>
     </AuthProvider>
