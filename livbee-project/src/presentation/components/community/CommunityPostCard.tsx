@@ -7,12 +7,15 @@ import { Badge } from '@/presentation/components/styled/CommonStyles';
 
 interface CommunityPostCardProps {
   post: CommunityPost;
-  onClick?: () => void;
+  onClick?: (postId: string) => void;
 }
 
-export const CommunityPostCard: React.FC<CommunityPostCardProps> = ({ post, onClick }) => {
+export const CommunityPostCard: React.FC<CommunityPostCardProps> = React.memo(({ post, onClick }) => {
   return (
-    <CardContainer type="button" onClick={onClick}>
+    <CardContainer
+      type="button"
+      onClick={onClick ? () => onClick(post.id) : undefined}
+    >
       <CardHeader>
         <LeftTags>
           {post.topicTag && (
@@ -60,7 +63,9 @@ export const CommunityPostCard: React.FC<CommunityPostCardProps> = ({ post, onCl
       </CardFooter>
     </CardContainer>
   );
-};
+});
+
+CommunityPostCard.displayName = 'CommunityPostCard';
 
 const CardContainer = styled.button`
   width: 100%;
