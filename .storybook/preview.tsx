@@ -23,6 +23,7 @@ const preview: Preview = {
       storySort: {
         order: [
           'Overview',
+          'Guides',
           'Auth',
           'Cards',
           'Design System',

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { MemoryRouter } from 'react-router-dom';
 import styled from 'styled-components';
 import HomeNavBar from '@/presentation/components/navigation/HomeNavBar';
 
@@ -27,12 +28,12 @@ const Page = styled.div`
 
 export const Default: Story = {
   render: () => (
-    <>
+    <MemoryRouter>
       <HomeNavBar />
       <Page>
         <p>상단 네비게이션이 스크롤에 고정되어 있는 모습을 확인할 수 있습니다.</p>
       </Page>
-    </>
+    </MemoryRouter>
   ),
 };
 

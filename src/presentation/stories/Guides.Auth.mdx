@@ -4,8 +4,7 @@ import { Meta } from '@storybook/addon-docs';
 
 # Auth & AuthGuard 가이드
 
-이 문서는 **인증 상태 관리(`useAuth`)와 라우트 가드(`AuthGuard`)를 어떻게 사용하는지**를 요약합니다.  
-자세한 용어 정의는 `docs/FRONTEND_GLOSSARY.md`의 관련 섹션을 참고하세요.
+이 문서는 **인증 상태 관리(`useAuth`)와 라우트 가드(`AuthGuard`)를 어떻게 사용하는지**를 요약합니다.
 
 ---
 
@@ -82,4 +81,3 @@ const MyPageHeader = () => {
 - 인증 관련 로직을 수정할 때:
   - [ ] `useAuth`를 통해 처리할 수 있는지 먼저 검토하고, 개별 페이지에서 중복 로직을 만들지 않는다.
   - [ ] 도메인 타입(`User`, `UserRole`)과 프론트 표현(`currentRole`)이 서로 어긋나지 않는지 확인한다.
-

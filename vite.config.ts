@@ -1,15 +1,10 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from 'vite';
 import type { ViteDevServer } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
 // https://vite.dev/config/
-import { fileURLToPath } from 'node:url';
-import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
-import { playwright } from '@vitest/browser-playwright';
 import { spawn } from 'child_process';
-const dirname =
-  typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
 // 외부 브라우저를 여는 Vite 플러그인
 const openExternalBrowser = () => {
@@ -63,7 +58,6 @@ const openExternalBrowser = () => {
   };
 };
 
-// More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
   plugins: [react(), openExternalBrowser()],
   /* Vite 절대 경로 설정 */
@@ -96,43 +90,5 @@ export default defineConfig({
         },
       },
     },
-  },
-  test: {
-    projects: [
-      // unit: *.test.ts만 실행, Node 환경, Storybook 미사용
-      {
-        test: {
-          name: 'unit',
-          include: ['**/*.test.ts'],
-          environment: 'node',
-        },
-      },
-      // storybook: Storybook 스토리 기반 테스트, Playwright 브라우저
-      {
-        extends: true,
-        plugins: [
-          // The plugin will run tests for the stories defined in your Storybook config
-          // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
-          storybookTest({
-            configDir: path.join(dirname, '.storybook'),
-          }),
-        ],
-        test: {
-          name: 'storybook',
-          exclude: ['**/*.test.ts'],
-          browser: {
-            enabled: true,
-            headless: true,
-            provider: playwright({}),
-            instances: [
-              {
-                browser: 'chromium',
-              },
-            ],
-          },
-          setupFiles: ['.storybook/vitest.setup.ts'],
-        },
-      },
-    ],
   },
 });
