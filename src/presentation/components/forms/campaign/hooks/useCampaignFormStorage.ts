@@ -387,7 +387,17 @@ export const useCampaignFormStorage = ({
         liveCover: liveCoverImageUrl,
       };
     }
-  }, [coverImageUrl, productImageUrl, liveCoverImageUrl, formData.qualifications, restoreFormData, onImageRestored]);
+  }, [
+    clearStorage,
+    coverImageUrl,
+    formData.qualifications,
+    liveCoverImageUrl,
+    onImageRestored,
+    productImageUrl,
+    restoreFormData,
+    restoreFormDataWithoutClear,
+    setFormData,
+  ]);
 
   // 페이지를 벗어났다가 돌아올 때 데이터 초기화 감지
   useEffect(() => {

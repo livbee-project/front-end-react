@@ -1,10 +1,10 @@
-# front-end-react(최신)
+# livbee-front
 
 ## Node.js 버전 고정 안내
 
 이 프로젝트는 Node.js의 안정적인 버전 관리를 위해 `.nvmrc` 파일을 사용합니다.
 
-- 현재 권장 Node.js 버전: **v24.11.0**
+- 현재 고정 Node.js 버전: **24.16.0** (`.nvmrc`, `package.json`의 `engines.node: 24.x`와 함께 사용)
 - nvm을 사용하는 경우 아래 명령어로 해당 버전 환경을 맞출 수 있습니다.
 
 ```bash
@@ -14,7 +14,7 @@ nvm use
 > 만약 해당 버전이 설치되어 있지 않다면, 아래 명령어로 설치 후 사용하세요.
 
 ```bash
-nvm install v24.11.0
+nvm install
 nvm use
 ```
 
@@ -35,15 +35,44 @@ nvm use
 
 아래 명령어로 코드 스타일을 자동 정렬할 수 있습니다.
 
-```
-npx prettier --write .
+```bash
+npm run format
 ```
 
 VSCode 등 IDE의 포맷 기능과 연동해 자동 정렬도 가능합니다.
 
 ---
 
-## 폴더 구조 및 클린 아키텍처(2025-10-30 기준)
+## 테스트
+
+| 명령어 | 설명 |
+|--------|------|
+| `npm test` | `src` 내 `*.test.ts` 유닛 테스트 (`vitest.config.ts`) |
+| `npm run test:storybook` | Storybook 스토리 기반 브라우저 테스트 (`vitest.storybook.config.ts`) |
+
+유닛·Storybook 테스트는 각각 전용 Vitest 설정 파일에서 관리하며, `vite.config.ts`는 앱 빌드·dev 전용입니다.
+
+Storybook 브라우저 테스트를 처음 실행할 때는 Playwright Chromium 설치가 필요합니다.
+
+```bash
+npx playwright install chromium
+```
+
+---
+
+## 품질 확인
+
+```bash
+npm run check      # lint + unit test + build
+npm run check:ci   # lint + unit + storybook test + build (CI와 동일)
+npm run format     # Prettier 포맷
+```
+
+CI(GitHub Actions)는 `check:ci`와 동일한 단계(`lint` → `test` → `test:storybook` → `build`)를 실행합니다.
+
+---
+
+## 폴더 구조 및 클린 아키텍처
 
 ```
 src/

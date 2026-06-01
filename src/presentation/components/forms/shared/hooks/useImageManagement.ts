@@ -287,7 +287,7 @@ export const useImageManagement = ({
         URL.revokeObjectURL(removedUrl);
       }
     },
-    [galleryImageUrls, galleryImageFiles, mainThumbnailUrl, storage, hookName]
+    [galleryImageUrls, galleryImageFiles, mainThumbnailUrl, storage]
   );
 
   // 이미지 상태 초기화

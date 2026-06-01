@@ -35,4 +35,16 @@ export default defineConfig([
       'preserve-caught-error': 'off',
     },
   },
+  {
+    files: [
+      '**/*StoryContent*.tsx',
+      '**/HomeCardImage.tsx',
+      '**/Typography.tsx',
+      '**/HomeSection.tsx',
+      '**/DetailPageLayoutStoryContent.tsx',
+    ],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ])
