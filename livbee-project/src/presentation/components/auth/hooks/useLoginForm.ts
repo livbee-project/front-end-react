@@ -96,7 +96,7 @@ export const useLoginForm = ({
         showToast('로그인되었습니다.');
       }
       onSuccess?.();
-    } catch (err) {
+    } catch {
       // API 에러는 ApiErrorToastListener에서 처리하므로 여기서는 토스트를 표시하지 않음
       // 단, API 에러가 아닌 경우를 대비해 에러를 다시 throw하지 않음 (이미 ApiErrorToastListener가 처리)
     } finally {

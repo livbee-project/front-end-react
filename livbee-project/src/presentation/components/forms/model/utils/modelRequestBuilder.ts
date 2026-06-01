@@ -38,10 +38,7 @@ export const buildModelRequest = (
   const experienceYears = parseNumber(formData.tags[3]?.value);
   const age = parseNumber(formData.tags[4]?.value);
 
-  // undefined를 null로 변환하여 서버에 명시적으로 전송
-  // 서버가 null을 기대하거나 필수 필드로 처리할 수 있음
-  // 타입 단언을 사용하여 null 허용 (서버가 null을 기대할 수 있음)
-  const request = {
+  const request: CreateModelRequest = {
     nickname: safeTrim(formData.name),
     oneLineIntro: safeTrim(formData.oneLineIntro),
     detailedIntro: safeTrim(formData.detailedIntro),
@@ -54,17 +51,17 @@ export const buildModelRequest = (
     openChat: safeTrim(formData.openChat),
     registrationType: safeTrim(formData.registrationType),
     attachedFileUrl: uploadedPortfolioFileUrl,
-    height: height ?? (null as any),
-    weight: weight ?? (null as any),
-    topSize: topSize ?? (null as any),
-    experienceYears: experienceYears ?? (null as any),
-    age: age ?? (null as any),
+    height,
+    weight,
+    topSize,
+    experienceYears,
+    age,
     status: 'published',
     publicScope: '전체공개',
     isAgePublic: true,
     isSizingPublic: true,
     isReceivingOffers: true,
-  } as CreateModelRequest;
+  };
 
   return request;
 };

@@ -190,7 +190,7 @@ export const useCommunityPostWriteForm = () => {
         replace: true,
       });
     } catch (error) {
-      // eslint-disable-next-line no-console
+       
       console.error('[useCommunityPostWriteForm] 게시글 생성 실패:', error);
       showToast('게시글 등록 중 오류가 발생했습니다.', undefined, 'error');
     } finally {

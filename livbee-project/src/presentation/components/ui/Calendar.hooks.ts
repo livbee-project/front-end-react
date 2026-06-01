@@ -18,7 +18,7 @@ export const useCalendarDOM = ({ calendarRef }: UseCalendarDOMProps) => {
     let isUpdating = false;
     let lastMonthYear = '';
     let weekdaysUpdated = false;
-    let mutationTimeout: NodeJS.Timeout | null = null;
+    let mutationTimeout: ReturnType<typeof setTimeout> | null = null;
     
     
     const updateWeekdays = () => {
@@ -108,7 +108,7 @@ export const useCalendarDOM = ({ calendarRef }: UseCalendarDOMProps) => {
       updateWeekdays();
     }, CALENDAR_TIMING.INITIAL_DELAY);
     
-    let buttonClickTimeout: NodeJS.Timeout | null = null;
+    let buttonClickTimeout: ReturnType<typeof setTimeout> | null = null;
     const handleButtonClick = () => {
       if (buttonClickTimeout) {
         clearTimeout(buttonClickTimeout);

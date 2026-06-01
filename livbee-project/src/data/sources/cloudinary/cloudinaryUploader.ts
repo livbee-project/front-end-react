@@ -97,7 +97,7 @@ export class CloudinaryUploader {
       let errorData = null;
       try {
         errorData = JSON.parse(responseText);
-      } catch (e) {
+      } catch {
         // JSON 파싱 실패 시 텍스트 그대로 사용
       }
       
@@ -352,14 +352,22 @@ export class CloudinaryUploader {
 
     if (!response.ok) {
       const errorText = await response.text();
-      let errorData: any = {};
+      let errorData: Record<string, unknown> = { raw: errorText };
       try {
-        errorData = JSON.parse(errorText);
+        errorData = JSON.parse(errorText) as Record<string, unknown>;
       } catch {
-        errorData = { raw: errorText };
+        // keep raw fallback
       }
+      const nestedError = errorData.error;
+      const nestedMessage =
+        typeof nestedError === 'object' &&
+        nestedError !== null &&
+        'message' in nestedError &&
+        typeof nestedError.message === 'string'
+          ? nestedError.message
+          : undefined;
       const errorMessage =
-        errorData.error?.message || `Cloudinary upload failed: ${response.status} ${response.statusText}`;
+        nestedMessage || `Cloudinary upload failed: ${response.status} ${response.statusText}`;
       
       // 에러 정보를 모두 펼쳐서 한 번에 표시 (그룹 없이)
       const signatureString = paramsToSign.map(([key, value]) => `${key}=${value}`).join('&');

@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components';
-/* eslint-disable react-refresh/only-export-components */
+ 
 import { H2, PMuted, Small, Caption } from '@/presentation/components/styled/Typography';
 
 export const PageWrapper = styled.div`

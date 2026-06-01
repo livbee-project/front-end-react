@@ -11,6 +11,8 @@ import { RouteFallback } from '@/presentation/components/states/RouteFallback';
 import { error as logError } from '@/shared/utils/logger';
 
 // 동적 임포트에 에러 핸들링 추가 (Vite HMR 이슈 대응)
+// lazy()는 페이지별 props 타입이 달라 공통 제네릭에 any가 필요함
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const lazyWithRetry = <T extends React.ComponentType<any>>(
   importFn: () => Promise<{ default: T }>
 ): React.LazyExoticComponent<T> => {

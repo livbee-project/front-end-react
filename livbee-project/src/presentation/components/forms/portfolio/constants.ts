@@ -1,17 +1,18 @@
-import { Youtube, Instagram, Video } from 'lucide-react';
+import { SiYoutube, SiInstagram } from '@icons-pack/react-simple-icons';
+import { Video } from 'lucide-react';
 
 export const SNS_ENTRIES = [
   {
     id: 0,
     label: '유튜브',
     placeholder: 'https://youtube.com/...',
-    icon: Youtube,
+    icon: SiYoutube,
   },
   {
     id: 1,
     label: '인스타그램',
     placeholder: 'https://instagram.com/...',
-    icon: Instagram,
+    icon: SiInstagram,
   },
   {
     id: 2,

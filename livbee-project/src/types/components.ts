@@ -69,7 +69,7 @@ export interface ImageCardProps extends BaseCardProps {
 /**
  * @deprecated @/types/commonProps의 ModalProps를 사용하세요
  */
-export interface BaseModalProps extends CommonModalProps {}
+export type BaseModalProps = CommonModalProps
 
 // ===== 파일 업로드 관련 =====
 
@@ -90,7 +90,7 @@ export interface ImageUploadProps extends CommonImageUploadProps {
 /**
  * @deprecated @/types/commonProps의 BaseInputProps를 사용하세요
  */
-export interface BaseInputProps extends CommonBaseInputProps {}
+export type BaseInputProps = CommonBaseInputProps
 
 export interface SelectInputProps
   extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'value' | 'onChange'>,

@@ -74,7 +74,7 @@ const SignupPage: React.FC = () => {
       const info = JSON.parse(stored) as KakaoUserInfo;
       handleKakaoSuccess(info);
     } catch (error) {
-      // eslint-disable-next-line no-console
+       
       console.error('Failed to parse kakao_signup_info:', error);
     } finally {
       window.sessionStorage.removeItem('kakao_signup_info');

@@ -211,7 +211,7 @@ export const useModelRegisterForm = () => {
 
     try {
       let uploadedMainThumbnailUrl: string | undefined;
-      let uploadedGalleryUrls: string[] = [];
+      const uploadedGalleryUrls: string[] = [];
       let uploadedPortfolioFileUrl: string | undefined;
 
       // ref에서도 파일 확인 (상태가 null일 수 있으므로)

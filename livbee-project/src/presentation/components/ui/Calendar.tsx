@@ -123,8 +123,16 @@ const Calendar: React.FC<CalendarProps> = ({
           onSelect={handleDateSelect}
           showOutsideDays
           fixedWeeks
-          fromDate={minDate}
-          toDate={maxDate}
+          startMonth={minDate}
+          endMonth={maxDate}
+          hidden={
+            minDate || maxDate
+              ? [
+                  ...(minDate ? [{ before: minDate }] : []),
+                  ...(maxDate ? [{ after: maxDate }] : []),
+                ]
+              : undefined
+          }
         />
         <CalendarFooter>
           <CancelButton onClick={handleCancelClick} type="button">

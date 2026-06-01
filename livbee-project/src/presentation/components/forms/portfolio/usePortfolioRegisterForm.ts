@@ -197,7 +197,7 @@ export const usePortfolioRegisterForm = () => {
 
     try {
       let uploadedMainThumbnailUrl: string | undefined;
-      let uploadedGalleryUrls: string[] = [];
+      const uploadedGalleryUrls: string[] = [];
       let uploadedPortfolioFileUrl: string | undefined;
       let uploadedResumeFileUrl: string | undefined;
 

@@ -50,8 +50,8 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, onClose }) => 
     let hourColumn: HTMLElement | null = null;
     let minuteColumn: HTMLElement | null = null;
     let isInitialScrollDone = false;
-    let hourScrollTimeout: NodeJS.Timeout | null = null;
-    let minuteScrollTimeout: NodeJS.Timeout | null = null;
+    const hourScrollTimeout: ReturnType<typeof setTimeout> | null = null;
+    const minuteScrollTimeout: ReturnType<typeof setTimeout> | null = null;
     let animationFrameId: number | null = null;
 
     const findPickerColumns = () => {

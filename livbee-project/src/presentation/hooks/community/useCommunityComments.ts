@@ -75,7 +75,7 @@ export const useCommunityComments = (postId?: string): UseCommunityCommentsResul
         const refreshed = await communityRepository.getComments(postId, undefined);
         setComments(refreshed.items);
       } catch (error) {
-        // eslint-disable-next-line no-console
+         
         console.error('[useCommunityComments] 댓글 작성 실패:', error);
         showToast('댓글 작성 중 오류가 발생했습니다.', undefined, 'error');
       } finally {

@@ -87,7 +87,7 @@ export const useCommunityDetail = (id?: string): UseCommunityDetailResult => {
     } catch (err) {
       // 롤백
       setPost(prev);
-      // eslint-disable-next-line no-console
+       
       console.error('[useCommunityDetail] 좋아요 토글 실패:', err);
       showToast('좋아요 처리 중 오류가 발생했습니다.', undefined, 'error');
     } finally {
