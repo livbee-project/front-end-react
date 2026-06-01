@@ -3,6 +3,7 @@ import { CommunityRepository } from '@/data/repositories/CommunityRepository';
 import type { CommunityPostDetail } from '@/domain/entities/Community';
 import { useRepository } from '@/presentation/hooks/common/useRepository';
 import { useToast } from '@/presentation/contexts/ToastContext';
+import { error as logError } from '@/shared/utils/logger';
 
 interface UseCommunityDetailResult {
   post: CommunityPostDetail | null;
@@ -88,7 +89,7 @@ export const useCommunityDetail = (id?: string): UseCommunityDetailResult => {
       // 롤백
       setPost(prev);
        
-      console.error('[useCommunityDetail] 좋아요 토글 실패:', err);
+      logError('useCommunityDetail', '좋아요 토글 실패', err);
       showToast('좋아요 처리 중 오류가 발생했습니다.', undefined, 'error');
     } finally {
       setLiking(false);

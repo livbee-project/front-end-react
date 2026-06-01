@@ -11,6 +11,7 @@ import { validateCampaignForm } from '@/presentation/components/forms/campaign/u
 import { buildCampaignRequest } from '@/presentation/components/forms/campaign/utils/campaignRequestBuilder';
 import { useCampaignFormStorage } from '@/presentation/components/forms/campaign/hooks/useCampaignFormStorage';
 import { useCampaignImageManagement } from '@/presentation/components/forms/campaign/hooks/useCampaignImageManagement';
+import { error as logError } from '@/shared/utils/logger';
 
 const INITIAL_FORM_DATA: CampaignFormData = {
   brandName: '',
@@ -174,13 +175,6 @@ export const useCampaignRegisterForm = () => {
       const finalLiveCoverImageFile = liveCoverImageFile || await getLiveCoverImageFile();
 
       if (finalCoverImageFile) {
-        console.log('[useCampaignRegisterForm] 📤 커버 이미지 업로드 시작', {
-          fileName: finalCoverImageFile.name,
-          fileSize: finalCoverImageFile.size,
-          fileType: finalCoverImageFile.type,
-          fromState: !!coverImageFile,
-          fromRef: !!getCoverImageFile() && !coverImageFile,
-        });
         // 모집공고 등록 시 category는 'campaign', resourceId는 아직 생성되지 않았으므로 undefined
         // publicId는 'cover'로 지정 (백엔드 폴더 구조에 따라)
         const url = await uploadFile(finalCoverImageFile, {
@@ -188,77 +182,42 @@ export const useCampaignRegisterForm = () => {
           category: 'campaign',
           publicId: 'cover',
         });
-        console.log('[useCampaignRegisterForm] ✅ 커버 이미지 업로드 완료', { url });
         if (!url) {
           showToast('커버 이미지 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
           setIsSubmitting(false);
           return;
         }
         uploadedCoverImageUrl = url;
-      } else {
-        console.log('[useCampaignRegisterForm] ⚠️ coverImageFile이 없습니다', {
-          coverImageFile: null,
-          refFile: getCoverImageFile(),
-          coverImageUrl,
-        });
       }
 
       if (finalProductImageFile) {
-        console.log('[useCampaignRegisterForm] 📤 상품 이미지 업로드 시작', {
-          fileName: finalProductImageFile.name,
-          fileSize: finalProductImageFile.size,
-          fileType: finalProductImageFile.type,
-          fromState: !!productImageFile,
-          fromRef: !!getProductImageFile() && !productImageFile,
-        });
         // 상품 이미지는 'product'로 지정 (백엔드 폴더 구조에 따라 'product.jpg' 또는 'products/{product_id}.jpg')
         const url = await uploadFile(finalProductImageFile, {
           type: 'image',
           category: 'campaign',
           publicId: 'product',
         });
-        console.log('[useCampaignRegisterForm] ✅ 상품 이미지 업로드 완료', { url });
         if (!url) {
           showToast('상품 이미지 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
           setIsSubmitting(false);
           return;
         }
         uploadedProductImageUrl = url;
-      } else {
-        console.log('[useCampaignRegisterForm] ⚠️ productImageFile이 없습니다', {
-          productImageFile: null,
-          refFile: getProductImageFile(),
-          productImageUrl,
-        });
       }
 
       if (finalLiveCoverImageFile) {
-        console.log('[useCampaignRegisterForm] 📤 라이브 커버 이미지 업로드 시작', {
-          fileName: finalLiveCoverImageFile.name,
-          fileSize: finalLiveCoverImageFile.size,
-          fileType: finalLiveCoverImageFile.type,
-          fromState: !!liveCoverImageFile,
-          fromRef: !!getLiveCoverImageFile() && !liveCoverImageFile,
-        });
         // 라이브 커버 이미지는 'live-cover'로 지정 (백엔드 폴더 구조에 따라)
         const url = await uploadFile(finalLiveCoverImageFile, {
           type: 'image',
           category: 'campaign',
           publicId: 'live-cover',
         });
-        console.log('[useCampaignRegisterForm] ✅ 라이브 커버 이미지 업로드 완료', { url });
         if (!url) {
           showToast('라이브 커버 이미지 업로드에 실패했습니다. 로그인 상태를 확인해주세요.', undefined, 'error');
           setIsSubmitting(false);
           return;
         }
         uploadedLiveCoverImageUrl = url;
-      } else {
-        console.log('[useCampaignRegisterForm] ⚠️ liveCoverImageFile이 없습니다', {
-          liveCoverImageFile: null,
-          refFile: getLiveCoverImageFile(),
-          liveCoverImageUrl,
-        });
       }
 
       const request = buildCampaignRequest(
@@ -267,13 +226,6 @@ export const useCampaignRegisterForm = () => {
         uploadedProductImageUrl,
         uploadedLiveCoverImageUrl
       );
-
-      // 디버깅: 전송되는 요청 데이터 로깅
-      console.log('[useCampaignRegisterForm] 📤 전송되는 요청 데이터:', {
-        ...request,
-        qualifications: request.qualifications,
-        qualificationsLength: request.qualifications?.length,
-      });
 
       const response = await campaignRepository.createCampaign(request);
 
@@ -293,16 +245,18 @@ export const useCampaignRegisterForm = () => {
       // fetchApi의 notifyApiError가 이미 ApiErrorToastListener를 통해 토스트를 표시하므로
       // 여기서는 추가로 토스트를 표시하지 않음
       // 에러는 로깅만 수행
-      console.error('모집 공고 등록 실패:', error);
+      logError('useCampaignRegisterForm', '모집 공고 등록 실패', error);
     } finally {
       setIsSubmitting(false);
     }
   }, [
     campaignRepository,
     clearStorage,
-    clearImageUrls,
     coverImageFile,
     formData,
+    getCoverImageFile,
+    getLiveCoverImageFile,
+    getProductImageFile,
     liveCoverImageFile,
     navigate,
     productImageFile,

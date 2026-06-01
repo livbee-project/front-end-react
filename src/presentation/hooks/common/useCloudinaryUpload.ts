@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import { CloudinaryUploader } from '@/data/sources/cloudinary/cloudinaryUploader';
 import type { UploadOptions } from '@/data/sources/cloudinary/types';
 import { translateCloudinaryError } from '@/shared/utils/cloudinaryErrorTranslator';
+import { error as logError } from '@/shared/utils/logger';
 
 /**
  * Cloudinary 업로드 Hook 반환 타입
@@ -50,11 +51,10 @@ export const useCloudinaryUpload = (): UseCloudinaryUploadReturn => {
       } catch (err) {
         const rawErrorMessage = err instanceof Error ? err.message : '파일 업로드에 실패했습니다.';
         const errorMessage = translateCloudinaryError(rawErrorMessage);
-        console.error('[useCloudinaryUpload] ❌ 업로드 에러 발생', {
+        logError('useCloudinaryUpload', '업로드 실패', {
           error: err,
           rawErrorMessage,
           errorMessage,
-          errorStack: err instanceof Error ? err.stack : undefined,
           options,
         });
         setError(errorMessage);

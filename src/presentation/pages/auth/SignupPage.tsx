@@ -7,6 +7,7 @@ import { SignupForm } from '@/presentation/components/auth/SignupForm';
 import { useSignupForm } from '@/presentation/components/auth/hooks/useSignupForm';
 import { PageWrapper } from '@/presentation/pages/auth/styled/LoginPageStyles';
 import type { UserRole, KakaoUserInfo } from '@/domain/entities/User';
+import { error as logError } from '@/shared/utils/logger';
 
 const SignupPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -75,7 +76,7 @@ const SignupPage: React.FC = () => {
       handleKakaoSuccess(info);
     } catch (error) {
        
-      console.error('Failed to parse kakao_signup_info:', error);
+      logError('SignupPage', 'kakao_signup_info 파싱 실패', error);
     } finally {
       window.sessionStorage.removeItem('kakao_signup_info');
     }

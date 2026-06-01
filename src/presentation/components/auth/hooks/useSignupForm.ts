@@ -10,6 +10,7 @@ import { useTimer } from '@/presentation/hooks/useTimer';
 import { useKakaoAuth } from '@/presentation/hooks/auth/useKakaoAuth';
 import { removePhoneHyphens, getBusinessNumberDigits } from '@/shared/utils/formatUtils';
 import { ApiError } from '@/shared/utils/apiClient';
+import { error as logError } from '@/shared/utils/logger';
 
 interface UseSignupFormOptions {
   defaultUserType?: UserRole;
@@ -254,7 +255,7 @@ export const useSignupForm = ({
         showToast(fullMessage, undefined, 'error');
       }
       // 다른 에러는 ApiErrorToastListener에서 처리
-      console.error('회원가입 실패:', err);
+      logError('useSignupForm', '회원가입 실패', err);
     } finally {
       setIsLoading(false);
     }

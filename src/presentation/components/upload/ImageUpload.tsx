@@ -59,11 +59,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         // handleImageSelect는 이미 (file) => handleImageSelect(file, type) 형태로 래핑되어 있으므로
         // 그대로 등록하면 됨
         window.__imageCropCallbacks[callbackKey] = handleImageSelect;
-        console.log('[ImageUpload] 📝 콜백 등록', {
-          callbackKey,
-          hasCallback: !!handleImageSelect,
-          callbackType: typeof handleImageSelect,
-        });
       }
       
       navigate('/image/crop', {
@@ -75,11 +70,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           callbackKey,
           aspectRatio, // 미리보기 비율 전달
         },
-      });
-      console.log('[ImageUpload] 🔄 크롭 페이지로 이동', {
-        callbackKey,
-        imageFileName: file.name,
-        returnPath: location.pathname,
       });
     } else {
       // 크롭 기능이 비활성화되어 있으면 바로 콜백 호출

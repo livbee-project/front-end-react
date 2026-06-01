@@ -7,6 +7,7 @@ import type {
   CreateModelResponse,
 } from '@/domain/entities/Model';
 import { buildApiUrl, getAuthHeaders } from '@/shared/config/apiConfig';
+import { error as logError } from '@/shared/utils/logger';
 import { ApiError, fetchApi } from '@/shared/utils/apiClient';
 import { transformModelDetailResponse, transformModelListResponse } from '@/data/mappers/ModelMapper';
 import { handleShowhostEntityError } from '@/data/errorHandlers/showhostEntityErrorHandler';
@@ -93,13 +94,6 @@ export class ModelApiSource implements IModelApiSource {
     const url = buildApiUrl('/models');
     const headers = getAuthHeaders();
     try {
-      console.log('[ModelApiSource] 📤 모델 등록 요청:', {
-        url,
-        method: 'POST',
-        headers: Object.fromEntries(new Headers(headers).entries()),
-        body: JSON.stringify(request),
-      });
-      
       const result = await fetchApi<{ message?: string; data?: CreateModelResponse['data'] }>(
         url,
         {
@@ -109,9 +103,7 @@ export class ModelApiSource implements IModelApiSource {
         },
         '모델 등록'
       );
-      
-      console.log('[ModelApiSource] ✅ createModel 응답 result:', result);
-      
+
       // fetchApi가 성공 응답을 받으면 extractData를 통해 data만 반환하거나 전체 응답을 반환할 수 있음
       // 201 Created 응답이므로 성공으로 간주하고 ok: true를 명시적으로 추가
       
@@ -173,19 +165,18 @@ export class ModelApiSource implements IModelApiSource {
       }
       
       // 예상치 못한 형식인 경우 - 로그를 남기고 에러 발생
-      console.error('[ModelApiSource] ❌ 예상치 못한 응답 형식:', result);
+      logError('ModelApiSource', '예상치 못한 응답 형식', result);
       throw new Error(`예상치 못한 응답 형식입니다. 응답: ${JSON.stringify(result)}`);
     } catch (error) {
       if (error instanceof ApiError) {
-        console.error('[ModelApiSource] ❌ 모델 등록 에러:', {
+        logError('ModelApiSource', '모델 등록 API 에러', {
           status: error.status,
           message: error.message,
           payload: error.payload,
-          fullError: error,
         });
         throw handleShowhostEntityError({ status: error.status }, error.payload, '모델 등록에 실패했습니다.');
       }
-      console.error('[ModelApiSource] ❌ 모델 등록 예상치 못한 에러:', error);
+      logError('ModelApiSource', '모델 등록 예상치 못한 에러', error);
       throw error;
     }
   }

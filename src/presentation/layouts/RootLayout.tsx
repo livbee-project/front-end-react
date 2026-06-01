@@ -5,6 +5,7 @@ import BottomNavBar from '@/presentation/components/navigation/BottomNavBar';
 import AppFooter from '@/presentation/components/footer/AppFooter';
 import { ApiErrorToastListener } from '@/presentation/components/error/ApiErrorToastListener';
 import { ROUTE_PATHS } from '@/app/routes/routeMeta';
+import { error as logError } from '@/shared/utils/logger';
 
 const RootLayout: React.FC = () => {
   const location = useLocation();
@@ -70,7 +71,7 @@ const RootLayout: React.FC = () => {
           return;
         }
       } catch (error) {
-        console.error('스크롤 위치 복원 실패:', error);
+        logError('RootLayout', '스크롤 위치 복원 실패', error);
         sessionStorage.removeItem('scrollPosition');
       }
     }

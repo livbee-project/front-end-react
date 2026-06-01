@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTE_PATHS } from '@/app/routes/routeMeta';
+import { error as logError } from '@/shared/utils/logger';
 import { CommunityRepository } from '@/data/repositories/CommunityRepository';
 import type { CommunityCategoryCode } from '@/domain/entities/Community';
 import { CreateCommunityPostUseCase } from '@/domain/usecases/community/CreateCommunityPostUseCase';
@@ -191,7 +192,7 @@ export const useCommunityPostWriteForm = () => {
       });
     } catch (error) {
        
-      console.error('[useCommunityPostWriteForm] 게시글 생성 실패:', error);
+      logError('useCommunityPostWriteForm', '게시글 생성 실패', error);
       showToast('게시글 등록 중 오류가 발생했습니다.', undefined, 'error');
     } finally {
       setIsSubmitting(false);

@@ -12,6 +12,7 @@ import { buildPortfolioRequest } from '@/presentation/components/forms/portfolio
 import { usePortfolioImageManagement } from '@/presentation/components/forms/portfolio/hooks/usePortfolioImageManagement';
 import { usePortfolioFormStorage } from '@/presentation/components/forms/portfolio/hooks/usePortfolioFormStorage';
 import { formatFileSize } from '@/shared/constants/fileUpload';
+import { error as logError } from '@/shared/utils/logger';
 
 const INITIAL_FORM_DATA: PortfolioFormData = {
   registrationType: 'showhost',
@@ -259,8 +260,6 @@ export const usePortfolioRegisterForm = () => {
         uploadedResumeFileUrl || uploadedPortfolioFileUrl
       );
 
-      console.log('[usePortfolioRegisterForm] 📤 포트폴리오 등록 요청 데이터:', JSON.stringify(request, null, 2));
-
       const response = await portfolioRepository.createPortfolio(request);
 
       if (response.ok) {
@@ -274,7 +273,7 @@ export const usePortfolioRegisterForm = () => {
         showToast(errorMessage, undefined, 'error');
       }
     } catch (error) {
-      console.error('포트폴리오 등록 실패:', error);
+      logError('usePortfolioRegisterForm', '포트폴리오 등록 실패', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -290,7 +289,6 @@ export const usePortfolioRegisterForm = () => {
     uploadFile,
     portfolioRepository,
     clearStorage,
-    clearImageUrls,
     navigate,
     showToast,
   ]);

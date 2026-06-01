@@ -3,6 +3,7 @@ import { CommunityRepository } from '@/data/repositories/CommunityRepository';
 import type { CommunityComment } from '@/domain/entities/Community';
 import { useRepository } from '@/presentation/hooks/common/useRepository';
 import { useToast } from '@/presentation/contexts/ToastContext';
+import { error as logError } from '@/shared/utils/logger';
 
 interface UseCommunityCommentsResult {
   comments: CommunityComment[];
@@ -76,7 +77,7 @@ export const useCommunityComments = (postId?: string): UseCommunityCommentsResul
         setComments(refreshed.items);
       } catch (error) {
          
-        console.error('[useCommunityComments] 댓글 작성 실패:', error);
+        logError('useCommunityComments', '댓글 작성 실패', error);
         showToast('댓글 작성 중 오류가 발생했습니다.', undefined, 'error');
       } finally {
         setSubmitting(false);

@@ -5,6 +5,7 @@
 
 import { extractErrorMessage, isSuccessResponse, extractData, type ApiResponse } from '@/shared/utils/apiResponseHandler';
 import { emitApiErrorEvent } from '@/shared/utils/apiEvents';
+import { error as logError } from '@/shared/utils/logger';
 
 export class ApiError extends Error {
   status?: number;
@@ -95,7 +96,7 @@ export async function fetchApi<T>(
       } catch {
         // 텍스트 읽기 실패 시 무시
       }
-      console.error(`[fetchApi] ❌ ${errorContext} 실패 - JSON 파싱 불가:`, {
+      logError('fetchApi', `${errorContext} 실패 - JSON 파싱 불가`, {
         status: response.status,
         statusText: response.statusText,
         errorText,
@@ -116,25 +117,25 @@ export async function fetchApi<T>(
     if (response.status === 429 && !(result && typeof result === 'object' && typeof (result as Record<string, unknown>).userMessage === 'string')) {
       errorMessage = '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.';
     }
-    // 에러 응답을 자세히 로그로 출력
-    console.error(`[fetchApi] ❌ ${errorContext} 실패:`, {
-      status: response.status,
-      statusText: response.statusText,
-      errorMessage,
-      errorResponse: result,
-    });
-    // 에러 응답의 모든 필드를 펼쳐서 출력
     if (result && typeof result === 'object') {
-      console.error(`[fetchApi] ❌ ${errorContext} 에러 응답 상세:`, JSON.stringify(result, null, 2));
-      // detail, message, userMessage 등 주요 필드 확인
       const errorObj = result as Record<string, unknown>;
-      console.error(`[fetchApi] ❌ ${errorContext} 에러 필드:`, {
+      logError('fetchApi', `${errorContext} 실패`, {
+        status: response.status,
+        statusText: response.statusText,
+        errorMessage,
         detail: errorObj.detail,
         message: errorObj.message,
         userMessage: errorObj.userMessage,
         error: errorObj.error,
         code: errorObj.code,
         allKeys: Object.keys(errorObj),
+      });
+    } else {
+      logError('fetchApi', `${errorContext} 실패`, {
+        status: response.status,
+        statusText: response.statusText,
+        errorMessage,
+        errorResponse: result,
       });
     }
     const apiError = new ApiError(errorMessage || `${errorContext}에 실패했습니다.`, response.status, result);
