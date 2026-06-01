@@ -1,0 +1,9 @@
+﻿{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    // TS 6 paths-only 검증: app 설정 상속 후 deprecated 옵션을 명시적으로 해제
+    // 실행: npx tsc -p tsconfig.test-dep.json --noEmit
+    "ignoreDeprecations": null,
+    "baseUrl": null
+  }
+}
