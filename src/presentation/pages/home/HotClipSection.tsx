@@ -17,7 +17,7 @@ const clips = [
     title: '뷰티 신제품 리뷰',
     description: '화제의 스킨케어 제품 테스트',
     duration: '2:45',
-    thumbnail: 'https://images.unsplash.com/photo-1504198453319-5ce911bafcde?auto=format&fit=crop&w=400&q=80',
+    thumbnail: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=400&q=80',
   },
   {
     id: 3,
