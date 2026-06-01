@@ -72,7 +72,7 @@ const AppFooter: React.FC = () => {
 
 const FooterContainer = styled.footer`
   width: 100%;
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.surface};
   border-top: 1px solid ${({ theme }) => theme.colors.border};
 `;
 

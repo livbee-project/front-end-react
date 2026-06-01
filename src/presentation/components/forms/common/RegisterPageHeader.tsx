@@ -9,7 +9,7 @@ interface RegisterPageHeaderProps {
 
 const HeaderContainer = styled.header`
   width: 100%;
-  background-color: #FFFFFF;
+  background-color: ${({ theme }) => theme.colors.surface};
   border-radius: 20px 20px 0 0;
   display: flex;
   align-items: center;

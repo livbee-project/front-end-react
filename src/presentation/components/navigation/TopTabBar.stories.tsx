@@ -1,3 +1,4 @@
+import { palette } from '@/presentation/styles/tokens';
 import type { Meta, StoryObj } from '@storybook/react';
 import TopTabBar from '@/presentation/components/navigation/TopTabBar';
 import { MemoryRouter } from 'react-router-dom';
@@ -86,7 +87,7 @@ export const ComingSoon: Story = {
         {comingSoonPaths.map((path) => (
           <div key={path} style={{ border: '1px solid #e0e0e0', borderRadius: '8px', overflow: 'hidden' }}>
             <h3 style={{ margin: '10px', marginBottom: '0' }}>준비중: {path}</h3>
-            <p style={{ margin: '0 10px 10px', fontSize: '12px', color: '#717182' }}>
+            <p style={{ margin: '0 10px 10px', fontSize: '12px', color: 'palette.subText' }}>
               이 경로를 클릭하면 "준비중인 기능입니다." 토스트가 표시됩니다.
             </p>
             <MemoryRouter initialEntries={['/clips']}>

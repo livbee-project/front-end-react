@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const PageContainer = styled.div`
   width: 100%;
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.surface};
   padding: 32px 20px;
   box-sizing: border-box;
   flex: 1;
@@ -19,7 +19,7 @@ export const Title = styled.h1`
   margin: 0 0 24px;
   font-size: 16px;
   font-weight: 700;
-  color: #0f0f17;
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 export const MessageList = styled.div`
@@ -55,7 +55,7 @@ export const MessageHeader = styled.div`
 export const Name = styled.div`
   font-size: 14px;
   font-weight: 600;
-  color: #0f0f17;
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 export const Timestamp = styled.div`
@@ -66,7 +66,7 @@ export const Timestamp = styled.div`
 
 export const MessageText = styled.div`
   font-size: 13px;
-  color: #696a7c;
+  color: ${({ theme }) => theme.colors.muted};
   margin-top: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -76,19 +76,19 @@ export const MessageText = styled.div`
 export const EmptyState = styled.div`
   padding: 48px 24px;
   text-align: center;
-  border: 1px dashed #dfe3f3;
+  border: 1px dashed ${({ theme }) => theme.colors.border};
   border-radius: 16px;
   color: #7b7f92;
-  background: #fff;
+  background: ${({ theme }) => theme.colors.surface};
 `;
 
 export const RetryButton = styled.button`
   margin-top: 12px;
   padding: 8px 16px;
-  border: 1px solid #d8dae8;
+  border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 8px;
-  background: #fff;
-  color: #3a3b4f;
+  background: ${({ theme }) => theme.colors.surface};
+  color: ${({ theme }) => theme.colors.text};
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -98,7 +98,7 @@ export const RetryButton = styled.button`
   transition: background-color 0.2s;
 
   &:hover {
-    background: #f4f5fb;
+    background: ${({ theme }) => theme.colors.secondary};
   }
 `;
 
@@ -107,7 +107,7 @@ export const DeleteButton = styled.button`
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: #ef4444;
+  color: ${({ theme }) => theme.colors.error};
   cursor: pointer;
   display: flex;
   align-items: center;

@@ -142,7 +142,7 @@ const CropOverlay = styled.div<{
   top: ${({ $y }) => `${$y}px`};
   width: ${({ $width }) => `${$width}px`};
   height: ${({ $height }) => `${$height}px`};
-  border: 2px solid #fff;
+  border: 2px solid ${({ theme }) => theme.colors.surface};
   box-sizing: border-box;
   cursor: ${({ $isDragging }) => ($isDragging ? 'grabbing' : 'grab')};
   z-index: 10;

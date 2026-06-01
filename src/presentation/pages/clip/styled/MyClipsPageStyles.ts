@@ -4,7 +4,7 @@ import Button from '@/presentation/components/ui/Button';
 export const PageContainer = styled.div`
   width: 100%;
   min-height: 100vh;
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.surface};
   padding-bottom: 80px;
 `;
 
@@ -15,7 +15,7 @@ export const BackButton = styled.button`
   padding: 12px 16px;
   background: transparent;
   border: none;
-  color: #1f1f25;
+  color: ${({ theme }) => theme.colors.text};
   font-size: 0.95rem;
   cursor: pointer;
   font-weight: 500;
@@ -28,7 +28,7 @@ export const HeaderSection = styled.div`
 export const PageTitle = styled.h1`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1f1f25;
+  color: ${({ theme }) => theme.colors.text};
   margin: 0 0 8px 0;
 `;
 
@@ -49,7 +49,7 @@ export const ClipsGrid = styled.div`
 `;
 
 export const ClipCardContainer = styled.div`
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.surface};
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -58,9 +58,9 @@ export const ClipCardContainer = styled.div`
 export const ImageContainer = styled.div`
   position: relative;
   width: 100%;
-  aspect-ratio: 9 / 16;
+  aspect-ratio: ${({ theme }) => theme.aspectRatio.clip};
   overflow: hidden;
-  background: #f4f5fb;
+  background: ${({ theme }) => theme.colors.secondary};
 `;
 
 export const ClipImage = styled.img`
@@ -80,7 +80,7 @@ export const VideoIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: ${({ theme }) => theme.colors.surface};
 `;
 
 export const CardBody = styled.div`
@@ -90,7 +90,7 @@ export const CardBody = styled.div`
 export const ClipTitle = styled.div`
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1f1f25;
+  color: ${({ theme }) => theme.colors.text};
   margin-bottom: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -119,7 +119,7 @@ export const EditButton = styled(Button)`
   padding: 8px;
   font-size: 0.875rem;
   border: 1px solid #5a64ff;
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.surface};
   color: #5a64ff;
 
   &:hover {
@@ -132,7 +132,7 @@ export const DeleteButton = styled(Button)`
   padding: 8px;
   font-size: 0.875rem;
   background: #5a64ff;
-  color: #ffffff;
+  color: ${({ theme }) => theme.colors.surface};
 
   &:hover {
     background: #4a54e8;
@@ -140,10 +140,10 @@ export const DeleteButton = styled(Button)`
 `;
 
 export const AddCard = styled.div`
-  background: #f4f5fb;
+  background: ${({ theme }) => theme.colors.secondary};
   border-radius: 12px;
   border: 2px dashed #d1d5db;
-  aspect-ratio: 9 / 16;
+  aspect-ratio: ${({ theme }) => theme.aspectRatio.clip};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -151,7 +151,7 @@ export const AddCard = styled.div`
   transition: all 0.2s;
 
   &:hover {
-    background: #eceff7;
+    background: ${({ theme }) => theme.colors.border};
     border-color: #5a64ff;
   }
 `;
@@ -161,7 +161,7 @@ export const AddIcon = styled.div`
   height: 48px;
   border-radius: 50%;
   background: #5a64ff;
-  color: #ffffff;
+  color: ${({ theme }) => theme.colors.surface};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -178,7 +178,7 @@ export const FloatingActionButton = styled.button`
   border-radius: 50%;
   background: #5a64ff;
   border: none;
-  color: #ffffff;
+  color: ${({ theme }) => theme.colors.surface};
   font-size: 24px;
   font-weight: 300;
   cursor: pointer;

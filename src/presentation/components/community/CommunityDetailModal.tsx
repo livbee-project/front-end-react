@@ -77,8 +77,8 @@ const CommunityDetailModal: React.FC = () => {
                   >
                     <Heart
                       size={16}
-                      color={post.isLiked ? '#ef4444' : undefined}
-                      fill={post.isLiked ? '#ef4444' : 'none'}
+                      color={post.isLiked ? '${({ theme }) => theme.colors.error}' : undefined}
+                      fill={post.isLiked ? '${({ theme }) => theme.colors.error}' : 'none'}
                     />
                     <MetricText>{post.likeCount}</MetricText>
                   </LikeMetricButton>

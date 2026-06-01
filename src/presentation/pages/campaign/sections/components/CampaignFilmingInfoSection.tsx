@@ -70,7 +70,7 @@ const InputField = styled.input`
 
   &:focus {
     outline: none;
-    background-color: #FFFFFF;
+    background-color: ${({ theme }) => theme.colors.surface};
     box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}20;
   }
 
@@ -83,7 +83,7 @@ const InputField = styled.input`
 const IconArea = styled.button`
   width: 56px;
   height: 56px;
-  background-color: #E5E7EB;
+  background-color: ${({ theme }) => theme.colors.border};
   border: none;
   border-radius: 0 16px 16px 0;
   display: flex;
@@ -125,7 +125,7 @@ const TimeIconArea = styled(IconArea)`
 const UnitArea = styled.div`
   width: 56px;
   height: 56px;
-  background-color: #E5E7EB;
+  background-color: ${({ theme }) => theme.colors.border};
   border-radius: 0 16px 16px 0;
   display: flex;
   align-items: center;

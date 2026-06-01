@@ -19,7 +19,7 @@ export const FormContainer = styled.div`
 
 export const HeaderContainer = styled.header`
   width: 100%;
-  background-color: #FFFFFF;
+  background-color: ${({ theme }) => theme.colors.surface};
   border-radius: 20px 20px 0 0;
   display: flex;
   align-items: center;
@@ -73,7 +73,7 @@ export const RegisterForm = styled.form`
 `;
 
 export const FormSection = styled.section`
-  background-color: #FFFFFF;
+  background-color: ${({ theme }) => theme.colors.surface};
   border-radius: 20px;
   padding: 24px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
@@ -135,7 +135,7 @@ export const StyledSelect = styled.select`
 
   &:focus {
     outline: none;
-    background-color: #FFFFFF;
+    background-color: ${({ theme }) => theme.colors.surface};
     box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}20;
   }
 
@@ -174,7 +174,7 @@ export const StyledInput = styled.input`
 
   &:focus {
     outline: none;
-    background-color: #FFFFFF;
+    background-color: ${({ theme }) => theme.colors.surface};
     box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}20;
   }
 
@@ -214,7 +214,7 @@ export const StyledTextarea = styled.textarea`
 
   &:focus {
     outline: none;
-    background-color: #FFFFFF;
+    background-color: ${({ theme }) => theme.colors.surface};
     box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}20;
   }
 
@@ -257,7 +257,7 @@ export const CancelButton = styled.button`
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #E5E7EB;
+    background-color: ${({ theme }) => theme.colors.border};
   }
 
   &:disabled {

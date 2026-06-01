@@ -85,7 +85,7 @@ const ListContent = styled.div`
 
 const CardPlaceholder = styled.div`
   padding: 20px;
-  background-color: #f5f6ff;
-  border-radius: 8px;
+  background-color: ${({ theme }) => theme.colors.secondary};
+  border-radius: ${({ theme }) => theme.radii.sm};
 `;
 

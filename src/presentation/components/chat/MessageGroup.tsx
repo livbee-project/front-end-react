@@ -83,11 +83,14 @@ const MessageGroupContainer = styled.div<{ $align: 'start' | 'end' }>`
 `;
 
 const MessageBubble = styled.div<{ $variant: 'sent' | 'received' }>`
-  background: ${({ $variant }) => ($variant === 'sent' ? '#687CF4' : '#FFFFFF')};
-  color: ${({ $variant }) => ($variant === 'sent' ? '#FFFFFF' : '#030213')};
-  padding: 12px 16px;
-  border-radius: 10px;
-  border: ${({ $variant }) => ($variant === 'sent' ? 'none' : '1px solid rgba(0, 0, 0, 0.1)')};
+  background: ${({ $variant, theme }) =>
+    $variant === 'sent' ? theme.colors.primary : theme.colors.surface};
+  color: ${({ $variant, theme }) =>
+    $variant === 'sent' ? theme.colors.primaryForeground : theme.colors.text};
+  padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.lg}`};
+  border-radius: ${({ theme }) => theme.radii.md};
+  border: ${({ $variant, theme }) =>
+    $variant === 'sent' ? 'none' : `1px solid ${theme.colors.border}`};
   max-width: 90%;
   font-size: 14px;
   font-weight: 300;
@@ -97,9 +100,8 @@ const MessageBubble = styled.div<{ $variant: 'sent' | 'received' }>`
 `;
 
 const MessageTime = styled.span`
-  font-size: 12px;
-  font-weight: 300;
-  color: #717182;
+  font: ${({ theme }) => theme.fonts.caption};
+  color: ${({ theme }) => theme.colors.muted};
 `;
 
 const MessageMeta = styled.div`
@@ -110,25 +112,25 @@ const MessageMeta = styled.div`
 
 const MessageStatus = styled.span`
   font-size: 0.75rem;
-  color: #5a64ff;
+  color: ${({ theme }) => theme.colors.primary};
   font-weight: 600;
 `;
 
 const SystemMessage = styled.div`
   font-size: 0.85rem;
-  color: #7d8299;
-  background: #f4f5fb;
-  border-radius: 999px;
+  color: ${({ theme }) => theme.colors.muted};
+  background: ${({ theme }) => theme.colors.secondary};
+  border-radius: ${({ theme }) => theme.radii.full};
   padding: 6px 14px;
 `;
 
 const DateDivider = styled.div`
   align-self: center;
   font-size: 0.75rem;
-  color: #7d8299;
+  color: ${({ theme }) => theme.colors.muted};
   padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(125, 130, 153, 0.12);
+  border-radius: ${({ theme }) => theme.radii.full};
+  background: ${({ theme }) => theme.primaryOpacity['10']};
 `;
 
 export default MessageGroup;

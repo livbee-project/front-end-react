@@ -7,11 +7,14 @@ import styled from 'styled-components';
 import { theme } from '@/presentation/styles/theme';
 
 const TYPOGRAPHY_DESCRIPTION: Record<string, string> = {
-  h1: '페이지 타이틀 (H1)',
-  h2: '섹션 타이틀, 이름, 브랜드명 (H2)',
-  body: '본문 텍스트 (Body)',
-  button: '버튼 텍스트 (Button)',
-  caption: '캡션, 태그 (Caption)',
+  h1: '페이지 타이틀 (H1) — 28px / 700',
+  h2: '섹션 타이틀 (H2) — 22px / 700',
+  h3: '카드 타이틀 (H3) — 18px / 600',
+  body: '본문 P1 — 14px / 400',
+  p1: '본문 P1 — 14px / 400',
+  p2: '보조 P2 — 13px / 400',
+  button: '버튼·P2 — 13px / 400',
+  caption: '캡션 — 12px / 400',
 };
 
 export const TypographySection: React.FC = () => (

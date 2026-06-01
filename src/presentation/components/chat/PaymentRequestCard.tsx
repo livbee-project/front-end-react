@@ -84,8 +84,8 @@ const PaymentRequestCardWrapper = styled.div<{ $align: 'start' | 'end' }>`
 `;
 
 const PaymentRequestBanner = styled.div`
-  background: #f4f5fb;
-  color: #434659;
+  background: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.text};
   padding: 10px 16px;
   border-radius: 8px;
   font-size: 13px;
@@ -95,9 +95,9 @@ const PaymentRequestBanner = styled.div`
 
 const Card = styled.div`
   width: 100%;
-  border: 1px solid #eceff7;
-  border-radius: 16px;
-  background: #ffffff;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  background: ${({ theme }) => theme.colors.surface};
   box-shadow: 0 4px 12px rgba(20, 24, 46, 0.06);
   display: flex;
   flex-direction: column;
@@ -105,15 +105,15 @@ const Card = styled.div`
 `;
 
 const PaymentRequestHeader = styled.div`
-  background: #687CF4;
-  color: #ffffff;
-  padding: 16px;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primaryForeground};
+  padding: ${({ theme }) => theme.spacing.lg};
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 16px;
+  gap: ${({ theme }) => theme.spacing.sm};
+  font: ${({ theme }) => theme.fonts.p1};
   font-weight: 600;
-  
+
   svg {
     width: 18px;
     height: 18px;
@@ -124,45 +124,45 @@ const PaymentRequestContent = styled.div`
   padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: ${({ theme }) => theme.spacing.lg};
 `;
 
 const PaymentRequestSection = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: ${({ theme }) => theme.spacing.sm};
 `;
 
 const PaymentRequestLabel = styled.span`
-  font-size: 12px;
-  color: #a0a1b2;
+  font: ${({ theme }) => theme.fonts.caption};
+  color: ${({ theme }) => theme.colors.muted};
   font-weight: 500;
 `;
 
 const PaymentRequestCampaignName = styled.div`
-  font-size: 16px;
+  font: ${({ theme }) => theme.fonts.p1};
   font-weight: 600;
-  color: #0f0f17;
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 const PaymentRequestCampaignTitle = styled.div`
-  font-size: 13px;
-  color: #7d8299;
+  font: ${({ theme }) => theme.fonts.p2};
+  color: ${({ theme }) => theme.colors.muted};
   line-height: 1.4;
 `;
 
 const PaymentRequestDivider = styled.div`
   height: 1px;
-  background: #eceff7;
-  margin: 4px 0;
+  background: ${({ theme }) => theme.colors.border};
+  margin: ${({ theme }) => theme.spacing.xs} 0;
 `;
 
 const PaymentRequestSchedule = styled.div`
   display: flex;
   align-items: center;
-  gap: 16px;
-  font-size: 14px;
-  color: #434659;
+  gap: ${({ theme }) => theme.spacing.lg};
+  font: ${({ theme }) => theme.fonts.p1};
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 const ScheduleItem = styled.div`
@@ -172,53 +172,53 @@ const ScheduleItem = styled.div`
   color: inherit;
 
   svg {
-    color: #a0a1b2;
+    color: ${({ theme }) => theme.colors.muted};
   }
 `;
 
 const PaymentRequestAmountBox = styled.div`
-  background: #f4f5fb;
-  border-radius: 12px;
-  padding: 16px;
+  background: ${({ theme }) => theme.colors.secondary};
+  border-radius: ${({ theme }) => theme.radii.md};
+  padding: ${({ theme }) => theme.spacing.lg};
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: ${({ theme }) => theme.spacing.sm};
 `;
 
 const PaymentRequestAmountLabel = styled.span`
-  font-size: 12px;
-  color: #7d8299;
+  font: ${({ theme }) => theme.fonts.caption};
+  color: ${({ theme }) => theme.colors.muted};
   font-weight: 500;
 `;
 
 const PaymentRequestAmount = styled.div`
   font-size: 24px;
   font-weight: 700;
-  color: #687CF4;
+  color: ${({ theme }) => theme.colors.primary};
 `;
 
 const PaymentRequestButton = styled.button`
   width: 100%;
-  background: #687CF4;
-  color: #ffffff;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primaryForeground};
   border: none;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   padding: 14px 20px;
-  font-size: 15px;
+  font: ${({ theme }) => theme.fonts.p1};
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: ${({ theme }) => theme.spacing.sm};
   transition: background-color 0.2s;
 
   &:hover {
-    background: #5a6ae8;
+    background: ${({ theme }) => theme.colors.primaryHover};
   }
 
   &:active {
-    background: #4d5cdb;
+    background: ${({ theme }) => theme.colors.primaryHover};
   }
 
   svg {

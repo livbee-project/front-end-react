@@ -33,7 +33,7 @@ const TagItem = styled.div<{ $disabled: boolean }>`
   opacity: ${({ $disabled }) => ($disabled ? 0.5 : 1)};
 
   &:focus-within {
-    background-color: #FFFFFF;
+    background-color: ${({ theme }) => theme.colors.surface};
     box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}20;
   }
 `;

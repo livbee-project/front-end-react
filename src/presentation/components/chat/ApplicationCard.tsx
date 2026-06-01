@@ -99,10 +99,10 @@ const ApplicationCardWrapper = styled.div<{ $align: 'start' | 'end' }>`
 const Card = styled.div`
   width: 100%;
   max-width: 75%;
-  border: 1px solid #eceff7;
-  border-radius: 16px;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radii.lg};
   padding: 0;
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.surface};
   box-shadow: 0 4px 12px rgba(20, 24, 46, 0.06);
   display: flex;
   flex-direction: column;
@@ -113,67 +113,69 @@ const ApplicationHeader = styled.div<{ $isMyMessage: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: ${({ $isMyMessage }) => ($isMyMessage ? '#687CF4' : '#ffffff')};
-  padding: 16px;
-  border-radius: 16px 16px 0 0;
+  background: ${({ $isMyMessage, theme }) =>
+    $isMyMessage ? theme.colors.primary : theme.colors.surface};
+  padding: ${({ theme }) => theme.spacing.lg};
+  border-radius: ${({ theme }) => `${theme.radii.lg} ${theme.radii.lg} 0 0`};
 `;
 
 const ApplicationBadge = styled.div<{ $isMyMessage?: boolean }>`
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
+  font: ${({ theme }) => theme.fonts.p2};
   font-weight: 600;
-  color: ${({ $isMyMessage }) => ($isMyMessage ? '#ffffff' : '#5c5d70')};
-  
+  color: ${({ $isMyMessage, theme }) =>
+    $isMyMessage ? theme.colors.primaryForeground : theme.colors.muted};
+
   svg {
-    color: ${({ $isMyMessage }) => ($isMyMessage ? '#ffffff' : '#5c5d70')};
+    color: inherit;
   }
 `;
 
 const ApplicationStatus = styled.span<{ $status?: string; $isMyMessage?: boolean }>`
-  font-size: 12px;
+  font: ${({ theme }) => theme.fonts.caption};
   font-weight: 600;
-  color: ${({ $status, $isMyMessage }) => {
+  color: ${({ $status, $isMyMessage, theme }) => {
     if ($isMyMessage) {
       return 'rgba(255, 255, 255, 0.9)';
     }
-    if ($status === 'accepted') return '#3c82f6';
-    if ($status === 'rejected') return '#ff5c5c';
-    return '#a0a1b2';
+    if ($status === 'accepted') return theme.colors.primary;
+    if ($status === 'rejected') return theme.colors.error;
+    return theme.colors.muted;
   }};
 `;
 
 const ApplicationContent = styled.div`
-  padding: 16px;
+  padding: ${({ theme }) => theme.spacing.lg};
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: ${({ theme }) => theme.spacing.lg};
 `;
 
 const ApplicationSection = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: ${({ theme }) => theme.spacing.xs};
 `;
 
 const ApplicationSectionLabel = styled.span`
-  font-size: 12px;
-  color: #a0a1b2;
+  font: ${({ theme }) => theme.fonts.caption};
+  color: ${({ theme }) => theme.colors.muted};
 `;
 
 const ApplicationSectionValue = styled.span`
-  font-size: 14px;
-  color: #0f0f17;
+  font: ${({ theme }) => theme.fonts.p1};
+  color: ${({ theme }) => theme.colors.text};
   font-weight: 500;
 `;
 
 const ApplicationSchedule = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 13px;
-  color: #444556;
+  gap: ${({ theme }) => theme.spacing.md};
+  font: ${({ theme }) => theme.fonts.p2};
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 const ScheduleItem = styled.div`
@@ -183,46 +185,49 @@ const ScheduleItem = styled.div`
   color: inherit;
 
   svg {
-    color: #a0a1b2;
+    color: ${({ theme }) => theme.colors.muted};
   }
 `;
 
 const ApplicationMessageBox = styled.div`
-  border-radius: 12px;
-  border: 1px solid rgba(104, 124, 244, 0.15);
-  background: rgba(104, 124, 244, 0.08);
-  padding: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
+  border: 1px solid ${({ theme }) => theme.primaryOpacity['15']};
+  background: ${({ theme }) => theme.primaryOpacity['10']};
+  padding: ${({ theme }) => theme.spacing.md};
   display: flex;
-  gap: 8px;
-  color: #0f0f17;
+  gap: ${({ theme }) => theme.spacing.sm};
+  color: ${({ theme }) => theme.colors.text};
 
   p {
     margin: 0;
-    font-size: 13px;
+    font: ${({ theme }) => theme.fonts.p2};
     line-height: 1.5;
   }
 
   svg {
     flex-shrink: 0;
-    color: #687cf4;
+    color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
 const ApplicationActions = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 16px 16px;
+  gap: ${({ theme }) => theme.spacing.md};
+  padding: 0 ${({ theme }) => theme.spacing.lg} ${({ theme }) => theme.spacing.lg};
 `;
 
 const ApplicationButton = styled.button<{ $variant: 'primary' | 'secondary' }>`
   flex: 1;
-  border-radius: 10px;
-  padding: 12px 0;
-  border: ${({ $variant }) => ($variant === 'secondary' ? '1px solid #d8dae8' : 'none')};
-  background: ${({ $variant }) => ($variant === 'secondary' ? '#fff' : '#687cf4')};
-  color: ${({ $variant }) => ($variant === 'secondary' ? '#3a3b4f' : '#fff')};
-  font-size: 14px;
+  border-radius: ${({ theme }) => theme.radii.md};
+  padding: ${({ theme }) => theme.spacing.md} 0;
+  border: ${({ $variant, theme }) =>
+    $variant === 'secondary' ? `1px solid ${theme.colors.border}` : 'none'};
+  background: ${({ $variant, theme }) =>
+    $variant === 'secondary' ? theme.colors.surface : theme.colors.primary};
+  color: ${({ $variant, theme }) =>
+    $variant === 'secondary' ? theme.colors.text : theme.colors.primaryForeground};
+  font: ${({ theme }) => theme.fonts.p1};
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;

@@ -86,7 +86,7 @@ export const ModelInfoSection: React.FC<ModelInfoSectionProps> = ({
 );
 
 const ContentCard = styled.div`
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.surface};
   margin: 0 16px;
   padding: 24px 20px;
   border-radius: 0 0 20px 20px;
@@ -119,14 +119,14 @@ const SectionIcon = styled.div`
 const SectionTitle = styled.h3`
   font-size: 1.125rem;
   font-weight: 700;
-  color: #1f1f25;
+  color: ${({ theme }) => theme.colors.text};
   margin: 0;
 `;
 
 const SectionContent = styled.div`
   font-size: 0.95rem;
   line-height: 1.6;
-  color: #434659;
+  color: ${({ theme }) => theme.colors.text};
   white-space: pre-wrap;
 `;
 
@@ -145,7 +145,7 @@ const BulletItem = styled.li`
   gap: 8px;
   font-size: 0.95rem;
   line-height: 1.6;
-  color: #434659;
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 const BulletDot = styled.span`
@@ -159,7 +159,7 @@ const BulletDot = styled.span`
 
 const Divider = styled.div`
   height: 1px;
-  background: #eceff7;
+  background: ${({ theme }) => theme.colors.border};
   margin: 24px 0;
 `;
 

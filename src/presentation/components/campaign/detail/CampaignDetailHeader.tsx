@@ -60,7 +60,7 @@ const HeaderWrapper = styled.div`
 
 const HeaderImage = styled.div`
   width: calc(100% + 32px);
-  aspect-ratio: 4 / 3;
+  aspect-ratio: ${({ theme }) => theme.aspectRatio.campaign};
   background-color: ${({ theme }) => theme.colors.secondary};
   position: relative;
   overflow: hidden;

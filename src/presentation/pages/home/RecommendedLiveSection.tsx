@@ -30,10 +30,10 @@ const StyledBadge = styled(Badge)`
   top: ${({ theme }) => theme.spacing.md};
   right: ${({ theme }) => theme.spacing.md};
   padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
-  color: #FFFFFF;
+  color: ${({ theme }) => theme.colors.surface};
 
   ${CaptionMedium} {
-    color: #FFFFFF;
+    color: ${({ theme }) => theme.colors.surface};
   }
 `;
 

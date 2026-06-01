@@ -11,13 +11,13 @@ const VariantContainer = styled.div`
 const InfoText = styled.p`
   margin-top: 8px;
   font-size: 12px;
-  color: #717182;
+  color: ${({ theme }) => theme.colors.muted};
 `;
 
 const Card = styled.div`
-  border: 1px solid #e0e0e0;
-  padding: 16px;
-  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  padding: ${({ theme }) => theme.spacing.lg};
+  border-radius: ${({ theme }) => theme.radii.sm};
 `;
 
 export const SectionTitleVariants: React.FC = () => (

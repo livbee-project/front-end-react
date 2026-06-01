@@ -1,3 +1,4 @@
+import { palette } from '@/presentation/styles/tokens';
 import type { Meta, StoryObj } from '@storybook/react';
 import SectionContainer from '@/presentation/components/home/sections/SectionContainer';
 import PortraitCard from '@/presentation/components/cards/PortraitCard';
@@ -57,13 +58,13 @@ export const Default: Story = {
     title: '섹션 제목',
     children: (
       <ContentArea>
-        <div style={{ padding: '20px', backgroundColor: '#f5f6ff', borderRadius: '8px', minWidth: '200px' }}>
+        <div style={{ padding: '20px', backgroundColor: 'palette.background', borderRadius: '8px', minWidth: '200px' }}>
           컨텐츠 1
         </div>
-        <div style={{ padding: '20px', backgroundColor: '#f5f6ff', borderRadius: '8px', minWidth: '200px' }}>
+        <div style={{ padding: '20px', backgroundColor: 'palette.background', borderRadius: '8px', minWidth: '200px' }}>
           컨텐츠 2
         </div>
-        <div style={{ padding: '20px', backgroundColor: '#f5f6ff', borderRadius: '8px', minWidth: '200px' }}>
+        <div style={{ padding: '20px', backgroundColor: 'palette.background', borderRadius: '8px', minWidth: '200px' }}>
           컨텐츠 3
         </div>
       </ContentArea>

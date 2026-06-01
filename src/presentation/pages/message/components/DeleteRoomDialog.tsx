@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 const DeleteDialog = styled.div`
   position: fixed;
@@ -16,7 +16,7 @@ const DeleteDialog = styled.div`
 `;
 
 const DeleteDialogContent = styled.div`
-  background: #fff;
+  background: ${({ theme }) => theme.colors.surface};
   border-radius: 16px;
   padding: 24px;
   max-width: 400px;
@@ -26,15 +26,14 @@ const DeleteDialogContent = styled.div`
 
 const DeleteDialogTitle = styled.h3`
   margin: 0 0 12px;
-  font-size: 18px;
-  font-weight: 700;
-  color: #0f0f17;
+  font: ${({ theme }) => theme.fonts.h3};
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 const DeleteDialogMessage = styled.p`
   margin: 0 0 24px;
-  font-size: 14px;
-  color: #696a7c;
+  font: ${({ theme }) => theme.fonts.p1};
+  color: ${({ theme }) => theme.colors.muted};
   line-height: 1.5;
 `;
 
@@ -44,37 +43,42 @@ const DeleteDialogActions = styled.div`
   justify-content: flex-end;
 `;
 
+const primaryDialogButton = css`
+  background: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.errorForeground};
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:active {
+    opacity: 0.85;
+  }
+`;
+
+const secondaryDialogButton = css`
+  background: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.text};
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.border};
+  }
+
+  &:active {
+    opacity: 0.9;
+  }
+`;
+
 const DialogButton = styled.button<{ $variant?: 'primary' | 'secondary' }>`
   padding: 10px 20px;
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: ${({ theme }) => theme.radii.sm};
+  font: ${({ theme }) => theme.fonts.p1};
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 
-  ${({ $variant }) =>
-    $variant === 'primary'
-      ? `
-    background: #ef4444;
-    color: #fff;
-    &:hover {
-      background: #dc2626;
-    }
-    &:active {
-      background: #b91c1c;
-    }
-  `
-      : `
-    background: #f4f5fb;
-    color: #3a3b4f;
-    &:hover {
-      background: #e5e7eb;
-    }
-    &:active {
-      background: #d1d5db;
-    }
-  `}
+  ${({ $variant }) => ($variant === 'primary' ? primaryDialogButton : secondaryDialogButton)}
 `;
 
 interface DeleteRoomDialogProps {

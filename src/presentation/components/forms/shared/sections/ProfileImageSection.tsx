@@ -39,7 +39,7 @@ const AvatarImage = styled.div<{ $hasImage: boolean }>`
   height: 100%;
   border-radius: 50%;
   background-color: #F3F4F6;
-  border: 2px solid #E5E7EB;
+  border: 2px solid ${({ theme }) => theme.colors.border};
   display: flex;
   align-items: center;
   justify-content: center;

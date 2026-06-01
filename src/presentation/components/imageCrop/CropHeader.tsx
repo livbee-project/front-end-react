@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { X, Check } from 'lucide-react';
-import { theme } from '@/presentation/styles/theme';
 
 interface CropHeaderProps {
   onBack: () => void;
@@ -39,7 +38,7 @@ const TopBar = styled.div`
   padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
   padding-top: calc(${({ theme }) => theme.spacing.md} + env(safe-area-inset-top));
   background-color: #1a1a1a;
-  color: ${theme.colors.primaryForeground};
+  color: ${({ theme }) => theme.colors.primaryForeground};
   position: fixed; /* 상단 고정 */
   top: 0;
   left: 0;
@@ -56,6 +55,33 @@ const TopBar = styled.div`
   -ms-user-select: none;
 `;
 
+const cancelButtonStyles = css`
+  background-color: #000000;
+  color: ${({ theme }) => theme.colors.surface};
+
+  &:hover {
+    background-color: #333333;
+  }
+
+  &:active {
+    background-color: #1a1a1a;
+  }
+`;
+
+const confirmButtonStyles = css`
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.surface};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.primaryHover};
+    opacity: 0.9;
+  }
+
+  &:active {
+    opacity: 0.8;
+  }
+`;
+
 const IconButton = styled.button<{ $variant: 'cancel' | 'confirm' }>`
   width: ${BUTTON_SIZE}px;
   height: ${BUTTON_SIZE}px;
@@ -69,32 +95,6 @@ const IconButton = styled.button<{ $variant: 'cancel' | 'confirm' }>`
   position: relative;
   flex-shrink: 0;
 
-  ${({ $variant }) =>
-    $variant === 'cancel'
-      ? `
-    background-color: #000000;
-    color: #ffffff;
-    
-    &:hover {
-      background-color: #333333;
-    }
-    
-    &:active {
-      background-color: #1a1a1a;
-    }
-  `
-      : `
-    background-color: ${theme.colors.primary};
-    color: #ffffff;
-    
-    &:hover {
-      background-color: ${theme.colors.primaryHover || theme.colors.primary};
-      opacity: 0.9;
-    }
-    
-    &:active {
-      opacity: 0.8;
-    }
-  `}
+  ${({ $variant }) => ($variant === 'cancel' ? cancelButtonStyles : confirmButtonStyles)}
 `;
 

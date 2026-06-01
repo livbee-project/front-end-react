@@ -14,8 +14,8 @@ export const ImageElement = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border: 1px solid #E5E7EB;
-  border-radius: 10px;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radii.md};
   transition: transform 0.3s;
 `;
 

@@ -33,7 +33,7 @@ const SnsItem = styled.div<{ $disabled: boolean }>`
   opacity: ${({ $disabled }) => ($disabled ? 0.5 : 1)};
 
   &:focus-within {
-    background-color: #FFFFFF;
+    background-color: ${({ theme }) => theme.colors.surface};
     box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}20;
   }
 `;
@@ -42,7 +42,7 @@ const SnsIconWrapper = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background-color: #FFFFFF;
+  background-color: ${({ theme }) => theme.colors.surface};
   display: flex;
   align-items: center;
   justify-content: center;

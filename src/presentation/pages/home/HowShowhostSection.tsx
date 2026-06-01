@@ -23,7 +23,7 @@ const Card = styled.article`
   gap: ${({ theme }) => theme.spacing.lg};
   padding: ${({ theme }) => theme.spacing.lg};
   border-radius: 12px;
-  background-color: #FFFFFF;
+  background-color: ${({ theme }) => theme.colors.surface};
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   transition: all 0.3s ease;
   cursor: pointer;
@@ -44,7 +44,7 @@ const Avatar = styled.div`
   overflow: hidden;
   background-color: ${({ theme }) => theme.colors.secondary};
   flex-shrink: 0;
-  border: 1px solid #E5E7EB;
+  border: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
 const AvatarImage = styled.img`

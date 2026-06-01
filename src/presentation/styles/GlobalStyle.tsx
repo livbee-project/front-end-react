@@ -1,4 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
+import { themeCssVariables } from '@/presentation/styles/themeCssVars';
 
 export const GlobalStyle = createGlobalStyle`
   @font-face {
@@ -22,6 +23,11 @@ export const GlobalStyle = createGlobalStyle`
     font-display: fallback;
   }
 
+  :root {
+    ${themeCssVariables}
+    --livbee-layout-max-width: ${({ theme }) => theme.layout.maxWidth};
+  }
+
   *, *::before, *::after {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
@@ -36,12 +42,18 @@ export const GlobalStyle = createGlobalStyle`
     margin: 0;
     font-family: ${({ theme }) => theme.fonts.family};
     background-color: ${({ theme }) => theme.colors.background};
-    color: ${({ theme }) => theme.colors.foreground};
+    color: ${({ theme }) => theme.colors.text};
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     min-height: 100dvh;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     overscroll-behavior-y: none;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  body::-webkit-scrollbar {
+    display: none;
   }
 
   #root {
@@ -66,4 +78,3 @@ export const GlobalStyle = createGlobalStyle`
     display: none;
   }
 `;
-

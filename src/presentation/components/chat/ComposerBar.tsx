@@ -57,9 +57,9 @@ const ComposerBarContainer = styled.div`
   z-index: 60;
   width: 100%;
   max-width: 960px;
-  padding: 12px 16px;
-  background: #ffffff;
-  border-top: 1px solid #e1e4f2;
+  padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.lg}`};
+  background: ${({ theme }) => theme.colors.surface};
+  border-top: 1px solid ${({ theme }) => theme.colors.border};
   box-sizing: border-box;
   box-shadow: 0 -6px 16px rgba(0, 0, 0, 0.04);
 
@@ -82,16 +82,16 @@ const ComposerInner = styled.div`
 
 const InputField = styled.input`
   flex: 1;
-  border-radius: 12px;
-  border: 1px solid #dfe3f3;
-  padding: 12px 18px;
+  border-radius: ${({ theme }) => theme.radii.md};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  padding: ${({ theme }) => `${theme.spacing.md} 18px`};
   font-size: 16px;
-  background: #fff;
+  background: ${({ theme }) => theme.colors.surface};
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
   outline: none;
 
   &:focus {
-    border-color: #687cf4;
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 
   &:disabled {
@@ -107,12 +107,12 @@ const InputField = styled.input`
 const SendButton = styled.button`
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   border: none;
-  background: #687cf4;
-  color: #fff;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primaryForeground};
   font-size: 1rem;
-  box-shadow: 0 10px 22px rgba(104, 124, 244, 0.35);
+  box-shadow: 0 10px 22px ${({ theme }) => theme.primaryOpacity['35']};
   opacity: ${({ disabled }) => (disabled ? 0.6 : 1)};
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   transition: opacity 0.2s;
@@ -123,9 +123,9 @@ const SendButton = styled.button`
 `;
 
 const SendError = styled.p`
-  margin-top: 8px;
-  color: #e64444;
-  font-size: 12px;
+  margin-top: ${({ theme }) => theme.spacing.sm};
+  color: ${({ theme }) => theme.colors.error};
+  font: ${({ theme }) => theme.fonts.caption};
 `;
 
 export default ComposerBar;

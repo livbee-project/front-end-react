@@ -15,7 +15,7 @@ const Section = styled.section`
 
 const ScrapButtonCaption = styled(Caption)<{ $isScraped: boolean }>`
   color: ${({ $isScraped, theme }) => 
-    $isScraped ? '#FFFFFF' : theme.colors.primary};
+    $isScraped ? '${({ theme }) => theme.colors.surface}' : theme.colors.primary};
 `;
 
 const ScrapButton = styled(ButtonBase)<{ $isScraped: boolean }>`
@@ -40,7 +40,7 @@ const ScrapButton = styled(ButtonBase)<{ $isScraped: boolean }>`
 `;
 
 const OfferButtonCaption = styled(Caption)`
-  color: #FFFFFF;
+  color: ${({ theme }) => theme.colors.surface};
 `;
 
 const OfferButton = styled(ButtonBase)`

@@ -9,8 +9,7 @@ import styled from 'styled-components';
 // ===== 제목 컴포넌트 =====
 
 /**
- * H1 - 페이지 타이틀
- * 16px, Bold 700
+ * H1 - 페이지 타이틀 (MVP: 28px / 700)
  */
 export const H1 = styled.h1`
   margin: 0;
@@ -20,8 +19,7 @@ export const H1 = styled.h1`
 `;
 
 /**
- * H2 - 섹션 타이틀
- * 16px, Bold 700
+ * H2 - 섹션 타이틀 (MVP: 22px / 700)
  */
 export const H2 = styled.h2`
   margin: 0;
@@ -31,8 +29,7 @@ export const H2 = styled.h2`
 `;
 
 /**
- * H3 - 카드/중요 타이틀
- * 15px, Bold 700
+ * H3 - 카드/중요 타이틀 (MVP: 18px / 600)
  */
 export const H3 = styled.h3`
   margin: 0;
@@ -79,8 +76,7 @@ export const Small = styled.p`
 // ===== 캡션 컴포넌트 =====
 
 /**
- * Caption - 캡션, 태그
- * 12px, Light 300
+ * Caption - 캡션, 태그 (MVP: 12px / 400)
  */
 export const Caption = styled.span`
   font: ${({ theme }) => theme.fonts.caption};

@@ -30,7 +30,7 @@ const CardContainer = styled.div`
 
 const Thumbnail = styled.div<{ $hasImage: boolean; $imageUrl?: string }>`
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: ${({ theme }) => theme.aspectRatio.clip};
   background-color: ${({ theme }) => theme.colors.secondary};
   border-radius: ${({ theme }) => theme.radii.lg};
   border: ${({ $hasImage, theme }) => ($hasImage ? 'none' : `1px solid ${theme.colors.border}`)};

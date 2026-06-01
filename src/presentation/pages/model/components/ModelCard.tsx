@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import Button from '@/presentation/components/ui/Button';
 
 const ModelCardContainer = styled.div`
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.surface};
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -20,9 +20,9 @@ const ModelCardContainer = styled.div`
 const ModelImageContainer = styled.div`
   position: relative;
   width: 100%;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: ${({ theme }) => theme.aspectRatio.model};
   overflow: hidden;
-  background: #f4f5fb;
+  background: ${({ theme }) => theme.colors.secondary};
 `;
 
 const ModelImage = styled.img`
@@ -69,7 +69,7 @@ const ConceptTag = styled.div`
 const ModelName = styled.div`
   font-size: 1rem;
   font-weight: 700;
-  color: #1f1f25;
+  color: ${({ theme }) => theme.colors.text};
   margin-bottom: 4px;
 `;
 
@@ -89,8 +89,8 @@ const CategoryTags = styled.div`
 const CategoryTag = styled.span`
   padding: 4px 8px;
   border-radius: 8px;
-  background: #f4f5fb;
-  color: #434659;
+  background: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.text};
   font-size: 0.75rem;
   font-weight: 500;
 `;

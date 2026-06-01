@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const PageContainer = styled.div`
   width: 100%;
   min-height: 100vh;
-  background: #f4f5fb;
+  background: ${({ theme }) => theme.colors.secondary};
   padding-bottom: 80px;
 `;
 
@@ -14,7 +14,7 @@ export const BackButton = styled.button`
   padding: 12px 16px;
   background: transparent;
   border: none;
-  color: #1f1f25;
+  color: ${({ theme }) => theme.colors.text};
   font-size: 0.95rem;
   cursor: pointer;
   font-weight: 500;
@@ -22,13 +22,13 @@ export const BackButton = styled.button`
 
 export const HeaderSection = styled.div`
   padding: 20px 16px;
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.surface};
 `;
 
 export const PageTitle = styled.h1`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1f1f25;
+  color: ${({ theme }) => theme.colors.text};
   margin: 0 0 8px 0;
 `;
 
@@ -65,17 +65,17 @@ export const FilterButton = styled.button<{ $active: boolean }>`
   cursor: pointer;
   transition: all 0.2s;
 
-  background: ${({ $active }) => ($active ? '#5a64ff' : '#ffffff')};
-  color: ${({ $active }) => ($active ? '#ffffff' : '#1f1f25')};
-  border: ${({ $active }) => ($active ? 'none' : '1px solid #eceff7')};
+  background: ${({ $active }) => ($active ? '#5a64ff' : '${({ theme }) => theme.colors.surface}')};
+  color: ${({ $active }) => ($active ? '${({ theme }) => theme.colors.surface}' : '${({ theme }) => theme.colors.text}')};
+  border: ${({ $active }) => ($active ? 'none' : '1px solid ${({ theme }) => theme.colors.border}')};
 
   &:hover {
-    background: ${({ $active }) => ($active ? '#4a54e8' : '#f4f5fb')};
+    background: ${({ $active }) => ($active ? '#4a54e8' : '${({ theme }) => theme.colors.secondary}')};
   }
 `;
 
 export const CampaignCard = styled.div`
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.surface};
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 16px;
@@ -92,7 +92,7 @@ export const CardHeader = styled.div`
 export const CompanyName = styled.div`
   font-size: 1rem;
   font-weight: 700;
-  color: #1f1f25;
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 export const StatusBadges = styled.div`
@@ -112,11 +112,11 @@ export const StatusBadge = styled.span<{
   ${({ $variant }) => {
     switch ($variant) {
       case 'accepted':
-        return 'background: #3cd25a; color: #ffffff;';
+        return 'background: #3cd25a; color: ${({ theme }) => theme.colors.surface};';
       case 'pending':
-        return 'background: #ffa726; color: #ffffff;';
+        return 'background: #ffa726; color: ${({ theme }) => theme.colors.surface};';
       case 'rejected':
-        return 'background: #ff4757; color: #ffffff;';
+        return 'background: #ff4757; color: ${({ theme }) => theme.colors.surface};';
       case 'in-progress':
         return 'background: #edf0ff; color: #5a64ff;';
       case 'recruiting':
@@ -124,7 +124,7 @@ export const StatusBadge = styled.span<{
       case 'completed':
         return 'background: #f5f5f5; color: #757575;';
       default:
-        return 'background: #f4f5fb; color: #434659;';
+        return 'background: ${({ theme }) => theme.colors.secondary}; color: ${({ theme }) => theme.colors.text};';
     }
   }}
 `;
@@ -132,7 +132,7 @@ export const StatusBadge = styled.span<{
 export const CampaignTitle = styled.h3`
   font-size: 1rem;
   font-weight: 600;
-  color: #1f1f25;
+  color: ${({ theme }) => theme.colors.text};
   margin: 0 0 12px 0;
 `;
 
@@ -157,7 +157,7 @@ export const InfoItem = styled.div`
   align-items: center;
   gap: 6px;
   font-size: 0.875rem;
-  color: #434659;
+  color: ${({ theme }) => theme.colors.text};
 
   svg {
     width: 16px;
@@ -168,7 +168,7 @@ export const InfoItem = styled.div`
 
 export const Requirement = styled.div`
   font-size: 0.875rem;
-  color: #434659;
+  color: ${({ theme }) => theme.colors.text};
   margin-bottom: 8px;
 `;
 
@@ -177,7 +177,7 @@ export const CardFooter = styled.div`
   align-items: center;
   justify-content: space-between;
   padding-top: 12px;
-  border-top: 1px solid #eceff7;
+  border-top: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
 export const Compensation = styled.div`
@@ -186,7 +186,7 @@ export const Compensation = styled.div`
   gap: 6px;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1f1f25;
+  color: ${({ theme }) => theme.colors.text};
 
   svg {
     width: 16px;

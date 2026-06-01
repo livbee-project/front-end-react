@@ -1,3 +1,4 @@
+import { palette } from '@/presentation/styles/tokens';
 import React from 'react';
 import styled from 'styled-components';
 import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
@@ -31,7 +32,7 @@ export const CampaignDetailLayoutExample: React.FC = () => (
   <DetailPageLayout>
     <ContentSection>
       <H1>2024 봄/여름 컬렉션 모델 모집</H1>
-      <P style={{ marginTop: '16px', color: '#687CF4', fontWeight: 600 }}>패션 브랜드</P>
+      <P style={{ marginTop: '16px', color: palette.primary, fontWeight: 600 }}>패션 브랜드</P>
       <P style={{ marginTop: '8px' }}>패션 쇼와 광고 촬영에 참여할 모델을 모집합니다.</P>
     </ContentSection>
     <ContentSection>

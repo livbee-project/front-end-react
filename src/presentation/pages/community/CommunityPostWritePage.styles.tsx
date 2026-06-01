@@ -26,7 +26,7 @@ export const FormContainer = styled.div`
 `;
 
 export const Sheet = styled.div<{ $variant: 'page' | 'modal' }>`
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.colors.surface};
 
   ${({ $variant, theme }) =>
     $variant === 'page'
@@ -143,7 +143,7 @@ export const Input = styled.input`
 
   &:focus {
     border-color: ${({ theme }) => theme.colors.primary};
-    background-color: #ffffff;
+    background-color: ${({ theme }) => theme.colors.surface};
     box-shadow: 0 0 0 1px ${({ theme }) => theme.colors.primary}20;
   }
 `;
@@ -167,7 +167,7 @@ export const Textarea = styled.textarea`
 
   &:focus {
     border-color: ${({ theme }) => theme.colors.primary};
-    background-color: #ffffff;
+    background-color: ${({ theme }) => theme.colors.surface};
     box-shadow: 0 0 0 1px ${({ theme }) => theme.colors.primary}20;
   }
 
@@ -217,7 +217,7 @@ export const ImageUploadButton = styled.label`
   border-radius: 9999px;
   border: none;
   background-color: #111827;
-  color: #ffffff;
+  color: ${({ theme }) => theme.colors.surface};
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -267,7 +267,7 @@ export const ImageRemoveButton = styled.button`
   border-radius: 9999px;
   border: none;
   background-color: rgba(0, 0, 0, 0.6);
-  color: #ffffff;
+  color: ${({ theme }) => theme.colors.surface};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -281,7 +281,7 @@ export const FooterButtonRow = styled.div`
   margin-top: 24px;
   padding-top: 12px;
   border-top: 1px solid #f3f4f6;
-  background: linear-gradient(to top, #ffffff, rgba(255, 255, 255, 0.9));
+  background: linear-gradient(to top, ${({ theme }) => theme.colors.surface}, rgba(255, 255, 255, 0.9));
   display: flex;
   gap: 12px;
 `;

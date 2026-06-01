@@ -1,3 +1,4 @@
+import { palette } from '@/presentation/styles/tokens';
 import type { Meta, StoryObj } from '@storybook/react';
 import FloatingActionButton from '@/presentation/components/ui/FloatingActionButton';
 import styled from 'styled-components';

@@ -51,7 +51,7 @@ const ScrollArea = styled.div`
 
 const Card = styled.article`
   flex: 0 0 180px;
-  background-color: #FFFFFF;
+  background-color: ${({ theme }) => theme.colors.surface};
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
@@ -70,7 +70,7 @@ const Card = styled.article`
 const Thumbnail = styled.div`
   position: relative;
   width: 100%;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: ${({ theme }) => theme.aspectRatio.clip};
   overflow: hidden;
 `;
 
@@ -78,7 +78,7 @@ const ClipImage = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border: 1px solid #E5E7EB;
+  border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 10px;
   transition: transform 0.3s;
 

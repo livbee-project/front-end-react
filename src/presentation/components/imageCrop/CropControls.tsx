@@ -133,7 +133,7 @@ const StarIcon = styled.span`
 `;
 
 const RecommendationText = styled.span`
-  color: #ffffff;
+  color: ${({ theme }) => theme.colors.surface};
   font-size: 12px;
   font-weight: 500;
 `;
@@ -142,8 +142,8 @@ const RatioButton = styled.button<{ $isActive: boolean }>`
   padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
   border-radius: 8px;
   border: none;
-  background-color: ${({ $isActive }) => ($isActive ? '#ffffff' : '#333333')};
-  color: ${({ $isActive }) => ($isActive ? '#000000' : '#ffffff')};
+  background-color: ${({ $isActive }) => ($isActive ? '${({ theme }) => theme.colors.surface}' : '#333333')};
+  color: ${({ $isActive }) => ($isActive ? '#000000' : '${({ theme }) => theme.colors.surface}')};
   font: ${({ theme }) => theme.fonts.body};
   font-weight: 500;
   cursor: pointer;

@@ -23,12 +23,10 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "ignoreDeprecations": "6.0",
 
-    /* 절대 경로 설정 */
-    "baseUrl": ".", // (수정) 제거했던 baseUrl을 다시 추가합니다.
+    /* 절대 경로 설정 (TS 6: baseUrl 폐기 → paths에 전체 경로만 사용) */
     "paths": {
-      "@/*": ["./src/*"] // (수정) "src/*" -> "./src/*"로 변경
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src"],

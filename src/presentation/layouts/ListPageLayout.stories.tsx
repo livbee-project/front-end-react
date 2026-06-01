@@ -1,3 +1,4 @@
+import { palette } from '@/presentation/styles/tokens';
 import type { Meta, StoryObj } from '@storybook/react';
 import ListPageLayout from '@/presentation/layouts/ListPageLayout';
 import { MemoryRouter } from 'react-router-dom';
@@ -106,7 +107,7 @@ export const WithoutHint: Story = {
     floatingActionButtonPath: '/register',
     children: (
       <ListContentWrapper>
-        <div style={{ padding: '20px', backgroundColor: '#f5f6ff', borderRadius: '8px' }}>
+        <div style={{ padding: '20px', backgroundColor: 'palette.background', borderRadius: '8px' }}>
           리스트 아이템
         </div>
       </ListContentWrapper>

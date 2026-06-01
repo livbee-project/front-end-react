@@ -49,7 +49,7 @@ const BackButton = styled.button`
   padding: 12px 16px;
   background: transparent;
   border: none;
-  color: #1f1f25;
+  color: ${({ theme }) => theme.colors.text};
   font-size: 0.95rem;
   cursor: pointer;
   font-weight: 500;
@@ -70,7 +70,7 @@ const HeaderImageContent = styled.img`
 `;
 
 const HeaderInfo = styled.div`
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.surface};
   padding: 20px 16px;
   border-radius: 20px 20px 0 0;
   margin-top: -20px;
@@ -87,7 +87,7 @@ const BrandName = styled.div`
 const Title = styled.h1`
   font-size: 1.25rem;
   font-weight: 700;
-  color: #1f1f25;
+  color: ${({ theme }) => theme.colors.text};
   margin: 0 0 12px 0;
 `;
 
@@ -102,8 +102,8 @@ const TagBadge = styled.span<{ $variant?: 'primary' | 'secondary' }>`
   border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 600;
-  background: ${({ $variant }) => ($variant === 'primary' ? '#5a64ff' : '#ffffff')};
-  color: ${({ $variant }) => ($variant === 'primary' ? '#ffffff' : '#1f1f25')};
-  border: ${({ $variant }) => ($variant === 'primary' ? 'none' : '1px solid #eceff7')};
+  background: ${({ $variant }) => ($variant === 'primary' ? '#5a64ff' : '${({ theme }) => theme.colors.surface}')};
+  color: ${({ $variant }) => ($variant === 'primary' ? '${({ theme }) => theme.colors.surface}' : '${({ theme }) => theme.colors.text}')};
+  border: ${({ $variant }) => ($variant === 'primary' ? 'none' : '1px solid ${({ theme }) => theme.colors.border}')};
 `;
 

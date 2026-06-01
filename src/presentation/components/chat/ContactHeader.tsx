@@ -59,17 +59,17 @@ const BackButton = styled.button`
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1px solid #eceff7;
-  background: #fff;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  background: ${({ theme }) => theme.colors.surface};
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #1b1c2e;
+  color: ${({ theme }) => theme.colors.text};
   cursor: pointer;
   transition: background-color 0.2s;
 
   &:hover {
-    background: #f5f6ff;
+    background: ${({ theme }) => theme.colors.secondary};
   }
 `;
 
@@ -92,7 +92,7 @@ const StatusDot = styled.span`
   height: 10px;
   border-radius: 50%;
   background: #3cd25a;
-  border: 2px solid #fff;
+  border: 2px solid ${({ theme }) => theme.colors.surface};
 `;
 
 const NameRoleGroup = styled.div`
@@ -104,13 +104,13 @@ const NameRoleGroup = styled.div`
 const HeaderName = styled.div`
   font-size: 1rem;
   font-weight: 700;
-  color: #1f1f25;
+  color: ${({ theme }) => theme.colors.text};
   line-height: 1.2;
 `;
 
 const HeaderRole = styled.div`
   font-size: 0.75rem;
-  color: #7d8299;
+  color: ${({ theme }) => theme.colors.muted};
   line-height: 1.2;
 `;
 

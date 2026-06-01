@@ -5,7 +5,7 @@ const SkeletonItem = styled.div`
   display: flex;
   gap: 12px;
   padding: 16px;
-  border-bottom: 1px solid #f4f5fb;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.secondary};
   animation: pulse 1.4s ease infinite;
 
   @keyframes pulse {
@@ -25,7 +25,7 @@ const SkeletonAvatar = styled.div`
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #eceff7;
+  background: ${({ theme }) => theme.colors.border};
 `;
 
 const SkeletonTextGroup = styled.div`
@@ -38,7 +38,7 @@ const SkeletonTextGroup = styled.div`
 const SkeletonLine = styled.div<{ $width?: string }>`
   height: 12px;
   border-radius: 999px;
-  background: #eceff7;
+  background: ${({ theme }) => theme.colors.border};
   width: ${({ $width }) => $width || '100%'};
 `;
 

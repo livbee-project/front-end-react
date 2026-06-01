@@ -78,7 +78,7 @@ export const DateInputUsageExamples: React.FC = () => {
 const HelperText = styled.p`
   margin-top: 8px;
   font-size: 12px;
-  color: #717182;
+  color: ${({ theme }) => theme.colors.muted};
 `;
 
 const Field = styled.div``;

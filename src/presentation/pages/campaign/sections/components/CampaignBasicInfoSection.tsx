@@ -54,7 +54,7 @@ const IconContainer = styled.div`
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background-color: #E5E7EB;
+  background-color: ${({ theme }) => theme.colors.border};
   display: flex;
   align-items: center;
   justify-content: center;

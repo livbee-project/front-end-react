@@ -1,3 +1,4 @@
+import { palette } from '@/presentation/styles/tokens';
 import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 
@@ -55,7 +56,7 @@ const SystemFlowDiagram: React.FC = () => {
 
   const arrow: React.CSSProperties = {
     fontSize: 24,
-    color: '#687CF4',
+    color: 'palette.primary',
     fontWeight: 'bold',
     margin: '0 12px',
   };
@@ -64,7 +65,7 @@ const SystemFlowDiagram: React.FC = () => {
     padding: '20px',
     borderRadius: 12,
     border: '2px solid',
-    backgroundColor: '#ffffff',
+    backgroundColor: 'palette.surface',
     textAlign: 'center',
     boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
   };
@@ -72,7 +73,7 @@ const SystemFlowDiagram: React.FC = () => {
   return (
     <div
       style={{
-        backgroundColor: '#ffffff',
+        backgroundColor: 'palette.surface',
         border: '1px solid #e0e0e0',
         borderRadius: 16,
         padding: '40px',
@@ -81,7 +82,7 @@ const SystemFlowDiagram: React.FC = () => {
     >
       {/* 메인 화면 구조 */}
       <div style={{ marginBottom: 48 }}>
-        <h3 style={{ marginBottom: 24, fontSize: 20, fontWeight: 700, color: '#030213' }}>
+        <h3 style={{ marginBottom: 24, fontSize: 20, fontWeight: 700, color: 'palette.text' }}>
           📱 앱의 주요 화면
         </h3>
         <div
@@ -92,16 +93,16 @@ const SystemFlowDiagram: React.FC = () => {
             flexWrap: 'wrap',
             gap: 16,
             padding: '24px',
-            backgroundColor: '#F5F6FF',
+            backgroundColor: 'palette.background',
             borderRadius: 12,
           }}
         >
           <div
             style={{
               ...screenBox,
-              backgroundColor: '#ffffff',
-              borderColor: '#687CF4',
-              color: '#030213',
+              backgroundColor: 'palette.surface',
+              borderColor: 'palette.primary',
+              color: 'palette.text',
             }}
           >
             🏠 홈
@@ -110,9 +111,9 @@ const SystemFlowDiagram: React.FC = () => {
           <div
             style={{
               ...screenBox,
-              backgroundColor: '#ffffff',
+              backgroundColor: 'palette.surface',
               borderColor: '#0ea5e9',
-              color: '#030213',
+              color: 'palette.text',
             }}
           >
             📋 모집공고
@@ -121,9 +122,9 @@ const SystemFlowDiagram: React.FC = () => {
           <div
             style={{
               ...screenBox,
-              backgroundColor: '#ffffff',
+              backgroundColor: 'palette.surface',
               borderColor: '#10b981',
-              color: '#030213',
+              color: 'palette.text',
             }}
           >
             👤 모델
@@ -132,9 +133,9 @@ const SystemFlowDiagram: React.FC = () => {
           <div
             style={{
               ...screenBox,
-              backgroundColor: '#ffffff',
+              backgroundColor: 'palette.surface',
               borderColor: '#f59e0b',
-              color: '#030213',
+              color: 'palette.text',
             }}
           >
             🎨 포트폴리오
@@ -143,22 +144,22 @@ const SystemFlowDiagram: React.FC = () => {
           <div
             style={{
               ...screenBox,
-              backgroundColor: '#ffffff',
+              backgroundColor: 'palette.surface',
               borderColor: '#ef4444',
-              color: '#030213',
+              color: 'palette.text',
             }}
           >
             👤 마이페이지
           </div>
         </div>
-        <div style={{ marginTop: 16, fontSize: 14, color: '#717182', textAlign: 'center' }}>
+        <div style={{ marginTop: 16, fontSize: 14, color: 'palette.subText', textAlign: 'center' }}>
           하단 네비게이션 바를 통해 언제든지 이동 가능
         </div>
       </div>
 
       {/* 사용자 여정 */}
       <div style={{ marginBottom: 48 }}>
-        <h3 style={{ marginBottom: 24, fontSize: 20, fontWeight: 700, color: '#030213' }}>
+        <h3 style={{ marginBottom: 24, fontSize: 20, fontWeight: 700, color: 'palette.text' }}>
           🎯 주요 사용 흐름
         </h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -166,12 +167,12 @@ const SystemFlowDiagram: React.FC = () => {
           <div
             style={{
               padding: '24px',
-              backgroundColor: '#F5F6FF',
+              backgroundColor: 'palette.background',
               borderRadius: 12,
-              border: '1px solid #687CF4',
+              border: '1px solid palette.primary',
             }}
           >
-            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12, color: '#030213' }}>
+            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12, color: 'palette.text' }}>
               1️⃣ 모집공고 찾기 & 지원하기
             </div>
             <div
@@ -184,13 +185,13 @@ const SystemFlowDiagram: React.FC = () => {
                 marginTop: 16,
               }}
             >
-              <div style={{ ...featureCard, borderColor: '#687CF4' }}>모집공고 목록</div>
+              <div style={{ ...featureCard, borderColor: 'palette.primary' }}>모집공고 목록</div>
               <span style={arrow}>→</span>
-              <div style={{ ...featureCard, borderColor: '#687CF4' }}>상세 정보 보기</div>
+              <div style={{ ...featureCard, borderColor: 'palette.primary' }}>상세 정보 보기</div>
               <span style={arrow}>→</span>
-              <div style={{ ...featureCard, borderColor: '#687CF4' }}>지원하기</div>
+              <div style={{ ...featureCard, borderColor: 'palette.primary' }}>지원하기</div>
               <span style={arrow}>→</span>
-              <div style={{ ...featureCard, borderColor: '#687CF4' }}>채팅으로 소통</div>
+              <div style={{ ...featureCard, borderColor: 'palette.primary' }}>채팅으로 소통</div>
             </div>
           </div>
 
@@ -203,7 +204,7 @@ const SystemFlowDiagram: React.FC = () => {
               border: '1px solid #0ea5e9',
             }}
           >
-            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12, color: '#030213' }}>
+            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12, color: 'palette.text' }}>
               2️⃣ 모델 프로필 등록하기
             </div>
             <div
@@ -235,7 +236,7 @@ const SystemFlowDiagram: React.FC = () => {
               border: '1px solid #10b981',
             }}
           >
-            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12, color: '#030213' }}>
+            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12, color: 'palette.text' }}>
               3️⃣ 포트폴리오 관리하기
             </div>
             <div
@@ -262,7 +263,7 @@ const SystemFlowDiagram: React.FC = () => {
 
       {/* 주요 기능 */}
       <div>
-        <h3 style={{ marginBottom: 24, fontSize: 20, fontWeight: 700, color: '#030213' }}>
+        <h3 style={{ marginBottom: 24, fontSize: 20, fontWeight: 700, color: 'palette.text' }}>
           ⭐ 주요 기능
         </h3>
         <div
@@ -273,7 +274,7 @@ const SystemFlowDiagram: React.FC = () => {
           }}
         >
           {[
-            { icon: '📋', name: '모집공고', desc: '브랜드가 모델을 모집하는 공고를 확인하고 지원할 수 있어요', color: '#687CF4' },
+            { icon: '📋', name: '모집공고', desc: '브랜드가 모델을 모집하는 공고를 확인하고 지원할 수 있어요', color: 'palette.primary' },
             { icon: '👤', name: '모델 프로필', desc: '모델 정보를 등록하고 관리할 수 있어요', color: '#0ea5e9' },
             { icon: '🎨', name: '포트폴리오', desc: '작업 사진과 경력을 포트폴리오로 관리해요', color: '#10b981' },
             { icon: '💬', name: '실시간 채팅', desc: '지원 후 브랜드와 실시간으로 소통할 수 있어요', color: '#f59e0b' },
@@ -292,7 +293,7 @@ const SystemFlowDiagram: React.FC = () => {
               <div style={{ fontWeight: 700, color: feature.color, marginBottom: 8, fontSize: 16 }}>
                 {feature.name}
               </div>
-              <div style={{ fontSize: 13, color: '#717182', lineHeight: 1.5 }}>
+              <div style={{ fontSize: 13, color: 'palette.subText', lineHeight: 1.5 }}>
                 {feature.desc}
               </div>
             </div>

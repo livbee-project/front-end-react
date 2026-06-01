@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const PageContainer = styled.div`
   width: 100%;
   min-height: 100vh;
-  background: #f4f5fb;
+  background: ${({ theme }) => theme.colors.secondary};
   padding-bottom: 80px;
 
   @media (max-width: 600px) {
@@ -13,13 +13,13 @@ export const PageContainer = styled.div`
 
 export const HeaderSection = styled.div`
   padding: 20px 16px;
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.surface};
 `;
 
 export const HeaderTitle = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1f1f25;
+  color: ${({ theme }) => theme.colors.text};
   margin: 0 0 8px 0;
   
   span {
@@ -41,11 +41,11 @@ export const SearchBar = styled.div`
 export const SearchInput = styled.input`
   width: 100%;
   padding: 12px 16px 12px 44px;
-  border: 1px solid #eceff7;
+  border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 12px;
   font-size: 0.95rem;
-  background: #ffffff;
-  color: #1f1f25;
+  background: ${({ theme }) => theme.colors.surface};
+  color: ${({ theme }) => theme.colors.text};
   
   &::placeholder {
     color: #a0a4b7;
@@ -89,12 +89,12 @@ export const FilterButton = styled.button<{ $active: boolean }>`
   cursor: pointer;
   transition: all 0.2s;
   
-  background: ${({ $active }) => ($active ? '#5a64ff' : '#ffffff')};
-  color: ${({ $active }) => ($active ? '#ffffff' : '#1f1f25')};
-  border: ${({ $active }) => ($active ? 'none' : '1px solid #eceff7')};
+  background: ${({ $active }) => ($active ? '#5a64ff' : '${({ theme }) => theme.colors.surface}')};
+  color: ${({ $active }) => ($active ? '${({ theme }) => theme.colors.surface}' : '${({ theme }) => theme.colors.text}')};
+  border: ${({ $active }) => ($active ? 'none' : '1px solid ${({ theme }) => theme.colors.border}')};
   
   &:hover {
-    background: ${({ $active }) => ($active ? '#4a54e8' : '#f4f5fb')};
+    background: ${({ $active }) => ($active ? '#4a54e8' : '${({ theme }) => theme.colors.secondary}')};
   }
 `;
 
@@ -117,7 +117,7 @@ export const FloatingActionButton = styled.button`
   border-radius: 50%;
   background: #5a64ff;
   border: none;
-  color: #ffffff;
+  color: ${({ theme }) => theme.colors.surface};
   font-size: 24px;
   font-weight: 300;
   cursor: pointer;

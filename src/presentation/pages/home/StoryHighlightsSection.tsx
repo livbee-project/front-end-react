@@ -2,6 +2,7 @@ import React from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import { Sparkles } from 'lucide-react';
 import { Caption } from '@/presentation/components/styled/Typography';
+import { palette } from '@/presentation/styles/tokens';
 
 const highlights = [
   {
@@ -121,7 +122,7 @@ const StoryHighlightsSection: React.FC = () => (
           <HighlightRing $gradient={story.gradient} $animate={story.isNew}>
             {story.isNew && (
               <SparklesWrapper>
-                <Sparkles size={20} color="#687CF4" />
+                <Sparkles size={20} color={palette.primary} />
               </SparklesWrapper>
             )}
             <HighlightImage>

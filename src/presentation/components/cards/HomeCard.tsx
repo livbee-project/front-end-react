@@ -5,7 +5,7 @@ export const HomeCard = styled.article<{ $basis?: string }>`
   flex: 0 0 ${({ $basis }) => $basis ?? '65vw'};
   min-width: 240px;
   max-width: 300px;
-  background-color: #FFFFFF;
+  background-color: ${({ theme }) => theme.colors.surface};
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;

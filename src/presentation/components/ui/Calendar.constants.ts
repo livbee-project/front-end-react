@@ -1,3 +1,5 @@
+import { palette } from '@/presentation/styles/tokens';
+
 /**
  * 캘린더 관련 상수
  */
@@ -6,8 +8,8 @@ export const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'] as con
 export const CALENDAR_COLORS = {
   SUNDAY: '#ef4444',
   SATURDAY: '#3b82f6',
-  BLACK: '#000000',
-  WHITE: '#ffffff',
+  BLACK: palette.text,
+  WHITE: palette.surface,
 } as const;
 
 export const CALENDAR_OPACITY = {
@@ -24,6 +26,6 @@ export const CALENDAR_TIMING = {
 export const WEEKDAY_STYLES = {
   FONT_SIZE: '13px',
   FONT_WEIGHT: '700',
-  COLOR: '#000000',
+  COLOR: palette.text,
 } as const;
 

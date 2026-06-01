@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const PageWrapper = styled.div`
   min-height: 100vh;
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.surface};
   padding: 2rem 1rem;
 
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {

@@ -1,3 +1,4 @@
+import { palette } from '@/presentation/styles/tokens';
 import type { Meta, StoryObj } from '@storybook/react';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
