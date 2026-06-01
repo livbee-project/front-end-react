@@ -1,0 +1,4 @@
+{
+  "typescript.tsdk": "livbee-project/node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}

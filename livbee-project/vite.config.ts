@@ -1,5 +1,5 @@
-/// <reference types="vitest/config" />
-import { defineConfig, type ViteDevServer } from 'vite';
+import { defineConfig } from 'vitest/config';
+import type { ViteDevServer } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
@@ -83,16 +83,20 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          react: ['react', 'react-dom'],
-          router: ['react-router-dom'],
-          styled: ['styled-components'],
+        manualChunks(id) {
+          if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/')) {
+            return 'react';
+          }
+          if (id.includes('node_modules/react-router-dom')) {
+            return 'router';
+          }
+          if (id.includes('node_modules/styled-components')) {
+            return 'styled';
+          }
         },
       },
     },
   },
-  // Vitest 옵션 (vitest/config 타입 확장)
-  // @ts-expect-error - UserConfigExport에 test 속성 확장 (vitest)
   test: {
     projects: [
       // unit: *.test.ts만 실행, Node 환경, Storybook 미사용
