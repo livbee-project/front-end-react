@@ -46,30 +46,13 @@ VSCode 등 IDE의 포맷 기능과 연동해 자동 정렬도 가능합니다.
 ## 폴더 구조 및 클린 아키텍처(2025-10-30 기준)
 
 ```
-livbee-project/
-  └── src/
-      ├── app/
-      ├── assets/
-      │    └── react.svg
-      ├── data/
-      │    ├── mappers/
-      │    ├── repositories/
-      │    └── sources/
-      ├── domain/
-      │    ├── entities/
-      │    └── usecases/
-      ├── presentation/
-      │    ├── components/
-      │    │    └── Home.tsx
-      │    ├── hooks/
-      │    ├── pages/
-      │    └── styles/
-      │         └── Home.css
-      ├── shared/
-      ├── App.css
-      ├── App.tsx
-      ├── index.css
-      └── main.tsx
+src/
+  ├── app/
+  ├── assets/
+  ├── data/
+  ├── domain/
+  ├── presentation/
+  └── shared/
 ```
 
 > 📚 **클린 아키텍처 구조 설명**

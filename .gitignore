@@ -214,3 +214,12 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,react,node
+
+# Vite / Storybook / 로컬 전용
+dist-ssr
+commit_message.txt
+*storybook.log
+storybook-static
+.antigravity/
+docs/
+.env.example
