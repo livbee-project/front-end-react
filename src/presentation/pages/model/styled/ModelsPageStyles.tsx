@@ -102,12 +102,6 @@ export const ContentSection = styled.div`
   padding: 20px 16px;
 `;
 
-export const ModelsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-`;
-
 export const FloatingActionButton = styled.button`
   position: fixed;
   bottom: 80px;

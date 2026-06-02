@@ -14,7 +14,8 @@ const meta: Meta<typeof HomeCard> = {
     layout: 'padded',
     docs: {
       description: {
-        component: '홈 화면에서 사용되는 카드 컴포넌트입니다. 이미지, 브랜드, 제목, 설명, 메타 정보를 포함합니다.',
+        component:
+          '[deprecated] ContentCard를 사용하세요. 레거시 홈 카드 조합(HomeCard + HomeCardImage + HomeCardBody)입니다.',
       },
     },
   },
@@ -35,7 +36,7 @@ export const Examples: Story = {
   parameters: {
     docs: {
       description: {
-        story: '다양한 홈 카드 예시입니다. 가로 스크롤 리스트로 사용됩니다.',
+        story: '다양한 홈 카드 예시입니다. 목록 레이아웃은 ContentCardGrid(반응형 2/3/4열)를 사용합니다.',
       },
     },
   },

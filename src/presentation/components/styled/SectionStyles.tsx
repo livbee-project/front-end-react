@@ -140,37 +140,6 @@ export const CardFooter = styled.div`
   margin-top: ${({ theme }) => theme.spacing.sm};
 `;
 
-// ===== 그리드 레이아웃 =====
-
-/**
- * CardGrid - 카드 그리드 레이아웃
- * theme spacing 사용
- */
-export const CardGrid = styled.div`
-  display: grid;
-  gap: ${({ theme }) => theme.spacing.lg};
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  width: 100%;
-  box-sizing: border-box;
-`;
-
-/**
- * CardRow - 카드 가로 스크롤 레이아웃
- * theme spacing 사용
- */
-export const CardRow = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.sm};
-  overflow-x: auto;
-  padding: ${({ theme }) => theme.spacing.sm} 0;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
-
 // ===== 간격 유틸리티 =====
 
 /**

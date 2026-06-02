@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Plus } from 'lucide-react';
 import { debug } from '@/shared/utils/logger';
 import type { Clip } from '@/domain/entities/Clip';
+import { ContentCardGrid } from '@/presentation/components/cards/content/ContentCardGrid';
 import ClipCard from '@/presentation/pages/clip/components/ClipCard';
 import {
   AddCard,
   AddIcon,
   BackButton,
-  ClipsGrid,
   ContentSection,
   FloatingActionButton,
   HeaderSection,
@@ -81,7 +81,7 @@ const MyClipsPage: React.FC = () => {
       </HeaderSection>
 
       <ContentSection>
-        <ClipsGrid>
+        <ContentCardGrid>
           {mockClips.map((clip) => (
             <ClipCard key={clip.id} clip={clip} onEdit={handleEdit} onDelete={handleDelete} />
           ))}
@@ -90,7 +90,7 @@ const MyClipsPage: React.FC = () => {
               <Plus size={24} />
             </AddIcon>
           </AddCard>
-        </ClipsGrid>
+        </ContentCardGrid>
       </ContentSection>
 
       <FloatingActionButton onClick={handleAdd}>

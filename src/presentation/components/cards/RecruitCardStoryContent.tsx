@@ -1,6 +1,7 @@
  
 import React from 'react';
 import styled from 'styled-components';
+import { ContentCardGrid } from '@/presentation/components/cards/content/ContentCardGrid';
 import Button from '@/presentation/components/ui/Button';
 import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
 import RecruitCard from '@/presentation/components/cards/RecruitCard';
@@ -10,7 +11,7 @@ interface RecruitCardScrollProps {
 }
 
 export const RecruitCardScroll: React.FC<RecruitCardScrollProps> = ({ children }) => (
-  <ScrollContainer>{children}</ScrollContainer>
+  <ContentCardGrid>{children}</ContentCardGrid>
 );
 
 interface RecruitCardImageProps {
@@ -114,14 +115,6 @@ export const RecruitCardNonClickableArgs = {
   title: '클릭 불가능한 카드',
   content: 'onPress가 없으면 카드가 클릭 불가능한 상태가 됩니다.',
 };
-
-const ScrollContainer = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.lg};
-  overflow-x: auto;
-  padding: ${({ theme }) => theme.spacing.md};
-  max-width: 100%;
-`;
 
 const TopImage = styled.div<{ $imageUrl?: string }>`
   width: 100%;

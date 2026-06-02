@@ -15,11 +15,12 @@ const groups = [
   {
     title: '카드 & 콘텐츠',
     items: [
-      { label: 'CampaignCard', path: '/?path=/docs/cards-campaigncard--docs', desc: '모집 공고 카드' },
-      { label: 'PortfolioCard', path: '/?path=/docs/cards-portfoliocard--docs', desc: '포트폴리오 목록 카드' },
-      { label: 'MyPortfolioCard', path: '/?path=/docs/cards-myportfoliocard--docs', desc: '내 포트폴리오 카드' },
-      { label: 'HomeCard', path: '/?path=/docs/cards-homecard--docs', desc: '홈 섹션 카드' },
-      { label: 'ClipCard', path: '/?path=/docs/cards-clipcard--docs', desc: '숏클립 카드' },
+      { label: 'ContentCard', path: '/?path=/docs/cards-contentcard--docs', desc: '공통 콘텐츠 카드 5종 (권장)' },
+      { label: 'CampaignCard', path: '/?path=/docs/cards-campaigncard--docs', desc: '모집 공고 (ContentCard 래퍼)' },
+      { label: 'PortfolioCard', path: '/?path=/docs/cards-portfoliocard--docs', desc: '쇼호스트 목록 (ContentCard 래퍼)' },
+      { label: 'MyPortfolioCard', path: '/?path=/docs/cards-myportfoliocard--docs', desc: '내 포트폴리오 관리 카드' },
+      { label: 'HomeCard', path: '/?path=/docs/cards-homecard--docs', desc: '[deprecated] 레거시 홈 카드' },
+      { label: 'ClipCard', path: '/?path=/docs/cards-clipcard--docs', desc: '[deprecated] 레거시 클립 카드' },
     ],
   },
   {
@@ -336,7 +337,8 @@ const OverviewDoc = () => (
       <h2>화면 흐름</h2>
       <ol>
         <li>
-          <strong>홈:</strong> TopNavLayout → HomeSectionHeader → 카드 (CampaignCard / PortfolioRowCard / ProductCard)
+          <strong>홈·목록:</strong> TopNavLayout → HomeSectionHeader → ContentCard + ContentCardGrid
+          (모바일 2열 스크롤 / 태블릿 3열 / 웹 4열 — Design System → 반응형 그리드 참고)
         </li>
         <li>
           <strong>목록:</strong> ListPageLayout + 검색/필터(CampaignSearchSection, SearchInput, Filters)

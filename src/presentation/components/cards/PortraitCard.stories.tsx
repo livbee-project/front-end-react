@@ -80,7 +80,7 @@ export const HorizontalScroll: Story = {
   parameters: {
     docs: {
       description: {
-        story: '가로 스크롤 리스트에서 사용하는 예시입니다. 홈 화면의 컨셉 모델 섹션에서 사용됩니다.',
+        story: 'ContentCardGrid 기반 목록 예시입니다. 모바일 2열 가로 스크롤, 태블릿 3열, 웹 4열입니다.',
       },
     },
   },
@@ -92,7 +92,7 @@ export const UsageExamples: Story = {
   parameters: {
     docs: {
       description: {
-        story: '실제 사용 예시입니다. 모델 카드나 클립 카드로 사용할 수 있습니다.',
+        story: 'ContentCardGrid 안에서 모델 카드 목록으로 사용하는 예시입니다.',
       },
     },
   },

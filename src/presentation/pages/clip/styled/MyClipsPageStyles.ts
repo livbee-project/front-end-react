@@ -42,12 +42,6 @@ export const ContentSection = styled.div`
   padding: 0 16px;
 `;
 
-export const ClipsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-`;
-
 export const ClipCardContainer = styled.div`
   background: ${({ theme }) => theme.colors.surface};
   border-radius: 12px;

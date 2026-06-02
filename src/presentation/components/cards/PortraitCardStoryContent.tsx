@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { ContentCardGrid } from '@/presentation/components/cards/content/ContentCardGrid';
 import PortraitCard from '@/presentation/components/cards/PortraitCard';
 
 export const PortraitCardSizesSection: React.FC = () => (
@@ -11,7 +12,7 @@ export const PortraitCardSizesSection: React.FC = () => (
 );
 
 export const PortraitCardScrollSection: React.FC = () => (
-  <ScrollContainer>
+  <ContentCardGrid>
     {Array.from({ length: 5 }).map((_, index) => (
       <PortraitCard
         key={index}
@@ -20,11 +21,11 @@ export const PortraitCardScrollSection: React.FC = () => (
         onPress={() => alert(`카드 ${index + 1} 클릭`)}
       />
     ))}
-  </ScrollContainer>
+  </ContentCardGrid>
 );
 
 export const PortraitCardUsageSection: React.FC = () => (
-  <SizeContainer>
+  <ContentCardGrid>
     <PortraitCard
       imageUrl="https://via.placeholder.com/300x400"
       title="김모델"
@@ -43,33 +44,12 @@ export const PortraitCardUsageSection: React.FC = () => (
       content="라이프스타일 모델, 신인"
       onPress={() => alert('박모델 클릭')}
     />
-  </SizeContainer>
+  </ContentCardGrid>
 );
 
 const SizeContainer = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing.xl};
   flex-wrap: wrap;
-`;
-
-const ScrollContainer = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.lg};
-  overflow-x: auto;
-  padding: ${({ theme }) => theme.spacing.lg} 0;
-
-  &::-webkit-scrollbar {
-    height: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: ${({ theme }) => theme.colors.secondary};
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.colors.primary};
-    border-radius: 4px;
-  }
 `;
 

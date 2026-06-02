@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
 import { HomeCard } from '@/presentation/components/cards/HomeCard';
 import { HomeCardImage } from '@/presentation/components/cards/HomeCardImage';
 import {
@@ -10,6 +9,7 @@ import {
   HomeCardMetaRow,
   CTAButton,
 } from '@/presentation/components/cards/HomeCardBody';
+import { ContentCardGrid } from '@/presentation/components/cards/content/ContentCardGrid';
 import { Caption } from '@/presentation/components/styled/Typography';
 
 export const HomeCardDefaultContent = (
@@ -29,7 +29,7 @@ export const HomeCardDefaultContent = (
 );
 
 export const HomeCardExamplesSection: React.FC = () => (
-  <CardContainer>
+  <ContentCardGrid>
     {homeCardExamples.map(({ brand, title, description, date, views }, index) => (
       <HomeCard key={title}>
         <HomeCardImage src="https://via.placeholder.com/300x300" alt={`카드 ${index + 1}`} />
@@ -45,7 +45,7 @@ export const HomeCardExamplesSection: React.FC = () => (
         </HomeCardBody>
       </HomeCard>
     ))}
-  </CardContainer>
+  </ContentCardGrid>
 );
 
 export const HomeCardNoImage: React.FC = () => (
@@ -105,25 +105,4 @@ const homeCardExamples = [
     views: '2,345',
   },
 ];
-
-const CardContainer = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.lg};
-  overflow-x: auto;
-  padding: ${({ theme }) => theme.spacing.lg} 0;
-
-  &::-webkit-scrollbar {
-    height: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: ${({ theme }) => theme.colors.secondary};
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.colors.primary};
-    border-radius: 4px;
-  }
-`;
 

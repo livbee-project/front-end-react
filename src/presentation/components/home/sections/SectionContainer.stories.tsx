@@ -1,7 +1,11 @@
 import { palette } from '@/presentation/styles/tokens';
 import type { Meta, StoryObj } from '@storybook/react';
 import SectionContainer from '@/presentation/components/home/sections/SectionContainer';
-import PortraitCard from '@/presentation/components/cards/PortraitCard';
+import { ContentCard } from '@/presentation/components/cards/content/ContentCard';
+import { ContentCardGrid } from '@/presentation/components/cards/content/ContentCardGrid';
+
+const SAMPLE_IMAGE =
+  'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=400&q=80';
 import styled from 'styled-components';
 
 const meta: Meta<typeof SectionContainer> = {
@@ -32,42 +36,16 @@ export default meta;
 type Story = StoryObj<typeof SectionContainer>;
 
 // ===== 기본 섹션 =====
-const ContentArea = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.lg};
-  overflow-x: auto;
-  padding: ${({ theme }) => theme.spacing.md};
-  
-  &::-webkit-scrollbar {
-    height: 8px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: ${({ theme }) => theme.colors.secondary};
-    border-radius: 4px;
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.colors.primary};
-    border-radius: 4px;
-  }
-`;
-
 export const Default: Story = {
   args: {
     title: '섹션 제목',
     children: (
-      <ContentArea>
-        <div style={{ padding: '20px', backgroundColor: 'palette.background', borderRadius: '8px', minWidth: '200px' }}>
-          컨텐츠 1
-        </div>
-        <div style={{ padding: '20px', backgroundColor: 'palette.background', borderRadius: '8px', minWidth: '200px' }}>
-          컨텐츠 2
-        </div>
-        <div style={{ padding: '20px', backgroundColor: 'palette.background', borderRadius: '8px', minWidth: '200px' }}>
-          컨텐츠 3
-        </div>
-      </ContentArea>
+      <ContentCardGrid>
+        <ContentCard variant="live" imageUrl={SAMPLE_IMAGE} heading="콘텐츠 1" supplementary="부가 정보" />
+        <ContentCard variant="live" imageUrl={SAMPLE_IMAGE} heading="콘텐츠 2" supplementary="부가 정보" />
+        <ContentCard variant="live" imageUrl={SAMPLE_IMAGE} heading="콘텐츠 3" supplementary="부가 정보" />
+        <ContentCard variant="live" imageUrl={SAMPLE_IMAGE} heading="콘텐츠 4" supplementary="부가 정보" />
+      </ContentCardGrid>
     ),
   },
 };
@@ -78,12 +56,12 @@ export const WithMoreButton: Story = {
     title: '컨셉에 맞는 모델 찾기',
     onMorePressed: () => alert('더보기 클릭'),
     children: (
-      <ContentArea>
-        <PortraitCard title="모델 1" content="한 줄 소개" />
-        <PortraitCard title="모델 2" content="한 줄 소개" />
-        <PortraitCard title="모델 3" content="한 줄 소개" />
-        <PortraitCard title="모델 4" content="한 줄 소개" />
-      </ContentArea>
+      <ContentCardGrid>
+        <ContentCard variant="showhost" imageUrl={SAMPLE_IMAGE} heading="모델 1" supplementary="한 줄 소개" />
+        <ContentCard variant="showhost" imageUrl={SAMPLE_IMAGE} heading="모델 2" supplementary="한 줄 소개" />
+        <ContentCard variant="showhost" imageUrl={SAMPLE_IMAGE} heading="모델 3" supplementary="한 줄 소개" />
+        <ContentCard variant="showhost" imageUrl={SAMPLE_IMAGE} heading="모델 4" supplementary="한 줄 소개" />
+      </ContentCardGrid>
     ),
   },
 };
@@ -96,33 +74,33 @@ export const DifferentSections: Story = {
         title="지금 뜨는 쇼핑라이브"
         onMorePressed={() => alert('더보기 클릭')}
       >
-        <ContentArea>
-          <PortraitCard title="라이브 1" content="방송 중" />
-          <PortraitCard title="라이브 2" content="방송 중" />
-          <PortraitCard title="라이브 3" content="방송 중" />
-        </ContentArea>
+        <ContentCardGrid>
+          <ContentCard variant="ad" imageUrl={SAMPLE_IMAGE} heading="브랜드 1" title="라이브 1" supplementary="방송 중" />
+          <ContentCard variant="ad" imageUrl={SAMPLE_IMAGE} heading="브랜드 2" title="라이브 2" supplementary="방송 중" />
+          <ContentCard variant="ad" imageUrl={SAMPLE_IMAGE} heading="브랜드 3" title="라이브 3" supplementary="방송 중" />
+        </ContentCardGrid>
       </SectionContainer>
       
       <SectionContainer
         title="브랜드 PICK"
         onMorePressed={() => alert('더보기 클릭')}
       >
-        <ContentArea>
-          <PortraitCard title="브랜드 1" content="추천 브랜드" />
-          <PortraitCard title="브랜드 2" content="추천 브랜드" />
-          <PortraitCard title="브랜드 3" content="추천 브랜드" />
-        </ContentArea>
+        <ContentCardGrid>
+          <ContentCard variant="ad" imageUrl={SAMPLE_IMAGE} heading="브랜드 1" title="추천 캠페인" supplementary="~ 05.31 마감" />
+          <ContentCard variant="ad" imageUrl={SAMPLE_IMAGE} heading="브랜드 2" title="추천 캠페인" supplementary="~ 06.15 마감" />
+          <ContentCard variant="ad" imageUrl={SAMPLE_IMAGE} heading="브랜드 3" title="추천 캠페인" supplementary="~ 06.30 마감" />
+        </ContentCardGrid>
       </SectionContainer>
       
       <SectionContainer
         title="HOT CLIP"
         onMorePressed={() => alert('더보기 클릭')}
       >
-        <ContentArea>
-          <PortraitCard title="클립 1" content="인기 클립" />
-          <PortraitCard title="클립 2" content="인기 클립" />
-          <PortraitCard title="클립 3" content="인기 클립" />
-        </ContentArea>
+        <ContentCardGrid>
+          <ContentCard variant="flip" imageUrl={SAMPLE_IMAGE} heading="클립 1" supplementary="인기 클립" />
+          <ContentCard variant="flip" imageUrl={SAMPLE_IMAGE} heading="클립 2" supplementary="인기 클립" />
+          <ContentCard variant="flip" imageUrl={SAMPLE_IMAGE} heading="클립 3" supplementary="인기 클립" />
+        </ContentCardGrid>
       </SectionContainer>
     </div>
   ),
