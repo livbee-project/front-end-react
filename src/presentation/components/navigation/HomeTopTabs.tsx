@@ -17,7 +17,7 @@ const comingSoon = ['/live', '/event', '/service'];
 
 const TabsWrapper = styled.div`
   position: sticky;
-  top: 4rem;
+  top: 6.75rem;
   z-index: 40;
   background-color: ${({ theme }) => theme.colors.background};
 `;
@@ -28,14 +28,14 @@ const TabsInner = styled.div`
   display: flex;
   gap: 2rem;
   overflow-x: auto;
-  padding: 0 1rem;
+  padding: 0 ${({ theme }) => theme.layout.pagePadding.mobile};
 
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 0 1.5rem;
+    padding: 0 ${({ theme }) => theme.layout.pagePadding.tablet};
   }
 
   @media (min-width: ${({ theme }) => theme.breakpoints.desktop}) {
-    padding: 0 2rem;
+    padding: 0 ${({ theme }) => theme.layout.pagePadding.desktop};
   }
 
   -ms-overflow-style: none;
@@ -60,6 +60,10 @@ const TabButton = styled.button<{ $active: boolean }>`
 
   &:hover {
     color: ${({ theme }) => theme.colors.foreground};
+  }
+
+  &:first-of-type {
+    padding-left: 0;
   }
 `;
 

@@ -14,7 +14,7 @@ const NavBar = styled.nav`
 const NavInner = styled.div`
   max-width: ${({ theme }) => theme.layout.maxWidth};
   margin: 0 auto;
-  height: 4rem;
+  height: 6.75rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -42,11 +42,13 @@ const LogoLink = styled(Link)`
 `;
 
 const LogoImage = styled.img`
-  height: 32px;
+  height: 108px;
   width: auto;
-  max-width: 120px;
+  max-width: 405px;
   object-fit: contain;
   display: block;
+  /* PNG 캔버스 좌측 여백 보정 — 홈 탭 텍스트 시작선과 맞춤 */
+  margin-left: calc(-1 * ${({ theme }) => theme.spacing.xl} * 1.5);
 `;
 
 const IconContainer = styled.div`
