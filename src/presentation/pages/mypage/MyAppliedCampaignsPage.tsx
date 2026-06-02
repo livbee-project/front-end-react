@@ -5,6 +5,7 @@ import type { AppliedCampaign } from '@/domain/entities/AppliedCampaign';
 import { useListPageState } from '@/presentation/hooks/list/useListPageState';
 import AppliedCampaignFilters from '@/presentation/pages/mypage/components/AppliedCampaignFilters';
 import AppliedCampaignCard from '@/presentation/pages/mypage/components/AppliedCampaignCard';
+import { ContentCardGrid } from '@/presentation/components/cards/content/ContentCardGrid';
 import {
   BackButton,
   ContentSection,
@@ -115,9 +116,13 @@ const MyAppliedCampaignsPage: React.FC = () => {
       </HeaderSection>
 
       <ContentSection>
-        {renderState || filteredCampaigns.map((campaign) => (
-          <AppliedCampaignCard key={campaign.id} campaign={campaign} onClick={handleCampaignClick} />
-        ))}
+        {renderState || (
+          <ContentCardGrid>
+            {filteredCampaigns.map((campaign) => (
+              <AppliedCampaignCard key={campaign.id} campaign={campaign} onClick={handleCampaignClick} />
+            ))}
+          </ContentCardGrid>
+        )}
       </ContentSection>
     </PageContainer>
   );

@@ -5,6 +5,8 @@ import { H3, PMuted, Caption } from '@/presentation/components/styled/Typography
 import { EllipsisText } from '@/presentation/components/styled/CommonStyles';
 
 /**
+ * @deprecated ContentCard variant="flip"을 사용하세요.
+ *
  * ClipCard 컴포넌트가 받을 props 타입을 정의합니다.
  * @param imageUrl - 비디오 썸네일 이미지 URL (선택)
  * @param title - 영상 제목

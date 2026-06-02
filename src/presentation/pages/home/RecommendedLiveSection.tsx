@@ -1,7 +1,8 @@
 import React, { useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import HomeSection, { Highlight, HorizontalScroll } from '@/presentation/pages/home/components/HomeSection';
+import { PMuted } from '@/presentation/components/styled/Typography';
+import HomeSection, { Highlight } from '@/presentation/pages/home/components/HomeSection';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { EmptyState } from '@/presentation/components/states/EmptyState';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
@@ -10,31 +11,24 @@ import { htmlToText } from '@/shared/utils/htmlUtils';
 import { useRepository } from '@/presentation/hooks/common/useRepository';
 import { useListData } from '@/presentation/hooks/list/useListData';
 import { useAuth } from '@/presentation/hooks/auth/useAuth';
-import { CaptionMedium } from '@/presentation/components/styled/Typography';
-import { Badge } from '@/presentation/components/styled/CommonStyles';
-import { HomeCard } from '@/presentation/components/cards/HomeCard';
-import { HomeCardImage } from '@/presentation/components/cards/HomeCardImage';
-import {
-  HomeCardBody,
-  HomeCardBrand,
-  HomeCardTitle,
-  HomeCardDescription,
-  HomeCardMetaRow,
-  CTAButton,
-} from '@/presentation/components/cards/HomeCardBody';
+import { ContentCard } from '@/presentation/components/cards/content/ContentCard';
+import { ContentCardGrid } from '@/presentation/components/cards/content/ContentCardGrid';
+import { CardActionButton } from '@/presentation/components/cards/content/ContentCard.styles';
 import { calculateDDay } from '@/shared/utils/dateUtils';
 import CampaignApplyModal from '@/presentation/components/campaign/detail/apply/CampaignApplyModal';
+import { getCampaignCoverUrl } from '@/presentation/pages/home/utils/campaignCover';
+import { CampaignDdayBadge } from '@/presentation/pages/home/components/CampaignDdayBadge';
 
-const StyledBadge = styled(Badge)`
-  position: absolute;
-  top: ${({ theme }) => theme.spacing.md};
-  right: ${({ theme }) => theme.spacing.md};
-  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
-  color: ${({ theme }) => theme.colors.surface};
+const buildCampaignSummary = (campaign: Campaign): string => {
+  const summary = campaign.summary || campaign.detailedContent || campaign.content || '';
+  return summary ? htmlToText(summary).slice(0, 60) : '';
+};
 
-  ${CaptionMedium} {
-    color: ${({ theme }) => theme.colors.surface};
-  }
+const buildFeeLabel = (campaign: Campaign): string =>
+  campaign.fee ? `${campaign.fee.toLocaleString()}원` : '협의';
+
+const MetaLine = styled(PMuted)`
+  margin: 0 0 ${({ theme }) => theme.spacing.sm};
 `;
 
 const RecommendedLiveSection: React.FC = React.memo(() => {
@@ -43,15 +37,13 @@ const RecommendedLiveSection: React.FC = React.memo(() => {
   const [selectedCampaign, setSelectedCampaign] = React.useState<Campaign | null>(null);
   const campaignRepository = useRepository(CampaignRepository);
 
-  // query 객체 메모이제이션
   const query = useMemo(() => ({ page: 1, limit: 10, sort: 'deadline' as const }), []);
-  
-  // fetchFunction 메모이제이션
+
   const fetchCampaigns = useCallback(
     (query: { page: number; limit: number; sort?: 'latest' | 'deadline' }, signal?: AbortSignal) => {
       return campaignRepository.getCampaignList(query, signal);
     },
-    [campaignRepository]
+    [campaignRepository],
   );
 
   const cacheKey = useMemo(() => `recommended-live-${JSON.stringify(query)}`, [query]);
@@ -60,13 +52,7 @@ const RecommendedLiveSection: React.FC = React.memo(() => {
     Campaign,
     { page: number; limit: number; sort?: 'latest' | 'deadline' },
     { items: Campaign[] }
-  >(
-    fetchCampaigns,
-    query,
-    [],
-    '라이브 추천 목록을 불러오는 중 오류가 발생했습니다.',
-    { cacheKey }
-  );
+  >(fetchCampaigns, query, [], '라이브 추천 목록을 불러오는 중 오류가 발생했습니다.', { cacheKey });
 
   const sectionTitle = (
     <>
@@ -100,57 +86,47 @@ const RecommendedLiveSection: React.FC = React.memo(() => {
   }
 
   return (
-    <HomeSection
-      title={sectionTitle}
-      onMore={() => navigate('/campaigns')}
-    >
-      <HorizontalScroll>
+    <HomeSection title={sectionTitle} onMore={() => navigate('/campaigns')}>
+      <ContentCardGrid>
         {campaigns.map((campaign) => {
-          // 라이브 커버 이미지 우선순위: liveVerticalCoverUrl > coverImageUrl > imageUrl > thumbnailUrl
-          const imageUrl = campaign.liveVerticalCoverUrl || campaign.coverImageUrl || campaign.imageUrl || campaign.thumbnailUrl || undefined;
-          // 백엔드에서 최적화된 summary 필드 우선 사용, 없으면 detailedContent 또는 content 사용
-          const summary = campaign.summary || campaign.detailedContent || campaign.content || '';
-          const displaySummary = summary ? htmlToText(summary).slice(0, 60) : '';
+          const imageUrl = getCampaignCoverUrl(campaign);
+          const displaySummary = buildCampaignSummary(campaign);
           const dday = campaign.closeAt ? calculateDDay(campaign.closeAt) : '';
+          const metaLine = `${buildFeeLabel(campaign)} · ${campaign.category || '카테고리 없음'}`;
 
           return (
-            <HomeCard key={campaign.id} onClick={() => navigate(`/campaigns/${campaign.id}`)}>
-              <HomeCardImage src={imageUrl} alt={campaign.title}>
-                {dday && (
-                  <StyledBadge>
-                    <CaptionMedium>{dday}</CaptionMedium>
-                  </StyledBadge>
-                )}
-              </HomeCardImage>
-              <HomeCardBody>
-                <HomeCardBrand>{campaign.brandName}</HomeCardBrand>
-                <HomeCardTitle>{campaign.title}</HomeCardTitle>
-                <HomeCardDescription>{displaySummary}</HomeCardDescription>
-                <HomeCardMetaRow>
-                  <HomeCardBrand as="span">
-                    {campaign.brandName} · {campaign.fee ? `${campaign.fee.toLocaleString()}원` : '협의'}
-                  </HomeCardBrand>
-                  <HomeCardBrand as="span">{campaign.category}</HomeCardBrand>
-                </HomeCardMetaRow>
-                <CTAButton
-                  type="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    // 비로그인 상태면 로그인 페이지로 이동
-                    if (!isLoggedIn) {
-                      navigate('/login', { replace: true });
-                      return;
-                    }
-                    setSelectedCampaign(campaign);
-                  }}
-                >
-                  지원하기
-                </CTAButton>
-              </HomeCardBody>
-            </HomeCard>
+            <ContentCard
+              key={campaign.id}
+              variant="ad"
+              imageUrl={imageUrl}
+              imageAlt={campaign.title}
+              heading={campaign.brandName || '브랜드'}
+              title={campaign.title}
+              supplementary={displaySummary || undefined}
+              mediaOverlay={dday ? <CampaignDdayBadge label={dday} /> : undefined}
+              footer={
+                <>
+                  <MetaLine>{metaLine}</MetaLine>
+                  <CardActionButton
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      if (!isLoggedIn) {
+                        navigate('/login', { replace: true });
+                        return;
+                      }
+                      setSelectedCampaign(campaign);
+                    }}
+                  >
+                    지원하기
+                  </CardActionButton>
+                </>
+              }
+              onClick={() => navigate(`/campaigns/${campaign.id}`)}
+            />
           );
         })}
-      </HorizontalScroll>
+      </ContentCardGrid>
 
       {selectedCampaign && (
         <CampaignApplyModal
@@ -167,4 +143,3 @@ const RecommendedLiveSection: React.FC = React.memo(() => {
 RecommendedLiveSection.displayName = 'RecommendedLiveSection';
 
 export default RecommendedLiveSection;
-

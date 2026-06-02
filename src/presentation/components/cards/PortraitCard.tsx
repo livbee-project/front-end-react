@@ -4,6 +4,8 @@ import { H3, PMuted } from '@/presentation/components/styled/Typography';
 import { EllipsisText } from '@/presentation/components/styled/CommonStyles';
 
 /**
+ * @deprecated ContentCard variant="showhost"를 사용하세요.
+ *
  * PortraitCard가 받을 props 타입을 정의합니다.
  * @param imageUrl - 300x400 비율의 세로형 이미지 (선택)
  * @param title - 카드 제목 (예: 모델 이름, 클립 제목)

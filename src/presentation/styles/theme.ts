@@ -4,6 +4,7 @@ import {
   fontFamily,
   fontScale,
   gridColumns,
+  gridBreakpoints,
   layoutMaxWidth,
   palette,
   primaryMutedSurface,
@@ -83,6 +84,7 @@ export const theme = {
   aspectRatio,
   grid: {
     columns: gridColumns,
+    breakpoints: gridBreakpoints,
     gap: spacing.lg,
   },
   input: {

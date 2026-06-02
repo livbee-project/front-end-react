@@ -1,44 +1,27 @@
 import React, { useMemo, useCallback } from 'react';
-import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import HomeSection, { Highlight, HorizontalScroll } from '@/presentation/pages/home/components/HomeSection';
+import HomeSection, { Highlight } from '@/presentation/pages/home/components/HomeSection';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { EmptyState } from '@/presentation/components/states/EmptyState';
 import { ModelRepository } from '@/data/repositories/ModelRepository';
 import type { Model } from '@/domain/entities/Model';
 import { useRepository } from '@/presentation/hooks/common/useRepository';
 import { useListData } from '@/presentation/hooks/list/useListData';
-import { HomeCard } from '@/presentation/components/cards/HomeCard';
-import { HomeCardImage } from '@/presentation/components/cards/HomeCardImage';
-import { HomeCardBody, HomeCardTitle, HomeCardDescription } from '@/presentation/components/cards/HomeCardBody';
-
-const StyledCard = styled(HomeCard)`
-  flex: 0 0 65vw;
-  min-width: 200px;
-  max-width: 220px;
-
-  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    flex: 0 0 200px;
-  }
-
-  @media (min-width: ${({ theme }) => theme.breakpoints.desktop}) {
-    flex: 0 0 220px;
-  }
-`;
+import { ContentCard } from '@/presentation/components/cards/content/ContentCard';
+import { ContentCardGrid } from '@/presentation/components/cards/content/ContentCardGrid';
+import { buildModelSupplementary } from '@/presentation/components/cards/content/modelCardHelpers';
 
 const ConceptModelSection: React.FC = React.memo(() => {
   const navigate = useNavigate();
   const modelRepository = useRepository(ModelRepository);
 
-  // query 객체 메모이제이션
   const query = useMemo(() => ({ page: 1, limit: 10 }), []);
-  
-  // fetchFunction 메모이제이션
+
   const fetchModels = useCallback(
     (query: { page: number; limit: number }, signal?: AbortSignal) => {
       return modelRepository.getModelList(query, signal);
     },
-    [modelRepository]
+    [modelRepository],
   );
 
   const cacheKey = useMemo(() => `concept-models-${JSON.stringify(query)}`, [query]);
@@ -47,17 +30,19 @@ const ConceptModelSection: React.FC = React.memo(() => {
     Model,
     { page: number; limit: number },
     { items: Model[] }
-  >(
-    fetchModels,
-    query,
-    [],
-    '모델 목록을 불러오는 중 오류가 발생했습니다.',
-    { cacheKey }
+  >(fetchModels, query, [], '모델 목록을 불러오는 중 오류가 발생했습니다.', { cacheKey });
+
+  const sectionTitle = (
+    <>
+      <span>이런 </span>
+      <Highlight>모델</Highlight>
+      <span>은 어떠세요?</span>
+    </>
   );
 
   if (loading) {
     return (
-      <HomeSection title={<><span>이런 </span><Highlight>모델</Highlight><span>은 어떠세요?</span></>}>
+      <HomeSection title={sectionTitle}>
         <LoadingState />
       </HomeSection>
     );
@@ -65,28 +50,27 @@ const ConceptModelSection: React.FC = React.memo(() => {
 
   if (models.length === 0) {
     return (
-      <HomeSection title={<><span>이런 </span><Highlight>모델</Highlight><span>은 어떠세요?</span></>}>
+      <HomeSection title={sectionTitle}>
         <EmptyState message="데이터가 없습니다." />
       </HomeSection>
     );
   }
 
   return (
-    <HomeSection
-      title={<><span>이런 </span><Highlight>모델</Highlight><span>은 어떠세요?</span></>}
-      onMore={() => navigate('/models')}
-    >
-      <HorizontalScroll>
+    <HomeSection title={sectionTitle} onMore={() => navigate('/models')}>
+      <ContentCardGrid>
         {models.map((model) => (
-          <StyledCard key={model.id} onClick={() => navigate(`/models/${model.id}`)}>
-            <HomeCardImage src={model.mainThumbnailUrl || undefined} alt={model.nickname || '모델'} aspectRatio="3 / 4" />
-            <HomeCardBody>
-              <HomeCardTitle>{model.nickname || '이름 없음'}</HomeCardTitle>
-              <HomeCardDescription>{model.oneLineIntro || '소개 없음'}</HomeCardDescription>
-            </HomeCardBody>
-          </StyledCard>
+          <ContentCard
+            key={model.id}
+            variant="showhost"
+            imageUrl={model.mainThumbnailUrl || undefined}
+            imageAlt={model.nickname || '모델'}
+            heading={model.nickname || '이름 없음'}
+            supplementary={buildModelSupplementary(model)}
+            onClick={() => navigate(`/models/${model.id}`)}
+          />
         ))}
-      </HorizontalScroll>
+      </ContentCardGrid>
     </HomeSection>
   );
 });

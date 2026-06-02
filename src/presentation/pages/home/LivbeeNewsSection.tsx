@@ -1,82 +1,55 @@
 import React from 'react';
-import styled from 'styled-components';
-import { Calendar } from 'lucide-react';
-import HomeSection from '@/presentation/pages/home/components/HomeSection';
-import { H3, PMuted, Caption } from '@/presentation/components/styled/Typography';
 import { debug } from '@/shared/utils/logger';
+import HomeSection from '@/presentation/pages/home/components/HomeSection';
+import { ContentCard } from '@/presentation/components/cards/content/ContentCard';
+import { ContentCardGrid } from '@/presentation/components/cards/content/ContentCardGrid';
 
 const newsItems = [
   {
     id: 1,
     title: '라이비, 2025년 상반기 파트너사 모집',
-    time: '5분 전',
-    content: '브랜드와 쇼호스트를 위한 새로운 협업 프로그램이 시작됩니다.',
+    supplementary: '라이브 뉴스 · 2025.05.20',
+    imageUrl:
+      'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 2,
     title: '새로운 기능 업데이트 안내 (v1.2)',
-    time: '3일 전',
-    content: '스튜디오 예약 기능과 자동 편성 도구가 추가되었습니다.',
+    supplementary: '라이브 뉴스 · 2025.05.18',
+    imageUrl:
+      'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 3,
+    title: '2025 라이브커머스 트렌드 리포트',
+    supplementary: '라이브 뉴스 · 2025.05.15',
+    imageUrl:
+      'https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 4,
+    title: '쇼호스트 성장 프로그램 오픈',
+    supplementary: '라이브 뉴스 · 2025.05.10',
+    imageUrl:
+      'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
   },
 ];
 
-const List = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.lg};
-`;
-
-const Card = styled.article`
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  padding: ${({ theme }) => theme.spacing.lg};
-  background-color: ${({ theme }) => theme.colors.card};
-  transition: transform 0.2s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-  }
-`;
-
-const Title = styled(H3)`
-  margin-bottom: ${({ theme }) => theme.spacing.sm};
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-`;
-
-const Description = styled(PMuted)`
-  margin-bottom: ${({ theme }) => theme.spacing.md};
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-`;
-
-const Meta = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing.xs};
-  ${Caption} {
-    color: ${({ theme }) => theme.colors.muted};
-  }
-`;
-
 const LivbeeNewsSection: React.FC = () => (
   <HomeSection title="뉴스" onMore={() => debug('LivbeeNewsSection', '뉴스 더보기 클릭')}>
-    <List>
+    <ContentCardGrid>
       {newsItems.map((news) => (
-        <Card key={news.id}>
-          <Title>{news.title}</Title>
-          <Description>{news.content}</Description>
-          <Meta>
-            <Calendar size={14} />
-            <Caption>{news.time}</Caption>
-          </Meta>
-        </Card>
+        <ContentCard
+          key={news.id}
+          variant="news"
+          imageUrl={news.imageUrl}
+          imageAlt={news.title}
+          heading={news.title}
+          supplementary={news.supplementary}
+          onClick={() => debug('LivbeeNewsSection', `뉴스 클릭: ${news.id}`)}
+        />
       ))}
-    </List>
+    </ContentCardGrid>
   </HomeSection>
 );
 

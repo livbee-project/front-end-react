@@ -2,7 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import HomeSection from '@/presentation/pages/home/components/HomeSection';
-import { H3, PMuted, Caption } from '@/presentation/components/styled/Typography';
+import { Caption } from '@/presentation/components/styled/Typography';
+import { ContentCard } from '@/presentation/components/cards/content/ContentCard';
+import { ContentCardGrid } from '@/presentation/components/cards/content/ContentCardGrid';
 
 const clips = [
   {
@@ -35,90 +37,18 @@ const clips = [
   },
 ];
 
-const ScrollArea = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.sm};
-  overflow-x: auto;
-  overflow-y: visible;
-  padding: 0.5rem 0;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
-
-const Card = styled.article`
-  flex: 0 0 180px;
-  background-color: ${({ theme }) => theme.colors.surface};
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  transition: all 0.3s ease;
-  cursor: pointer;
-  position: relative;
-  will-change: transform;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    z-index: 1;
-  }
-`;
-
-const Thumbnail = styled.div`
-  position: relative;
-  width: 100%;
-  aspect-ratio: ${({ theme }) => theme.aspectRatio.clip};
-  overflow: hidden;
-`;
-
-const ClipImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 10px;
-  transition: transform 0.3s;
-
-  ${Card}:hover & {
-    transform: scale(1.05);
-  }
-`;
-
-const Duration = styled.span`
+const DurationBadge = styled.span`
   position: absolute;
   bottom: ${({ theme }) => theme.spacing.sm};
   right: ${({ theme }) => theme.spacing.sm};
   background-color: rgba(0, 0, 0, 0.7);
   color: ${({ theme }) => theme.colors.primaryForeground};
-  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.xs};
+  padding: ${({ theme }) => theme.spacing.xs};
   border-radius: ${({ theme }) => theme.radii.sm};
+
   ${Caption} {
     color: inherit;
   }
-`;
-
-const ClipBody = styled.div`
-  padding: ${({ theme }) => theme.spacing.md};
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.xs};
-`;
-
-const ClipTitle = styled(H3)`
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-`;
-
-const ClipDescription = styled(PMuted)`
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 `;
 
 const HotClipSection: React.FC = () => {
@@ -126,20 +56,24 @@ const HotClipSection: React.FC = () => {
 
   return (
     <HomeSection title="HOT CLIP" onMore={() => navigate('/clips')}>
-      <ScrollArea>
+      <ContentCardGrid>
         {clips.map((clip) => (
-          <Card key={clip.id}>
-            <Thumbnail>
-              <ClipImage src={clip.thumbnail} alt={clip.title} />
-              <Duration><Caption>{clip.duration}</Caption></Duration>
-            </Thumbnail>
-            <ClipBody>
-              <ClipTitle>{clip.title}</ClipTitle>
-              <ClipDescription>{clip.description}</ClipDescription>
-            </ClipBody>
-          </Card>
+          <ContentCard
+            key={clip.id}
+            variant="flip"
+            imageUrl={clip.thumbnail}
+            imageAlt={clip.title}
+            heading={clip.title}
+            supplementary={clip.description}
+            mediaOverlay={
+              <DurationBadge>
+                <Caption>{clip.duration}</Caption>
+              </DurationBadge>
+            }
+            onClick={() => navigate('/clips')}
+          />
         ))}
-      </ScrollArea>
+      </ContentCardGrid>
     </HomeSection>
   );
 };

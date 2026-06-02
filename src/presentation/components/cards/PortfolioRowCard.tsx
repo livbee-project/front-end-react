@@ -4,6 +4,8 @@ import { H2, PMuted, Caption } from '@/presentation/components/styled/Typography
 import { EllipsisText } from '@/presentation/components/styled/CommonStyles';
 
 /**
+ * @deprecated ContentCard variant="showhost"를 사용하세요.
+ *
  * PortfolioRowCard가 받을 props 타입을 정의합니다.
  * @param title - 한 줄 제목
  * @param content - 한 줄 소개 (내용)

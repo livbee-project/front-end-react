@@ -4,6 +4,8 @@ import PlaceholderImage from '@/presentation/components/ui/PlaceholderImage';
 import { P } from '@/presentation/components/styled/Typography';
 
 /**
+ * @deprecated ContentCard variant="ad"를 사용하세요.
+ *
  * ProductCard 컴포넌트가 받을 props 타입을 정의합니다.
  * @param imageUrl - 상품 이미지 URL (선택)
  * @param productName - 상품명

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Pagination from '@/presentation/components/list/Pagination';
 import { ListStatePlaceholder } from '@/presentation/components/list/ListStatePlaceholder';
 import { CampaignCard } from '@/presentation/components/campaign/CampaignCard';
+import { ContentCardGrid } from '@/presentation/components/cards/content/ContentCardGrid';
 import type { Campaign } from '@/domain/entities/Campaign';
 
 interface CampaignListContentProps {
@@ -13,7 +14,7 @@ interface CampaignListContentProps {
   totalPages?: number;
   isScrapped: (id: string) => boolean;
   onCardClick: (campaignId: string) => void;
-  onScrapClick: (campaignId: string, event: React.MouseEvent) => void;
+  onScrapClick: (campaignId: string, event: React.MouseEvent<HTMLButtonElement>) => void;
   onPageChange: (page: number) => void;
   onRetry: () => void;
 }
@@ -40,7 +41,7 @@ export const CampaignListContent: React.FC<CampaignListContentProps> = ({
       showEmptyState={true}
     >
       <>
-        <CardsColumn>
+        <ContentCardGrid>
           {filteredCampaigns.map((campaign) => (
             <CampaignCard
               key={campaign.id}
@@ -50,7 +51,7 @@ export const CampaignListContent: React.FC<CampaignListContentProps> = ({
               onScrapClick={(event) => onScrapClick(campaign.id, event)}
             />
           ))}
-        </CardsColumn>
+        </ContentCardGrid>
 
         {totalPages && totalPages > 1 && (
           <PaginationWrapper>
@@ -62,15 +63,8 @@ export const CampaignListContent: React.FC<CampaignListContentProps> = ({
   );
 };
 
-const CardsColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.lg};
-`;
-
 const PaginationWrapper = styled.div`
   margin-top: ${({ theme }) => theme.spacing.xl};
   display: flex;
   justify-content: center;
 `;
-

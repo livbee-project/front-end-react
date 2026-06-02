@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import HomeSection, { Highlight, HorizontalScroll } from '@/presentation/pages/home/components/HomeSection';
+import HomeSection, { Highlight } from '@/presentation/pages/home/components/HomeSection';
 import { LoadingState } from '@/presentation/components/states/LoadingState';
 import { EmptyState } from '@/presentation/components/states/EmptyState';
 import { CampaignRepository } from '@/data/repositories/CampaignRepository';
@@ -10,19 +10,12 @@ import { htmlToText } from '@/shared/utils/htmlUtils';
 import { useRepository } from '@/presentation/hooks/common/useRepository';
 import { useListData } from '@/presentation/hooks/list/useListData';
 import { H2, CaptionMedium } from '@/presentation/components/styled/Typography';
-import { Badge } from '@/presentation/components/styled/CommonStyles';
-import { HomeCard } from '@/presentation/components/cards/HomeCard';
-import { HomeCardImage } from '@/presentation/components/cards/HomeCardImage';
-import { HomeCardBody, HomeCardBrand, HomeCardTitle, HomeCardDescription } from '@/presentation/components/cards/HomeCardBody';
+import { ContentCard } from '@/presentation/components/cards/content/ContentCard';
+import { ContentCardGrid } from '@/presentation/components/cards/content/ContentCardGrid';
 import { calculateDDay } from '@/shared/utils/dateUtils';
 import { formatCurrency } from '@/shared/utils/formatUtils';
-
-const StyledBadge = styled(Badge)`
-  position: absolute;
-  top: ${({ theme }) => theme.spacing.md};
-  right: ${({ theme }) => theme.spacing.md};
-  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
-`;
+import { getCampaignCoverUrl } from '@/presentation/pages/home/utils/campaignCover';
+import { CampaignDdayBadge } from '@/presentation/pages/home/components/CampaignDdayBadge';
 
 const ProductInfo = styled.div`
   display: flex;
@@ -62,19 +55,22 @@ const PriceValue = styled(H2)`
   text-overflow: ellipsis;
 `;
 
+const buildCampaignSummary = (campaign: Campaign): string => {
+  const summary = campaign.summary || campaign.detailedContent || campaign.content || '';
+  return summary ? htmlToText(summary).slice(0, 60) : '';
+};
+
 const ShoppingLiveSection: React.FC = React.memo(() => {
   const navigate = useNavigate();
   const campaignRepository = useRepository(CampaignRepository);
 
-  // query 객체 메모이제이션
   const query = useMemo(() => ({ page: 1, limit: 10, sort: 'latest' as const }), []);
-  
-  // fetchFunction 메모이제이션
+
   const fetchCampaigns = useCallback(
     (query: { page: number; limit: number; sort?: 'latest' | 'deadline' }, signal?: AbortSignal) => {
       return campaignRepository.getCampaignList(query, signal);
     },
-    [campaignRepository]
+    [campaignRepository],
   );
 
   const cacheKey = useMemo(() => `shopping-live-${JSON.stringify(query)}`, [query]);
@@ -83,13 +79,7 @@ const ShoppingLiveSection: React.FC = React.memo(() => {
     Campaign,
     { page: number; limit: number; sort?: 'latest' | 'deadline' },
     { items: Campaign[] }
-  >(
-    fetchCampaigns,
-    query,
-    [],
-    '쇼핑 라이브 목록을 불러오는 중 오류가 발생했습니다.',
-    { cacheKey }
-  );
+  >(fetchCampaigns, query, [], '쇼핑 라이브 목록을 불러오는 중 오류가 발생했습니다.', { cacheKey });
 
   const sectionTitle = (
     <>
@@ -123,36 +113,29 @@ const ShoppingLiveSection: React.FC = React.memo(() => {
   }
 
   return (
-    <HomeSection
-      title={sectionTitle}
-      onMore={() => navigate('/campaigns')}
-    >
-      <HorizontalScroll>
+    <HomeSection title={sectionTitle} onMore={() => navigate('/campaigns')}>
+      <ContentCardGrid>
         {campaigns.map((campaign) => {
-          // 라이브 커버 이미지 우선순위: liveVerticalCoverUrl > coverImageUrl > imageUrl > thumbnailUrl
-          const imageUrl = campaign.liveVerticalCoverUrl || campaign.coverImageUrl || campaign.imageUrl || campaign.thumbnailUrl || undefined;
-          // 백엔드에서 최적화된 summary 필드 우선 사용, 없으면 detailedContent 또는 content 사용
-          const summary = campaign.summary || campaign.detailedContent || campaign.content || '';
-          const displaySummary = summary ? htmlToText(summary).slice(0, 60) : '';
+          const imageUrl = getCampaignCoverUrl(campaign);
+          const displaySummary = buildCampaignSummary(campaign);
           const dday = campaign.closeAt ? calculateDDay(campaign.closeAt) : '';
           const price = campaign.fee != null ? formatCurrency(campaign.fee) : '가격 미정';
 
           return (
-            <HomeCard key={campaign.id} onClick={() => navigate(`/campaigns/${campaign.id}`)}>
-              <HomeCardImage src={imageUrl} alt={campaign.title}>
-                {dday && <StyledBadge>{dday}</StyledBadge>}
-              </HomeCardImage>
-              <HomeCardBody>
-                <HomeCardBrand>{campaign.brandName}</HomeCardBrand>
-                <HomeCardTitle>{campaign.title}</HomeCardTitle>
-                <HomeCardDescription>{displaySummary}</HomeCardDescription>
+            <ContentCard
+              key={campaign.id}
+              variant="ad"
+              imageUrl={imageUrl}
+              imageAlt={campaign.title}
+              heading={campaign.brandName || '브랜드'}
+              title={campaign.title}
+              supplementary={displaySummary || dday}
+              mediaOverlay={dday ? <CampaignDdayBadge label={dday} /> : undefined}
+              footer={
                 <ProductInfo>
                   <ProductThumb>
                     {campaign.productThumbnailUrl && (
-                      <ProductImage
-                        src={campaign.productThumbnailUrl}
-                        alt={campaign.title}
-                      />
+                      <ProductImage src={campaign.productThumbnailUrl} alt={campaign.title} loading="lazy" />
                     )}
                   </ProductThumb>
                   <ProductText>
@@ -160,11 +143,12 @@ const ShoppingLiveSection: React.FC = React.memo(() => {
                     <PriceValue>{price}</PriceValue>
                   </ProductText>
                 </ProductInfo>
-              </HomeCardBody>
-            </HomeCard>
+              }
+              onClick={() => navigate(`/campaigns/${campaign.id}`)}
+            />
           );
         })}
-      </HorizontalScroll>
+      </ContentCardGrid>
     </HomeSection>
   );
 });

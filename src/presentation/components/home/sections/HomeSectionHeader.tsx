@@ -29,13 +29,14 @@ const HighlightText = styled.span`
 `;
 
 const MoreButton = styled.button`
+  flex-shrink: 0;
   border: none;
   background: transparent;
   color: ${({ theme }) => theme.colors.muted};
-  font: ${({ theme }) => theme.fonts.h2};
-  font-weight: 700;
+  font: ${({ theme }) => theme.fonts.caption};
+  font-weight: 400;
   cursor: pointer;
-  padding: ${({ theme }) => theme.spacing.xs};
+  padding: 0;
   transition: color 0.2s;
 
   &:hover {
@@ -75,7 +76,7 @@ const HomeSectionHeader: React.FC<SectionHeaderProps> = ({ title, onMorePressed 
       </TitleText>
       {onMorePressed && (
         <MoreButton type="button" onClick={onMorePressed}>
-          더보기
+          {'더보기 >'}
         </MoreButton>
       )}
     </HeaderWrapper>

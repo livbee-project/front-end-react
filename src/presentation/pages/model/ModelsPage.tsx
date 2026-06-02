@@ -15,7 +15,10 @@ import { setAuthRedirectPath, setOriginPage } from '@/shared/utils/authRedirect'
 import LoginRequiredModal from '@/presentation/components/navigation/LoginRequiredModal';
 import { ModelSearchSection } from '@/presentation/components/model/ModelSearchSection';
 import { ModelFilterRow } from '@/presentation/components/model/ModelFilterRow';
-import { ModelCard } from '@/presentation/pages/model/components/ModelCard';
+import { ContentCard } from '@/presentation/components/cards/content/ContentCard';
+import { ContentCardGrid } from '@/presentation/components/cards/content/ContentCardGrid';
+import { CardActionButton } from '@/presentation/components/cards/content/ContentCard.styles';
+import { buildModelSupplementary } from '@/presentation/components/cards/content/modelCardHelpers';
 import { useModelFilter } from '@/presentation/pages/model/hooks/useModelFilter';
 import { modelFilters } from '@/presentation/pages/model/mock/mockModels';
 import { EmptyState } from '@/presentation/components/states/EmptyState';
@@ -29,7 +32,6 @@ const ModelsPage: React.FC = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const modelRepository = useRepository(ModelRepository);
 
-  // query 객체 메모이제이션
   const query = useMemo(() => ({ page: 1, limit: 20 }), []);
 
   const { data: models, loading, error } = useListFetcher<
@@ -58,7 +60,7 @@ const ModelsPage: React.FC = () => {
     if (!models || !Array.isArray(models)) {
       return [];
     }
-    
+
     return models.map((model) => ({
       id: model.id,
       nickname: model.nickname ?? null,
@@ -84,14 +86,16 @@ const ModelsPage: React.FC = () => {
 
   const handleFormSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // 검색은 실시간으로 처리되므로 여기서는 preventDefault만 수행
   }, []);
 
-  const handleModelClick = useCallback((modelId: string) => {
-    navigate(`/models/${modelId}`);
-  }, [navigate]);
+  const handleModelClick = useCallback(
+    (modelId: string) => {
+      navigate(`/models/${modelId}`);
+    },
+    [navigate],
+  );
 
-  const handleCastingProposal = useCallback((e: React.MouseEvent) => {
+  const handleCastingProposal = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     // TODO: 캐스팅 제안 기능 구현
   }, []);
@@ -122,30 +126,29 @@ const ModelsPage: React.FC = () => {
           placeholder="이름, 카테고리로 검색"
         />
 
-        <ModelFilterRow
-          filters={modelFilters}
-          activeFilter={selectedFilter}
-          onFilterChange={setSelectedFilter}
-        />
+        <ModelFilterRow filters={modelFilters} activeFilter={selectedFilter} onFilterChange={setSelectedFilter} />
 
         {filteredModels.length === 0 ? (
           <EmptyState message="등록된 모델이 없습니다." />
         ) : (
-          <ModelsGrid>
+          <ContentCardGrid>
             {filteredModels.map((model) => (
-              <ModelCard
+              <ContentCard
                 key={model.id}
-                id={model.id}
-                nickname={model.nickname || ''}
-                mainThumbnailUrl={model.mainThumbnailUrl || ''}
-                height={model.height || 0}
-                concept={model.concept || null}
-                categories={model.categories || []}
-                onCardClick={handleModelClick}
-                onCastingProposal={handleCastingProposal}
+                variant="showhost"
+                imageUrl={model.mainThumbnailUrl || undefined}
+                imageAlt={model.nickname || '모델'}
+                heading={model.nickname || '이름 없음'}
+                supplementary={buildModelSupplementary(model)}
+                onClick={() => handleModelClick(model.id)}
+                footer={
+                  <CardActionButton type="button" onClick={handleCastingProposal}>
+                    캐스팅 제안
+                  </CardActionButton>
+                }
               />
             ))}
-          </ModelsGrid>
+          </ContentCardGrid>
         )}
       </PageInner>
 
@@ -167,19 +170,17 @@ const ModelsPage: React.FC = () => {
             }
             navigate('/models/register');
           }}
-        aria-label="모델 등록"
-      >
-        <Plus size={24} strokeWidth={2.5} />
-      </RegisterFab>
+          aria-label="모델 등록"
+        >
+          <Plus size={24} strokeWidth={2.5} />
+        </RegisterFab>
       )}
 
       <LoginRequiredModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
         onConfirm={() => {
-          // 현재 페이지 경로 저장 (권한 불일치 시 돌아갈 페이지)
           setOriginPage('/models');
-          // 등록 페이지 경로 저장 (로그인 성공 시 이동할 페이지)
           setAuthRedirectPath('/models/register');
           setIsLoginModalOpen(false);
           navigate('/login?userType=showhost', { replace: true });
@@ -207,12 +208,6 @@ const PageInner = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.xl};
-`;
-
-const ModelsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
 `;
 
 const RegisterFab = styled.button`

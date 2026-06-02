@@ -1,3 +1,6 @@
+/**
+ * @deprecated ContentCard + ContentCardGrid를 사용하세요.
+ */
 import styled from 'styled-components';
 import { ImageElement } from '@/presentation/components/cards/HomeCardImage';
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import ListPageLayout from '@/presentation/layouts/ListPageLayout';
 import { CampaignCard } from '@/presentation/components/campaign/CampaignCard';
+import { ContentCardGrid } from '@/presentation/components/cards/content/ContentCardGrid';
 import Pagination from '@/presentation/components/list/Pagination';
 import { createMockCampaign } from '@/presentation/stories/mocks/campaign';
 
@@ -20,36 +21,38 @@ export const CampaignPageDemo: React.FC = () => {
       onSearch={(query) => alert(`검색: ${query}`)}
     >
       <ListContent>
-        {[
-          createMockCampaign({
-            id: 'cmp-demo-1',
-            brandName: '패션 브랜드',
-            title: '2024 봄/여름 컬렉션 모델 모집',
-            content: '패션 쇼와 광고 촬영에 참여할 모델을 모집합니다.',
-          }),
-          createMockCampaign({
-            id: 'cmp-demo-2',
-            brandName: '뷰티 브랜드',
-            title: '화장품 광고 모델 모집',
-            content: '신제품 런칭 광고에 출연할 모델을 찾고 있습니다.',
-            category: '뷰티',
-          }),
-          createMockCampaign({
-            id: 'cmp-demo-3',
-            brandName: '라이프스타일 브랜드',
-            title: '인플루언서 협업 모집',
-            content: '제품 리뷰 및 콘텐츠 제작에 참여할 인플루언서를 모집합니다.',
-            category: '생활/리빙',
-          }),
-        ].map((campaign, index) => (
-          <CampaignCard
-            key={campaign.id}
-            campaign={campaign}
-            isScrapped={index === 1}
-            onCardClick={() => {}}
-            onScrapClick={(event) => event.stopPropagation()}
-          />
-        ))}
+        <ContentCardGrid>
+          {[
+            createMockCampaign({
+              id: 'cmp-demo-1',
+              brandName: '패션 브랜드',
+              title: '2024 봄/여름 컬렉션 모델 모집',
+              content: '패션 쇼와 광고 촬영에 참여할 모델을 모집합니다.',
+            }),
+            createMockCampaign({
+              id: 'cmp-demo-2',
+              brandName: '뷰티 브랜드',
+              title: '화장품 광고 모델 모집',
+              content: '신제품 런칭 광고에 출연할 모델을 찾고 있습니다.',
+              category: '뷰티',
+            }),
+            createMockCampaign({
+              id: 'cmp-demo-3',
+              brandName: '라이프스타일 브랜드',
+              title: '인플루언서 협업 모집',
+              content: '제품 리뷰 및 콘텐츠 제작에 참여할 인플루언서를 모집합니다.',
+              category: '생활/리빙',
+            }),
+          ].map((campaign, index) => (
+            <CampaignCard
+              key={campaign.id}
+              campaign={campaign}
+              isScrapped={index === 1}
+              onCardClick={() => {}}
+              onScrapClick={(event) => event.stopPropagation()}
+            />
+          ))}
+        </ContentCardGrid>
       </ListContent>
       <Pagination currentPage={page} totalPages={5} onPageChange={setPage} />
     </ListPageLayout>
@@ -67,9 +70,11 @@ export const PortfolioPageDemo: React.FC = () => {
       onSearch={(query) => alert(`검색: ${query}`)}
     >
       <ListContent>
-        {['포트폴리오 카드 1', '포트폴리오 카드 2', '포트폴리오 카드 3'].map((text) => (
-          <CardPlaceholder key={text}>{text}</CardPlaceholder>
-        ))}
+        <ContentCardGrid>
+          {['포트폴리오 카드 1', '포트폴리오 카드 2', '포트폴리오 카드 3'].map((text) => (
+            <CardPlaceholder key={text}>{text}</CardPlaceholder>
+          ))}
+        </ContentCardGrid>
       </ListContent>
       <Pagination currentPage={page} totalPages={8} onPageChange={setPage} />
     </ListPageLayout>
@@ -77,9 +82,6 @@ export const PortfolioPageDemo: React.FC = () => {
 };
 
 const ListContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.md};
   padding: ${({ theme }) => theme.spacing.lg};
 `;
 
@@ -87,5 +89,5 @@ const CardPlaceholder = styled.div`
   padding: 20px;
   background-color: ${({ theme }) => theme.colors.secondary};
   border-radius: ${({ theme }) => theme.radii.sm};
+  min-height: 120px;
 `;
-

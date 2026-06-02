@@ -5,6 +5,8 @@ import { PrimaryBadge } from '@/presentation/components/styled/CommonStyles';
 import { EllipsisText } from '@/presentation/components/styled/CommonStyles';
 
 /**
+ * @deprecated ContentCard variant="ad"를 사용하세요.
+ *
  * RecruitCard 컴포넌트가 받을 props 타입을 정의합니다.
  * @param topContent - 카드의 상단 영역 (이미지, 뱃지 등)
  * @param bottomContent - 카드의 하단 영역 (상품 정보, 버튼 등)

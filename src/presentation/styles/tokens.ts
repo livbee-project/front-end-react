@@ -51,10 +51,14 @@ export const fontScale = {
 } as const;
 
 export const aspectRatio = {
+  live: '1 / 1',
   host: '3 / 4',
   model: '3 / 4',
+  ad: '3 / 4',
   campaign: '4 / 3',
+  news: '16 / 9',
   clip: '2 / 3',
+  flip: '2 / 3',
 } as const;
 
 export const gridColumns = {
@@ -63,9 +67,21 @@ export const gridColumns = {
   desktop: 4,
 } as const;
 
+/** 반응형 카드 그리드 구간 (기획 반응형 그리드 가이드) */
+export const gridBreakpoints = {
+  /** 디자인 최소 뷰포트 (문서·가이드용) */
+  mobileMin: '375px',
+  mobileMax: '767px',
+  tabletMin: '768px',
+  tabletMax: '1279px',
+  wideMin: '1280px',
+} as const;
+
 export const breakpoints = {
   tablet: '768px',
   desktop: '1024px',
+  /** 카드 그리드 4열 기준 (기획 1280px+) */
+  wide: '1280px',
 } as const;
 
 export const layoutMaxWidth = '1280px';

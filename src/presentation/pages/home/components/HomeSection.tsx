@@ -31,7 +31,7 @@ const SectionWrapper = styled.section`
 
 const Header = styled.div`
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 1rem;
@@ -50,18 +50,18 @@ export const Highlight = styled.span`
 `;
 
 const MoreButton = styled.button`
+  flex-shrink: 0;
   border: none;
-  border-radius: ${({ theme }) => theme.radii.md};
-  background-color: ${({ theme }) => theme.primaryOpacity['10']};
-  color: ${({ theme }) => theme.colors.primary};
-  padding: 0.25rem 0.75rem;
-  font-size: 12px;
-  font-weight: 500;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.muted};
+  padding: 0;
+  font: ${({ theme }) => theme.fonts.caption};
+  font-weight: 400;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: color 0.2s ease;
 
   &:hover {
-    background-color: ${({ theme }) => theme.primaryOpacity['20']};
+    color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
@@ -112,7 +112,11 @@ const HomeSection: React.FC<HomeSectionProps> = ({ title, onMore, children }) =>
     <SectionWrapper>
       <Header>
         <Title>{renderTitleWithHighlight()}</Title>
-        {onMore && <MoreButton onClick={onMore}>MORE</MoreButton>}
+        {onMore && (
+          <MoreButton type="button" onClick={onMore}>
+            {'더보기 >'}
+          </MoreButton>
+        )}
       </Header>
       {children}
     </SectionWrapper>

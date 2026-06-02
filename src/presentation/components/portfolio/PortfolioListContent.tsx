@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Pagination from '@/presentation/components/list/Pagination';
 import { ListStatePlaceholder } from '@/presentation/components/list/ListStatePlaceholder';
 import { PortfolioCard } from '@/presentation/components/portfolio/PortfolioCard';
+import { ContentCardGrid } from '@/presentation/components/cards/content/ContentCardGrid';
 import type { Portfolio } from '@/domain/entities/Portfolio';
 
 interface PortfolioListContentProps {
@@ -13,7 +14,7 @@ interface PortfolioListContentProps {
   totalPages?: number;
   isScrapped: (id: string) => boolean;
   onCardClick: (portfolioId: string) => void;
-  onScrapClick: (portfolioId: string, event: React.MouseEvent) => void;
+  onScrapClick: (portfolioId: string, event: React.MouseEvent<HTMLButtonElement>) => void;
   onPageChange: (page: number) => void;
   onRetry: () => void;
 }
@@ -40,7 +41,7 @@ export const PortfolioListContent: React.FC<PortfolioListContentProps> = ({
       showEmptyState={true}
     >
       <>
-        <CardsColumn>
+        <ContentCardGrid>
           {filteredPortfolios.map((portfolio) => (
             <PortfolioCard
               key={portfolio.id}
@@ -50,7 +51,7 @@ export const PortfolioListContent: React.FC<PortfolioListContentProps> = ({
               onScrapClick={(event) => onScrapClick(portfolio.id, event)}
             />
           ))}
-        </CardsColumn>
+        </ContentCardGrid>
 
         {totalPages && totalPages > 1 && (
           <PaginationWrapper>
@@ -62,15 +63,8 @@ export const PortfolioListContent: React.FC<PortfolioListContentProps> = ({
   );
 };
 
-const CardsColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.lg};
-`;
-
 const PaginationWrapper = styled.div`
   margin-top: ${({ theme }) => theme.spacing.xl};
   display: flex;
   justify-content: center;
 `;
-

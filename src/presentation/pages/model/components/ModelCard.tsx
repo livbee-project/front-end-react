@@ -1,3 +1,6 @@
+/**
+ * @deprecated ContentCard variant="showhost"를 사용하세요.
+ */
 import React from 'react';
 import { Heart } from 'lucide-react';
 import styled from 'styled-components';
