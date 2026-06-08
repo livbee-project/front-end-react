@@ -1,5 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppShell } from '@/presentation/layouts/AppShell'
+import { CampaignCreatePage } from '@/presentation/pages/campaigns/create/CampaignCreatePage'
+import { CampaignDetailPage } from '@/presentation/pages/campaigns/CampaignDetailPage'
+import { CampaignsListPage } from '@/presentation/pages/campaigns/CampaignsListPage'
 import { ModelCreatePage } from '@/presentation/pages/models/create/ModelCreatePage'
 import { ModelDetailPage } from '@/presentation/pages/models/ModelDetailPage'
 import { ModelsListPage } from '@/presentation/pages/models/ModelsListPage'
@@ -31,6 +34,23 @@ export function AppRoutes() {
         element={
           <AppShell>
             <ModelDetailPage />
+          </AppShell>
+        }
+      />
+      <Route path="/campaigns/create" element={<CampaignCreatePage />} />
+      <Route
+        path="/campaigns"
+        element={
+          <AppShell>
+            <CampaignsListPage />
+          </AppShell>
+        }
+      />
+      <Route
+        path="/campaigns/:id"
+        element={
+          <AppShell>
+            <CampaignDetailPage />
           </AppShell>
         }
       />
