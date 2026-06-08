@@ -1,0 +1,66 @@
+---
+description: LIVBEE 메인페이지 — 섹션·카드·반응형·라우트 기획 SSOT
+alwaysApply: false
+---
+
+# 메인페이지 (Home)
+
+> 라우트: `/` (또는 `/home`) · 구현 범위: UI·목데이터 섹션까지. 실 API 추후.
+
+## 목적
+
+인기 라이브·공고·인재·클립·뉴스를 노출해 매칭·지원을 유도.
+
+## 섹션 구성 (7블록)
+
+| # | 섹션 | 카드 컴포넌트 | 전체보기 |
+|---|------|---------------|----------|
+| 1 | Hero Banner | 배열 기반 슬라이드 | 링크별 |
+| 2 | 지금 뜨는 쇼핑라이브 | `LiveCard` | `/campaigns` 등 |
+| 3 | 브랜드 PICK | `CampaignCard` | `/campaigns` |
+| 4 | 추천 쇼호스트 | `HostCard` | `/hosts` |
+| 5 | 추천 모델 | `ModelCard` | `/models` |
+| 6 | HOT CLIP | `ClipCard` | `/clips` |
+| 7 | 라이브 뉴스 | `NewsCard` | `/news` |
+
+## 카드 필드 SSOT
+
+| 컴포넌트 | 필드 |
+|----------|------|
+| Hero | `id`, `image`, `title`, `subtitle`, `link` |
+| LiveCard | `id`, `liveThumbnail`, `brandName`, `title`, `summary`, `isLive` |
+| CampaignCard | `id`, `coverImage`, `brandName`, `title`, `payment`, `applyDeadline`, `likeCount` |
+| HostCard | `id`, `profileImage`, `name`, `category`, `experienceYears` |
+| ModelCard | `id`, `profileImage`, `name`, `modelType`, `height` |
+| ClipCard | `id`, `thumbnail`, `title`, `viewCount` |
+| NewsCard | `id`, `thumbnail`, `category`, `title`, `createdAt`, `viewCount` |
+
+## 반응형
+
+| 뷰포트 | 레이아웃 |
+|--------|----------|
+| Desktop 1280+ | PC 그리드, 가로 카드 배열 |
+| Tablet 768~1279 | 3열 그리드 |
+| Mobile 375~767 | 1열 + **가로 스크롤** (라이브·호스트·모델·클립 ~1.2장, 브랜드 PICK ~2.5장) |
+
+## 라우트 (GNB)
+
+| 메뉴 | 경로 |
+|------|------|
+| 쇼호스트 | `/hosts` |
+| 모델 | `/models` |
+| 공고 | `/campaigns` |
+| 이벤트 | `/events` |
+| 뉴스 | `/news` |
+| 숏클립 | `/clips` |
+| 마이 | `/mypage` |
+
+## UI 규칙
+
+- 공통 카드 컴포넌트 재사용 (메인·목록·등록 미리보기)
+- Sticky 헤더
+- 카드 클릭 → 상세, 전체보기 → 목록
+
+## 공고 등록과의 연결
+
+메인 `LiveCard`·`CampaignCard` 필드 = `campaign-create.mdc` 등록 컬럼과 **동일 SSOT**.

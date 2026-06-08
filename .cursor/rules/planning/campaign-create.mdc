@@ -1,0 +1,151 @@
+---
+description: LIVBEE 공고 등록 — 4단계 폼·카드 매핑·검증 기획 SSOT
+alwaysApply: false
+---
+
+# 공고 등록 (Campaign Create)
+
+> 라우트: `/campaigns/create` · 구현 범위: UI·검증·목데이터까지. 실 API 연동은 추후.
+> 필드명: Supabase 컬럼형 camelCase SSOT.
+
+## 핵심 원칙
+
+- 모바일 퍼스트 반응형
+- 등록값 ↔ **LiveCard**·**CampaignCard**·상세 노출 데이터 일치
+- 입력 중 실시간 카드 미리보기
+- 이미지 비율: 라이브 썸네일 **1:1**, 대표 이미지 **4:3**
+- 출연료 **원 단위** 포맷, **종료시간 > 시작시간** 검증
+
+## 4단계 플로우
+
+| STEP | 제목 | 주요 필드 |
+|------|------|-----------|
+| 1 | 기본 정보 | `liveThumbnail`, `coverImage`, `brandName`, `title`, `summary`, `description` |
+| 2 | 모집 정보 | `recruitType`, `category`, `payment`, `recruitCount`, `location` |
+| 3 | 일정 및 장소 | `shootingDate`, `applyDeadline`, `startTime`, `endTime`, `location` |
+| 4 | 미리보기 | LiveCard·CampaignCard·상세 요약, 등록 완료 |
+
+> `location`은 STEP 2·3 모두 입력 UI에 등장. **단일 컬럼**으로 관리하고 어느 단계에서 수정해도 동기화.
+
+---
+
+## 노출 카드 vs 저장 필드 (매핑)
+
+### LiveCard (지금 뜨는 쇼핑라이브)
+
+| 카드 필드 | 저장 컬럼 |
+|-----------|-----------|
+| 썸네일 | `liveThumbnail` |
+| 브랜드명 | `brandName` |
+| 제목 | `title` |
+| 한줄 소개 | `summary` |
+| LIVE 뱃지 | `isLive` (목·추후 API) |
+
+### CampaignCard (브랜드 PICK)
+
+| 카드 필드 | 저장 컬럼 |
+|-----------|-----------|
+| 대표 이미지 | `coverImage` |
+| 브랜드명 | `brandName` |
+| 제목 | `title` |
+| 출연료 | `payment` |
+| 마감 D-day | `applyDeadline` |
+| 좋아요 수 | `likeCount` (목·추후 API, 등록 폼 입력 아님) |
+
+### 상세 페이지 추가 노출
+
+`description`, `recruitType`, `category`, `recruitCount`, `location`, `shootingDate`, `startTime`, `endTime`
+
+| 컬럼 | 주로 노출 위치 |
+|------|----------------|
+| `recruitCount` | 상세 (지원자 참고) |
+| `startTime` / `endTime` | 상세 |
+| `shootingDate` | LiveCard·CampaignCard·상세 |
+| `applyDeadline` | CampaignCard D-day·상세 |
+
+---
+
+## STEP별 입력 상세
+
+### STEP 1 — 기본 정보
+
+| 필드 | 필수 | 제약 |
+|------|------|------|
+| `coverImage` | O | JPG/PNG, 최대 10MB, 비율 **4:3**, Brand PICK·목록·상세 |
+| `liveThumbnail` | O | 비율 **1:1**, 지금 뜨는 쇼핑라이브·상세 |
+| `brandName` | O | 최대 50자 |
+| `title` | O | 최대 100자 |
+| `summary` | O | 최대 80자 |
+| `description` | O | 최대 3000자 |
+
+### STEP 2 — 모집 정보
+
+| 필드 | 필수 | 제약 |
+|------|------|------|
+| `recruitType` | O | 쇼호스트·모델·스태프·기타 |
+| `category` | O | 뷰티·패션 등 (선택 목록 TBD) |
+| `payment` | O | 숫자만, 원 단위 콤마 표시 |
+| `recruitCount` | O | 숫자, 명 단위 |
+| `location` | O | 시·구 등 텍스트 |
+
+### STEP 3 — 일정 및 장소
+
+| 필드 | 필수 | 제약 |
+|------|------|------|
+| `shootingDate` | O | YYYY-MM-DD |
+| `applyDeadline` | O | YYYY-MM-DD, Brand PICK·목록 노출 기준 |
+| `startTime` | O | HH:mm |
+| `endTime` | O | HH:mm, **시작보다 이후** |
+| `location` | O | STEP 2와 동일 값 동기화 |
+
+### STEP 4 — 미리보기
+
+- LiveCard·CampaignCard 실시간 미리보기
+- 상세 노출 정보 테이블
+- 최종 체크리스트 (비율·필수값·출연료·시간 검증)
+- 등록 완료
+
+---
+
+## 검증 규칙 (요약)
+
+**필수:** STEP 1~3 전체 필수 항목
+
+**형식:** payment 숫자 · 종료시간 > 시작시간 · 날짜 형식
+
+**글자 수:** brandName 50 · title 100 · summary 80 · description 3000
+
+---
+
+## 반응형
+
+| 뷰포트 | 레이아웃 |
+|--------|----------|
+| Desktop (1280+) | 좌 미리보기·가이드 · 중 폼 · 우 FAQ·팁 (또는 2열: 폼+미리보기) |
+| Tablet (768~1279) | 상 Stepper · 1열 폼 · 하 미리보기 |
+| Mobile (375) | 세로 스크롤 + 하단 Sticky (이전/다음·등록) |
+
+---
+
+## 네비게이션·상태
+
+| 동작 | 처리 |
+|------|------|
+| 등록 완료 | `/campaigns/:id` |
+| 뒤로가기 (STEP 1) | `/campaigns` |
+| 임시 저장 | 현재 페이지 유지 + Toast |
+
+---
+
+## 모델 프로필 등록과 공통 재사용
+
+- 4단계 위저드 훅·레이아웃 패턴 (`useModelCreateWizard` 구조)
+- UI 원자: Button, Input, Textarea, Toast, Stepper
+- styled-components theme·breakpoints
+- `data/repositories` + `mocks` 패턴
+
+## 확인 필요 (기획 보강 시)
+
+- `category` 선택지 목록 확정
+- `isLive`·`likeCount` 목 초기값 정책
+- AppShell·글로벌 헤더/푸터 (공고·모델 공통)

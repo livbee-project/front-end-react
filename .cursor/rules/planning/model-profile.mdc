@@ -1,0 +1,138 @@
+---
+description: LIVBEE 모델 프로필 등록 — 4단계 폼·필드·검증·반응형 기획 SSOT
+alwaysApply: false
+---
+
+# 모델 프로필 등록 (Model Profile Create)
+
+> 라우트: `/models/create` · 구현 범위: UI·검증·목데이터까지. 실 API 연동은 추후.
+> 필드명: Supabase 컬럼형 camelCase SSOT.
+
+## 핵심 원칙
+
+- 모바일 퍼스트 반응형
+- 등록값 ↔ `ModelCard`·상세 노출 데이터 일치
+- 입력 중 실시간 미리보기
+- 평점·팔로워 수·SNS 수치 **미사용**
+
+## 4단계 플로우
+
+| STEP | 제목 | 주요 필드 |
+|------|------|-----------|
+| 1 | 기본 정보 | `profileImage`, `name`, `summary`, `description`, `modelType`, `height`, `weight`, `location` |
+| 2 | 포트폴리오 | `galleryImages`, `portfolioFiles`, `recentWorkUrl` |
+| 3 | 연락처 | `contactEmail`, `contactPhone`, `openChatUrl` + 각 **공개 여부** 토글 |
+| 4 | 미리보기/완료 | `tags`, 전체 미리보기, 등록 완료 |
+
+---
+
+## 노출 블록 vs 저장 필드 (매핑)
+
+체크리스트·상세 UI는 **섹션(블록) 이름**으로 말하고, 폼·DB·목데이터는 **컬럼 이름**을 쓴다.
+구현 시 엔티티·폼 state는 **컬럼명** 기준, 상세 페이지는 컬럼을 묶어 **블록**으로 렌더한다.
+
+### ModelCard (목록·추천 카드)
+
+| 블록 | 사용 컬럼 |
+|------|-----------|
+| 카드 전체 | `profileImage`, `name`, `modelType`, `height` |
+
+연락처·태그·갤러리 등은 **카드에 노출하지 않음**.
+
+### 상세 페이지 블록 → 컬럼 매핑
+
+| 상세 블록 (기획·체크리스트) | 저장 컬럼 | 상세에서 보여주는 내용 |
+|----------------------------|-----------|------------------------|
+| `description` | `summary`, `description` | 한줄 소개 + 상세 소개 텍스트 |
+| `gallery` | `galleryImages` | 이미지 그리드·캐러셀 (최대 9장) |
+| `portfolio` | `portfolioFiles` | 파일 목록 (이미지/PDF/영상, 최대 10개) |
+| `contact` | `contactEmail`, `contactPhone`, `openChatUrl`, `recentWorkUrl` + 각 `*Public` | 공개 ON인 항목만 연락 버튼·링크 노출 |
+| `tags` | `tags` | 해시태그 칩 (최대 5개) |
+
+기본 정보 중 상세에만 추가 노출: `weight`, `location` 등 (카드엔 없음).
+
+### 연락처 블록 (`contact`) 상세
+
+| 입력 필드 | 공개 여부 필드 | 필수 | 비고 |
+|-----------|----------------|------|------|
+| `contactEmail` | `contactEmailPublic` | 선택 | 이메일 |
+| `contactPhone` | `contactPhonePublic` | **필수**(값) | 목록 카드엔 미노출, 상세는 토글 ON 시만 |
+| `openChatUrl` | `openChatPublic` | 선택 | 카카오 오픈채팅 URL |
+| `recentWorkUrl` | `recentWorkUrlPublic` | 선택 | 최근 활동·인스타 등 외부 링크, URL 검증 |
+
+> STEP 4 미리보기의 「이메일·연락처·인스타 공개」= 위 `*Public` 토글과 동일 개념.
+> `recentWorkUrl`이 인스타·활동 링크 역할이며, 공개 여부는 `recentWorkUrlPublic`.
+
+---
+
+## STEP별 입력 상세
+
+### STEP 1 — 기본 정보
+
+| 필드 | 필수 | 제약 |
+|------|------|------|
+| `profileImage` | O | JPG/PNG, 최대 5MB, 비율 3:4 |
+| `name` | O | 최대 20자 |
+| `summary` | O | 최대 50자 |
+| `description` | O | 최대 500자 |
+| `modelType` | O | 여성·남성·키즈·시니어·피팅·뷰티·스포츠·기타 |
+| `height` | O | cm, 숫자 |
+| `weight` | X | kg, 숫자 |
+| `location` | O | 서울·경기·인천·부산·대구·대전·광주·기타 |
+
+### STEP 2 — 포트폴리오
+
+| 필드 | 필수 | 제약 |
+|------|------|------|
+| `galleryImages` | X | 3:4 권장, 최대 9장, JPG/PNG |
+| `portfolioFiles` | X | 최대 10개, JPG/PNG/PDF/MP4/MOV |
+| `recentWorkUrl` | X | URL 형식 + 검증 버튼 |
+
+### STEP 3 — 연락처
+
+| 필드 | 필수 | 제약 |
+|------|------|------|
+| `contactPhone` | O | 전화번호 형식 |
+| `contactEmail` | X | 이메일 형식 |
+| `openChatUrl` | X | URL 형식 |
+| `contactPhonePublic` | — | 연락처 상세 공개 |
+| `contactEmailPublic` | — | 이메일 상세 공개 |
+| `openChatPublic` | — | 오픈채팅 상세 공개 |
+| `recentWorkUrlPublic` | — | 활동·인스타 링크 상세 공개 |
+
+### STEP 4 — 미리보기/완료
+
+| 필드 | 필수 | 제약 |
+|------|------|------|
+| `tags` | X | 최대 5개 |
+| — | — | ModelCard + 상세 요약 미리보기, 최종 체크리스트 |
+
+---
+
+## 검증 규칙 (요약)
+
+**필수값:** `profileImage`, `name`, `summary`, `description`, `modelType`, `height`, `location`, `contactPhone`
+
+**글자 수:** name 20 · summary 50 · description 500
+
+**개수·형식:** tags 5 · galleryImages 9 · portfolioFiles 10 · URL 형식 검증
+
+---
+
+## 반응형
+
+| 뷰포트 | 레이아웃 |
+|--------|----------|
+| Desktop | 좌 Step Nav · 중 폼 · 우 실시간 미리보기 |
+| Tablet | 상 Stepper · 중 1열 폼 · 하 미리보기 |
+| Mobile (375px) | 세로 스크롤 + 하단 Sticky (다음/완료), STEP 4 전체 미리보기 |
+
+---
+
+## 네비게이션·상태
+
+| 동작 | 처리 |
+|------|------|
+| 등록 완료 | `/models/:id` |
+| 뒤로가기 | `/models` |
+| 임시 저장 | 현재 페이지 유지 + Toast |
