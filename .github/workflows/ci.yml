@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [renewal, dev, prod]
+  pull_request:
+    branches: [renewal, dev, prod]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_DEPLOY_TARGET: renewal
+          VITE_API_URL: https://dev-api.livbee.co.kr/api/v1
+          VITE_APP_TITLE: Livbee
+          VITE_DEBUG_LOG_ENABLED: false
+          VITE_USE_COMMUNITY_MOCK: false

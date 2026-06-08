@@ -1,0 +1,49 @@
+---
+description: .env 단일 파일 환경 변수 관리·Vercel 연동 규칙
+alwaysApply: true
+---
+
+# 환경 변수 파일 규칙
+
+## 권한
+
+- 에이전트는 루트 **`.env` 파일에 대한 읽기·생성·수정·키 추가 권한**을 가진다.
+- 환경 변수 추가·변경 시 **코드와 `.env`를 함께** 갱신한다 (`src/shared/config/env.ts` SSOT).
+
+## 절대 금지
+
+- **`.env.example`**, `.env.sample`, `.env.template` 생성·수정·제안 금지
+- `.env.local`, `.env.development`, `.env.production` 등 **분리 파일 생성 금지** — 루트 `.env` 하나로 통합
+- 코드에 API URL·시크릿·키를 **하드코딩** 금지 (`import.meta.env` 직접 산재 참조 금지)
+
+## 필수
+
+- `.env`는 **저장소 루트**에만 둔다
+- Vite 노출 변수는 `VITE_` 접두사 사용
+- 앱에서 환경 값은 **`src/shared/config/env.ts`만** 통해 읽는다
+- 새 `VITE_*` 키 추가 시: `.env` 주석 + `env.ts` + `vite-env.d.ts` 동시 반영
+- 기존 `.env` 내용·주석은 유지한 채 필요한 키만 추가·갱신
+
+## Vercel 배포
+
+- 환경 4종: **Production** (`prod`) · **Preview** (`dev` 등) · **renewal** (Custom) · **Development**
+- 상세 절차: `frontend-vercel-deployment.mdc` 참고
+- renewal은 **Custom Environment**로 등록, 도메인은 **`*.vercel.app` 임시만** 사용
+- Vercel Environment Variables에 **`.env`와 동일한 `VITE_*` 키**를 환경별로 등록 (로컬은 `.env`만)
+- 빌드: `npm run build`, 출력: `dist`, Node: `.nvmrc`(24) 기준
+- SPA 라우팅은 `vercel.json` rewrites로 처리
+
+## 키 목록 (SSOT)
+
+| 키 | 용도 |
+|----|------|
+| `VITE_API_URL` | API 베이스 URL |
+| `VITE_KAKAO_JS_KEY` | 카카오 JS SDK 키 |
+| `VITE_KAKAO_REST_KEY` | 카카오 REST API 키 |
+| `VITE_KAKAO_REDIRECT_URI` | 카카오 OAuth 리다이렉트 URI |
+| `VITE_DEBUG_LOG_ENABLED` | 디버그 로그 on/off |
+| `VITE_DEBUG_LOG_ENDPOINT` | 디버그 로그 수집 엔드포인트 |
+| `VITE_USE_COMMUNITY_MOCK` | 커뮤니티 목 데이터 사용 |
+| `VITE_APP_TITLE` | 앱 타이틀 |
+| `VITE_DEPLOY_TARGET` | 배포 대상 (`local` / `renewal` / `production` / `preview`) |
+| `VITE_DEPLOY_URL` | 배포 URL (Vercel 빌드 시 `VERCEL_URL` 자동 주입) |

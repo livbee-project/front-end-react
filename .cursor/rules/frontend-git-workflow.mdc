@@ -1,0 +1,70 @@
+---
+description: Git 워크플로·커밋 메시지·PowerShell 한글 인코딩 규칙
+alwaysApply: true
+---
+
+# 프론트엔드 Git 워크플로
+
+## 1. 절대 금지
+
+- 사용자가 **"커밋해줘"**, **"푸시해줘"**, **"커밋 준비"** 등으로 명시하기 전:
+  - `git commit`, `git push` 실행 금지
+- **"커밋 준비"** = 스테이징 + 메시지 **제안만** (실제 커밋·푸시 금지)
+
+## 2. 커밋 메시지 포맷 (필수)
+
+한 줄, 다음 형식만 사용:
+
+```
+YYMMDD > <type> > 작업내용 한줄 요약
+```
+
+**type** (소문자 하나):
+- `feat` — 기능 추가·변경
+- `fix` — 버그 수정
+- `chore` — 구조·설정·의존성·규칙
+- `build` — 빌드·번들·TS/ESLint/Vite 설정
+- `docs` — 문서
+- `refactor` — 동작 동일, 구조만 변경
+- `test` — 테스트
+
+**예시**:
+- `260602 > refactor > 반응형 카드 그리드 SSOT 정리 및 Storybook·MyClips 반영`
+- `260608 > build > Vite 8·React 19·TypeScript 6 환경 초기 세팅`
+
+**금지 포맷**: `YYMMDD > front-end > react > …` (2026-06 이후 사용 안 함)
+
+**날짜 규칙**: 매번 터미널에서 조회 — PowerShell `Get-Date -Format "yyMMdd"`. 추측·맥락 날짜 사용 금지.
+
+**요약**: 한국어, 80자 내외, 무엇을·왜 했는지 명확히.
+
+## 3. 명령 위치
+
+- `package.json`, `src/`, `.env`는 **저장소 루트** 기준
+- `npm install`, `npm run dev`, `npm run build`, `npm run lint`는 **항상 루트**에서 실행
+
+## 4. PowerShell 한글 깨짐 방지
+
+Windows에서 한글 커밋·터미널 출력 시:
+
+```powershell
+chcp 65001
+$OutputEncoding = [Console]::OutputEncoding = [Text.UTF8Encoding]::UTF8
+```
+
+**커밋 시 (UTF-8 BOM 없음)**:
+
+```powershell
+$msg = "YYMMDD > type > 한줄요약"
+[System.IO.File]::WriteAllText("$PWD\commit_message.txt", $msg, [System.Text.UTF8Encoding]::new($false))
+chcp 65001; git commit -F commit_message.txt
+```
+
+- `git commit -m "한글"` 직접 사용 지양 (인코딩 깨짐 위험)
+- `commit_message.txt`는 `.gitignore`에 포함됨 — 커밋 후 삭제 가능
+
+## 5. 커밋·푸시 실행 시
+
+1. 커밋 준비 전 `npm run build` 성공 확인
+2. `git commit`과 `git push`는 **순차** 실행 (같은 응답에서 병렬 금지)
+3. `git config` 변경, `--no-verify`, force push는 사용자 명시 요청 없이 금지

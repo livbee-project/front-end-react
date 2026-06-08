@@ -1,0 +1,68 @@
+---
+description: Vercel Custom Environment(renewal)·vercel.app 임시 도메인 배포 규칙
+alwaysApply: true
+---
+
+# Vercel 배포 — renewal 커스텀 환경
+
+## 환경 구분 (4종)
+
+| Vercel 환경 | 용도 | Git 브랜치 | 도메인 |
+|-------------|------|------------|--------|
+| **Production** | 실서비스 | `prod` (기존 유지) | 추후 커스텀 도메인 |
+| **Preview** | PR·기타 브랜치 | `dev` 등 | `*-git-*-*.vercel.app` (자동) |
+| **renewal** (Custom) | 리뉴얼 전용 | `renewal` | `*.vercel.app` 임시 도메인 |
+| **Development** | `vercel dev` 로컬 | — | localhost |
+
+> Custom Environment **renewal**은 Production·Preview와 **별도**로 환경 변수·도메인을 관리한다.
+> Pro 플랜 이상에서 Environments > Create Environment 로 생성. (Hobby는 Preview + 브랜치별 변수로 대체)
+
+## 대시보드 설정 (renewal 신규 등록)
+
+1. **Project** → **Settings** → **Environments** → **Create Environment**
+2. Name: `renewal`
+3. **Branch Tracking**: `equals` → `renewal`
+4. **Domains**: 커스텀 도메인(livbee.co.kr 등) **추가하지 않음**
+   - 배포 후 자동 부여되는 **`*.vercel.app`** 만 사용
+   - 필요 시 Domains에서 `프로젝트명-git-renewal-팀.vercel.app` 형태 확인·고정
+5. **Environment Variables** (renewal 환경에만 등록):
+
+```
+VITE_DEPLOY_TARGET=renewal
+VITE_API_URL=https://dev-api.livbee.co.kr/api/v1
+VITE_APP_TITLE=Livbee (Renewal)
+VITE_KAKAO_REDIRECT_URI=https://<프로젝트>-git-renewal-<팀>.vercel.app/auth/kakao/callback
+VITE_KAKAO_JS_KEY=<키>
+VITE_KAKAO_REST_KEY=<키>
+VITE_DEBUG_LOG_ENABLED=false
+VITE_USE_COMMUNITY_MOCK=false
+```
+
+6. **Production Branch**는 `prod` 유지 (`renewal`을 Production으로 두지 않음)
+7. `renewal` 브랜치 push 시 **renewal 환경**으로 자동 배포
+
+## Hobby 플랜 대안
+
+Custom Environment 없을 때:
+
+- `renewal`은 **Preview**로 배포됨 → `*-git-renewal-*.vercel.app` 자동 생성
+- Environment Variables에서 **Preview + Git Branch `renewal`** 스코프로 동일 `VITE_*` 등록
+
+## CLI (선택)
+
+```powershell
+npx vercel link
+npx vercel deploy --target=renewal
+npx vercel env add VITE_API_URL renewal
+```
+
+## 코드 연동
+
+- `VITE_DEPLOY_TARGET`: `local` | `renewal` | `production` | `preview`
+- `VITE_DEPLOY_URL`: 빌드 시 `VERCEL_URL`이 있으면 `vite.config.ts`가 `https://` URL로 주입
+- 로컬은 `.env`만 사용, Vercel은 대시보드 renewal 환경 변수 사용
+
+## 금지
+
+- renewal에 실서비스 커스텀 도메인 연결 (임시 `vercel.app`만)
+- renewal 환경 변수를 Production에 중복 등록해 덮어쓰기
