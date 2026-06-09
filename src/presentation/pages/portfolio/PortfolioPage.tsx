@@ -1,201 +1,162 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import { Plus } from 'lucide-react';
+import {
+  filterPortfolioMockList,
+  PORTFOLIO_FILTER_OPTIONS,
+} from '@/data/sources/mocks/portfolioMockData';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
 import type { Portfolio } from '@/domain/entities/Portfolio';
+import { isPortfolioMockEnabled } from '@/shared/config/portfolioMockConfig';
+import LoginRequiredModal from '@/presentation/components/navigation/LoginRequiredModal';
+import PortfolioListCard from '@/presentation/pages/portfolio/components/PortfolioListCard';
+import type { PortfolioFilterKey } from '@/presentation/pages/portfolio/types/portfolioView';
+import {
+  PortfolioCardGrid,
+  PortfolioFilterBar,
+  PortfolioFilterButton,
+  PortfolioListMain,
+  PortfolioListPageRoot,
+  PortfolioListSection,
+  PortfolioRegisterFab,
+  PortfolioSectionHeader,
+} from '@/presentation/pages/portfolio/styles/portfolioList.styles';
 import { useRepository } from '@/presentation/hooks/common/useRepository';
 import { useListFetcher } from '@/presentation/hooks/list/useListFetcher';
-import { useListFilters } from '@/presentation/hooks/list/useListFilters';
-import { useListSearch } from '@/presentation/hooks/list/useListSearch';
-import { useScrapToggle } from '@/presentation/hooks/common/useScrapToggle';
 import { useAuth } from '@/presentation/hooks/auth/useAuth';
 import { useRoleAccess } from '@/presentation/hooks/common/useRoleAccess';
 import { useRegisterFabVisibility } from '@/presentation/hooks/common/useRegisterFabVisibility';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import { setAuthRedirectPath, setOriginPage } from '@/shared/utils/authRedirect';
-import LoginRequiredModal from '@/presentation/components/navigation/LoginRequiredModal';
-import { PortfolioSearchSection } from '@/presentation/components/portfolio/PortfolioSearchSection';
-import { PortfolioFilterRow } from '@/presentation/components/portfolio/PortfolioFilterRow';
-import { PortfolioListContent } from '@/presentation/components/portfolio/PortfolioListContent';
+import { EmptyState } from '@/presentation/components/states/EmptyState';
 
 const PortfolioPage: React.FC = () => {
   const navigate = useNavigate();
+  const useMock = isPortfolioMockEnabled();
   const { isLoggedIn } = useAuth();
   const { hasShowhostRole } = useRoleAccess();
   const { shouldHideRegisterFab } = useRegisterFabVisibility('showhost');
   const { showToast } = useToast();
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [activeFilter, setActiveFilter] = useState<PortfolioFilterKey>('전체');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const { searchInputValue, setSearchInputValue, searchQuery, handleSearchSubmit, clearSearch } = useListSearch();
-  const { activeFilter, setActiveFilter } = useListFilters<string>('전체');
-  const { handleScrapToggle, isScrapped } = useScrapToggle();
 
   const portfolioRepository = useRepository(PortfolioRepository);
-
-  // query 객체 메모이제이션
-  const query = useMemo(
-    () => ({
-      page: currentPage,
-      limit: 20,
-      search: searchQuery || undefined,
-    }),
-    [currentPage, searchQuery]
-  );
+  const query = useMemo(() => ({ page: 1, limit: 20 }), []);
 
   const {
-    data: portfolios,
+    data: apiPortfolios,
     loading,
     error,
-    totalPages,
   } = useListFetcher<
     Portfolio,
-    { page: number; limit: number; search?: string },
+    { page: number; limit: number },
     PortfolioRepository,
-    { items: Portfolio[]; currentPage?: number; totalPages?: number; totalItems?: number }
+    { items: Portfolio[]; currentPage?: number; totalPages?: number }
   >({
     repository: portfolioRepository,
     method: 'getPortfolioList',
     query,
-    dependencies: [currentPage, searchQuery],
+    dependencies: [],
     errorMessage: '포트폴리오 목록을 불러오는 중 오류가 발생했습니다.',
-    cacheKey: `portfolio-list-${JSON.stringify(query)}`,
+    cacheKey: 'portfolio-list-page',
+    enabled: !useMock,
   });
 
-  const filteredPortfolios = useMemo(() => {
-    // TODO: 필터 기능은 추후 카테고리 데이터 추가 시 구현
-    return portfolios;
-  }, [portfolios]);
+  const mockListItems = useMemo(
+    () => filterPortfolioMockList(activeFilter),
+    [activeFilter],
+  );
 
-  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    handleSearchSubmit(event);
-    setCurrentPage(1);
-  };
+  const apiListItems = useMemo(() => {
+    if (useMock) return [];
 
-  const handleFilterChange = (value: string) => {
-    setActiveFilter(value);
-    setCurrentPage(1);
-  };
+    return apiPortfolios.map((portfolio) => ({
+      id: portfolio.id,
+      name: portfolio.nickname ?? '이름 없음',
+      summary: portfolio.oneLineIntro ?? '',
+      profileImage: portfolio.mainThumbnailUrl ?? '',
+      category: '전체',
+      experienceYears: portfolio.experienceYears ?? 0,
+    }));
+  }, [apiPortfolios, useMock]);
 
-  const handleCardClick = (portfolioId: string) => {
-    navigate(`/portfolios/${portfolioId}`);
-  };
+  const listItems = useMock ? mockListItems : apiListItems;
+  const isLoading = useMock ? false : loading;
+  const listError = useMock ? null : error;
 
-  const handleScrapClick = (portfolioId: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-    handleScrapToggle(portfolioId);
-  };
-
-  const handleRetry = () => {
-    setCurrentPage(1);
-    clearSearch();
+  const handleRegisterClick = () => {
+    if (!isLoggedIn) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+    if (!hasShowhostRole) {
+      showToast('쇼호스트 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
+      return;
+    }
+    navigate('/portfolios/register');
   };
 
   return (
-    <PageWrapper>
-      <PageInner>
-        <PortfolioSearchSection
-          value={searchInputValue}
-          onChange={setSearchInputValue}
-          onSubmit={handleFormSubmit}
-        />
+    <PortfolioListPageRoot>
+      <PortfolioListMain>
+        <PortfolioFilterBar aria-label="쇼호스트 필터">
+          {PORTFOLIO_FILTER_OPTIONS.map((filter) => (
+            <PortfolioFilterButton
+              key={filter}
+              type="button"
+              $active={activeFilter === filter}
+              onClick={() => setActiveFilter(filter)}
+            >
+              {filter}
+            </PortfolioFilterButton>
+          ))}
+        </PortfolioFilterBar>
 
-        <PortfolioFilterRow activeFilter={activeFilter} onFilterChange={handleFilterChange} />
+        <PortfolioListSection>
+          <PortfolioSectionHeader>
+            <div>
+              <h2>
+                추천 <em>쇼호스트</em>
+              </h2>
+              <p>홈 카드와 동일한 정보 기준으로 노출됩니다.</p>
+            </div>
+            <span>{listItems.length}명</span>
+          </PortfolioSectionHeader>
 
-        <PortfolioListContent
-          filteredPortfolios={filteredPortfolios}
-          loading={loading}
-          error={error}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          isScrapped={isScrapped}
-          onCardClick={handleCardClick}
-          onScrapClick={handleScrapClick}
-          onPageChange={setCurrentPage}
-          onRetry={handleRetry}
-        />
-      </PageInner>
+          {isLoading ? <p>불러오는 중...</p> : null}
+          {listError ? <p>{listError}</p> : null}
 
-      {!shouldHideRegisterFab && (
-        <RegisterFab
-          type="button"
-          onClick={() => {
-            if (!isLoggedIn) {
-              setIsLoginModalOpen(true);
-              return;
-            }
-            if (!hasShowhostRole) {
-              showToast('쇼호스트 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
-              return;
-            }
-            navigate('/portfolios/register');
-          }}
-        aria-label="쇼호스트 등록"
-      >
-        <Plus size={24} strokeWidth={2.5} />
-      </RegisterFab>
-      )}
+          {!isLoading && !listError && listItems.length === 0 ? (
+            <EmptyState message="등록된 쇼호스트가 없습니다." />
+          ) : null}
+
+          {!isLoading && !listError && listItems.length > 0 ? (
+            <PortfolioCardGrid>
+              {listItems.map((item) => (
+                <PortfolioListCard key={item.id} item={item} />
+              ))}
+            </PortfolioCardGrid>
+          ) : null}
+        </PortfolioListSection>
+      </PortfolioListMain>
+
+      {!shouldHideRegisterFab ? (
+        <PortfolioRegisterFab type="button" onClick={handleRegisterClick} aria-label="쇼호스트 등록">
+          +
+        </PortfolioRegisterFab>
+      ) : null}
 
       <LoginRequiredModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
         onConfirm={() => {
-          // 현재 페이지 경로 저장 (권한 불일치 시 돌아갈 페이지)
           setOriginPage('/portfolios');
-          // 등록 페이지 경로 저장 (로그인 성공 시 이동할 페이지)
           setAuthRedirectPath('/portfolios/register');
           setIsLoginModalOpen(false);
           navigate('/login?userType=showhost', { replace: true });
         }}
       />
-    </PageWrapper>
+    </PortfolioListPageRoot>
   );
 };
-
-const PageWrapper = styled.div`
-  min-height: 100vh;
-  background: ${({ theme }) => theme.colors.background};
-  padding: 2rem 1rem 6rem;
-  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 2.5rem 1.5rem 6rem;
-  }
-  @media (min-width: ${({ theme }) => theme.breakpoints.desktop}) {
-    padding: 3rem 2rem 6rem;
-  }
-`;
-
-const PageInner = styled.div`
-  max-width: 960px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.xl};
-`;
-
-const RegisterFab = styled.button`
-  position: fixed;
-  right: ${({ theme }) => theme.spacing.xl};
-  bottom: 6rem;
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: ${({ theme }) => theme.radii.full};
-  border: none;
-  background: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.primaryForeground};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 12px 24px ${({ theme }) => theme.primaryOpacity['35']};
-  cursor: pointer;
-  z-index: 50;
-  transition: transform 0.2s, background 0.2s;
-  &:hover {
-    background: ${({ theme }) => theme.colors.primaryHover};
-    transform: scale(1.05);
-  }
-  &:active {
-    transform: scale(0.98);
-  }
-`;
 
 export default PortfolioPage;
