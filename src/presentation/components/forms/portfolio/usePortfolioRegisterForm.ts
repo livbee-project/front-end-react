@@ -13,6 +13,7 @@ import { usePortfolioImageManagement } from '@/presentation/components/forms/por
 import { usePortfolioFormStorage } from '@/presentation/components/forms/portfolio/hooks/usePortfolioFormStorage';
 import { formatFileSize } from '@/shared/constants/fileUpload';
 import { error as logError } from '@/shared/utils/logger';
+import { isPortfolioMockEnabled } from '@/shared/config/portfolioMockConfig';
 
 const INITIAL_FORM_DATA: PortfolioFormData = {
   registrationType: 'showhost',
@@ -191,6 +192,14 @@ export const usePortfolioRegisterForm = () => {
     const validation = validatePortfolioForm(formData, toggles);
     if (!validation.isValid) {
       showToast(validation.errorMessage || '입력 정보를 확인해주세요.', undefined, 'error');
+      return;
+    }
+
+    if (isPortfolioMockEnabled()) {
+      clearStorage();
+      clearImageUrls();
+      showToast('포트폴리오가 등록되었습니다.', undefined, 'success');
+      navigate('/portfolios', { replace: true });
       return;
     }
 

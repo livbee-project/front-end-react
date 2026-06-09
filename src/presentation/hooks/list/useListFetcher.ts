@@ -9,6 +9,7 @@ interface UseListFetcherOptions<Q, R extends object> {
   errorMessage?: string;
   cacheKey?: string;
   cacheTime?: number;
+  enabled?: boolean;
 }
 
 /**
@@ -28,6 +29,7 @@ export function useListFetcher<
   errorMessage,
   cacheKey,
   cacheTime,
+  enabled,
 }: UseListFetcherOptions<Q, R>) {
   const fetchFunction = useRepositoryListMethod<T, Q, R, Response>(repository, method);
 
@@ -36,6 +38,7 @@ export function useListFetcher<
   return useListData<T, Q, Response>(fetchFunction, query, dependencies, errorMessage, {
     cacheKey: resolvedCacheKey,
     cacheTime,
+    enabled,
   });
 }
 

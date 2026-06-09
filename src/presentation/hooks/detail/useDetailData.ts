@@ -17,6 +17,8 @@ interface DetailDataOptions {
   cacheKey?: string;
   cacheTime?: number;
   onError?: (message: string) => void;
+  /** false면 API 호출 없이 loading만 해제 */
+  enabled?: boolean;
 }
 
 export function useDetailData<T>(
@@ -28,9 +30,15 @@ export function useDetailData<T>(
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const { cacheKey, cacheTime = 5 * 60 * 1000, onError } = options;
+  const { cacheKey, cacheTime = 5 * 60 * 1000, onError, enabled = true } = options;
 
   useEffect(() => {
+    if (!enabled) {
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     const abortController = new AbortController();
     let isCancelled = false;
 
@@ -87,7 +95,7 @@ export function useDetailData<T>(
       abortController.abort();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, enabled]);
 
   const updateData = useCallback(
     (updater: React.SetStateAction<T | null>) => {

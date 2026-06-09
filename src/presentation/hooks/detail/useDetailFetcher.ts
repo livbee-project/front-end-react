@@ -9,6 +9,7 @@ interface UseDetailFetcherOptions<R extends object> {
   errorMessage?: string;
   cacheKey?: string;
   cacheTime?: number;
+  enabled?: boolean;
 }
 
 /**
@@ -22,6 +23,7 @@ export function useDetailFetcher<T, R extends object>({
   errorMessage,
   cacheKey,
   cacheTime,
+  enabled,
 }: UseDetailFetcherOptions<R>) {
   const fetchFunction = useRepositoryMethod<T, R>(repository, method);
   const handleError = useErrorHandler(errorMessage);
@@ -32,6 +34,7 @@ export function useDetailFetcher<T, R extends object>({
     cacheKey: resolvedCacheKey,
     cacheTime,
     onError: handleError,
+    enabled,
   });
 }
 
