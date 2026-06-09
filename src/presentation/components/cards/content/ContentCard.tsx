@@ -27,7 +27,10 @@ import {
 import { useTheme } from 'styled-components';
 
 const variantSupportsFavorite = (variant: ContentCardProps['variant']) =>
-  variant === 'showhost' || variant === 'ad' || variant === 'flip';
+  variant === 'showhost' || variant === 'ad' || variant === 'campaign' || variant === 'flip';
+
+const showsTitleLine = (variant: ContentCardProps['variant']) =>
+  variant === 'ad' || variant === 'campaign';
 
 const showsPlayOverlay = (variant: ContentCardProps['variant']) =>
   variant === 'news' || variant === 'flip';
@@ -122,7 +125,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
           </RatingRow>
         )}
 
-        {variant === 'ad' && title && (
+        {showsTitleLine(variant) && title && (
           <EllipsisText>
             <TitleLine>{title}</TitleLine>
           </EllipsisText>

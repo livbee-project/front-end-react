@@ -1,6 +1,6 @@
 import type { MouseEvent, ReactNode } from 'react';
 
-export type ContentCardVariant = 'live' | 'showhost' | 'ad' | 'news' | 'flip';
+export type ContentCardVariant = 'live' | 'showhost' | 'ad' | 'campaign' | 'news' | 'flip';
 
 export interface ContentCardProps {
   variant: ContentCardVariant;

@@ -8,6 +8,7 @@ const variantAspectRatio: Record<ContentCardVariant, keyof AppTheme['aspectRatio
   live: 'live',
   showhost: 'host',
   ad: 'ad',
+  campaign: 'campaign',
   news: 'news',
   flip: 'flip',
 };
