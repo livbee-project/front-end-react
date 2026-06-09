@@ -8,6 +8,7 @@ interface ImportMetaEnv {
   readonly VITE_DEBUG_LOG_ENABLED?: string;
   readonly VITE_DEBUG_LOG_ENDPOINT?: string;
   readonly VITE_USE_COMMUNITY_MOCK?: string;
+  readonly VITE_USE_HOME_MOCK?: string;
 }
 
 interface ImportMeta {

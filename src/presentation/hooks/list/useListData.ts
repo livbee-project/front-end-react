@@ -19,6 +19,8 @@ import { dataCache } from '@/shared/state/dataCache';
 interface ListDataOptions {
   cacheKey?: string;
   cacheTime?: number;
+  /** false면 API 호출 없이 loading만 해제 (홈 목데이터 모드 등) */
+  enabled?: boolean;
 }
 
 export function useListData<T, Q, Response extends { items: T[]; currentPage?: number; totalPages?: number }>(
@@ -33,9 +35,15 @@ export function useListData<T, Q, Response extends { items: T[]; currentPage?: n
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const { cacheKey, cacheTime = 2 * 60 * 1000 } = options;
+  const { cacheKey, cacheTime = 2 * 60 * 1000, enabled = true } = options;
 
   useEffect(() => {
+    if (!enabled) {
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     const abortController = new AbortController();
     let isCancelled = false;
 
