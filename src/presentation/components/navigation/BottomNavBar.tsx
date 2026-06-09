@@ -1,82 +1,64 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useLocation, useNavigate } from 'react-router-dom';
-import BottomNavItem from '@/presentation/components/navigation/BottomNavItem';
-import { useAuth } from '@/presentation/hooks/auth/useAuth';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ROUTE_PATHS } from '@/app/routes/routeMeta';
 import { setAuthRedirectPath } from '@/shared/utils/authRedirect';
+import { useAuth } from '@/presentation/hooks/auth/useAuth';
 import LoginRequiredModal from '@/presentation/components/navigation/LoginRequiredModal';
-// 커스텀 네비게이션 아이콘 컴포넌트
-import {
-  IconHome,
-  IconSearch,
-  IconMic,
-  IconCamera,
-  IconSmile,
-} from '@/presentation/components/icons/NavigationIcons';
+import { BottomNavIcon, type BottomNavIconType } from '@/presentation/components/navigation/BottomNavIcons';
 
-/**
- * 하단 네비게이션 탭 메뉴 데이터
- * 디자인 스펙에 따라 커스텀 SVG 아이콘 사용
- */
-const TABS = [
-  { label: '홈', path: ROUTE_PATHS.home, icon: IconHome },
-  { label: '모집공고', path: ROUTE_PATHS.campaigns, icon: IconSearch },
-  { label: '쇼호스트', path: ROUTE_PATHS.portfolios, icon: IconMic },
-  { label: '모델', path: ROUTE_PATHS.models, icon: IconCamera },
-  { label: 'MY', path: ROUTE_PATHS.myPage, icon: IconSmile },
+type BottomNavKey = BottomNavIconType;
+
+const BOTTOM_TABS: ReadonlyArray<{ key: BottomNavKey; label: string; path: string }> = [
+  { key: 'home', label: '홈', path: ROUTE_PATHS.home },
+  { key: 'hosts', label: '쇼호스트', path: ROUTE_PATHS.portfolios },
+  { key: 'models', label: '모델', path: ROUTE_PATHS.models },
+  { key: 'campaigns', label: '공고', path: ROUTE_PATHS.campaigns },
+  { key: 'mypage', label: '마이페이지', path: ROUTE_PATHS.myPage },
 ];
-/**
- * 로그인이 필요한 경로
- * Flutter의 authRequiredRoutes
- * (현재는 비활성화 - 필요시 다시 활성화)
- */
+
 const AUTH_REQUIRED_PATHS = new Set<string>([ROUTE_PATHS.myPage]);
 
-/**
- * 화면 하단에 고정되는 공통 네비게이션 바 컴포넌트
- * Flutter의 CommonBottomNavBar 위젯에 해당합니다.
- */
+const primaryLight = '#f1ebff';
+
+// 하단 탭 활성 키 계산
+const resolveBottomNavKey = (pathname: string): BottomNavKey | undefined => {
+  if (pathname === ROUTE_PATHS.home) return 'home';
+  if (pathname === ROUTE_PATHS.portfolios || pathname.startsWith(`${ROUTE_PATHS.portfolios}/`)) return 'hosts';
+  if (pathname === ROUTE_PATHS.models || pathname.startsWith(`${ROUTE_PATHS.models}/`)) return 'models';
+  if (pathname === ROUTE_PATHS.campaigns || pathname.startsWith(`${ROUTE_PATHS.campaigns}/`)) return 'campaigns';
+  if (pathname === ROUTE_PATHS.myPage || pathname.startsWith(`${ROUTE_PATHS.myPage}/`)) return 'mypage';
+  return undefined;
+};
+
 const BottomNavBar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isLoggedIn } = useAuth(); // 인증 상태 가져오기
+  const { isLoggedIn } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [pendingPath, setPendingPath] = useState<string | null>(null);
+  const activeKey = resolveBottomNavKey(location.pathname);
 
-  /**
-   * 탭 클릭 시 네비게이션을 처리하는 함수
-   */
   const handleNavigate = (path: string) => {
-    // 1. 현재 경로와 같으면 아무것도 하지 않음
     if (location.pathname === path) return;
 
-    // 2. 로그인이 필요한 경로인지 확인
     if (AUTH_REQUIRED_PATHS.has(path) && !isLoggedIn) {
       setPendingPath(path);
       setIsLoginModalOpen(true);
       return;
     }
 
-    // 3. 페이지 이동
     navigate(path);
   };
 
-  /**
-   * 로그인 모달에서 로그인하기 버튼 클릭 시
-   */
   const handleLoginConfirm = () => {
-    if (pendingPath) {
-      setAuthRedirectPath(pendingPath);
-      setIsLoginModalOpen(false);
-      navigate(ROUTE_PATHS.login, { replace: true });
-      setPendingPath(null);
-    }
+    if (!pendingPath) return;
+    setAuthRedirectPath(pendingPath);
+    setIsLoginModalOpen(false);
+    navigate(ROUTE_PATHS.login, { replace: true });
+    setPendingPath(null);
   };
 
-  /**
-   * 로그인 모달 닫기
-   */
   const handleLoginModalClose = () => {
     setIsLoginModalOpen(false);
     setPendingPath(null);
@@ -84,27 +66,29 @@ const BottomNavBar: React.FC = () => {
 
   return (
     <>
-      <Nav>
-        <Wrapper>
-          {/*
-            --- (수정) TABS.map() 내부 ---
-            복잡한 <button> JSX 대신 BottomNavItem 컴포넌트를 렌더링
-          */}
-          {TABS.map((tab) => {
-            const isActive = location.pathname === tab.path;
+      <Nav aria-label="하단 네비게이션">
+        {BOTTOM_TABS.map((tab) => {
+          const isActive = activeKey === tab.key;
 
-            return (
-              <BottomNavItem
-                key={tab.path}
-                label={tab.label}
-                icon={tab.icon}
-                isActive={isActive}
-                onClick={() => handleNavigate(tab.path)}
-              />
-            );
-          })}
-        </Wrapper>
+          return (
+            <NavLink
+              key={tab.key}
+              to={tab.path}
+              $active={isActive}
+              onClick={(event) => {
+                event.preventDefault();
+                handleNavigate(tab.path);
+              }}
+            >
+              <IconWrap $active={isActive}>
+                <BottomNavIcon type={tab.key} />
+              </IconWrap>
+              <Label>{tab.label}</Label>
+            </NavLink>
+          );
+        })}
       </Nav>
+
       <LoginRequiredModal
         isOpen={isLoginModalOpen}
         onClose={handleLoginModalClose}
@@ -116,25 +100,79 @@ const BottomNavBar: React.FC = () => {
 
 const Nav = styled.nav`
   position: fixed;
+  left: 0;
+  right: 0;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: ${({ theme }) => theme.colors.background};
-  width: 100%;
-  max-width: 1200px;
+  z-index: 90;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  height: 74px;
+  padding-bottom: env(safe-area-inset-bottom);
   border-top: 1px solid ${({ theme }) => theme.colors.border};
-  box-shadow: 0 -8px 22px rgba(0, 0, 0, 0.06);
-  padding-bottom: env(safe-area-inset-bottom, 0);
-  box-sizing: border-box;
-  z-index: 100;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 -8px 22px rgba(36, 33, 43, 0.04);
+
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.tabletMin}) {
+    display: none;
+  }
 `;
 
-const Wrapper = styled.div`
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: ${({ theme }) => theme.spacing.sm} 0;
-  width: 100%;
+const NavLink = styled(Link)<{ $active: boolean }>`
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 4px;
+  min-width: 0;
+  color: ${({ $active, theme }) => ($active ? theme.colors.primary : '#4b4654')};
+  font-size: 10.5px;
+  font-weight: 850;
+  line-height: 1;
+  letter-spacing: -0.2px;
+  text-decoration: none;
+`;
+
+const IconWrap = styled.span<{ $active: boolean }>`
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  color: currentColor;
+  background: ${({ $active }) => ($active ? primaryLight : 'transparent')};
+
+  svg {
+    width: 23px;
+    height: 23px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  ${({ $active, theme }) =>
+    $active
+      ? `
+    &::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: -6px;
+      width: 4px;
+      height: 4px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: ${theme.colors.primary};
+    }
+  `
+      : ''}
+`;
+
+const Label = styled.span`
+  display: block;
+  white-space: nowrap;
 `;
 
 export default BottomNavBar;

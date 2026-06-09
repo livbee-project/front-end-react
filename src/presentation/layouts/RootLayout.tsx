@@ -112,8 +112,8 @@ const MainContent = styled.main`
   overflow-x: hidden;
   padding-bottom: 32px;
 
-  @media (max-width: 768px) {
-    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.mobileMax}) {
+    padding-bottom: calc(74px + env(safe-area-inset-bottom));
   }
 `;
 

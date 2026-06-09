@@ -1,7 +1,6 @@
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import HomeNavBar from '@/presentation/components/navigation/HomeNavBar';
-import HomeTopTabs from '@/presentation/components/navigation/HomeTopTabs';
+import AppHeader from '@/presentation/components/navigation/AppHeader';
 import { ROUTE_PATHS } from '@/app/routes/routeMeta';
 
 // 메인 헤더가 노출되는 페이지 목록
@@ -14,14 +13,6 @@ const MAIN_HEADER_PATHS = new Set([
   ROUTE_PATHS.portfolios, // 쇼호스트
   ROUTE_PATHS.models,
   ROUTE_PATHS.myPage,
-]);
-
-// 상단 탭이 노출되는 페이지 목록 (홈, 뉴스, 숏클립, 커뮤니티)
-const TOP_TABS_PATHS = new Set([
-  ROUTE_PATHS.home,
-  ROUTE_PATHS.news,
-  ROUTE_PATHS.clips,
-  ROUTE_PATHS.community,
 ]);
 
 // 뒤로가기 헤더가 있는 페이지 (메인 헤더 숨김)
@@ -54,15 +45,11 @@ const TopNavLayout: React.FC = () => {
     currentPath.startsWith('/community/') && currentPath !== ROUTE_PATHS.community;
   
   // 메인 헤더 노출 여부 (뒤로가기 헤더가 있으면 숨김)
-  const showMainHeader = MAIN_HEADER_PATHS.has(currentPath) && !hasBackHeader;
-  
-  // 상단 탭 노출 여부 (홈, 뉴스, 커뮤니티만)
-  const showTopTabs = TOP_TABS_PATHS.has(currentPath) && !hasBackHeader;
+  const showAppHeader = MAIN_HEADER_PATHS.has(currentPath) && !hasBackHeader;
 
   return (
     <div>
-      {showMainHeader && <HomeNavBar />}
-      {showTopTabs && <HomeTopTabs />}
+      {showAppHeader && <AppHeader />}
       <main>
         <Outlet />
       </main>
