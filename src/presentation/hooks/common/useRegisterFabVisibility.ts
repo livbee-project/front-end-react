@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { UserRole } from '@/domain/entities/User';
 import { useAuth } from '@/presentation/hooks/auth/useAuth';
 import { useRoleAccess } from '@/presentation/hooks/common/useRoleAccess';
+import { isRegisterFabEnabled } from '@/shared/config/registerFabConfig';
 
 type RegisterFabTargetRole = 'brand' | 'showhost';
 
@@ -14,6 +15,7 @@ type RegisterFabTargetRole = 'brand' | 'showhost';
  * @param targetRole - FAB이 필요한 역할 ('brand': 모집공고 등록, 'showhost': 쇼호스트/모델 등록)
  */
 export const useRegisterFabVisibility = (targetRole: RegisterFabTargetRole) => {
+  const fabEnabled = isRegisterFabEnabled();
   const { isLoggedIn } = useAuth();
   const { currentRole, hasBrandRole, hasShowhostRole } = useRoleAccess();
 
@@ -21,8 +23,8 @@ export const useRegisterFabVisibility = (targetRole: RegisterFabTargetRole) => {
   const oppositeRole: UserRole = targetRole === 'brand' ? 'showhost' : 'brand';
 
   const shouldHideRegisterFab = useMemo(
-    () => isLoggedIn && (currentRole === oppositeRole || !hasTargetRole),
-    [isLoggedIn, currentRole, oppositeRole, hasTargetRole]
+    () => !fabEnabled || (isLoggedIn && (currentRole === oppositeRole || !hasTargetRole)),
+    [fabEnabled, isLoggedIn, currentRole, oppositeRole, hasTargetRole]
   );
 
   return {

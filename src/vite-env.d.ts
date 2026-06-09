@@ -10,6 +10,7 @@ interface ImportMetaEnv {
   readonly VITE_USE_COMMUNITY_MOCK?: string;
   readonly VITE_USE_HOME_MOCK?: string;
   readonly VITE_USE_PORTFOLIO_MOCK?: string;
+  readonly VITE_REGISTER_FAB_ENABLED?: string;
 }
 
 interface ImportMeta {
