@@ -1,21 +1,32 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 import { PortfolioRepository } from '@/data/repositories/PortfolioRepository';
+import {
+  getPortfolioMockDetail,
+  PORTFOLIO_MOCK_LIST_VIEWS,
+} from '@/data/sources/mocks/portfolioMockData';
 import type { PortfolioDetail } from '@/domain/entities/Portfolio';
+import { isPortfolioMockEnabled } from '@/shared/config/portfolioMockConfig';
+import PortfolioDetailView from '@/presentation/pages/portfolio/components/PortfolioDetailView';
 import { useRepository } from '@/presentation/hooks/common/useRepository';
 import { useDetailFetcher } from '@/presentation/hooks/detail/useDetailFetcher';
 import { useDetailPageState } from '@/presentation/hooks/detail/useDetailPageState';
-import { useProfileDetailPage } from '@/presentation/pages/detail/shared/useProfileDetailPage';
-import { ProfileDetailContent } from '@/presentation/pages/detail/shared/ProfileDetailContent';
+import { useToast } from '@/presentation/contexts/ToastContext';
+import DetailPageLayout from '@/presentation/layouts/DetailPageLayout';
 
 const PortfolioDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-
+  const useMock = isPortfolioMockEnabled();
+  const { showToast } = useToast();
   const portfolioRepository = useRepository(PortfolioRepository);
 
+  const mockPortfolio = useMemo(
+    () => (id && useMock ? getPortfolioMockDetail(id) : null),
+    [id, useMock],
+  );
+
   const {
-    data: portfolio,
+    data: apiPortfolio,
     loading: isLoading,
     error,
   } = useDetailFetcher<PortfolioDetail, PortfolioRepository>({
@@ -23,60 +34,22 @@ const PortfolioDetailPage: React.FC = () => {
     method: 'getPortfolioById',
     id,
     errorMessage: '포트폴리오를 불러오는데 실패했습니다.',
+    enabled: !useMock,
   });
 
-  // 하드코딩된 기본 데이터 (데이터가 없을 때 사용)
-  const defaultPortfolio: PortfolioDetail = {
-    id: id || '',
-    user: '',
-    nickname: '김지현',
-    oneLineIntro: '패션 전문 쇼호스트, 5년 경력',
-    detailedIntro: '안녕하세요! 패션과 뷰티 분야에서 5년간 활동한 쇼호스트 김지현입니다.\n라이브 커머스를 통해 고객과 소통하며 브랜드 가치를 전달하는 것을 즐깁니다. 진정성 있는 소통과 전문적인 제품 설명으로 높은 구매 전환율을 자랑합니다.\n함께 성장할 수 있는 브랜드와의 협업을 기대합니다!',
-    experienceYears: 5,
-    age: null,
-    isAgePublic: false,
-    mainThumbnailUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
-    backgroundImageUrl: null,
-    subThumbnailUrls: [
-      'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=400&q=80',
-      'https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=400&q=80',
-      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80',
-      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=400&q=80',
-      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
-    ],
-    status: 'active',
-    detailedRegion: null,
-    gender: null,
-    height: 168,
-    weight: null,
-    topSize: '55(S)',
-    bottomSize: null,
-    shoeSize: null,
-    isSizingPublic: true,
-    websiteUrl: 'https://www.instagram.com/jihyun_host',
-    instagramUrl: null,
-    youtubeUrl: null,
-    tiktokUrl: null,
-    publicScope: 'public',
-    isReceivingOffers: true,
-    recentLives: [],
-    attachedFileUrl: null,
-    createdAt: '',
-    updatedAt: '',
-  };
+  const portfolio = useMock ? mockPortfolio : apiPortfolio;
+  const loading = useMock ? false : isLoading;
+  const resolvedError = useMock && !mockPortfolio ? '포트폴리오를 찾을 수 없습니다.' : error;
 
-  // 모든 Hook은 early return 이전에 호출되어야 합니다
-  const { displayData: displayPortfolio, gallery, categories, tags, websiteUrl } = useProfileDetailPage({
-    data: portfolio,
-    defaultData: defaultPortfolio,
-  });
+  const listItemCategory = useMemo(
+    () => PORTFOLIO_MOCK_LIST_VIEWS.find((item) => item.id === id)?.category,
+    [id],
+  );
 
-  // 로딩/에러 상태 처리
   const { renderState, isReady } = useDetailPageState({
     data: portfolio,
-    loading: isLoading,
-    error,
+    loading,
+    error: resolvedError,
     notFoundMessage: '포트폴리오를 찾을 수 없습니다.',
     listPath: '/portfolios',
     LayoutComponent: DetailPageLayout,
@@ -86,66 +59,17 @@ const PortfolioDetailPage: React.FC = () => {
     return <>{renderState}</>;
   }
 
-  if (!isReady) {
+  if (!isReady || !portfolio) {
     return null;
   }
 
-  const handleProfileImageClick = () => {
-    // TODO: 이미지 확대 또는 갤러리 열기 기능 구현
-  };
-
-  const handleScrap = () => {
-    // TODO: 찜하기 기능 구현
-  };
-
-  const handleOffer = () => {
-    // TODO: 제안하기 기능 구현
-  };
-
-  const handleShare = () => {
-    // TODO: 공유 기능 구현
-  };
-
   return (
-    <DetailPageLayout>
-      <ProfileDetailContent
-        header={{
-          title: displayPortfolio.nickname || '쇼호스트',
-          onShare: handleShare,
-        }}
-        profileInfo={{
-          name: displayPortfolio.nickname || '',
-          description: displayPortfolio.oneLineIntro || '',
-          detailedIntro: displayPortfolio.detailedIntro || '',
-          profileImageUrl: displayPortfolio.mainThumbnailUrl || null,
-          type: 'showhost',
-          categories,
-          tags,
-          websiteUrl: websiteUrl || '',
-        }}
-        defaults={{
-          name: '김지현',
-          description: '패션 전문 쇼호스트, 5년 경력',
-          detailedIntro: '안녕하세요! 패션과 뷰티 분야에서 5년간 활동한 쇼호스트 김지현입니다.\n라이브 커머스를 통해 고객과 소통하며 브랜드 가치를 전달하는 것을 즐깁니다. 진정성 있는 소통과 전문적인 제품 설명으로 높은 구매 전환율을 자랑합니다.\n함께 성장할 수 있는 브랜드와의 협업을 기대합니다!',
-          profileImageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
-          websiteUrl: 'https://www.instagram.com/jihyun_host',
-          categories: ['패션', '뷰티'],
-          tags: ['키 168cm', '사이즈 55(S)', '경력 5년'],
-        }}
-        gallery={{
-          images: displayPortfolio.subThumbnailUrls || [],
-          defaultImages: defaultPortfolio.subThumbnailUrls,
-          gallery,
-        }}
-        actions={{
-          onProfileImageClick: handleProfileImageClick,
-          onScrap: handleScrap,
-          onOffer: handleOffer,
-          onShare: handleShare,
-          isReceivingOffers: displayPortfolio.isReceivingOffers ?? true,
-        }}
-      />
-    </DetailPageLayout>
+    <PortfolioDetailView
+      portfolio={portfolio}
+      listItemCategory={listItemCategory}
+      onOffer={() => showToast('제안하기 기능은 준비 중입니다.', undefined, 'info')}
+      onShare={() => showToast('공유 기능은 준비 중입니다.', undefined, 'info')}
+    />
   );
 };
 
