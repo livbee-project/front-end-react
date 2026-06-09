@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#fff1fb"/>
+      <stop offset="1" stop-color="#eee7ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="44" fill="url(#bg)"/>
+  <circle cx="735" cy="210" r="112" fill="#f8d8ec"/>
+  <rect x="610" y="150" width="210" height="260" rx="88" fill="#8b63ff" opacity=".92"/>
+  <circle cx="715" cy="124" r="58" fill="#ffd8e9"/>
+  <rect x="160" y="310" width="420" height="42" rx="21" fill="#fff" opacity=".75"/>
+  <rect x="160" y="370" width="310" height="30" rx="15" fill="#fff" opacity=".65"/>
+  <text x="160" y="190" fill="#24212b" font-family="Arial" font-size="58" font-weight="700">LIVBEE</text>
+  <text x="160" y="250" fill="#8b63ff" font-family="Arial" font-size="34" font-weight="700">Live commerce portfolio</text>
+</svg>

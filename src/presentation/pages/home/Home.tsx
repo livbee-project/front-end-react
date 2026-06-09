@@ -1,45 +1,130 @@
 import React from 'react';
-import styled from 'styled-components';
-// import StoryHighlightsSection from '@/presentation/pages/home/StoryHighlightsSection';
-import ShoppingLiveSection from '@/presentation/pages/home/ShoppingLiveSection';
-import HowShowhostSection from '@/presentation/pages/home/HowShowhostSection';
-import RecommendedLiveSection from '@/presentation/pages/home/RecommendedLiveSection';
-import ConceptModelSection from '@/presentation/pages/home/ConceptModelSection';
-import HotClipSection from '@/presentation/pages/home/HotClipSection';
-import LivbeeNewsSection from '@/presentation/pages/home/LivbeeNewsSection';
-import BannerSliderSection from '@/presentation/pages/home/BannerSliderSection';
-
-const Page = styled.div`
-  background-color: ${({ theme }) => theme.colors.background};
-`;
-
-const Content = styled.main`
-  max-width: ${({ theme }) => theme.layout.maxWidth};
-  margin: 0 auto;
-  padding: 0 ${({ theme }) => theme.layout.pagePadding.mobile} 4rem;
-
-  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 0 ${({ theme }) => theme.layout.pagePadding.tablet} 4rem;
-  }
-
-  @media (min-width: ${({ theme }) => theme.breakpoints.desktop}) {
-    padding: 0 ${({ theme }) => theme.layout.pagePadding.desktop} 4rem;
-  }
-`;
+import { homeContent } from '@/presentation/pages/home/config/homeContent';
+import {
+  HomeCampaignCard,
+  HomeClipCard,
+  HomeLiveCard,
+  HomeNewsCard,
+  HomeProfileCard,
+} from '@/presentation/pages/home/components/HomeCards';
+import HomeHeroSection from '@/presentation/pages/home/components/HomeHeroSection';
+import HomeJoinCtaSection from '@/presentation/pages/home/components/HomeJoinCtaSection';
+import HomeSectionShell from '@/presentation/pages/home/components/HomeSectionShell';
+import {
+  HOME_CAMPAIGN_ITEMS,
+  HOME_CLIP_ITEMS,
+  HOME_HOST_PROFILES,
+  HOME_LIVE_ITEMS,
+  HOME_MODEL_PROFILES,
+  HOME_NEWS_DISPLAY_COUNT,
+  HOME_NEWS_ITEMS,
+} from '@/data/sources/mocks/homeMockData';
+import { HomeMain, HomeNewsGrid, HomePageRoot, HomeScrollTrack } from '@/presentation/pages/home/styles/homeDesign.styles';
 
 const Home: React.FC = () => (
-  <Page>
-    <BannerSliderSection />
-    <Content>
-      {/* <StoryHighlightsSection /> */}
-      <ShoppingLiveSection />
-      <RecommendedLiveSection />
-      <HowShowhostSection />
-      <ConceptModelSection />
-      <HotClipSection />
-      <LivbeeNewsSection />
-    </Content>
-  </Page>
+  <HomePageRoot>
+    <HomeMain>
+      <HomeHeroSection />
+
+      <HomeSectionShell
+        title={
+          <>
+            지금 뜨는 <em>쇼핑라이브</em>
+          </>
+        }
+        subtitle={homeContent.sections.liveSubtitle}
+        moreHref="/campaigns"
+      >
+        <HomeScrollTrack $preset="live">
+          {HOME_LIVE_ITEMS.map((item) => (
+            <HomeLiveCard key={item.id} item={item} />
+          ))}
+        </HomeScrollTrack>
+      </HomeSectionShell>
+
+      <HomeSectionShell
+        title={
+          <>
+            브랜드 <em>PICK</em>
+          </>
+        }
+        subtitle={homeContent.sections.brandPickSubtitle}
+        moreHref="/campaigns"
+      >
+        <HomeScrollTrack $preset="campaign">
+          {HOME_CAMPAIGN_ITEMS.map((item) => (
+            <HomeCampaignCard key={item.id} item={item} />
+          ))}
+        </HomeScrollTrack>
+      </HomeSectionShell>
+
+      <HomeSectionShell
+        title={
+          <>
+            <i>HOT</i> CLIP
+          </>
+        }
+        subtitle={homeContent.sections.clipsSubtitle}
+        moreHref="/clips"
+      >
+        <HomeScrollTrack $preset="clip">
+          {HOME_CLIP_ITEMS.map((item) => (
+            <HomeClipCard key={item.id} item={item} />
+          ))}
+        </HomeScrollTrack>
+      </HomeSectionShell>
+
+      <HomeSectionShell
+        title={
+          <>
+            추천 <em>쇼호스트</em>
+          </>
+        }
+        subtitle={homeContent.sections.hostsSubtitle}
+        moreHref="/portfolios"
+      >
+        <HomeScrollTrack $preset="profile">
+          {HOME_HOST_PROFILES.map((item) => (
+            <HomeProfileCard key={item.id} item={item} type="host" />
+          ))}
+        </HomeScrollTrack>
+      </HomeSectionShell>
+
+      <HomeSectionShell
+        title={
+          <>
+            추천 <em>모델</em>
+          </>
+        }
+        subtitle={homeContent.sections.modelsSubtitle}
+        moreHref="/models"
+      >
+        <HomeScrollTrack $preset="profile">
+          {HOME_MODEL_PROFILES.map((item) => (
+            <HomeProfileCard key={item.id} item={item} type="model" />
+          ))}
+        </HomeScrollTrack>
+      </HomeSectionShell>
+
+      <HomeSectionShell
+        title={
+          <>
+            라이비 <em>뉴스</em>
+          </>
+        }
+        subtitle={homeContent.sections.newsSubtitle}
+        moreHref="/news"
+      >
+        <HomeNewsGrid>
+          {HOME_NEWS_ITEMS.slice(0, HOME_NEWS_DISPLAY_COUNT).map((item) => (
+            <HomeNewsCard key={item.id} item={item} />
+          ))}
+        </HomeNewsGrid>
+      </HomeSectionShell>
+
+      <HomeJoinCtaSection />
+    </HomeMain>
+  </HomePageRoot>
 );
 
 export default Home;
