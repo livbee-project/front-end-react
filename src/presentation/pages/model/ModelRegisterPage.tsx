@@ -1,116 +1,87 @@
-import React from 'react';
-import {
-  PageWrapper,
-  FormContainer,
-  RegisterForm,
-} from '@/presentation/components/forms/portfolio/PortfolioRegisterStyles';
-import {
-  ProfileImageSection,
-  BasicInfoSection,
-  ContactSection,
-  SnsSection,
-  PortfolioFilesSection,
-  TagsSection,
-  GallerySection,
-} from '@/presentation/components/forms/portfolio/sections';
-import { FormSubmitSection } from '@/presentation/components/forms/common/FormSubmitSection';
-import { RegisterPageHeader } from '@/presentation/components/forms/common/RegisterPageHeader';
+import React, { useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useModelRegisterForm } from '@/presentation/components/forms/model/useModelRegisterForm';
 import { LoadingOverlay } from '@/presentation/components/states/LoadingOverlay';
+import ModelRegisterFormView from '@/presentation/pages/model/components/ModelRegisterFormView';
+import {
+  PortfolioBackLink,
+  PortfolioCreateTop,
+  PortfolioRegisterFormLayout,
+  PortfolioRegisterMain,
+  PortfolioRegisterPageRoot,
+} from '@/presentation/pages/portfolio/styles/portfolioRegister.styles';
 
 const ModelRegisterPage: React.FC = () => {
+  const navigate = useNavigate();
   const {
     formData,
-    toggles,
     mainThumbnailUrl,
     galleryImageUrls,
-    portfolioFileUrl,
+    portfolioFile,
     isSubmitting,
     isImageUploading,
     handleInputChange,
-    handleToggleChange,
     handleProfileImageSelect,
     handleGalleryImageSelect,
-    handleGalleryImageReplace,
-    handleGalleryImageRemove,
     handlePortfolioFileSelect,
-    handlePortfolioFileRemove,
-    handleFileError,
-    handleSubmit,
+    handleSubmitForm,
+    handleDraftSave,
   } = useModelRegisterForm();
 
-  // 포트폴리오 폼과 호환되도록 websites 배열 변환
-  const websitesArray = formData.websites.map((w) => w.content || '');
+  const handleCancel = () => {
+    navigate(-1);
+  };
+
+  const handleGalleryImagesSelect = useCallback(
+    (files: File[]) => {
+      files.forEach((file) => handleGalleryImageSelect(file));
+    },
+    [handleGalleryImageSelect]
+  );
+
+  const handleSimpleInputChange = useCallback(
+    (field: keyof typeof formData, value: string) => {
+      handleInputChange(field, value);
+    },
+    [handleInputChange]
+  );
 
   return (
-    <PageWrapper>
-      <RegisterPageHeader title="등록하기" />
-      <FormContainer>
-          <RegisterForm
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSubmit();
-            }}
-          >
-          <ProfileImageSection
-            thumbnailUrl={mainThumbnailUrl}
-            onSelectImage={handleProfileImageSelect}
-          />
-          <BasicInfoSection
-            name={formData.name}
-            oneLineIntro={formData.oneLineIntro}
-            detailedIntro={formData.detailedIntro}
-            onChange={(field, value) => handleInputChange(field, value)}
-          />
-          <ContactSection
-            contact={formData.contact}
-            openChat={formData.openChat}
-            contactEnabled={toggles.contact}
-            openChatEnabled={toggles.openChat}
-            onInputChange={(field, value) => handleInputChange(field, value)}
-            onToggleChange={(field) => handleToggleChange(field)}
-          />
-          <SnsSection
-            websites={websitesArray}
-            websiteToggles={toggles.websites}
-            onInputChange={(value, index) => {
-              handleInputChange('websites', value, index, 'content');
-            }}
-            onToggleChange={(index) => handleToggleChange('websites', index)}
-          />
-          <PortfolioFilesSection
-            resumeFileInfo={null}
-            portfolioFileInfo={portfolioFileUrl || null}
-            onFileAdd={handlePortfolioFileSelect}
-            onResumeRemove={() => {}}
-            onPortfolioRemove={handlePortfolioFileRemove}
-            onFileError={handleFileError}
-          />
-          <TagsSection
-            tags={formData.tags.map((t) => (typeof t === 'object' ? t.value || '' : t))}
-            tagToggles={toggles.tags}
-            onInputChange={(value, index) => {
-              handleInputChange('tags', value, index);
-            }}
-            onToggleChange={(index) => handleToggleChange('tags', index)}
-          />
-          <GallerySection
-            images={galleryImageUrls}
-            onSelectImage={handleGalleryImageSelect}
-            onReplaceImage={handleGalleryImageReplace}
-            onRemoveImage={handleGalleryImageRemove}
-          />
-          <FormSubmitSection
-            disabled={isSubmitting || isImageUploading}
-            isSubmitting={isSubmitting}
-            submitType="submit"
-          />
-          </RegisterForm>
-        </FormContainer>
-      {isSubmitting && <LoadingOverlay message="등록 중..." />}
-      </PageWrapper>
+    <PortfolioRegisterPageRoot>
+      <PortfolioRegisterMain>
+        <PortfolioCreateTop>
+          <PortfolioBackLink to="/models" aria-label="모델 목록으로 돌아가기">
+            ‹
+          </PortfolioBackLink>
+          <span>모델</span>
+          <h1>프로필 등록</h1>
+          <p>브랜드가 촬영 제안을 보낼 때 확인하는 공개 프로필입니다. 이미지와 소개를 정확히 입력해 주세요.</p>
+        </PortfolioCreateTop>
+
+        <form onSubmit={handleSubmitForm}>
+          <PortfolioRegisterFormLayout>
+            <ModelRegisterFormView
+              formData={formData}
+              mainThumbnailUrl={mainThumbnailUrl}
+              galleryImageUrls={galleryImageUrls}
+              portfolioFileName={portfolioFile?.name ?? null}
+              portfolioFileSize={portfolioFile?.size ?? null}
+              isSubmitting={isSubmitting}
+              isImageUploading={isImageUploading}
+              onInputChange={handleSimpleInputChange}
+              onProfileImageSelect={handleProfileImageSelect}
+              onGalleryImagesSelect={handleGalleryImagesSelect}
+              onPortfolioFileSelect={handlePortfolioFileSelect}
+              onDraftSave={handleDraftSave}
+              onCancel={handleCancel}
+            />
+          </PortfolioRegisterFormLayout>
+        </form>
+      </PortfolioRegisterMain>
+
+      {isSubmitting ? <LoadingOverlay message="등록 중..." /> : null}
+    </PortfolioRegisterPageRoot>
   );
 };
 
 export default ModelRegisterPage;
-

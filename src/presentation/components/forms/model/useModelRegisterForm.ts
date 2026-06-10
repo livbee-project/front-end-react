@@ -13,6 +13,7 @@ import { useModelImageManagement } from '@/presentation/components/forms/model/h
 import { useModelFormStorage } from '@/presentation/components/forms/model/hooks/useModelFormStorage';
 import { formatFileSize } from '@/shared/constants/fileUpload';
 import { error as logError } from '@/shared/utils/logger';
+import { isModelMockEnabled } from '@/shared/config/modelMockConfig';
 
 const INITIAL_FORM_DATA: ModelFormData = {
   name: '',
@@ -201,6 +202,24 @@ export const useModelRegisterForm = () => {
   );
 
   const handleSubmit = useCallback(async () => {
+    if (isModelMockEnabled()) {
+      clearStorage();
+      clearImageUrls();
+      showToast('모델이 등록되었습니다.', undefined, 'success');
+      navigate('/models', { replace: true });
+      return;
+    }
+
+    const hasContractContact = Boolean(formData.contact.trim() || formData.openChat.trim());
+    if (!hasContractContact) {
+      showToast(
+        '계약 후 연락을 위해 연락처 또는 오픈채팅 링크 중 하나를 입력해주세요.',
+        undefined,
+        'error'
+      );
+      return;
+    }
+
     // 유효성 검사
     const validation = validateModelForm(formData, toggles);
     if (!validation.isValid) {
@@ -299,12 +318,29 @@ export const useModelRegisterForm = () => {
     showToast,
   ]);
 
+  const handleSubmitForm = useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      if (!isSubmitting && !isImageUploading) {
+        void handleSubmit();
+      }
+    },
+    [handleSubmit, isImageUploading, isSubmitting]
+  );
+
+  // test_codex 임시저장 — 목 모드에서 토스트 표시
+  const handleDraftSave = useCallback(() => {
+    saveFormData();
+    showToast('프로필을 임시저장했습니다.', undefined, 'success');
+  }, [saveFormData, showToast]);
+
   return {
     formData,
     toggles,
     mainThumbnailUrl,
     galleryImageUrls,
     portfolioFileUrl,
+    portfolioFile,
     isSubmitting,
     isImageUploading,
     handleInputChange,
@@ -318,6 +354,8 @@ export const useModelRegisterForm = () => {
     handlePortfolioFileRemove,
     handleFileError,
     handleSubmit,
+    handleSubmitForm,
+    handleDraftSave,
   };
 };
 
