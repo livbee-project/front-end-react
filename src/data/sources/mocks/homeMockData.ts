@@ -154,53 +154,7 @@ export const HOME_HOST_PROFILES: HomeProfileItem[] = [
   },
 ];
 
-export const HOME_MODEL_PROFILES: HomeProfileItem[] = [
-  {
-    id: 'model-jang',
-    profileImage: modelJang,
-    name: '장원영',
-    summary: '화사하고 고급스러운 이미지로 뷰티와 패션 브랜드 무드를 선명하게 표현하는 모델',
-    modelType: '키즈모델',
-    height: 173,
-  },
-  {
-    id: 'model-yujimin',
-    profileImage: modelYujimin,
-    name: '유지민',
-    summary: '도회적이고 시크한 분위기로 패션, 뷰티, 테크 브랜드 촬영에 잘 어울리는 모델',
-    modelType: '패션모델',
-    height: 168,
-  },
-  {
-    id: 'model-may',
-    profileImage: hostMay,
-    name: '메이',
-    summary: '청순하고 맑은 분위기로 뷰티와 패션 이미지를 섬세하게 표현하는 모델',
-    modelType: '뷰티모델',
-  },
-  {
-    id: 'model-jena',
-    profileImage: hostJena,
-    name: '제나',
-    summary: '세련되고 도회적인 이미지로 패션과 브랜드 화보에 잘 어울리는 모델',
-    modelType: '패션모델',
-  },
-  {
-    id: 'model-woni',
-    profileImage: hostWoni,
-    name: '원이',
-    summary: '밝고 생동감 있는 이미지로 라이프스타일과 데일리룩 촬영에 적합한 모델',
-    modelType: '피팅모델',
-  },
-  {
-    id: 'model-arin',
-    profileImage: cardFashion,
-    name: '아린',
-    summary: '자연스러운 라이프스타일 이미지와 편안한 데일리 무드',
-    modelType: '라이프모델',
-    height: 170,
-  },
-];
+export { HOME_MODEL_PROFILES } from '@/data/sources/mocks/modelMockData';
 
 export const HOME_CLIP_ITEMS: HomeClipItem[] = [
   {
