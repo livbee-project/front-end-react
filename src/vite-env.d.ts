@@ -13,6 +13,8 @@ interface ImportMetaEnv {
   readonly VITE_USE_MODEL_MOCK?: string;
   readonly VITE_REGISTER_FAB_ENABLED?: string;
   readonly VITE_REGISTER_FAB_SKIP_AUTH?: string;
+  readonly VITE_DEPLOY_TARGET?: string;
+  readonly VITE_DEPLOY_URL?: string;
 }
 
 interface ImportMeta {
