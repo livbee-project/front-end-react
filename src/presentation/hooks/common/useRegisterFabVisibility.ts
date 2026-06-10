@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import type { UserRole } from '@/domain/entities/User';
 import { useAuth } from '@/presentation/hooks/auth/useAuth';
 import { useRoleAccess } from '@/presentation/hooks/common/useRoleAccess';
-import { isRegisterFabEnabled } from '@/shared/config/registerFabConfig';
+import { isRegisterFabAuthSkipped, isRegisterFabEnabled } from '@/shared/config/registerFabConfig';
 
 type RegisterFabTargetRole = 'brand' | 'showhost';
 
@@ -16,16 +16,18 @@ type RegisterFabTargetRole = 'brand' | 'showhost';
  */
 export const useRegisterFabVisibility = (targetRole: RegisterFabTargetRole) => {
   const fabEnabled = isRegisterFabEnabled();
+  const skipAuth = isRegisterFabAuthSkipped();
   const { isLoggedIn } = useAuth();
   const { currentRole, hasBrandRole, hasShowhostRole } = useRoleAccess();
 
   const hasTargetRole = targetRole === 'brand' ? hasBrandRole : hasShowhostRole;
   const oppositeRole: UserRole = targetRole === 'brand' ? 'showhost' : 'brand';
 
-  const shouldHideRegisterFab = useMemo(
-    () => !fabEnabled || (isLoggedIn && (currentRole === oppositeRole || !hasTargetRole)),
-    [fabEnabled, isLoggedIn, currentRole, oppositeRole, hasTargetRole]
-  );
+  const shouldHideRegisterFab = useMemo(() => {
+    if (!fabEnabled) return true;
+    if (skipAuth) return false;
+    return isLoggedIn && (currentRole === oppositeRole || !hasTargetRole);
+  }, [fabEnabled, skipAuth, isLoggedIn, currentRole, oppositeRole, hasTargetRole]);
 
   return {
     shouldHideRegisterFab,

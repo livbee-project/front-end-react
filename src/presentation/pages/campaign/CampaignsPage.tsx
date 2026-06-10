@@ -9,11 +9,8 @@ import { useListFetcher } from '@/presentation/hooks/list/useListFetcher';
 import { useListFilters } from '@/presentation/hooks/list/useListFilters';
 import { useListSearch } from '@/presentation/hooks/list/useListSearch';
 import { useScrapToggle } from '@/presentation/hooks/common/useScrapToggle';
-import { useAuth } from '@/presentation/hooks/auth/useAuth';
-import { useRoleAccess } from '@/presentation/hooks/common/useRoleAccess';
+import { useRegisterFabAction } from '@/presentation/hooks/common/useRegisterFabAction';
 import { useRegisterFabVisibility } from '@/presentation/hooks/common/useRegisterFabVisibility';
-import { useToast } from '@/presentation/contexts/ToastContext';
-import { setAuthRedirectPath, setOriginPage } from '@/shared/utils/authRedirect';
 import LoginRequiredModal from '@/presentation/components/navigation/LoginRequiredModal';
 import { CampaignSearchSection } from '@/presentation/components/campaign/CampaignSearchSection';
 import { CampaignFilterRow } from '@/presentation/components/campaign/CampaignFilterRow';
@@ -24,12 +21,20 @@ type FilterValue = '전체' | Campaign['category'];
 const CampaignsPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isLoggedIn, currentRole } = useAuth();
-  const { hasBrandRole } = useRoleAccess();
   const { shouldHideRegisterFab } = useRegisterFabVisibility('brand');
-  const { showToast } = useToast();
+  const {
+    handleRegisterClick,
+    isLoginModalOpen,
+    closeLoginModal,
+    confirmLoginRedirect,
+  } = useRegisterFabAction({
+    registerPath: '/campaigns/register',
+    originPage: '/campaigns',
+    redirectPath: '/campaigns/register',
+    targetRole: 'brand',
+    roleErrorMessage: '브랜드 권한 사용자만 이용 가능한 기능입니다.',
+  });
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const { searchInputValue, setSearchInputValue, searchQuery, handleSearchSubmit, clearSearch } = useListSearch();
   const { activeFilter, setActiveFilter } = useListFilters<FilterValue>('전체');
   const { handleScrapToggle, isScrapped } = useScrapToggle();
@@ -128,40 +133,15 @@ const CampaignsPage: React.FC = () => {
       </PageInner>
 
       {!shouldHideRegisterFab && (
-        <RegisterFab
-          type="button"
-          onClick={() => {
-            if (!isLoggedIn) {
-              setIsLoginModalOpen(true);
-              return;
-            }
-            if (currentRole && currentRole !== 'brand') {
-              showToast('브랜드 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
-              return;
-            }
-            if (!hasBrandRole) {
-              showToast('브랜드 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
-              return;
-            }
-            navigate('/campaigns/register');
-          }}
-          aria-label="모집공고 등록"
-        >
+        <RegisterFab type="button" onClick={handleRegisterClick} aria-label="모집공고 등록">
           <Plus size={24} strokeWidth={2.5} />
         </RegisterFab>
       )}
 
       <LoginRequiredModal
         isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        onConfirm={() => {
-          // 현재 페이지 경로 저장 (권한 불일치 시 돌아갈 페이지)
-          setOriginPage('/campaigns');
-          // 등록 페이지 경로 저장 (로그인 성공 시 이동할 페이지)
-          setAuthRedirectPath('/campaigns/register');
-          setIsLoginModalOpen(false);
-          navigate('/login', { replace: true });
-        }}
+        onClose={closeLoginModal}
+        onConfirm={confirmLoginRedirect}
       />
     </PageWrapper>
   );

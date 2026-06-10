@@ -5,6 +5,7 @@ import { useAuth } from '@/presentation/hooks/auth/useAuth';
 import { useToast } from '@/presentation/contexts/ToastContext';
 import type { UserRole } from '@/domain/entities/User';
 import { setAuthRedirectPath, consumeOriginPage, hasAuthRedirectPath } from '@/shared/utils/authRedirect';
+import { isRegisterPageAuthSkipped } from '@/shared/config/registerFabConfig';
 
 interface AuthGuardProps {
   children: React.ReactElement;
@@ -24,6 +25,10 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   const location = useLocation();
   const { isLoggedIn, isLoading, user, currentRole } = useAuth();
   const { showToast } = useToast();
+
+  if (isRegisterPageAuthSkipped(location.pathname)) {
+    return children;
+  }
 
   // Role mismatch 체크 (다중 역할 계정 지원)
   // currentRole이 있으면 현재 활성화된 역할도 확인

@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   filterPortfolioMockList,
   PORTFOLIO_FILTER_OPTIONS,
@@ -22,22 +21,27 @@ import {
 } from '@/presentation/pages/portfolio/styles/portfolioList.styles';
 import { useRepository } from '@/presentation/hooks/common/useRepository';
 import { useListFetcher } from '@/presentation/hooks/list/useListFetcher';
-import { useAuth } from '@/presentation/hooks/auth/useAuth';
-import { useRoleAccess } from '@/presentation/hooks/common/useRoleAccess';
+import { useRegisterFabAction } from '@/presentation/hooks/common/useRegisterFabAction';
 import { useRegisterFabVisibility } from '@/presentation/hooks/common/useRegisterFabVisibility';
-import { useToast } from '@/presentation/contexts/ToastContext';
-import { setAuthRedirectPath, setOriginPage } from '@/shared/utils/authRedirect';
 import { EmptyState } from '@/presentation/components/states/EmptyState';
 
 const PortfolioPage: React.FC = () => {
-  const navigate = useNavigate();
   const useMock = isPortfolioMockEnabled();
-  const { isLoggedIn } = useAuth();
-  const { hasShowhostRole } = useRoleAccess();
   const { shouldHideRegisterFab } = useRegisterFabVisibility('showhost');
-  const { showToast } = useToast();
+  const {
+    handleRegisterClick,
+    isLoginModalOpen,
+    closeLoginModal,
+    confirmLoginRedirect,
+  } = useRegisterFabAction({
+    registerPath: '/portfolios/register',
+    originPage: '/portfolios',
+    redirectPath: '/portfolios/register',
+    targetRole: 'showhost',
+    roleErrorMessage: '쇼호스트 권한 사용자만 이용 가능한 기능입니다.',
+    loginPath: '/login?userType=showhost',
+  });
   const [activeFilter, setActiveFilter] = useState<PortfolioFilterKey>('전체');
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const portfolioRepository = useRepository(PortfolioRepository);
   const query = useMemo(() => ({ page: 1, limit: 20 }), []);
@@ -82,18 +86,6 @@ const PortfolioPage: React.FC = () => {
   const listItems = useMock ? mockListItems : apiListItems;
   const isLoading = useMock ? false : loading;
   const listError = useMock ? null : error;
-
-  const handleRegisterClick = () => {
-    if (!isLoggedIn) {
-      setIsLoginModalOpen(true);
-      return;
-    }
-    if (!hasShowhostRole) {
-      showToast('쇼호스트 권한 사용자만 이용 가능한 기능입니다.', undefined, 'error');
-      return;
-    }
-    navigate('/portfolios/register');
-  };
 
   return (
     <PortfolioListPageRoot>
@@ -147,13 +139,8 @@ const PortfolioPage: React.FC = () => {
 
       <LoginRequiredModal
         isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        onConfirm={() => {
-          setOriginPage('/portfolios');
-          setAuthRedirectPath('/portfolios/register');
-          setIsLoginModalOpen(false);
-          navigate('/login?userType=showhost', { replace: true });
-        }}
+        onClose={closeLoginModal}
+        onConfirm={confirmLoginRedirect}
       />
     </PortfolioListPageRoot>
   );
