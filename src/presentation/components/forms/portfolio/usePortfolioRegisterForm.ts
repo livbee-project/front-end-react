@@ -188,18 +188,28 @@ export const usePortfolioRegisterForm = () => {
   }, []);
 
   const handleSubmit = useCallback(async () => {
-    // 유효성 검사
-    const validation = validatePortfolioForm(formData, toggles);
-    if (!validation.isValid) {
-      showToast(validation.errorMessage || '입력 정보를 확인해주세요.', undefined, 'error');
-      return;
-    }
-
     if (isPortfolioMockEnabled()) {
       clearStorage();
       clearImageUrls();
       showToast('포트폴리오가 등록되었습니다.', undefined, 'success');
       navigate('/portfolios', { replace: true });
+      return;
+    }
+
+    const hasContractContact = Boolean(formData.contact.trim() || formData.openChat.trim());
+    if (!hasContractContact) {
+      showToast(
+        '계약 후 연락을 위해 연락처 또는 오픈채팅 링크 중 하나를 입력해주세요.',
+        undefined,
+        'error'
+      );
+      return;
+    }
+
+    // 유효성 검사
+    const validation = validatePortfolioForm(formData, toggles);
+    if (!validation.isValid) {
+      showToast(validation.errorMessage || '입력 정보를 확인해주세요.', undefined, 'error');
       return;
     }
 
@@ -312,6 +322,12 @@ export const usePortfolioRegisterForm = () => {
     [handleSubmit, isImageUploading, isSubmitting]
   );
 
+  // test_codex 임시저장 — 목 모드에서만 토스트 표시
+  const handleDraftSave = useCallback(() => {
+    saveFormData();
+    showToast('프로필을 임시저장했습니다.', undefined, 'success');
+  }, [saveFormData, showToast]);
+
   return {
     formData,
     toggles,
@@ -319,6 +335,8 @@ export const usePortfolioRegisterForm = () => {
     galleryImageUrls,
     resumeFileUrl,
     portfolioFileUrl,
+    portfolioFile,
+    resumeFile,
     isSubmitting,
     isImageUploading,
     handleInputChange,
@@ -332,6 +350,7 @@ export const usePortfolioRegisterForm = () => {
     handlePortfolioFileRemove,
     handleFileError,
     handleSubmitForm,
+    handleDraftSave,
   };
 };
 
