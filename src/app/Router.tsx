@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import type { Location } from 'react-router-dom';
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense } from 'react';
 import '@/presentation/styles/global.css';
 import TopNavLayout from '@/presentation/layouts/TopNavLayout';
 import RootLayout from '@/presentation/layouts/RootLayout';
@@ -8,31 +8,7 @@ import { AuthProvider } from '@/presentation/hooks/auth/useAuth';
 import { AuthGuard } from '@/presentation/routes/AuthGuard';
 import { ROUTE_PATHS, ROUTE_ROLE_PERMISSIONS } from '@/app/routes/routeMeta';
 import { RouteFallback } from '@/presentation/components/states/RouteFallback';
-import { error as logError } from '@/shared/utils/logger';
-
-// 동적 임포트에 에러 핸들링 추가 (Vite HMR 이슈 대응)
-// lazy()는 페이지별 props 타입이 달라 공통 제네릭에 any가 필요함
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const lazyWithRetry = <T extends React.ComponentType<any>>(
-  importFn: () => Promise<{ default: T }>
-): React.LazyExoticComponent<T> => {
-  return lazy(() =>
-    importFn().catch((error) => {
-      logError('Router', 'Failed to load module:', error);
-      // 재시도 로직: 1초 후 다시 시도
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          importFn()
-            .then(resolve)
-            .catch((retryError) => {
-              logError('Router', 'Retry failed:', retryError);
-              throw retryError;
-            });
-        }, 1000);
-      });
-    })
-  );
-};
+import { lazyWithRetry } from '@/shared/utils/lazyWithRetry';
 
 const Home = lazyWithRetry(() => import('@/presentation/pages/home/Home'));
 const CampaignsPage = lazyWithRetry(() => import('@/presentation/pages/campaign/CampaignsPage'));
@@ -66,6 +42,7 @@ const CommunityPostWritePage = lazyWithRetry(
 const CommunityPostWriteModal = lazyWithRetry(
   () => import('@/presentation/components/community/CommunityPostWriteModal')
 );
+const NotFoundPage = lazyWithRetry(() => import('@/presentation/pages/error/NotFoundPage'));
 
 interface LocationState {
   backgroundLocation?: Location;
@@ -244,6 +221,8 @@ const AppRoutes: React.FC = () => {
             </AuthGuard>
           }
         />
+
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
       {/* 모달 라우트: backgroundLocation 이 있을 때만 렌더링 (커뮤니티 상세 모달 등) */}

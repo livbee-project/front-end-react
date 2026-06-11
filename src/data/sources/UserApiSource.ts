@@ -188,6 +188,7 @@ export class UserApiSource implements IUserApiSource {
           method: 'GET',
           headers,
           signal,
+          suppressToast: true,
         },
         '내 정보 조회'
       );

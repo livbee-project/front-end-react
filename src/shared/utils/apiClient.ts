@@ -36,7 +36,15 @@ const handleNetworkError = (error: unknown, defaultMessage: string): Error => {
   return new Error(defaultMessage);
 };
 
-const notifyApiError = (message: string, status?: number, context?: string) => {
+const notifyApiError = (
+  message: string,
+  status?: number,
+  context?: string,
+  suppressToast = false
+) => {
+  if (suppressToast) {
+    return;
+  }
   emitApiErrorEvent({ message, status, context });
 };
 
@@ -48,6 +56,8 @@ export interface ApiRequestOptions {
   headers?: HeadersInit;
   body?: BodyInit;
   signal?: AbortSignal;
+  /** true면 ApiErrorToastListener에 토스트를 띄우지 않음 (호출부에서 처리) */
+  suppressToast?: boolean;
 }
 
 /**
@@ -64,7 +74,7 @@ export async function fetchApi<T>(
   options: ApiRequestOptions = {},
   errorContext: string = '요청'
 ): Promise<T> {
-  const { method = 'GET', headers, body, signal } = options;
+  const { method = 'GET', headers, body, signal, suppressToast = false } = options;
 
   // 1. 네트워크 요청 실행
   let response: Response;
@@ -77,7 +87,7 @@ export async function fetchApi<T>(
     });
   } catch (error) {
     const networkError = handleNetworkError(error, `${errorContext} 요청 중 오류가 발생했습니다.`);
-    notifyApiError(networkError.message, undefined, errorContext);
+    notifyApiError(networkError.message, undefined, errorContext, suppressToast);
     throw networkError;
   }
 
@@ -102,11 +112,11 @@ export async function fetchApi<T>(
         errorText,
       });
       const parsingError = new Error(`${errorContext}에 실패했습니다. (${response.status})`);
-      notifyApiError(parsingError.message, response.status, errorContext);
+      notifyApiError(parsingError.message, response.status, errorContext, suppressToast);
       throw parsingError;
     }
     const unknownFormatError = new Error('예상치 못한 응답 형식입니다.');
-    notifyApiError(unknownFormatError.message, response.status, errorContext);
+    notifyApiError(unknownFormatError.message, response.status, errorContext, suppressToast);
     throw unknownFormatError;
   }
 
@@ -139,7 +149,7 @@ export async function fetchApi<T>(
       });
     }
     const apiError = new ApiError(errorMessage || `${errorContext}에 실패했습니다.`, response.status, result);
-    notifyApiError(apiError.message, apiError.status, errorContext);
+    notifyApiError(apiError.message, apiError.status, errorContext, suppressToast);
     throw apiError;
   }
 
